@@ -2,13 +2,16 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Algorithm Nexus is a comprehensive framework for delivering and managing
-multiple AI models within a unified Python environment. It enables seamless
-integration of models built with different libraries and frameworks, providing
-robust dependency management, testing, and benchmarking capabilities to ensure
-reliable model deployment and operation.
+> **Note:** This project is in the very early stages of planning and
+> development. There is currently no functional code.
 
-## Features
+This library aims to robustly package a diverse set of AI models and frameworks
+within a unified Python environment, enabling seamless deployment and management
+of multiple models with different dependencies.
+
+## Roadmap
+
+### Goals
 
 - **Multi-Model Support**: Deploy and manage multiple AI models using different
   libraries (PyTorch, TensorFlow, scikit-learn, etc.) within the same Python
@@ -20,50 +23,11 @@ reliable model deployment and operation.
 - **Benchmarking**: Performance benchmarking tools to compare and optimize model
   performance
 
-## Quick Start
-
-### Prerequisites
-
-- Python 3.10 or higher
-- [uv](https://github.com/astral-sh/uv) for dependency management
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/IBM/algorithm-nexus.git
-cd algorithm-nexus
-
-# Install dependencies using uv
-uv sync
-```
-
-### Development Setup
-
-```bash
-# Install development dependencies (includes pre-commit and linting tools)
-uv sync --group dev
-
-# Install pre-commit hooks (recommended)
-pre-commit install --install-hooks
-pre-commit install --hook-type commit-msg
-```
-
-For detailed development setup instructions, see our
-[Contributing Guide](CONTRIBUTING.md).
-
-## Documentation
-
-For more information, see our [Contributing Guide](CONTRIBUTING.md).
-
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md)
-for details on:
-
-- Code of conduct
-- Development setup
-- Coding standards
+This project is currently in closed beta. We are not accepting external
+contributions at this time. For IBM contributors, please see our
+[Contributing Guide](CONTRIBUTING.md) for development setup and guidelines.
 
 ## License
 
