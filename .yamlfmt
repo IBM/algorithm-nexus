@@ -1,0 +1,14 @@
+# yamlfmt configuration
+# See https://github.com/google/yamlfmt
+
+formatter:
+  type: basic
+  indent: 2
+  include_document_start: false
+  line_ending: lf
+  retain_line_breaks: true
+  max_line_length: 120
+  scan_folded_as_literal: false
+  indentless_arrays: false
+  drop_merge_tag: false
+  pad_line_comments: 2
