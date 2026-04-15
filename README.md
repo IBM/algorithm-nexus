@@ -11,17 +11,18 @@ of multiple models with different dependencies.
 
 ## Roadmap
 
-### Goals
-
-- **Multi-Model Support**: Deploy and manage multiple AI models using different
-  libraries (PyTorch, TensorFlow, scikit-learn, etc.) within the same Python
-  environment
-- **Dependency Management**: Intelligent dependency resolution and conflict
-  detection across different model requirements
-- **Testing Framework**: Comprehensive testing infrastructure for model
-  validation and integration testing
-- **Benchmarking**: Performance benchmarking tools to compare and optimize model
-  performance
+- (E/O April 2026) **Cross-Model package dependency resolution**:
+  - Dependency resolution and conflict detection across different model package
+    requirements
+  - Dependency resolution for models served with vLLM
+  - Executed in CI/CD workflow
+- (E/O April 2026) **Models testing**:
+  - Initial CI/CD workflow for functional models testing
+- (E/O May 2026) **vLLM integration tests**:
+  - Extended CI/CD workflow with integrationtests for models served with vLLM
+- (E/O May 2026) **Agentic skills contributing a model**:
+  - Skill files for agentic aided generation of new model PRs
+- TBD
 
 ## Contributing
 
