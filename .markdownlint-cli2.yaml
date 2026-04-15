@@ -1,0 +1,42 @@
+# Markdownlint-cli2 configuration
+# See https://github.com/DavidAnson/markdownlint-cli2
+
+# Globs to ignore
+globs:
+  - "**/*.md"
+  - "!.venv/**"
+  - "!.tox/**"
+  - "!node_modules/**"
+  - "!**/node_modules/**"
+
+# Markdownlint configuration
+config:
+  # Default state for all rules
+  default: true
+
+  # MD013/line-length - Line length
+  MD013:
+    line_length: 120
+    heading_line_length: 120
+    code_block_line_length: 120
+    code_blocks: false
+    tables: false
+    headings: true
+    strict: false
+    stern: false
+
+  # MD033/no-inline-html - Inline HTML
+  MD033:
+    allowed_elements:
+      - br
+      - details
+      - summary
+      - img
+      - a
+
+  # MD041/first-line-heading - First line in file should be a top level heading
+  MD041: false
+
+  # MD046/code-block-style - Code block style
+  MD046:
+    style: fenced

@@ -1,0 +1,87 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
+default_stages: [pre-commit]
+
+repos:
+  # detect-secrets - Detect secrets in code
+  - repo: https://github.com/ibm/detect-secrets
+    rev: 0.13.1+ibm.64.dss
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline, --use-all-plugins, --fail-on-unaudited]
+
+  # Black - Python code formatter
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.3.1
+    hooks:
+      - id: black-jupyter
+        language_version: python3
+
+  # Ruff - Python linter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Conventional commits
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args:
+          - --no-color
+          - --verbose
+
+  # Codespell - Check for common misspellings
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.2
+    hooks:
+      - id: codespell
+        additional_dependencies: ['tomli']
+        args: ['--toml', 'pyproject.toml']
+
+  # UV lock check
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.6
+    hooks:
+      - id: uv-lock
+      - id: uv-export
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--output-file=requirements.txt"]
+
+  # Copywrite - License header management
+  - repo: https://github.com/hashicorp/copywrite
+    rev: v0.25.2
+    hooks:
+      - id: add-headers
+
+  # Markdownlint - Markdown linting
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.22.0
+    hooks:
+      - id: markdownlint-cli2
+
+  # Yamlfmt - YAML formatting
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.21.0
+    hooks:
+      - id: yamlfmt
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-json
+      - id: mixed-line-ending
