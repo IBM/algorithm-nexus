@@ -3,54 +3,94 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Requirements for a Nexus package
+# Requirements for a Nexus Package
 
-A Nexus package encapsulates a Python package and its associated models,
-providing standardized metadata for validation, testing, and integration.
-Contributors must provide both package-level information and model-specific
-details to ensure proper cataloging and operational readiness within the
-Algorithm Nexus ecosystem.
+**Status:** Proposed
 
-## Nexus Package Requirements
+## 1. Introduction
 
-| Requirement        | Description                                                                              |
-| ------------------ | ---------------------------------------------------------------------------------------- |
-| **Identifier**     | Unique Nexus package identifier (lowercase, hyphenated format, e.g., "transformers-llm") |
-| **Metadata**       | Package name, description and link to documentation                                      |
-| **Python package** | Name or URL of the python package                                                        |
-| **Version**        | Version of the python package                                                            |
-| **Models**         | List of the models supported by this package                                             |
+This document outlines the requirements for defining a Nexus package and the
+models it contains. A Nexus package encapsulates a Python package together with
+its associated models, providing standardized metadata for validation, testing,
+benchmarking, and integration within the Algorithm Nexus ecosystem.
 
-## Model Requirements
+---
 
-The table below summarises the requirements for each model in the Nexus Package
+## 2. Core Requirements
 
-| Requirement       | Description                                                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Identifier**    | Unique model identifier (lowercase, hyphenated format, e.g., "terramind-flood"). No two models can have the same name in Algorithm Nexus |
-| **Metadata**      | Model name, version, description, and link to documentation                                                                              |
-| **Model weights** | Name of the Hugging Face repository hosting the model weights, and version of the weights                                                |
-| **Testing**       | Artifacts for testing the model (see the [testing requirements](./models_testing.md))                                                    |
-| **Benchmarking**  | Artifacts for benchmarking the model (e.g., script, and specific benchmarking requirements)                                              |
-| **Model Owner**   | GitHub ID of the model owner                                                                                                             |
+### REQ-1: Nexus Package Definition
 
-Notes:
+A Nexus package **must** define the package-level metadata and assets required
+for cataloging and distribution.
 
-- The benchmarking and testing might endup being unified depending on the
-  outcomes of #8 and #18
+- **REQ-1.1 (Identifier):** A Nexus package **must** define a unique package
+  identifier using lowercase, hyphenated format (for example,
+  `transformers-llm`).
 
-### Optional requirements
+- **REQ-1.2 (Metadata):** A Nexus package **must** provide package metadata,
+  including its name, description, and a link to its documentation.
 
-The table below summarizes optional requirements for integrating models with
-agent frameworks and production systems.
+- **REQ-1.3 (Python Package):** A Nexus package **must** specify the Python
+  package name or the URL from which the package can be obtained.
 
-| Requirement           | Description                                                                                                                                                                                                                                                                                                                         |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model usage**       | Documentation on how to use the model. This includes a combination of text and code snippets to help model users in getting started with a specific model. Differently to the documentation info in the metadata, this should be committed as part of the Nexus package for further use in project documentation and agentic skills |
-| **Agent Integration** | Information on integration with agent frameworks (LangChain, AutoGPT, MCP servers, custom agents). This includes a combination of text and code snippets demonstrating integration with agent frameworks.                                                                                                                           |
-| **Observability**     | Information on integration with observability frameworks/standards (e.g., OpenTelemetry). This includes a combination of text and code snippets demonstrating integration with observability frameworks.                                                                                                                            |
-| **vLLM integration**  | Information related to serving the model with vLLM, including any vLLM specific plugins required to be installed in the python environment used for serving.                                                                                                                                                                        |
+- **REQ-1.4 (Version):** A Nexus package **must** specify the version of the
+  Python package.
 
-Notes:
+- **REQ-1.5 (Supported Models):** A Nexus package **must** declare the list of
+  models supported by the package.
 
-- The requirements for vLLM integration will be detailed in the future.
+### REQ-2: Model Definition
+
+Each model contained in a Nexus package **must** define the model-level metadata
+and operational artifacts required for integration into Algorithm Nexus.
+
+- **REQ-2.1 (Identifier):** Each model **must** define a unique model identifier
+  using lowercase, hyphenated format (for example, `terramind-flood`). No two
+  models in Algorithm Nexus may share the same identifier.
+
+- **REQ-2.2 (Metadata):** Each model **must** provide metadata including its
+  name, version, description, and a link to its documentation.
+
+- **REQ-2.3 (Model Weights):** Each model **must** specify the Hugging Face
+  repository hosting the model weights together with the version of those
+  weights.
+
+- **REQ-2.4 (Testing):** Each model **must** provide the artifacts required for
+  testing the model, as defined in
+  [Requirements for Model Testing](./models_testing.md).
+
+- **REQ-2.5 (Benchmarking):** Each model **must** provide the artifacts required
+  for benchmarking, such as scripts and any model-specific benchmarking
+  requirements.
+
+- **REQ-2.6 (Model Owner):** Each model **must** specify the GitHub ID of the
+  model owner.
+
+### REQ-3: Optional Integration Requirements
+
+A Nexus package **may** provide additional artifacts that support integration
+with agent frameworks, production systems, and serving runtimes.
+
+- **REQ-3.1 (Model Usage):** A model **may** provide usage documentation that
+  combines explanatory text and code snippets to help users get started. Unlike
+  the documentation link included in model metadata, this material should be
+  committed as part of the Nexus package for reuse in project documentation and
+  agentic skills.
+
+- **REQ-3.2 (Agent Integration):** A model **may** provide documentation and
+  examples for integration with agent frameworks such as LangChain, AutoGPT, MCP
+  servers, or custom agents.
+
+- **REQ-3.3 (Observability):** A model **may** provide documentation and
+  examples for integration with observability frameworks or standards such as
+  OpenTelemetry.
+
+- **REQ-3.4 (vLLM Integration):** A model **may** provide information related to
+  serving the model with `vllm`, including any `vllm`-specific plugins required
+  in the Python environment used for serving.
+
+## 3. Notes
+
+- Benchmarking and testing requirements may be unified in the future, depending
+  on the outcomes of issues #8 and #18.
+- Requirements for `vllm` integration will be detailed in the future.

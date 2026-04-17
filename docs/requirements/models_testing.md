@@ -3,56 +3,93 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Models Testing Requirements
+# Requirements for Model Testing
 
-This section defines the requirements for testing of models within Algorithm
+**Status:** Proposed
+
+## 1. Introduction
+
+This document outlines the requirements for testing models within Algorithm
 Nexus. Model tests validate that models operate correctly, produce expected
 outputs, and integrate properly with the platform. Contributors must provide
-comprehensive test suites that cover model initialization, inference, and
-integration scenarios.
+test suites that cover model initialization, inference, execution, and
+integration scenarios in a way that is reproducible and suitable for CI/CD
+environments.
 
-## Test Infrastructure Requirements
+---
 
-The table below outlines the infrastructure and environment requirements for
-testing models.
+## 2. Core Requirements
 
-| Requirement                 | Description                                                                                                                                                                              |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Hardware Specifications** | Minimum and recommended hardware for running tests. Must specify: GPU requirements (type, memory, count), CPU requirements, RAM requirements, and whether CPU-only fallback is supported |
-| **Test Dependencies**       | Python packages required for testing (e.g., pytest, unittest), version constraints, and any additional testing tools or frameworks                                                       |
-| **Test Fixtures**           | Reusable test components, test configurations, and setup/teardown procedures                                                                                                             |
+### REQ-1: Test Infrastructure
 
-## Test Implementation Requirements
+The testing setup **must** define the infrastructure and environment required to
+run model tests consistently.
 
-The table below specifies what must be included in the tests implementation.
+- **REQ-1.1 (Hardware Specifications):** Testing requirements **must** specify
+  the minimum and recommended hardware needed to run the tests, including GPU
+  requirements (type, memory, and count), CPU requirements, RAM requirements,
+  and whether CPU-only fallback is supported.
 
-| Requirement                  | Description                                                                                                                                                                                         |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model loading tests**      | Tests validating the model can be properly loaded                                                                                                                                                   |
-| **Inference tests**          | Tests at least one single inference (one input-one-output) and validates the value of the output is correct. Optionally other inference modes can be tested to (e.g., batch of inferences or ...) . |
-| **vLLM Integration Testing** | Tests verifying model loading and inference with vLLM. This test is optional.                                                                                                                       |
+- **REQ-1.2 (Test Dependencies):** Testing requirements **must** specify the
+  Python packages needed for testing, including version constraints and any
+  additional tools or frameworks required.
 
-Test implementations should follow pytest conventions and best practices, and
-all tests must be reproducible and deterministic. Test data retrieval must be
-part of the test itself. Also, tests should be designed to run in CI/CD
-environments with limited resources (both compute and storage).
+- **REQ-1.3 (Test Fixtures):** Testing requirements **must** define reusable
+  test components, test configurations, and any setup or teardown procedures.
+  Test fixtures must be delivered in the form of a python module.
 
-Notes:
+### REQ-2: Test Coverage Requirements
 
-- Implementation requirements do not have to be addressed one by one in
-  dedicated tests, they can also be all fulfilled in a single test.
-- The requirements for vLLM integration will be detailed in the future.
+Model tests **must** validate the required loading and inference behaviour for a
+model.
 
-## Test Execution Requirements
+- **REQ-2.1 (Model Loading Tests):** Tests **must** validate that the model can
+  be loaded correctly.
 
-The table below defines how tests should be executed and validated.
+- **REQ-2.2 (Inference Tests):** Tests **must** execute at least one inference
+  scenario using a single input and validate that the produced output is
+  correct. Additional inference modes, such as batched inference, may also be
+  tested.
 
-| Requirement       | Description                                                                                                                                                     |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Test Commands** | Specific commands to run tests (e.g., `pytest tests/models/model-id/`), commands for different test categories, and any required environment variables or flags |
-| **Test Duration** | Expected execution time for full test suite, execution time for individual test categories, and timeout configurations                                          |
+- **REQ-2.3 (vLLM Integration Testing):** Tests **must** verify model loading
+  and inference with `vllm`. **This requirement is optional**.
 
-Notes:
+### REQ-3: Test Implementation Conventions
 
-- The duration of the test could be capped at the AlgorithmNexus level, with
-  users requested to provide tests that run within a pre-defined amount of time.
+Model test implementations **must** follow conventions that make them reliable,
+reproducible, and suitable for automated execution.
+
+- **REQ-3.1 (Pytest Conventions):** Test implementations **must** follow
+  `pytest` conventions and testing best practices.
+
+- **REQ-3.2 (Reproducibility):** All tests **must** be reproducible and
+  deterministic.
+
+- **REQ-3.3 (Test Data Retrieval):** Retrieval of any test data **must** be part
+  of the test itself and **must not** require authentication.
+
+- **REQ-3.4 (CI/CD Suitability):** Tests **must** be designed to run in CI/CD
+  environments with limited compute and storage resources.
+
+### REQ-4: Test Execution
+
+The testing specification **must** define how tests are executed and what
+runtime expectations apply.
+
+- **REQ-4.1 (Test Commands):** The testing specification **must** provide the
+  commands used to run tests, such as `pytest tests/models/model-id/`, including
+  commands for different test categories and any required environment variables
+  or flags.
+
+- **REQ-4.2 (Test Duration):** The testing specification **must** define the
+  expected execution time for the full test suite, the expected execution time
+  for individual test categories, and any timeout configurations.
+
+## 3. Notes
+
+- Test Coverage requirements (REQ-2) do not need to be addressed one by one in
+  dedicated tests; they may also be fulfilled within a single test.
+- Requirements for `vllm` integration will be detailed in the future.
+- Test duration may eventually be capped at the Algorithm Nexus level, with
+  contributors expected to provide tests that run within a predefined time
+  limit.
