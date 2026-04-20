@@ -33,7 +33,7 @@ distributions (variants) of the project based on the inclusion and versioning of
 
 ### REQ-2: Dependency Declaration and Resolution
 
-The system must provide clear mechanisms for declaring dependency relationships
+The packaging system must provide clear mechanisms for declaring dependency relationships
 and resolving them correctly for each build target.
 
 - **REQ-2.1 (vLLM-Exclusive Dependencies):** When adding a new dependency, it
