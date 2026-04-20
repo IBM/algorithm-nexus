@@ -4,10 +4,26 @@
 
 ## 1. Introduction
 
-This document outlines the requirements for building and distributing package
-"variants" that cater to different runtime environments. The primary challenge
-is to manage dependencies for environments that may or may not include the
-`vllm` library, and may require specific versions of it.
+This document outlines the requirements for generating and installing distinct
+python distribution package variants tailored to diverse target environments. The
+primary technical challenge is managing the package metadata and subsequent
+dependency resolution graphs to support installations that either completely
+exclude the 'vllm' library, or strictly require specific, pinned versions of it.
+
+### 1.1. Terminology
+
+- project - a python project. The overarching library, framework, or application
+  you are building.
+  - May be same as "source tree"
+- distribution package - a python wheel
+- distribution package variant - customized configuration originating from the
+  same source tree, designed to trigger a distinct dependency resolution graph
+  or provide tailored compiled artifacts at install time.
+- packaging system - tooling which creates a package from a python project and
+  then installs that package into a python environment
+- build - creating a python distribution package
+- install - resolving distribution package dependencies, installing them, then
+  installing the distribution package
 
 ---
 
@@ -15,63 +31,56 @@ is to manage dependencies for environments that may or may not include the
 
 ### REQ-1: Multiple Build Targets
 
-The packaging system **must** be capable of producing distinct, installable
-distributions (variants) of the project based on the inclusion and versioning of
-`vllm`.
+The project's build configuration **must** support the generation and successful
+installation of distinct distribution package variants for "algorithm nexus,"
+defined by the inclusion and version constraints of the `vllm` dependency.
 
-- **REQ-1.1 (No vLLM):** It **must** be possible to build a "core" version of
-  the package that includes all base dependencies _without_ including `vllm` or
-  any code that strictly requires it.
+- **REQ-1.1 (Core Distribution):** It **must** be possible to build and
+  successfully install a base distribution package that declares only core
+  dependencies. This variant's metadata **must** exclude `vllm`.
 
-- **REQ-1.2 (vLLM - Product Target Versioned):** It **must** be possible to build a
-  variant of the package that bundles a specific, product targetted version of
-  the `vllm` library.
+- **REQ-1.2 (Pinned vLLM Variant):** It **must** be possible to build a
+  distribution package variant whose metadata strictly pins a specific,
+  product-targeted version of the `vllm` library. The resulting dependency tree
+  for this variant **must** be fully resolvable and successfully installable
+  into the target environment without conflicts.
 
-- **REQ-1.3 (vLLM - Latest):** It **must** be possible to build a variant that
-  bundles the latest stable version of the `vllm` library available from the
-  package index.
+- **REQ-1.3 (Latest vLLM Variant):** It **must** be possible to build a
+  distribution package variant whose metadata requires the latest stable release
+  of the `vllm` library from the package index. The resulting dependency tree
+  for this variant **must** be fully resolvable and successfully installable
+  into the target environment.
 
 ### REQ-2: Dependency Declaration and Resolution
 
-The packaging system must provide clear mechanisms for declaring dependency relationships
-and resolving them correctly for each build target (from Req 1)
+The packaging system must provide clear mechanisms for declaring dependency
+relationships and resolving them correctly for each build target (from Req 1)
 
 - **REQ-2.1 (vLLM-Exclusive Dependencies):** When adding a new dependency, it
-  **must** be possible to specify that it is required _only_ for the
+  **must** be possible to specify that it is required _only_ one or both of the
   `vllm`-enabled variants.
 
 - **REQ-2.2 (vLLM-Aware Optional Dependencies):** It **must** be possible for a
-  package within our project to have optional features that depend on `vllm`.
-  Such a package is "vLLM-aware."
+  declare a package to optionally require vLLM (vLLM aware)
   - **2.2.a:** A `vLLM-aware` package **must** be installable as part of the
-    "core" variant (**REQ-1.1**). When installed without `vllm`, any features
-    that depend on `vllm` **must** remain inactive and handle the missing
-    dependency gracefully without causing runtime errors.
-  - **2.2.b:** When a `vLLM-aware` package is installed as part of a
-    `vllm`-enabled variant (**REQ-1.2**, **REQ-1.3**), its `vllm`-dependent
-    features should be activated.
+    "core" variant (**REQ-1.1**).
+  - **2.2.b:** A `vLLM-aware` package **must** be installable as part of a
+    `vllm`-enabled variant (**REQ-1.2**, **REQ-1.3**)
 
 - **REQ-2.3 (Contextual Dependency Resolution):** The dependency resolution
   process **must** operate within the context of the selected build target.
-  - **2.3.a:** When building a `vllm`-enabled variant, the full dependency graph
-    for all included packages **must** be resolved against the specific version
-    of `vllm` defined for that variant (e.g., the RedHat version).
-  - **2.3.b:** When building the "core" variant, the dependency graph for all
+  - **2.3.a:** When installing a `vllm`-enabled variant, the full dependency
+    graph for all included packages **must** be resolved against the specific
+    version of `vllm` defined for that variant (e.g., the pineed version).
+  - **2.3.b:** When installing the "core" variant, the dependency graph for all
     included packages **must** be resolved together _without_ `vllm` present.
 
 ### REQ-3: Continuous Integration (CI) Validation
 
-The CI pipeline **must** validate the conformance of all defined package
-variants to the requirements of this document.
+The CI pipeline **must** validate the conformance of all defined distribution
+package variants to the requirements of this document.
 
-- **REQ-3.1 (Build Verification):** Upon a pull request, the CI process **must**
-  attempt to execute a full, contextual dependency resolution (**REQ-2.3**) and
-  build for _all_ variants defined in **REQ-1**. A failure in any single variant
-  build should fail the CI check.
-
-- **REQ-3.2 (Testing):** The CI pipeline **must** run distinct test suites
-  against each built variant.
-  - **3.2.a:** Tests for the "core" variant must validate core functionality and
-    confirm that `vllm`-dependent features fail gracefully or are inactive.
-  - **3.2.b:** Tests for the `vllm`-enabled variants must validate that the
-    `vllm`-aware features are active and functioning correctly.
+- **REQ-3.1 (Build Verification and Testing):** The CI pipeline **must**
+  validate each generated distribution package variant by successfully
+  installing the built artifact into an isolated target environment and
+  executing a distinct test suite against that installation."
