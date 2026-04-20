@@ -25,26 +25,31 @@ documentation and weights.
 A Python package **must** fulfill a set of requirements to guarantee it can be
 properly integrated with Nexus.
 
-- **REQ-1.1 (Release):** Each Python package **must** be released to PyPi.
+- **REQ-1.1 (Release):** A Python package **must** must provide versioned
+  releases, using any versioning scheme as long as it guarantees that increasing
+  version numbers represent newer releases. The releases must be published on
+  GitHub or PyPI.
 - **REQ-1.2 (Owner):** Each Python package **must** define at least one
   maintainer. This will be considered as owner of the Nexus package.
 - **REQ-1.3 (Metadata):** Each Python package **must** include a description and
   link to documentation in the released wheel.
-- **REQ-1.4 (Dependencies):** Each Python package **may** defined dependencies
-  for use and testing.
+- **REQ-1.4 (Dependencies):** Each Python package **must** define all
+  dependencies required for use and testing.
 
 ### REQ-2: Nexus Package Definition
 
 A Nexus package must allow for the following information to be recorded:
 
-- **REQ-2.1 (Python Package):** A Nexus package **must** provide the Python
-  package name, which serves as the identifier within Algorithm Nexus.
+- **REQ-2.1 (Python Package):** A Nexus package **must** provide the PyPI
+  package name or GitHub repository name, which serves as the identifier within
+  Algorithm Nexus.
 
 - **REQ-2.2 (Python Package Version):** A Nexus package **may** provide the
   version of the python package to be used for dependency resolution.
 
 - **REQ-2.3 (Supported Models):** A Nexus package **must** have a mechanism to
   define the models it supports.
+
 - **REQ-2.4 (Agent skills):** A Nexus package **may** specify agent skills for
   using the python package, either directly embedded in the Nexus package (e.g.
   AGENTS.md) or as a link to existing skills on an external repository.
@@ -65,8 +70,9 @@ artifacts required for integration into Algorithm Nexus.
   for benchmarking, such as scripts and any model-specific benchmarking
   requirements.
 
-- **REQ-3.4 (Owner):** The owner of the model is by default the owner of the
-  Nexus package it belongs to, unless explicitly specified by the user.
+- **REQ-3.4 (Owner):** Each model **must** have a designated owner. By default,
+  the owner of the Nexus package will be the the owner of each model unless a
+  specific owner is given.
 
 ### REQ-4: Optional Requirements
 

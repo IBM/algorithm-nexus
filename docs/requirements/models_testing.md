@@ -35,12 +35,11 @@ Model tests **must** validate the required loading and inference behaviour for a
 model.
 
 - **REQ-2.1 (Inference Tests):** Tests **must** execute at least one inference
-  scenario using a single input and validate that the produced output is
-  correct. Additional inference modes, such as batched inference, may also be
-  tested.
+  scenario using a single input. The test **must** validate that the produced
+  output is correct and report if the test is passed or failed.
 
-- **REQ-2.2 (vLLM Integration Testing):** Tests **must** verify model loading
-  and inference with `vllm`. **This requirement is optional**.
+- **REQ-2.2 (vLLM Integration Testing):** Models expected to be served by vLLM
+  **must** verify model loading and inference with `vllm`.
 
 ### REQ-3: Test Implementation Conventions
 
@@ -67,8 +66,7 @@ runtime expectations apply.
 - Test Coverage requirements (REQ-2) do not need to be addressed one by one in
   dedicated tests; they may also be fulfilled within a single test.
 - Requirements for `vllm` integration will be detailed in the future.
-- Test duration may eventually be capped at the Algorithm Nexus level, with
-  contributors expected to provide tests that run within a predefined time
-  limit.
+- Test duration may eventually be capped with contributors expected to provide
+  tests that run within a predefined time limit.
 - It is desirable that tests can be executeted in a CI/CD environment with
   potentially limited resources (compute and storage).
