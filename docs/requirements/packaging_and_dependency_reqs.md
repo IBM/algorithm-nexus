@@ -23,8 +23,8 @@ distributions (variants) of the project based on the inclusion and versioning of
   the package that includes all base dependencies _without_ including `vllm` or
   any code that strictly requires it.
 
-- **REQ-1.2 (vLLM - RedHat Versioned):** It **must** be possible to build a
-  variant of the package that bundles a specific, RedHat-determined version of
+- **REQ-1.2 (vLLM - Product Target Versioned):** It **must** be possible to build a
+  variant of the package that bundles a specific, product targetted version of
   the `vllm` library.
 
 - **REQ-1.3 (vLLM - Latest):** It **must** be possible to build a variant that
