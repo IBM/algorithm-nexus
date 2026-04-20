@@ -34,7 +34,7 @@ distributions (variants) of the project based on the inclusion and versioning of
 ### REQ-2: Dependency Declaration and Resolution
 
 The packaging system must provide clear mechanisms for declaring dependency relationships
-and resolving them correctly for each build target.
+and resolving them correctly for each build target (from Req 1)
 
 - **REQ-2.1 (vLLM-Exclusive Dependencies):** When adding a new dependency, it
   **must** be possible to specify that it is required _only_ for the
@@ -44,8 +44,9 @@ and resolving them correctly for each build target.
   package within our project to have optional features that depend on `vllm`.
   Such a package is "vLLM-aware."
   - **2.2.a:** A `vLLM-aware` package **must** be installable as part of the
-    "core" variant (**REQ-1.1**), where its `vllm`-dependent features will be
-    dormant.
+    "core" variant (**REQ-1.1**). When installed without `vllm`, any features
+    that depend on `vllm` **must** remain inactive and handle the missing
+    dependency gracefully without causing runtime errors.
   - **2.2.b:** When a `vLLM-aware` package is installed as part of a
     `vllm`-enabled variant (**REQ-1.2**, **REQ-1.3**), its `vllm`-dependent
     features should be activated.
@@ -60,7 +61,8 @@ and resolving them correctly for each build target.
 
 ### REQ-3: Continuous Integration (CI) Validation
 
-The CI pipeline **must** validate the integrity of all defined package variants.
+The CI pipeline **must** validate the conformance of all defined package
+variants to the requirements of this document.
 
 - **REQ-3.1 (Build Verification):** Upon a pull request, the CI process **must**
   attempt to execute a full, contextual dependency resolution (**REQ-2.3**) and
