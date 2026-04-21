@@ -40,7 +40,7 @@ of multiple models with different dependencies.
 
 - **Agentic functionalities extended** to supporting the deployment of the
   integrated models
-- **Integration of Biomedical Foundation Models (BMFM)**
+- **Integration of additional algorithm packages from beta-test phase**
 - **Models scoreboard implemented** to track the performance of the integrated
   models
 
