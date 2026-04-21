@@ -30,14 +30,14 @@ of multiple models with different dependencies.
 - **CI workflows extended** with validation of vLLM integration requirements and
   benchmarking tasks
 - **Agentic skills implemented** for generation of a Nexus package and PR
+- **Agentic functionalities implemented** for supporting the implementation of
+  the vLLM plugins required for a model
 - **Integration of
   [Tokamind](https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind) Fusion
   models**
 
 ### Version 0.3 (First Release, End of June 2026)
 
-- **Agentic functionalities extended** to supporting the implementation of the
-  vLLM plugins required for a model
 - **Agentic functionalities extended** to supporting the deployment of the
   integrated models
 - **Integration of Biomedical Foundation Models (BMFM)**
