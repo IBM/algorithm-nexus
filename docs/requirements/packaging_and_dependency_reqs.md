@@ -33,7 +33,7 @@ versions of it.
 ### REQ-1: Multiple Build Targets
 
 The project's build configuration **must** support building and installing
-distinct distribution package variants for "algorithm nexus", as defined by
+distinct distribution package variants for Algorithm Nexus, as defined by
 inclusion and version constraints of the `vllm` dependency.
 
 - **REQ-1.1 (Core Distribution):** It **must** be possible to build and
@@ -57,7 +57,7 @@ The packaging system must provide clear mechanisms for declaring dependency
 relationships and resolving them correctly for each build target (from Req 1)
 
 - **REQ-2.1 (vLLM-Exclusive Dependencies):** When adding a new dependency, it
-  **must** be possible to specify that it is required _only_ one or both of the
+  **must** be possible to specify that it is required for  _only_ one or both of the
   `vllm`-enabled variants.
 
 - **REQ-2.2 (vLLM-Aware Optional Dependencies):** It **must** be possible for a
