@@ -16,7 +16,7 @@ admins).
 
 ### Part I: Generic Benchmarking System Requirements
 
-#### 1. Benchmark Registry and Discoverability
+#### REQ-1: Benchmark Registry and Discoverability
 
 This section outlines requirements for managing and discovering available
 benchmarks.
@@ -28,10 +28,9 @@ benchmarks.
 - **REQ 1.3**: The system must allow a package owner to select an existing
   benchmark experiment from the registry, requiring them only to define the
   specific inputs for their model.
-- **REQ 1.4**: The system must allow specifying which experiments within a
-  benchmark experiment Python package are executable by the current package
-  version, including the ability to flag deprecated experiment versions or
-  instances.
+- **REQ 1.4**: The system must allow specifying which benchmark experiments
+  can be executed with a Python package in its current version, including the ability 
+  to flag deprecated experiment versions or instances.
 
 #### 2. Benchmark Definition, Interfaces, and Versioning
 
@@ -39,7 +38,7 @@ This section defines how benchmarks are constructed, formatted, standardized,
 and versioned to ensure reproducibility.
 
 - **REQ 2.1**: The system must provide a method to define a "concrete benchmark
-  case," strictly defined as a combination of a selected benchmark experiment
+  case", strictly defined as a combination of a selected benchmark experiment
   and its specific execution parameters.
 - **REQ 2.2**: Every benchmark experiment must adhere to a strictly defined
   input interface and a standardized output format.
@@ -95,9 +94,8 @@ resources, and managing execution states.
   completing).
 - **REQ 4.6**: The system must capture unexpected execution failures, including
   the underlying Python exception and traceback. Full execution logs must be
-  captured and made accessible to whoever is executing the benchmark, who holds
-  the discretion over their retention period; these logs are not required to be
-  retained indefinitely or made immediately accessible to package owners.
+  captured and made accessible to whoever is executing the benchmark.
+  The system is not required to retain these logs indefinitely.
 - **REQ 4.7**: Benchmark experiments must be entirely self-contained; they
   cannot rely on or expect data to be pre-existing in a particular location on
   the execution filesystem prior to running.
