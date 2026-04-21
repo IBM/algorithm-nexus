@@ -11,16 +11,38 @@ of multiple models with different dependencies.
 
 ## Roadmap
 
-- (E/O April 2026) **Cross-Model package dependency resolution**:
-  - Dependency resolution and conflict detection across packages
-  - Dependency resolution for models served with vLLM
-  - Executed in CI/CD workflow
-- (E/O April 2026) **Model testing**:
-  - Initial CI/CD workflow for functional model testing
-- (E/O May 2026) **vLLM integration tests**:
-  - Extended CI/CD workflow with integration tests for models served with vLLM
-- (E/O May 2026) **Agentic skills for contributing a package**:
-  - Agent skills for generation of PRs for new packages
+### Version 0.1 (Enf od April 26, Alpha)
+
+- **Project requirements for dependencies resolution, Nexus package definition,
+  testing and benchmarking**
+- **Protocol and tools for cross package dependency resolution in place**,
+  supporting with/without vLLM with latest and pinned scenarios
+- **Benchmarking and testing protocols defined**
+- **Nexus package and model owner responsibilities defined**
+- **Rules for contributing a new Nexus Package defined**
+- **Initial CI in place**, supporting Nexus package structure validation
+  (without vLLM validation), dependency resolution and models inference testing.
+- **Nexus package for TerraTorch integrated**
+
+### Version 0.2 (Beta, End of May 2026)
+
+- **Requirements for models integration with vLLM defined**
+- **CI workflows extended** with validation of vLLM integration requirements and
+  benchmarking tasks
+- **Agentic skills implemented** for generation of a Nexus package and PR
+- **Integration of
+  [Tokamind](https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind) Fusion
+  models**
+
+### Version 0.3 (First Release, End of June 2026)
+
+- **Agentic functionalities extended** to supporting the implementation of the
+  vLLM plugins required for a model
+- **Agentic functionalities extended** to supporting the deployment of the
+  integrated models
+- **Integration of Biomedical Foundation Models (BMFM)**
+- **Models scoreboard implemented** to track the performance of the integrated
+  models
 
 ## Contributing
 
