@@ -74,26 +74,21 @@ artifacts required for integration into Algorithm Nexus.
   the owner of the Nexus package will be the the owner of each model unless a
   specific owner is given.
 
-### REQ-4: Optional Requirements
+### REQ-4: Artifact Specification
 
-A Nexus package or a model **may** provide additional artifacts that support
-integration with agent frameworks, production systems, and serving runtimes.
+A Nexus package must allow specifying additional, optional, artifacts and
+information that support integration with agent frameworks and serving runtimes.
 
-- **REQ-4.1 (Model Usage):** A model **may** provide usage documentation that
-  combines explanatory text and code snippets to help users get started. Unlike
-  the documentation link included in model metadata, this material should be
-  committed as part of the Nexus package for reuse in project documentation and
-  agentic skills.
+- **REQ-4.1 (Model Usage):** A model **must** have a mechanism to provide usage
+  documentation to help users get started.
 
-- **REQ-4.2 (Agent Integration):** A Nexus package **may** provide concrete
-  integration artifacts for one or more supported agent frameworks, protocols,
-  or model-tool interaction interfaces. If provided, the package **should**
-  specify the supported target, setup requirements, and a minimal runnable
-  example of agent-to-model interaction.
+- **REQ-4.2 (Agent Integration):** A Nexus package **must** have a mechanism to
+  provide usage documentation for the integration with one or more supported
+  agent frameworks, protocols, or model-tool interaction interfaces.
 
-- **REQ-4.3 (vLLM Integration):** A model **may** provide information related to
-  serving the model with `vllm`, including any `vllm`-specific plugins required
-  in the Python environment used for serving.
+- **REQ-4.3 (vLLM Integration):** A model **must** have a mechanism to provide
+  information related to serving the model with `vllm`, including any
+  `vllm`-specific plugins required in the Python environment used for serving.
 
 ## 3. Notes
 
