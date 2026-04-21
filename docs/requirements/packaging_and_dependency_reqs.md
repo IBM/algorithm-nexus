@@ -1,6 +1,6 @@
 # Requirements for Package Variants and Dependency Management
 
-**Status:** Proposed
+**Status:** Approved
 
 ## 1. Introduction
 
