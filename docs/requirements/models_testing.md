@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 
 # Requirements for Model Testing
 
-**Status:** Proposed
+**Status:** Approved
 
 ## 1. Introduction
 
