@@ -48,7 +48,10 @@ into Algorithm Nexus**.
 
 #### Dependency Resolution Failures
 
-When the CI reports dependency conflicts or resolution failures:
+While performing dependencies resolution we expect two possible causes for
+failure: 1) the dependencies tree cannot be resolved because of cross-package
+conflicting versions. 2) One of the dependencies that is resolved introduces a
+CVE. When the the CI reports failures for any of the above the owers must:
 
 - **Analyze conflict details**: Which packages are in conflict, version
   constraints causing the issue, and impact on models and functionality.
