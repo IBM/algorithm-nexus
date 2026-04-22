@@ -107,6 +107,19 @@ and
 - **Document vLLM serving requirements** including specific plugins or
   configurations (REQ-4.3).
 
+## Owner responsibilities for integration with vLLM
+
+For models that are integrated with vLLM, the python package dependencies must
+be satisfied for both the latest and the pinned vLLM version target builds.
+Similarly, for each model that requires vLLM in the Nexus package, all tests
+must pass for both vLLM build targets.
+
+**In the case either the dependencies for the python package, or one or more
+model tests are failing with the pinned vLLM build target, the owner is expected
+to react and address the issue within 1 week from the notification of the
+failure. Failing to do so will result in the Nexus Package being removed from
+the next Algorithm Nexus release targeting the vLLM Pinned version.**
+
 ## Shared Responsibilities
 
 ### Communication and Collaboration
