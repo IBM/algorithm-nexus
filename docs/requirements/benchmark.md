@@ -29,7 +29,7 @@ benchmarks.
   benchmark experiment from the registry, requiring them only to define the
   specific inputs for their model.
 - **REQ 1.4**: The system must allow specifying which benchmark experiments
-  can be executed with a Python package in its current version, including the ability
+  can be executed from a benchmark python package in its current version, including the ability
   to flag deprecated experiment versions or instances.
 
 #### REQ-2. Benchmark Definition, Interfaces, and Versioning
@@ -47,11 +47,12 @@ and versioned to ensure reproducibility.
   optional parameters.
 - **REQ 2.4**: All benchmark experiments, including wrappers for external
   frameworks, must be implemented in Python.
-- **REQ 2.5**: Benchmark experiments are responsible for their own versioning.
+- **REQ 2.5**: A benchmark experiment must defined its dependencies
+- **REQ 2.6**: Benchmark experiments are responsible for their own versioning.
   The system's specification method must be flexible enough to satisfy the
   varying versioning requirements and preferences of different packages (e.g.,
   using version flags, distinct naming, or versioned dataset parameters).
-- **REQ 2.6**: The system must enforce that the combination of a benchmark
+- **REQ 2.7**: The system must enforce that the combination of a benchmark
   experiment name and the specific names and values of all its parameters
   defines a unique, repeatable experiment.
 
