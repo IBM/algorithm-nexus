@@ -47,7 +47,7 @@ and versioned to ensure reproducibility.
   optional parameters.
 - **REQ 2.4**: All benchmark experiments, including wrappers for external
   frameworks, must be implemented in Python.
-- **REQ 2.5**: A benchmark experiment must defined its dependencies
+- **REQ 2.5**: A benchmark experiment must define its dependencies
 - **REQ 2.6**: Benchmark experiments are responsible for their own versioning.
   The system's specification method must be flexible enough to satisfy the
   varying versioning requirements and preferences of different packages (e.g.,
