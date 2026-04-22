@@ -42,7 +42,7 @@ and versioned to ensure reproducibility.
   and its specific execution parameters.
 - **REQ 2.2**: Every benchmark experiment must adhere to a strictly defined
   input interface and a standardized output format.
-- **REQ 2.3**: Benchmark experiments must accept the target entity/model to be
+- **REQ 2.3**: Benchmark experiments must accept the target model/algorithm to be
   tested as a primary input, and must support the inclusion of additional
   optional parameters.
 - **REQ 2.4**: All benchmark experiments, including wrappers for external
