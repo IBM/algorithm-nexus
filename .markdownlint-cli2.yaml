@@ -1,14 +1,6 @@
 # Markdownlint-cli2 configuration
 # See https://github.com/DavidAnson/markdownlint-cli2
 
-# Globs to ignore
-globs:
-  - "**/*.md"
-  - "!.venv/**"
-  - "!.tox/**"
-  - "!node_modules/**"
-  - "!**/node_modules/**"
-
 # Markdownlint configuration
 config:
   # Default state for all rules
