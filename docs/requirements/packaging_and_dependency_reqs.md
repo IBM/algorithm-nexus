@@ -35,9 +35,9 @@ Algorithm Nexus's build configuration **must** support building and installing
 distinct distribution package variants, as defined by inclusion and version
 constraints of the `vllm` dependency.
 
-- **REQ-1.1 (Core Variant):** It **must** be possible to build and
-  successfully install a distribution variant package whose dependencies
-  **must** exclude `vllm`. We define this as the "Core" variant.
+- **REQ-1.1 (Core Variant):** It **must** be possible to build and successfully
+  install a distribution variant package whose dependencies **must** exclude
+  `vllm`. We define this as the "Core" variant.
 
 - **REQ-1.2 (Pinned vLLM Variant):** It **must** be possible to build and
   successfully install a distribution package variant whose metadata strictly
