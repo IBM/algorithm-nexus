@@ -3,19 +3,19 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Model and Package Owner Responsibilities
+# Nexus Package Owner and Nexus Package Model Owner Responsibilities
 
 This document defines the operational responsibilities of Nexus Package Owners
-and Model Owners within the Algorithm Nexus ecosystem, with emphasis on
+and Nexus Package Model Owners, with emphasis on
 day-to-day operations, issue resolution, and maintaining system health.
 
-## Package Owner Responsibilities
+## Nexus Package Owner Responsibilities
 
-Package owners are responsible for the Python package integrated into Algorithm
-Nexus and serve as the default owner for all models within their package unless
+Nexus Package owners are responsible for the related algorithm stack package integrated into Algorithm
+Nexus and serve as the default owner for all models declared in their Nexus package unless
 specific model owners are designated.
 
-### 1. Python Package Requirements
+### 1. Algorithm Stack Python Package Requirements
 
 To be integrated with Algorithm Nexus, your Python package must fulfill these
 requirements (see
@@ -69,7 +69,7 @@ Algorithm Nexus release until the failures are fixed.
 \*\***Failure in addressing dependency issues for two consecutive releases will
 result in the Nexus package being completely removed from Algorithm Nexus**\*\*.
 
-## Model Owner Responsibilities
+## Nexus Package Model Owner Responsibilities
 
 Model owners are responsible for individual models within a Nexus package. By
 default, the package owner serves as the model owner unless a specific owner is
@@ -112,8 +112,7 @@ and
 
 ## Owner responsibilities for integration with vLLM
 
-For models that are integrated with vLLM, the python package dependencies must
-be satisfied for both the latest and the pinned vLLM version target builds.
+Algorithm stack packages added to the product or candidate target must satisfy the relevant dependency requirements
 Similarly, for each model that requires vLLM in the Nexus package, all tests
 must pass for both vLLM build targets.
 
