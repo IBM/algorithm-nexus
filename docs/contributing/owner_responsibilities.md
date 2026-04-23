@@ -103,7 +103,7 @@ For detailed requirements, see
 and
 [REQ-4: Artifact Specification](../requirements/nexus_package.md#req-4-artifact-specification).
 
-- **Maintain model on Hugging Face** with proper documentation and weights
+- **Maintain model on Hugging Face** with proper documentation and open weights
   (REQ-3.1).
 - **Designate ownership** explicitly if different from package owner (REQ-3.4).
 - **Provide usage documentation** to help users get started (REQ-4.1).
