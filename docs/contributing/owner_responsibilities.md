@@ -39,8 +39,8 @@ into Algorithm Nexus**.
 
 #### Pull Requests Monitoring
 
-- **Monitor CI pipeline status**: If a PR is in review phase, the Nexus package
-  owner is responsible for monitoring the status of the CI pipeline and for
+- **Monitor CI pipeline status**: If a PR is in review phase, the PR author
+  is responsible for monitoring the status of the CI pipeline and for
   promptly addressing any failures.
 - **Escalate cross-package issues**: If a failure in the CI tasks involves
   another Nexus package, promptly contact the third party Nexus package owner
@@ -79,7 +79,7 @@ designated.
 
 #### Test Failure Response
 
-When CI/CD reports model test failures:
+When CI/CD reports model test failures the model owner is expected to:
 
 - **Investigate root cause**: Determine if a failure is due to model code
   changes, infrastructure issues, test environment problems, data or
@@ -102,7 +102,7 @@ For detailed requirements, see
 [REQ-3: Model Definition](../requirements/nexus_package.md#req-3-model-definition)
 and
 [REQ-4: Artifact Specification](../requirements/nexus_package.md#req-4-artifact-specification).
-
+The model owner is expected to:
 - **Maintain model on Hugging Face** with proper documentation and open weights
   (REQ-3.1).
 - **Designate ownership** explicitly if different from package owner (REQ-3.4).
@@ -113,14 +113,15 @@ and
 ## Owner responsibilities for integration with vLLM
 
 Algorithm stack packages added to the product or candidate target must satisfy the relevant dependency requirements
-Similarly, for each model that requires vLLM in the Nexus package, all tests
-must pass for both vLLM build targets.
+Similarly, for each model in a Nexus package added to the product or candidate targets, all tests must pass in a python environment with the relevant dependency requirements.
 
-**In the case either the dependencies for the python package, or one or more
-model tests are failing with the pinned vLLM build target, the owner is expected
+### Responsibilities for Packages in the Product Variant
+
+In the case either the dependencies for the algorithm stack package, or one or more
+model tests are failing with the product distribution variant, the owner is expected
 to react and address the issue within 1 week from the notification of the
 failure. Failing to do so will result in the Nexus Package being removed from
-the next Algorithm Nexus release targeting the vLLM Pinned version.**
+the product distribution variant int the next Algorithm Nexus release.
 
 ## Shared Responsibilities
 
