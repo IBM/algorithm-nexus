@@ -23,15 +23,15 @@ pinned versions of it.
   them along with the distribution package.
 - **Packaging system**: tooling which can create a distribution package from a
   Python project and install it into a Python environment.
-- **Project**: a Python project and its source tree
-- **Algorithm-Stack**: Set of dependencies of algorithm Nexus containing AI models/algorithms
-- **Algorithm-Stack package**: A python package in the algorithm stack
+- **Project**: a Python project and its source tree.
+- **Algorithm-Stack**: Set of dependencies of algorithm Nexus containing AI models/algorithms.
+- **Algorithm-Stack package**: A python package in the algorithm stack.
 
 ---
 
 ## 2. Core Requirements
 
-### REQ-1: Multiple Build Targets
+### REQ-1: Multiple Distribution Target Variants
 
 Algorithm Nexus's build configuration **must** support building and installing
 distinct distribution package variants, containing different parts of the Algorithm Stack,
@@ -84,7 +84,7 @@ relationships and resolving them correctly for each build target (from Req 1).
 
 - **REQ-2.5 (Contextual Dependency Resolution):** The dependency resolution
   process **must** operate within the context of the selected variant.
-  - **2.4.a:** When installing the product or candidate variances, the full dependency
+  - **2.4.a:** When installing the product or candidate variants, the full dependency
     graph for all included packages **must** be resolved against the specific
     version of `vllm` defined for that variant (e.g., the product version).
   - **2.4.b:** When installing the "ecosystem" variant, the dependency graph for all
