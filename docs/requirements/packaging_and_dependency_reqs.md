@@ -2,100 +2,190 @@
 
 **Status:** Approved
 
+---
+
 ## 1. Introduction
 
-This document outlines the requirements for building and installing distinct
-Python distribution package variants of Algorithm Nexus, tailored to diverse
-target environments. The primary technical challenge is managing the package
-metadata and subsequent dependency resolution graphs to support installations
-that either completely exclude the 'vllm' library, or strictly require specific,
-pinned versions of it.
+This document defines the requirements for building and installing multiple,
+distinct Python distribution package variants of **Algorithm Nexus**, tailored
+to different target environments.
 
-### 1.1. Terminology
+The primary technical challenge addressed by this document is the management of
+package metadata and dependency resolution graphs in order to support
+installations that:
 
-- **Building**: creating a Python distribution package.
-- **Distribution package**: a Python wheel.
-- **Distribution package variant**: a variant of the project's distribution
-  package, derived from the same source tree but configured to yield a distinct
-  dependency graph and/or install-time behavior. Typically the result of
-  selecting additional optional dependencies.
-- **Installing**: resolving distribution package dependencies and installing
-  them along with the distribution package.
-- **Packaging system**: tooling which can create a distribution package from a
-  Python project and install it into a Python environment.
-- **Project**: a Python project and its source tree.
-- **Algorithm-Stack**: Set of dependencies of algorithm Nexus containing AI models/algorithms.
-- **Algorithm-Stack package**: A python package in the algorithm stack.
+- completely exclude the `vllm` library, or
+- strictly require specific versions of the `vllm` library.
+
+All requirements in this document are normative unless explicitly stated
+otherwise.
+
+---
+
+## 1.1 Terminology
+
+The following terminology is used consistently throughout this document:
+
+- **Building**: The process of creating a Python distribution package from a
+  source tree.
+
+- **Distribution package**: A Python wheel (`.whl`) produced from a Python
+  project.
+
+- **Distribution package variant** (or **variant**): A distinct build and
+  install configuration of a distribution package, derived from the same source
+  tree but resulting in a different dependency graph and/or install-time
+  behavior. Variants are typically produced by selecting different sets of
+  optional dependencies.
+
+- **Installing**: The process of resolving dependencies for a distribution
+  package and installing both the package and its resolved dependencies into a
+  Python environment.
+
+- **Packaging system**: Tooling capable of building distribution packages and
+  installing them into Python environments (e.g., build backends, dependency
+  resolvers, and installers).
+
+- **Project**: A Python project and its associated source tree.
+
+- **Algorithm Stack**: A defined collection of Python package dependencies used
+  by Algorithm Nexus that provide AI models and algorithms.
+
+- **Algorithm Stack package**: An individual Python package that is a member of
+  the Algorithm Stack.
+
+- **`vllm`**: The Python package published under the name `vllm` in the package
+  index. This document uses the lowercase form consistently to match the package
+  name.
 
 ---
 
 ## 2. Core Requirements
 
-### REQ-1: Multiple Distribution Target Variants
+### REQ‑1: Multiple Build Targets
 
-Algorithm Nexus's build configuration **must** support building and installing
-distinct distribution package variants, containing different parts of the Algorithm Stack,
-as defined by inclusion and version constraints of the `vllm` dependency.
+Algorithm Nexus **must** support building and installing multiple, mutually
+distinct distribution package variants from the same source tree.
 
-- **REQ-1.1 (Ecosystem Variant):** It **must** be possible to build and
-  successfully install a distribution variant package whose dependencies
-  exclude `vllm`. A specific set of packages in the Algorithm Stack
-  will be in these dependencies (the Ecosystem Algorithm Stack).
+Each variant **must** define a different dependency graph by controlling:
 
-- **REQ-1.2 (Product Variant):** It **must** be possible to build and
-  successfully install a distribution package variant whose metadata strictly
-  pins a specific, product-targeted version of the `vllm` library.
-  A specific set of packages in the Algorithm Stack
-  will be in these dependencies (the Product Algorithm Stack).
+- whether and how the `vllm` library is included, and
+- which subset of the Algorithm Stack is selected.
 
-- **REQ-1.3 (Candidate Variant):** It **must** be possible to build and
-  successfully install a distribution package variant whose metadata requires
-  the latest stable release of the `vllm` library from the package index.
-  A specific set of packages in the Algorithm Stack
-  will be in these dependencies (the Candidate Algorithm Stack).
+The following **distribution package variants** are formally defined and
+referenced throughout this document:
 
-- **REQ-1.4 (Algorithm Stack Partitioning ):** Only algorithm stack
-  packages directly associated with a distribution package variant
-  are installed with that variant. An algorithm stack package may be
-  associated with more than one variant.
+- **Ecosystem Variant**
+- **Product Variant**
+- **Candidate Variant**
 
-### REQ-2: Dependency Declaration and Resolution
+#### REQ‑1.1: Ecosystem Variant
 
-The packaging system must provide clear mechanisms for declaring dependency
-relationships and resolving them correctly for each build target (from Req 1).
+It **must** be possible to build and successfully install the **Ecosystem
+Variant**, whose dependencies **do not include** the `vllm` library.
 
-- **REQ-2.1 Dependencies that can only be in the Ecosystem variant:** When adding a
-  new dependency, e.g., an Algorithm Stack package,
-  it **must** be possible to specify that it is required for
-  _only_ the "Ecosystem" variant.
+Only Algorithm Stack packages belonging to the _Ecosystem Algorithm Stack_
+**must** be included in this variant.
 
-- **REQ-2.2 Dependencies that can only be in a Product or Candidate variant:** When adding a new
-  dependency, e.g., an Algorithm Stack package,  it **must** be possible to specify that it is required for _only_
-  one or both of the candidate or product variants.
+#### REQ‑1.2: Product Variant
 
-- **REQ-2.3 Dependencies that can be in all variants:** It **must** be possible
-  for a package to specify that is required in all variants e.g. an Algorithm
-  Stack package is part of Ecosystem, Candidate and Product variants. We define such a
-  dependency as "vLLM-aware".
+It **must** be possible to build and successfully install the **Product
+Variant**, whose dependencies **require a specific, pinned version** of the
+`vllm` library.
 
-- **REQ-2.4 Algorithm stack packages must be explicitly associated to at least one variant:**
-  Algorithm stack package cannot be in a default group. Generic packages used by all variants
-  can be in a default group if desired.
+Only Algorithm Stack packages belonging to the _Product Algorithm Stack_
+**must** be included in this variant.
 
-- **REQ-2.5 (Contextual Dependency Resolution):** The dependency resolution
-  process **must** operate within the context of the selected variant.
-  - **2.4.a:** When installing the product or candidate variants, the full dependency
-    graph for all included packages **must** be resolved against the specific
-    version of `vllm` defined for that variant (e.g., the product version).
-  - **2.4.b:** When installing the "ecosystem" variant, the dependency graph for all
-    included packages **must** be resolved together _without_ `vllm` present.
+#### REQ‑1.3: Candidate Variant
 
-### REQ-3: Continuous Integration (CI) Validation
+It **must** be possible to build and successfully install the **Candidate
+Variant**, whose dependencies **require the latest stable release** of the
+`vllm` library available from the package index.
 
-The CI pipeline **must** validate the conformance of all defined distribution
-package variants to the requirements of this document.
+Only Algorithm Stack packages belonging to the _Candidate Algorithm Stack_
+**must** be included in this variant.
 
-- **REQ-3.1 (Build Verification and Testing):** The CI pipeline **must**
-  validate each distribution package variant by successfully installing the
-  built artifact into an isolated target environment and executing a distinct
-  test suite against that installation.
+#### REQ‑1.4: Algorithm Stack Partitioning
+
+When installing a given distribution package variant, **only** the Algorithm
+Stack packages associated with that variant **must** be installed.
+
+An individual Algorithm Stack package **may be** associated with more than one
+variant.
+
+---
+
+### REQ‑2: Dependency Declaration and Resolution
+
+The packaging system **must** provide clear and explicit mechanisms for
+declaring dependency relationships and resolving them correctly for each
+distribution package variant defined in REQ‑1.
+
+#### REQ‑2.1: Ecosystem‑Only Dependencies
+
+When adding a new dependency (e.g., an Algorithm Stack package), it **must** be
+possible to specify that the dependency is required **only** for the **Ecosystem
+Variant**.
+
+#### REQ‑2.2: Product‑ and Candidate‑Only Dependencies
+
+When adding a new dependency (e.g., an Algorithm Stack package), it **must** be
+possible to specify that the dependency is required **only** for:
+
+- the **Product Variant**,
+- the **Candidate Variant**, or
+- both the Product and Candidate Variants.
+
+#### REQ‑2.3: Dependencies Common to All Variants
+
+It **must** be possible to specify that a dependency is required for **all**
+distribution package variants.
+
+Such dependencies are defined as **vllm‑aware**, meaning that they are
+compatible with both:
+
+- environments where `vllm` is present, and
+- environments where `vllm` is absent.
+
+#### REQ‑2.4: Explicit Variant Association
+
+Every Algorithm Stack package **must** be explicitly associated with at least
+one defined distribution package variant.
+
+Algorithm Stack packages **must not** belong exclusively to an implicit or
+default dependency group.
+
+Non‑Algorithm‑Stack dependencies that are generic and used by all variants
+**may** be placed in a default dependency group.
+
+#### REQ‑2.5: Contextual Dependency Resolution
+
+The dependency resolution process **must** operate within the context of the
+selected distribution package variant.
+
+##### REQ‑2.5.a: Product and Candidate Resolution
+
+When installing the **Product Variant** or **Candidate Variant**, the complete
+dependency graph for all included packages **must** be resolved against the
+specific version of `vllm` defined for that variant (e.g., the pinned product
+version).
+
+##### REQ‑2.5.b: Ecosystem Resolution
+
+When installing the **Ecosystem Variant**, the complete dependency graph for all
+included packages **must** be resolved together **without** `vllm` present.
+
+---
+
+### REQ‑3: Continuous Integration (CI) Validation
+
+The continuous integration (CI) pipeline **must** validate conformance of all
+defined distribution package variants to the requirements in this document.
+
+#### REQ‑3.1: Build Verification and Testing
+
+The CI pipeline **must** validate each distribution package variant by:
+
+1. building the corresponding distribution package,
+2. installing the built artifact into an isolated target environment, and
+3. executing a variant‑specific test suite against that installation.
