@@ -1,0 +1,10 @@
+model:
+  id: "broken-org/undeclared-model"
+
+  testing:
+    hardware:
+      cpu:
+        cores: 2
+
+    commands:
+      - "pytest tests/"

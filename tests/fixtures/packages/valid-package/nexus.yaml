@@ -1,0 +1,8 @@
+package:
+  name: "example-package"
+  version: "1.0.0"
+  agent_skills:
+    embedded: true
+
+models:
+  - example-model

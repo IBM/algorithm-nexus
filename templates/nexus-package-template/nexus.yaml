@@ -1,0 +1,13 @@
+# Nexus Package Configuration Template
+# Replace placeholders with your actual package information
+
+package:
+  name: "your-package-name"  # Replace with your package name (e.g., "terratorch", "tokamind")
+  version: "0.1.0"  # Replace with your package version
+  agent_skills:
+    embedded: true  # Set to true if agent skills are embedded in the package
+
+models:
+  - your-model-name  # Replace with your model directory name(s)
+  # Add more models as needed:
+  # - another-model-name
