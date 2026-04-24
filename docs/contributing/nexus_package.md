@@ -43,7 +43,7 @@ packages/
         │   ├── model.yaml # Required model metadata
         │   ├── tests/     # Required test artifacts
         │   ├── benchmarks/# Optional benchmark artifacts
-        │   └── usage.md   # Required usage documentation
+        │   └── usage.md   # Optional usage documentation
         ├── <model-2>/
         │   └── ...
         └── ...
@@ -108,28 +108,29 @@ integration requirements.
 
 ##### `model`
 
-| Field          | Type     | Required      | Description                                                                                                                                                                |
-| -------------- | -------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`           | `string` | Yes           | Hugging Face model repository identifier, for example `org/model-name`.                                                                                                    |
-| `owner`        | `string` | No            | Model owner GitHub identifier. If omitted, ownership defaults to the Nexus package owner.                                                                                  |
-| `vllm`         | `object` | Conditionally | vLLM configuration. Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the `product` or `candidate` distribution variants. |
-| `testing`      | `object` | Yes           | Testing configuration including hardware requirements and test commands.                                                                                                   |
-| `benchmarking` | `object` | No            | Benchmarking configuration including experiment definitions.                                                                                                               |
+| Field          | Type     | Required | Description                                                                                                                                            |
+| -------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`           | `string` | Yes      | Hugging Face model repository identifier, for example `org/model-name`.                                                                                |
+| `owner`        | `string` | No       | Model owner GitHub identifier. If omitted, ownership defaults to the Nexus package owner.                                                              |
+| `vllm`         | `object` | No       | Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the `product` or `candidate` distribution variants. |
+| `testing`      | `object` | Yes      | Testing configuration including hardware requirements and test commands.                                                                               |
+| `benchmarking` | `object` | No       | Benchmarking configuration including experiment definitions.                                                                                           |
 
 ##### `model.vllm`
 
 | Field                   | Type           | Required | Description                                                                                          |
 | ----------------------- | -------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `enabled`               | `boolean`      | Yes      | Must be `true` to enable vLLM serving for this model.                                                |
 | `plugins.general`       | `string`       | No       | General vLLM plugin that loads the model class required in the runtime environment.                  |
 | `plugins.io_processors` | `list[string]` | No       | List of vLLM IO processor plugins supported by this model that should be in the runtime environment. |
 
 ##### `model.testing`
 
-| Field      | Type           | Required      | Description                                                                                                                                                         |
-| ---------- | -------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `hardware` | `object`       | Yes           | Hardware requirements for running the model test suite.                                                                                                             |
-| `commands` | `list[string]` | Yes           | Commands used to execute the required model tests.                                                                                                                  |
-| `vllm`     | `object`       | Conditionally | Should only be defined for models that should be tested with vLLM, and that belong to a Nexus Package targeting the `product` or `candidate` distribution variants. |
+| Field      | Type           | Required      | Description                                             |
+| ---------- | -------------- | ------------- | ------------------------------------------------------- |
+| `hardware` | `object`       | Yes           | Hardware requirements for running the model test suite. |
+| `commands` | `list[string]` | Yes           | Commands used to execute the required model tests.      |
+| `vllm`     | `object`       | Conditionally | Required only if `model.vllm.enabled` is `true`.        |
 
 ##### `model.testing.hardware`
 
@@ -181,6 +182,7 @@ model:
   owner: "ibm-esa-geospatial-team"
 
   vllm:
+    enabled: true
     plugins:
       io_processors:
         - "terratorch-tm-segmentation"
