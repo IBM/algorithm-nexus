@@ -80,6 +80,14 @@ repos:
     rev: v0.21.0
     hooks:
       - id: yamlfmt
+
+  # Tombi - TOML formatting
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.9.19
+    hooks:
+      - id: tombi-format
+        args: ["--offline"]
+
   # Standard pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
