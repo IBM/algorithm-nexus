@@ -1,7 +1,4 @@
-# Dependency Resolution in Algorithm Nexus
-
-
----
+# Algorithm Nexus Dependency Resolution Process
 
 ## 1. Introduction
 
@@ -16,8 +13,8 @@ via continuous integration (CI).
 
 ## 2. Packaging and Variant-Based Dependency Resolution
 
-Algorithm Nexus uses **uv** as its packaging system and is published on PyPI as
-the package **`algorithm-nexus`**.
+Algorithm Nexus uses **uv** as its packaging system and is built as
+**`algorithm-nexus`**.
 
 Support for multiple distribution package variants is implemented using
 **optional dependencies (extras)** as defined by uv:
@@ -80,7 +77,8 @@ their dependency metadata**, distinguishing between default and optional
 dependencies.
 
 When adding an Algorithm Stack package, contributors **must** classify it using
-exactly one of the following categories. This will determine the exact process they have to follow.
+exactly one of the following categories. This will determine the exact process
+they have to follow.
 
 ### 4.1 Ecosystem‑Only Packages
 
@@ -106,8 +104,8 @@ These packages always introduce `vllm` into the dependency graph.
 
 **Variant integration rules:**
 
-- These packages **must** be added to either or both of the **Candidate** and **Product**
-  Variants.
+- These packages **must** be added to either or both of the **Candidate** and
+  **Product** Variants.
 - These packages **must not** be added to the Ecosystem Variant.
 
 ### 4.3 vllm‑Agnostic Packages
@@ -127,7 +125,7 @@ These packages can participate in dependency graphs **both with and without**
 
 - For the **Candidate** and **Product Variants**: the package **must** be added
   **with extras enabled** such that `vllm` is included in the resolved
-  dependency graph.
+  dependency graph of the Algorithm Stack package.
 
 ## 5. Adding Packages with uv
 
@@ -139,11 +137,6 @@ determined by:
 
 The **same package may be added differently for different variants**, depending
 on whether `vllm` must or must not be present in the resulting dependency graph.
-
-> [!CAUTION]
->
-> No Algorithm Stack package may be added to a variant in a way that violates
-> the dependency guarantees of that variant.
 
 ### 5.1 General Command Pattern
 
@@ -159,13 +152,12 @@ Where `<variant-extra>` is one of:
 - `candidate`
 - `product`
 
-Packages **must only** be added to the extras required by their classification.
-Do **not** assume that a package should be added to all extras unless explicitly
-required by Section 4.
+Use the variant association rules defined in
+[Section 4](#4-variant-association-rules) to determine what variants the package
+should be added to. Packages **must only** be added to the extras required by
+their classification.
 
 ### 5.2 Ecosystem‑Only Packages
-
-Ecosystem‑only packages never introduce `vllm` into the dependency graph.
 
 Add the package **only** to the Ecosystem Variant:
 
@@ -175,22 +167,21 @@ uv add <package-name> --optional ecosystem
 
 ### 5.3 vllm‑Dependent Packages
 
-vllm‑dependent packages declare `vllm` as a **default dependency** and therefore
-always introduce `vllm` into the dependency graph.
+> [!NOTE]
+>
+> There may be cases where an Algorithm Stack package depends on a `vllm`
+> version that is higher than the one included in the `product` variant. In
+> these cases, the package should be added only to the `candidate` variant. In
+> other cases, packages should be added to **both** variants.
 
-Add the package to **both** vllm‑enabled variants:
+Add the package to the vllm‑enabled variants:
 
 ```bash
 uv add <package-name> --optional candidate
 uv add <package-name> --optional product
 ```
 
-These packages **must not** be added to the Ecosystem Variant.
-
 ### 5.4 vllm‑Agnostic Packages
-
-vllm‑agnostic packages do **not** declare `vllm` as a default dependency, but
-**do** declare `vllm` as an optional dependency via one or more extras.
 
 These packages must be added **differently per variant**.
 
@@ -210,6 +201,13 @@ uv add <package-name>[<non-vllm-extra>] --optional ecosystem
 
 #### Candidate and Product Variants (vllm included)
 
+> [!NOTE]
+>
+> There may be cases where an Algorithm Stack package depends on a `vllm`
+> version that is higher than the one included in the `product` variant. In
+> these cases, the package should be added only to the `candidate` variant. In
+> other cases, packages should be added to **both** variants.
+
 Add the package **with extras enabled** such that `vllm` is included in the
 dependency graph:
 
@@ -217,7 +215,6 @@ dependency graph:
 uv add <package-name>[<vllm-extra>] --optional candidate
 uv add <package-name>[<vllm-extra>] --optional product
 ```
-
 
 ### 5.5 Git‑Based Packages
 
@@ -234,48 +231,63 @@ General form:
 uv add git+https://<git-server-url>/<org>/<repository>[<extras>] --optional <variant-extra>
 ```
 
-Repeat the command for each variant as required by Section 4, enabling or
-disabling dependency‑introducing extras as appropriate.
+Repeat the command for each variant as required by
+[Section 4](#4-variant-association-rules), enabling or disabling
+dependency‑introducing extras as appropriate.
 
 ## 6. Dependency Resolution Checks in CI
 
-The Algorithm Nexus CI pipeline enforces dependency correctness on every pull
-request.
-
-The following checks **must** pass for all changes that modify dependencies or
-their resolution.
+The Algorithm Nexus CI pipeline **must** enforce dependency correctness checks
+on every pull request. Each of the commands that follow is required to exit with
+code `0`.
 
 ### 6.1 Lockfile and Export Consistency
 
-- The `uv.lock` file **must** be present and up to date.
-- A `requirements.txt` file **must** be exported from `uv.lock` and kept in
-  sync.
-- All packages listed in `requirements.txt` **must**:
-  - be available from the configured package index, and
-  - not be yanked or otherwise invalid.
+#### 6.1.1 `uv.lock` Presence and Freshness
+
+CI **must** verify that a `uv.lock` file exists and is up to date with respect
+to the project's dependency declarations.
+
+```shell
+uv lock --check
+```
+
+#### 6.1.2 Variant-Specific Requirements Exports
+
+CI **must** verify that for each distribution package variant (`ecosystem`,
+`candidate`, `product`), a variant-specific requirements file (called
+`requirements-<variant-extra>.txt`) has been exported from `uv.lock` and is up
+to date.
+
+```bash
+for variant in ecosystem candidate product; do
+    stat "requirements-${variant}.txt"
+    uv export --frozen --no-emit-project \
+              --no-header --no-default-groups \
+              --extra "${variant}" --output-file="requirements-${variant}-ci.txt"
+    diff "requirements-${variant}.txt" "requirements-${variant}-ci.txt"
+done
+```
+
+#### 6.1.3 Package Availability and Validity
+
+CI **must** verify that all packages listed in each
+`requirements-<variant-extra>.txt` file are resolvable and installable from the
+configured package index.
+
+```shell
+for variant in ecosystem candidate product; do
+    uv pip install -r "requirements-${variant}.txt" --reinstall --dry-run
+done
+```
 
 ### 6.2 Variant Dependency Resolution Checks
 
-Each distribution package variant **must** be validated independently in CI by
-resolving its dependency graph using the corresponding extra.
-
 #### Ecosystem Variant
 
-Resolving the `ecosystem` extra **must not** produce a dependency graph that
-contains `vllm`.
+CI **must** verify that resolving the `ecosystem` extra **does not** produce a
+dependency graph that contains `vllm`.
 
-CI **must** fail if `vllm` appears anywhere in the resolved dependency graph,
-including transitive dependencies.
-
-Packages may declare optional support for `vllm`, but any extras that introduce
-`vllm` **must not** be enabled for the Ecosystem Variant.
-
-#### Candidate and Product Variants
-
-Resolving the `candidate` and `product` extras **must** produce a dependency
-graph that includes `vllm`.
-
-CI **must** fail if:
-
-- `vllm` is missing from the resolved dependency graph, or
-- the resolved `vllm` version does not satisfy the variant’s constraints.
+```shell
+! grep vllm requirements-ecosystem.txt
+```
