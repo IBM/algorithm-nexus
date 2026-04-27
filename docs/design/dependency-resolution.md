@@ -212,6 +212,12 @@ dependency graph:
 uv add <package-name>[<vllm-extra>] --optional candidate
 ```
 
+or, if the package also requires non‑vllm extras:
+
+```bash
+uv add <package-name>[<vllm-extra>,<non-vllm-extra>] --optional candidate
+```
+
 ### 5.5 Git‑Based Packages
 
 > [!IMPORTANT]
