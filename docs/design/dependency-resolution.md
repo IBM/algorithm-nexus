@@ -169,16 +169,14 @@ uv add <package-name> --optional ecosystem
 
 > [!NOTE]
 >
-> There may be cases where an Algorithm Stack package depends on a `vllm`
-> version that is higher than the one included in the `product` variant. In
-> these cases, the package should be added only to the `candidate` variant. In
-> other cases, packages should be added to **both** variants.
+> Algorithm Stack package developers **must not** add packages to the `product`
+> variant. Algorithm Nexus owners will add them once external requirements have
+> been met, and will coordinate with the developers in case of need.
 
 Add the package to the vllm‑enabled variants:
 
 ```bash
 uv add <package-name> --optional candidate
-uv add <package-name> --optional product
 ```
 
 ### 5.4 vllm‑Agnostic Packages
@@ -203,17 +201,15 @@ uv add <package-name>[<non-vllm-extra>] --optional ecosystem
 
 > [!NOTE]
 >
-> There may be cases where an Algorithm Stack package depends on a `vllm`
-> version that is higher than the one included in the `product` variant. In
-> these cases, the package should be added only to the `candidate` variant. In
-> other cases, packages should be added to **both** variants.
+> Algorithm Stack package developers **must not** add packages to the `product`
+> variant. Algorithm Nexus owners will add them once external requirements have
+> been met, and will coordinate with the developers in case of need.
 
 Add the package **with extras enabled** such that `vllm` is included in the
 dependency graph:
 
 ```bash
 uv add <package-name>[<vllm-extra>] --optional candidate
-uv add <package-name>[<vllm-extra>] --optional product
 ```
 
 ### 5.5 Git‑Based Packages
