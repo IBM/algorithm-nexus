@@ -13,9 +13,8 @@ package based on the requirements outlined in the
 
 A Nexus package is a **metadata and configuration package** that references an
 external Python package (released on GitHub or PyPI) and defines the models it
-supports. The Nexus package **does not contain the Python package source code
-itself**, but rather provides standardized metadata for validation and
-integration within the Algorithm Nexus ecosystem.
+supports. Its purpose is validation and integration of Algorithm Stack Packages
+into the Algorithm Nexus ecosystem.
 
 The Nexus package serves as a registry entry that:
 
@@ -47,12 +46,12 @@ packages/
 
 The required root file is `nexus.yaml`, which declares the Nexus package
 metadata and the list of supported model folders. `skills` is optional and
-should only be included when the package provides embedded agent skills material
-to assist users in using the package. The `models/` directory is required
-whenever the package declares one or more supported models, and each model
-folder must contain a `model.yaml` file describing the model metadata and
-optional vLLM integration. Each model folder can optionally include a `usage.md`
-file to provide users with model-specific usage guidance.
+should only be included when the package provides agent skills material to
+assist users in using the package. The `models/` directory is required whenever
+the package declares one or more supported models, and each model folder must
+contain a `model.yaml` file describing the model metadata and optional vLLM
+integration. Each model folder can optionally include a `usage.md` file to
+provide users with model-specific usage guidance.
 
 ---
 
@@ -65,34 +64,26 @@ Python package and its supported models.
 
 #### 3.1.1. Fields Summary
 
-| Field                           | Type           | Required | Description                                                                                                                          |
-| ------------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `package.name`                  | `string`       | Yes      | Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI.             |
-| `package.agent_skills.embedded` | `boolean`      | No       | Indicates that agent skills are embedded in this package. When present, include the `skills` folder at the package root.<sup>1</sup> |
-| `package.agent_skills.external` | `string (URL)` | No       | URL to externally hosted agent skills resources.<sup>2</sup>                                                                         |
-| `models`                        | `list[string]` | No       | List of supported model folder names under `models/`. Leave empty when the package does not declare any models.                      |
+`package`
 
-<sup>1</sup> One sub-folder for each skill must be created in the `skills`
-folder. Agent skills should follow the
-[agent skills specification](https://agentskills.io/specification) to guarantee
-maximum interoperability across different agents.
-
-<sup>2</sup> The URL must point to a `skills` folder on a remote server.
+| Field  | Type     | Required | Description                                                                                                              |
+| ------ | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `name` | `string` | Yes      | Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI. |
 
 #### 3.1.2. Example
 
 ```yaml
 package:
-  name: "terramind-geospatial"
-  agent_skills:
-    embedded: true # Indicates embedded agent skills in skills/ folder
-
-# List model folder names to include
-# Leave empty if no models to include
-models:
-  - terramind-base-flood # Folder name in models/
-  - terramind-base-fire # Folder name in models/
+  name: "terratorch"
 ```
+
+#### 3.1.3. Agent Skills
+
+Nexus packages can optionally include agent skills to assist users in working
+with the package. Agent skills must be placed in the `skills` folder in the
+package root, with one sub-folder for each skill. Agent skills should follow the
+[agent skills specification](https://agentskills.io/specification) to guarantee
+maximum interoperability across different agents.
 
 ---
 
@@ -119,8 +110,7 @@ Each model has its own configuration file defining integration requirements.
 | `plugins.io_processors` | `list[string]` | No       | List of vLLM IO processor plugins supported by this model that should be in the runtime environment. |
 
 Each model can optionally provide usage documentation in
-`models/<model-name>/usage.md`. Usage documentation is not configured in
-`model.yaml`.
+`models/<model-name>/usage.md`.
 
 #### 3.2.2. Example
 
