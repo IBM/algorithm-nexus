@@ -170,7 +170,7 @@ uv add <package-name> --optional ecosystem
 > [!NOTE]
 >
 > Algorithm Stack package developers **must not** add packages to the `product`
-> variant. Algorithm Nexus owners will add them once external requirements have
+> variant. Algorithm Nexus owners will add them once product requirements have
 > been met, and will coordinate with the developers in case of need.
 
 Add the package to the vllm‑enabled variants:
@@ -202,7 +202,7 @@ uv add <package-name>[<non-vllm-extra>] --optional ecosystem
 > [!NOTE]
 >
 > Algorithm Stack package developers **must not** add packages to the `product`
-> variant. Algorithm Nexus owners will add them once external requirements have
+> variant. Algorithm Nexus owners will add them once product requirements have
 > been met, and will coordinate with the developers in case of need.
 
 Add the package **with extras enabled** such that `vllm` is included in the
