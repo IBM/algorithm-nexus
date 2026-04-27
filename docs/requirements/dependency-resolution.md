@@ -262,7 +262,7 @@ to date.
 ```bash
 for variant in ecosystem candidate product; do
     stat "requirements-${variant}.txt"
-    uv export --frozen --no-emit-project \
+    uv export -q --frozen --no-emit-project \
               --no-header --no-default-groups \
               --extra "${variant}" --output-file="requirements-${variant}-ci.txt"
     diff "requirements-${variant}.txt" "requirements-${variant}-ci.txt"
