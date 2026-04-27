@@ -45,8 +45,8 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
-        additional_dependencies: ['tomli']
-        args: ['--toml', 'pyproject.toml']
+        additional_dependencies: ["tomli"]
+        args: ["--toml", "pyproject.toml"]
 
   # UV lock check
   - repo: https://github.com/astral-sh/uv-pre-commit
@@ -54,7 +54,14 @@ repos:
     hooks:
       - id: uv-lock
       - id: uv-export
-        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--output-file=requirements.txt"]
+        alias: "uv-export-ecosystem"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--extra=ecosystem", "--output-file=requirements-ecosystem.txt"]
+      - id: uv-export
+        alias: "uv-export-candidate"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--extra=candidate", "--output-file=requirements-candidate.txt"]
+      - id: uv-export
+        alias: "uv-export-product"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--extra=product", "--output-file=requirements-product.txt"]
 
   # Copywrite - License header management
   - repo: https://github.com/hashicorp/copywrite
