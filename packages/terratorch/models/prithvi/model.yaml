@@ -1,0 +1,8 @@
+model:
+  id: ibm-nasa-geospatial/Prithvi-EO-2.0-300M-TL
+
+  vllm:
+    enabled: true
+    plugins:
+      io_processors:
+        - name: terratorch_segmentation

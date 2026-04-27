@@ -1,0 +1,7 @@
+model:
+  id: ibm-esa-geospatial/TerraMind-base-Fire
+  vllm:
+    enabled: true
+    plugins:
+      io_processors:
+        - name: terratorch_tm_segmentation
