@@ -1,6 +1,5 @@
 # Dependency Resolution in Algorithm Nexus
 
-**Status:** Draft
 
 ---
 
@@ -81,7 +80,7 @@ their dependency metadata**, distinguishing between default and optional
 dependencies.
 
 When adding an Algorithm Stack package, contributors **must** classify it using
-exactly one of the following categories.
+exactly one of the following categories. This will determine the exact process they have to follow.
 
 ### 4.1 Ecosystem‑Only Packages
 
@@ -107,7 +106,7 @@ These packages always introduce `vllm` into the dependency graph.
 
 **Variant integration rules:**
 
-- These packages **must** be added to the **Candidate** and **Product**
+- These packages **must** be added to either or both of the **Candidate** and **Product**
   Variants.
 - These packages **must not** be added to the Ecosystem Variant.
 
@@ -219,10 +218,6 @@ uv add <package-name>[<vllm-extra>] --optional candidate
 uv add <package-name>[<vllm-extra>] --optional product
 ```
 
-This ensures that:
-
-- the Ecosystem Variant remains free of `vllm`, and
-- the Candidate and Product Variants consistently include `vllm`.
 
 ### 5.5 Git‑Based Packages
 
