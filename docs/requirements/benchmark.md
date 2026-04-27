@@ -37,8 +37,8 @@ Benchmark Experiment)
 
 - **Benchmark**
   A standardized, repeatable evaluation used to compare the behavior of a
-  benchmark target (versions AI models or algorithms) on a problem of interest
-  (workload) under controlled conditions. Emodied as either a **fixed benchmark
+  benchmark target (versions of AI models or algorithms) on a problem of interest
+  (workload) under controlled conditions. Embodied as either a **fixed benchmark
   experiment** or a **workload** plus **parameterized benchmark experiment**.
 
 - **Benchmark Result**
@@ -59,16 +59,17 @@ Benchmark Experiment)
 This section sets requirements for how benchmark experiments are constructed,
 formatted, standardized, and versioned to ensure reproducibility.
 
-- **REQ 1.1: Input/Output Specification** A benchmark experiment must define its
+- **REQ 1.1: Input/Output Specification** 
+  A benchmark experiment must define its
   inputs and outputs using a standardized system schema. Experiments must accept
   the benchmark target (model or algorithm) as a primary programmatic input, and
   may support additional optional parameters. _Rationale_: Ensures the system
   can uniformly interact with diverse benchmark implementations.
 
 - **REQ 1.2: Python Package**
-   All benchmark experiments, including wrappers for external frameworks, must
+  All benchmark experiments, including wrappers for external frameworks, must
   be implemented in Python and distributed as standard Python packages. Each
-  package must define all its runtime dependencies _Rationale_: Provides a
+  package must define all its runtime dependencies. _Rationale_: Provides a
   predictable, unified installation mechanism for automated pipelines.
 
 - **REQ 1.3: Versioning**
@@ -77,7 +78,7 @@ formatted, standardized, and versioned to ensure reproducibility.
   approaches across packages.
 
 - **REQ 1.4: Reproducible Execution**
-  Benchmark experiments must ensure that the combination of their name and the
+  Benchmark experiments must ensure that the combination of their name, version and the
   specific names and values of all their parameters defines a unique, repeatable
   execution.
 
@@ -87,9 +88,9 @@ formatted, standardized, and versioned to ensure reproducibility.
   actively maintained or relevant.
 
 - **REQ 1.7: Required Data**
-   If a benchmark experiment requires specific data files to execute a workload
+  If a benchmark experiment requires specific data files to execute a workload
   these must be either (a) contained in the python package providing the
-  experiment; (b) downloaded by the experiment _Rationale_: Guarantees that
+  experiment; (b) downloaded by the experiment. _Rationale_: Guarantees that
   automated execution does not fail due to missing local filesystem
   dependencies.
 
@@ -106,13 +107,13 @@ benchmarks and benchmark experiments.
 
 - **REQ 2.2: Benchmark Experiment Discovery**
   The system must provide a method for users to list the registered benchmark
-  experiments (including deprecated experiments) _Rationale_: Encourages reuse
+  experiments (including deprecated experiments). _Rationale_: Encourages reuse
   and prevents duplicated effort across different research teams.
 
 - **REQ 2.3: Benchmark Registration**
   The system must provide a method to define and register a **benchmark**:
 - either as
-  1. a combination a parameterizable benchmark experiment and a benchmark
+  1. a combination of a parameterizable benchmark experiment and a benchmark
      workload
   2. a fixed benchmark experiment
 
@@ -129,19 +130,19 @@ This section details requirement for package owners to use the benchmarking
 system
 
 - **REQ 3.1: Benchmark Specification**
-  To use the system to benchmark a model/algorithm, the nexus package owner must
+  To use the system to benchmark a model/algorithm, the Nexus package owner must
   specify the benchmark to use, in the manner defined by the system c.f. REQ
-  2-1.
+  2-3.
 
 - **REQ 3.2: Providing Benchmark Experiments**
   If a model/algorithm requires a benchmark experiment not in the registry, the
   contributor must provide one, in compliance with the Standardized Packaging
   Protocol c.f. REQ-1.
-  _Rationale_: Empowers contributors to expand the system's capabilities
+  _Rationale_: Empowers contributors to expand the system's capabilities.
 
 - **REQ 3.3: Benchmark Experiment Reuse**
   The system must allow referencing and utilizing an existing benchmark
-  experiment or benchmark definition across different projects.
+  experiment or benchmark definition across Nexus packages.
 
 ---
 
@@ -151,17 +152,17 @@ This section covers operational requirements for execution, resource handling,
 and failure management.
 
 - **REQ 4.1: Single and Sweep Execution**
-   The system must support both executing single benchmark instances and
-  parameter sweeps. _Rationale_: Sweeps are essential for hyperparameter tuning,
-  performance profiling, and evaluating models across a spectrum of workloads.
+  The system must support both executing single benchmark instances and
+  parameter sweeps. _Rationale_: Sweeps are essential for
+  performance profiling and evaluating models across a spectrum of workloads.
 
 - **REQ 4.2: Resource Specification**
-   The system must allow benchmark experiments to define the compute resources
-  they require, _Rationale_: Ensures the system schedules tasks on capable
-  hardware, preventing Out-Of-Memory (OOM) errors and execution bottlenecks
+  The system must allow benchmark experiments to define the compute resources
+  they require. _Rationale_: Ensures the system schedules tasks on capable
+  hardware, preventing Out-Of-Memory (OOM) errors and execution bottlenecks.
 
 - **REQ 4.3: Resource Limits**
-   The system must support setting hard limits on maximum resource usage (time,
+  The system must support setting hard limits on maximum resource usage (time,
   compute, memory) per benchmark instance or set of instances. _Rationale_:
   Prevents processes from hogging shared infrastructure in the admin
   environment.
@@ -177,7 +178,7 @@ and failure management.
 - **REQ 4.6: Logging**
   The system must capture unexpected execution failures, including the
   underlying Python exception and traceback. Eecution logs must be captured and
-  made accessible the user executing the benchmark. The system is not required
+  made accessible to the user executing the benchmark. The system is not required
   to retain these logs indefinitely.
 
 - **REQ 4.7: Self-Contained Execution**
@@ -245,7 +246,7 @@ administrative oversight.
 
 - **REQ 7.1: Nexus-Level Benchmarks Definition**
   The system must support defining benchmarks independently of individual
-  packages.
+  Nexus packages.
 
 - **REQ 7.2: Admin-Triggered Evaluation Execution**
   The system must provide a dedicated mechanism for administrators to trigger
