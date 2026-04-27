@@ -13,6 +13,14 @@ Homepage = "https://github.com/IBM/algorithm-nexus"
 Issues = "https://github.com/IBM/algorithm-nexus/issues"
 Repository = "https://github.com/IBM/algorithm-nexus"
 
+[project.optional-dependencies]
+candidate = [
+  "vllm==0.19.1",
+]
+product = [
+  "vllm==0.18.0",
+]
+
 [dependency-groups]
 dev = [
   "black>=25.1.0",
