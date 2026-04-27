@@ -1,23 +1,40 @@
 [project]
 name = "algorithm-nexus"
+version = "0.1.0"
 description = "A comprehensive library for AI model delivery, testing, and benchmarking"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 license-files = ["LICENSE"]
 authors = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
 maintainers = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
-version = "0.1.0"
 
 [project.urls]
 Homepage = "https://github.com/IBM/algorithm-nexus"
-Repository = "https://github.com/IBM/algorithm-nexus"
 Issues = "https://github.com/IBM/algorithm-nexus/issues"
+Repository = "https://github.com/IBM/algorithm-nexus"
+
+[project.optional-dependencies]
+candidate = [
+  "vllm==0.19.1",
+]
+product = [
+  "vllm==0.18.0",
+]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.2.0",
-    "black>=25.1.0",
-    "ruff>=0.12.0",
-    "detect-secrets @ git+https://github.com/ibm/detect-secrets.git",
-    "codespell>=2.4.0",
+  "black>=25.1.0",
+  "codespell>=2.4.0",
+  "detect-secrets @ git+https://github.com/ibm/detect-secrets.git",
+  "pre-commit>=4.2.0",
+  "ruff>=0.12.0",
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "ecosystem" },
+    { extra = "candidate" },
+    { extra = "product" },
+  ],
 ]
