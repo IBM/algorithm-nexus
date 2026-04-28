@@ -115,21 +115,16 @@ The request payload consists of the following fields:
   - **`image_format`**: Leave as empty string `""` for multi-modal inputs
   - **`out_data_format`**: Format for the output data (`"b64_json"` for base64
     encoded, or `"path"` to save to disk)
-- **`priority`**: Request priority (0 = normal priority)
 - **`model`**: The model identifier
 
 ### Input Formats
 
-The TerraMind Base Flood model requires **multi-modal input** consisting of
-three data sources:
+The TerraMind Base Fire model requires **multi-modal input** consisting of three
+data sources:
 
 1. **DEM (Digital Elevation Model)**: TIFF format file
 2. **S1RTC (Sentinel-1 RTC)**: Zarr archive (.zarr.zip)
 3. **S2L2A (Sentinel-2 L2A)**: Zarr archive (.zarr.zip)
-
-You can provide these inputs in two ways:
-
-#### 1. URL Format
 
 Provide URLs to the data files:
 
@@ -142,88 +137,22 @@ Provide URLs to the data files:
 "data_format": "url"
 ```
 
-#### 2. Local Path Format
-
-Provide local file paths:
-
-```python
-"data": {
-    "DEM": "/path/to/dem.tif",
-    "S1RTC": "/path/to/s1rtc.zarr.zip",
-    "S2L2A": "/path/to/s2l2a.zarr.zip",
-},
-"data_format": "path"
-```
-
-### Output Formats
-
-The model supports two output formats:
-
-1. **Base64 JSON** (`"b64_json"`): Returns the segmentation mask as base64
-   encoded data in the JSON response
-2. **Path** (`"path"`): Saves the output to disk and returns the file path
-
-You can optionally specify a custom output directory using the `out_path`
-parameter:
-
-```python
-"data": {
-    "data": {...},
-    "data_format": "url",
-    "out_data_format": "path",
-    "out_path": "/custom/output/directory",
-    "image_format": "",
-}
-```
+Check the
+[Terramind Segmentation IO Processor plugin documentation](https://terrastackai.github.io/terratorch/stable/guide/vllm/plugins/tm_segmentation_io_plugin/)
+for full details on the input format.
 
 ## Output
 
-The model returns flood segmentation predictions as a TIFF file. The output
-contains:
+The model returns fire/burn scar segmentation predictions as a TIFF file. The
+output contains:
 
 - Segmentation masks indicating flooded areas
 - Same spatial dimensions as the input imagery
-- Pixel values representing different classes (e.g., water, no water)
+- Pixel values representing different classes (e.g., burned, unburned)
 
-## Use Cases
-
-The TerraMind Base Flood model is particularly useful for:
-
-- **Flood Detection**: Identifying flooded areas using multi-modal satellite
-  data
-- **Emergency Response**: Rapid flood extent mapping for disaster response
-- **Risk Assessment**: Analyzing flood-prone regions with elevation context
-- **Environmental Monitoring**: Tracking flood patterns over time
-- **Infrastructure Planning**: Assessing flood risk for development projects
-
-## Troubleshooting
-
-### Server Won't Start
-
-- Ensure all dependencies are installed: `pip install terratorch[vllm]`
-- Check that the model can be downloaded from Hugging Face
-- Verify sufficient GPU memory is available
-
-### Request Fails
-
-- Confirm the server is running and accessible at the specified endpoint
-- Verify all three input data sources (DEM, S1RTC, S2L2A) are accessible
-- Ensure the input data is in the correct format (TIFF for DEM, Zarr for
-  S1RTC/S2L2A)
-- Check that the request payload structure matches the expected format
-- Verify the Zarr files are properly formatted and not corrupted
-
-### Out of Memory Errors
-
-- Reduce input image size or spatial extent
-- Use smaller batch sizes (adjust `--max-num-seqs`)
-- Consider using a GPU with more memory
-
-### Invalid Output Path
-
-- Ensure the output directory exists and is writable
-- Use absolute paths when specifying custom output directories
-- Check file system permissions
+Check the
+[Terramind Segmentation IO Processor plugin documentation](https://terrastackai.github.io/terratorch/stable/guide/vllm/plugins/tm_segmentation_io_plugin/)
+for full details on the output format.
 
 ## Additional Resources
 
@@ -231,25 +160,3 @@ The TerraMind Base Flood model is particularly useful for:
 - [TerraTorch vLLM Serving Guide](https://terrastackai.github.io/terratorch/stable/vllm_serving.html)
 - [TerraTorch I/O Processor Plugins](https://terrastackai.github.io/terratorch/stable/vllm_serving.html#io-processor-plugins)
 - [vLLM Documentation](https://docs.vllm.ai/)
-- [TerraMind Base Flood Model on Hugging Face](https://huggingface.co/ibm-esa-geospatial/TerraMind-base-Flood)
-- [Test Dataset on Hugging Face](https://huggingface.co/datasets/christian-pinto/TestTerraMindDataset)
-
-## Model Configuration
-
-The model is configured in [`model.yaml`](model.yaml) with the following
-settings:
-
-```yaml
-model:
-  id: ibm-esa-geospatial/TerraMind-base-Flood
-  vllm:
-    enabled: true
-    plugins:
-      io_processors:
-        - name: terratorch_tm_segmentation
-```
-
-This configuration enables vLLM serving with the TerraMind segmentation I/O
-processor plugin (`terratorch_tm_segmentation`), which handles the preprocessing
-and postprocessing of multi-modal geospatial imagery for flood segmentation
-tasks.
