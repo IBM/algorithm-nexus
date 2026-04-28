@@ -60,11 +60,11 @@ to ado-core or other experiments to execute.
 
 ### 1.4 Centralized Data & Discovery
 
-The architecture utilizes `ado` distributed projects capabilities to store data
-. enforcing a uniform schema for results and custom metadata dictionaries.
-Furthermore, `ado`'s automatically registers available experiments upon
+The architecture utilizes `ado` distributed projects capabilities to store data,
+enforcing a uniform schema for results and custom metadata dictionaries.
+Furthermore, `ado` automatically registers available experiments upon
 environment installation, providing built-in commands to list and discover
-targets.
+them.
 
 #### System Architecture Requirements Matching
 
@@ -141,7 +141,7 @@ and operational systems to function correctly.
 
 Nexus relies on an organizational trust model. Only authorized IBMers can submit
 code. To enforce security, all packages undergo mandatory standard CI/CD CVE
-scans via GitHub before they are allowed into the execution environment.
+scans before they are allowed into the execution environment.
 
 ### 3.2 Packaging and Versioning Conventions
 
@@ -155,7 +155,7 @@ reliability.
   process** not produces the same result, as experiments can be stochastic.
 - **Versioning**: ado provides mechanisms for experiment versioning but does not
   prescribe any. The main convention w.r.t experiment versioning is that
-  whatever mechanism is chosen ensure the **Reproducibility Contract:**
+  whatever mechanism is chosen ensure the **Reproducibility Contract**
 - **Data Handling Guidelines:** Workload data must either be bundled directly
   inside the Nexus Python package or programmed to download dynamically at
   execution time.
@@ -174,12 +174,12 @@ submitted to the Ray cluster for execution.
 | Requirement | Name                            | Fulfillment Strategy    | Component     | Proposed Solution                                                                                                                                        |
 | ----------- | ------------------------------- |-------------------------| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. [PENDING: Versioning Semantics Decision]              |
-| **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`s convention that a given experiment name encodes a unique, repeatable experiment.                                              |
+| **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`'s convention that a given experiment name encodes a unique, repeatable experiment.                                              |
 | **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads dynamically.                                                       |
 | **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As 1.7                                                                                                                                                   |
 | **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a workload.                                                             |
 | **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Package owners provide custom experiments according to the Standardized Package Protocol.                                                                |
-| **REQ 6.1** | Admin Security                  | Process                 | GitHub CI     | Secured via trusted code submissions and mandatory CVE scans.                                                                                            |
+| **REQ 6.1** | Admin Security                  | Process                 | CI     | Secured via trusted code submissions and mandatory CVE scans.                                                                                            |
 | **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. [PENDING: Nexus Repo Layout Decision] |
 | **REQ 7.3** | Sweep Review and Approval       | Process                 | GitHub PRs    | Admins retain review oversight of sweep configurations via GitHub PR workflows.                                                                          |
 
@@ -202,19 +202,19 @@ issues.
 ### Contributing a benchmark experiment
 
 Developers write and package the experiment according to the standardized
-packaging protocol (REQ 3-2) i.e. as an ado custom experiment or
+packaging protocol (REQ 3.2) i.e. as an ado custom experiment or
 actuator+experiments. They add this package to their Nexus package where it is
-then registered on Nexus install (REQ 2-1).
+then registered on Nexus install (REQ 2.1).
 
 ### Defining a benchmark to use for a model
 
 First developers can:
 
-- use `ado` CLI to discover existing benchmark experiments (REQ 2-2)
-- use `nexus` CLI to discover existing benchmark specifications (REQ 2-4)
+- use `ado` CLI to discover existing benchmark experiments (REQ 2.2)
+- use `nexus` CLI to discover existing benchmark specifications (REQ 2.4)
 
-They then define their benchmark using an ado configuration (REQ 3-1) adding
-this to the model YAML in their nexus package (REQ 2-3). The benchmark
+They then define their benchmark using an ado configuration (REQ 3.1) adding
+this to the model YAML in their nexus package (REQ 2.3). The benchmark
 configuration can reference any existing benchmark experiment, for example one
-discovered via `ado` CLI, (REQ 3-3). The benchmark configuration can also be
+discovered via `ado` CLI, (REQ 3.3). The benchmark configuration can also be
 based on one discovered via the Nexus CLI.
