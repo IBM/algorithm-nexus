@@ -45,16 +45,23 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
-        additional_dependencies: ['tomli']
-        args: ['--toml', 'pyproject.toml']
+        additional_dependencies: ["tomli"]
+        args: ["--toml", "pyproject.toml"]
 
   # UV lock check
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.11.6
     hooks:
       - id: uv-lock
+        # - id: uv-export
+        #   alias: "uv-export-ecosystem"
+        #   args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=ecosystem", "--output-file=requirements-ecosystem.txt"]
       - id: uv-export
-        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--output-file=requirements.txt"]
+        alias: "uv-export-candidate"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=candidate", "--output-file=requirements-candidate.txt"]
+      - id: uv-export
+        alias: "uv-export-product"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=product", "--output-file=requirements-product.txt"]
 
   # Copywrite - License header management
   - repo: https://github.com/hashicorp/copywrite
@@ -73,6 +80,14 @@ repos:
     rev: v0.21.0
     hooks:
       - id: yamlfmt
+
+  # Tombi - TOML formatting
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v0.9.19
+    hooks:
+      - id: tombi-format
+        args: ["--offline"]
+
   # Standard pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

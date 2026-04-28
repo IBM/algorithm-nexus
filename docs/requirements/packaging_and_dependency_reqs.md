@@ -141,7 +141,7 @@ possible to specify that the dependency is required **only** for:
 It **must** be possible to specify that a dependency is required for **all**
 distribution package variants.
 
-Such dependencies are defined as **vllm‑aware**, meaning that they are
+Such dependencies are defined as **vllm‑agnostic**, meaning that they are
 compatible with both:
 
 - environments where `vllm` is present, and
