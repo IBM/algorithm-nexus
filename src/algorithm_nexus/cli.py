@@ -31,6 +31,7 @@ console = Console()
 app = typer.Typer(
     help="Algorithm Nexus CLI - Tools for managing and validating Nexus packages.",
     add_completion=False,
+    no_args_is_help=True,
 )
 
 
