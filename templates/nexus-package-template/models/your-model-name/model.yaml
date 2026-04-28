@@ -2,55 +2,20 @@
 # Replace placeholders with your actual model information
 
 model:
-  id: "your-org/your-model-name"  # Replace with your model ID (e.g., "ibm/granite-3.0-8b")
-  # (optional) Model owner.
-  # owner: "your-gh-id"
+  id: "your-org/your-model-name"  # Replace with Hugging Face model repository identifier (e.g., "ibm-nasa-geospatial/Prithvi-EO-2.0-300M-TL")
 
-  # vLLM Configuration (optional - remove if not using vLLM)
-  vllm:
-    enabled: true  # Must be true if vLLM section is present
-    plugins:
-      # General plugin (optional)
-      # general: "your-vllm-plugin"
+  # (Optional) Model owner GitHub identifier
+  # If omitted, ownership defaults to the Nexus package owner
+  # owner: "your-github-username"
 
-      # IO processors (optional)
-      io_processors:
-        - "your-io-processor"
-
-  # Testing Configuration (required)
-  testing:
-    hardware:
-      # GPU configuration (optional)
-      gpu:
-        type: "NVIDIA A100"  # Replace with your GPU type
-        count: 1  # Number of GPUs required
-        cpu_fallback: false  # Whether CPU fallback is supported
-
-      # CPU configuration (required)
-      cpu:
-        cores: 8  # Number of CPU cores required
-        ram: "32GB"  # Amount of RAM required
-
-    # Test commands (required)
-    commands:
-      - "pytest tests/test_inference.py -v"
-
-    # vLLM testing (required if vllm.enabled is true)
-    vllm:
-      commands:
-        - "pytest tests/test_vllm.py -v"
-
-      # Benchmarking Configuration (optional)
-      # If present, benchmarks should be defined in the benchmark
-      # folder inside the model folder.
-      # benchmarking:
-      # Standard experiments
-      # experiments:
-      # - name: "standard-benchmark"
-      #   args: "--batch-size 8"
-
-# Custom experiments (optional)
-# custom_experiments:
-#   - name: "custom-benchmark"
-#     python_module: "benchmarks/custom.py"
-#     args: "--mode advanced"
+  # vLLM Configuration (optional - only include if model needs additional vLLM plugins)
+  # Only required for models targeting the product or candidate distribution variants
+  # vllm:
+  #   enabled: true  # Must be true if vLLM section is present
+  #   plugins:
+  #     # General plugin (optional) - loads the model class required in runtime
+  #     # general: "your-vllm-plugin"
+  #
+  #     # IO processors (optional) - list of vLLM IO processor plugins
+  #     io_processors:
+  #       - "your-io-processor-plugin"

@@ -29,12 +29,6 @@ def create_valid_nexus_yaml(package_dir: Path) -> None:
         dedent("""
             package:
               name: "test-package"
-              version: "1.0.0"
-              agent_skills:
-                embedded: true
-
-            models:
-              - test-model
             """)
     )
 
@@ -59,35 +53,11 @@ def create_valid_model_structure(
                 plugins:
                   io_processors:
                     - "test-processor"
-
-              testing:
-                hardware:
-                  gpu:
-                    type: "NVIDIA A100"
-                    count: 1
-                    cpu_fallback: false
-                  cpu:
-                    cores: 8
-                    ram: "32GB"
-
-                commands:
-                  - "pytest tests/test_inference.py -v"
-
-                vllm:
-                  commands:
-                    - "pytest tests/test_vllm.py -v"
-
-              benchmarking:
-                experiments:
-                  - name: "test-experiment"
-                    args: "--batch-size 8"
             """)
     )
 
-    # Create required files and directories
+    # Create optional usage.md
     (model_dir / "usage.md").write_text("# Usage\n\nTest model usage.")
-    (model_dir / "tests").mkdir()
-    (model_dir / "tests" / "test_inference.py").write_text("# Test file")
 
 
 class TestValidPackageStructure:
@@ -105,19 +75,9 @@ class TestValidPackageStructure:
 
     def test_valid_package_with_multiple_models(self, temp_package_dir: Path) -> None:
         """Test validation with multiple models."""
-        nexus_yaml = temp_package_dir / "nexus.yaml"
-        nexus_yaml.write_text(
-            dedent("""
-                package:
-                  name: "test-package"
+        create_valid_nexus_yaml(temp_package_dir)
 
-                models:
-                  - model-1
-                  - model-2
-                """)
-        )
-
-        # Create model structures without vLLM (ecosystem only)
+        # Create model structures
         for model_name in ["model-1", "model-2"]:
             model_dir = temp_package_dir / "models" / model_name
             model_dir.mkdir(parents=True)
@@ -127,19 +87,10 @@ class TestValidPackageStructure:
                 dedent("""
                     model:
                       id: "org/model"
-
-                      testing:
-                        hardware:
-                          cpu:
-                            cores: 4
-
-                        commands:
-                          - "pytest tests/"
                     """)
             )
 
             (model_dir / "usage.md").write_text("# Usage")
-            (model_dir / "tests").mkdir()
 
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
@@ -157,27 +108,11 @@ class TestMissingModelConfig:
         model_dir = temp_package_dir / "models" / "test-model"
         model_dir.mkdir(parents=True)
         (model_dir / "usage.md").write_text("# Usage")
-        (model_dir / "tests").mkdir()
 
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "model.yaml" in result.stdout
-
-    def test_missing_tests_directory(self, temp_package_dir: Path) -> None:
-        """Test that missing tests directory is detected."""
-        create_valid_nexus_yaml(temp_package_dir)
-        create_valid_model_structure(temp_package_dir)
-
-        # Remove tests directory
-        import shutil
-
-        shutil.rmtree(temp_package_dir / "models" / "test-model" / "tests")
-
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
-
-        assert result.exit_code == 1
-        assert "tests" in result.stdout
+        assert "Missing YAML file" in result.stdout
 
 
 class TestMissingPackageConfig:
@@ -212,68 +147,24 @@ class TestMalformedPackageConfig:
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "yaml" in result.stdout.lower()
 
-    def test_undeclared_model_directory(self, temp_package_dir: Path) -> None:
-        """Test that undeclared model directories are detected."""
-        create_valid_nexus_yaml(temp_package_dir)
-        create_valid_model_structure(temp_package_dir)
-
-        # Create an undeclared model directory
-        undeclared_model = temp_package_dir / "models" / "undeclared-model"
-        undeclared_model.mkdir()
-
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
-
-        assert result.exit_code == 1
-        assert "undeclared" in result.stdout.lower()
-
-
-class TestCrossValidation:
-    """Tests for cross-validation between package and model configs."""
-
-    def test_vllm_requires_vllm_testing(self, temp_package_dir: Path) -> None:
-        """Test that vLLM configuration requires vLLM testing."""
+    def test_yaml_list_instead_of_dict(self, temp_package_dir: Path) -> None:
+        """Test that YAML containing a list instead of dict is rejected."""
         nexus_yaml = temp_package_dir / "nexus.yaml"
-        nexus_yaml.write_text(
-            dedent("""
-                package:
-                  name: "test-package"
-
-                models:
-                  - test-model
-                """)
-        )
-
-        model_dir = temp_package_dir / "models" / "test-model"
-        model_dir.mkdir(parents=True)
-
-        model_yaml = model_dir / "model.yaml"
-        model_yaml.write_text(
-            dedent("""
-                model:
-                  id: "org/test-model"
-
-                  vllm:
-                    enabled: true
-                    plugins:
-                      io_processors:
-                        - "test-processor"
-
-                  testing:
-                    hardware:
-                      cpu:
-                        cores: 4
-                    commands:
-                      - "pytest tests/"
-                """)
-        )
-
-        (model_dir / "usage.md").write_text("# Usage")
-        (model_dir / "tests").mkdir()
+        nexus_yaml.write_text("- item1\n- item2\n")
 
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "vllm" in result.stdout.lower()
-        assert "testing" in result.stdout.lower()
+        assert "must contain a YAML mapping at the top level" in result.stdout
+
+    def test_yaml_string_instead_of_dict(self, temp_package_dir: Path) -> None:
+        """Test that YAML containing a string instead of dict is rejected."""
+        nexus_yaml = temp_package_dir / "nexus.yaml"
+        nexus_yaml.write_text("just a string\n")
+
+        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+
+        assert result.exit_code == 1
+        assert "must contain a YAML mapping at the top level" in result.stdout
+        assert "yaml" in result.stdout.lower()

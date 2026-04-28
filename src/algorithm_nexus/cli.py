@@ -69,16 +69,24 @@ def validate(
     if collector.has_errors:
         console.print(
             Panel(
-                str(collector),
+                collector.format_errors(),
                 title="[bold red]Validation Failed[/bold red]",
                 border_style="red",
             )
         )
         raise typer.Exit(code=1)
 
+    # Build success message
+    success_message = "[green]✓[/green] All validation checks passed"
+
+    if collector.has_info:
+        success_message += (
+            "\n\n[bold]Optional files/directories:[/bold]\n" + collector.format_info()
+        )
+
     console.print(
         Panel(
-            "[green]✓[/green] All validation checks passed",
+            success_message,
             title="[bold green]Validation Successful[/bold green]",
             border_style="green",
         )
