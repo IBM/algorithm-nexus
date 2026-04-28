@@ -103,8 +103,12 @@ model.
 ## Contributing
 
 This project is currently in closed beta. We are not accepting external
-contributions at this time. For IBM contributors, please see our
-[Contributing Guide](CONTRIBUTING.md) for development setup and guidelines.
+contributions at this time. For IBM contributors:
+
+- Please, see our [Contributing Guide](CONTRIBUTING.md) for development setup
+  and guidelines.
+- Read the [guide](./docs/contributing/add_new_nexus_package.md) for
+  step-by-step instructions for contributing a Nexus Package.
 
 ## License
 

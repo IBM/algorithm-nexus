@@ -45,13 +45,13 @@ packages/
 ```
 
 The required root file is `nexus.yaml`, which declares the Nexus package
-metadata. `skills` is optional and
-should only be included when the package provides agent skills to assist users
-in using the package. The `models/` folder is required whenever a Nexus package
-wants to advertise one or more models, with one sub-folder for each model. Each
-model folder must contain a `model.yaml` file describing the model metadata and
-optional vLLM integration. Each model folder can optionally include a `usage.md`
-file to provide users with model-specific usage guidance.
+metadata. `skills` is optional and should only be included when the package
+provides agent skills to assist users in using the package. The `models/` folder
+is required whenever a Nexus package wants to advertise one or more models, with
+one sub-folder for each model. Each model folder must contain a `model.yaml`
+file describing the model metadata and optional vLLM integration. Each model
+folder can optionally include a `usage.md` file to provide users with
+model-specific usage guidance.
 
 ---
 
