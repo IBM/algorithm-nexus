@@ -53,7 +53,7 @@ class ValidationErrorCollector:
         return "\n".join(f"[yellow]i[/yellow] {msg}" for msg in self.info)
 
     def __str__(self) -> str:
-        """Format errors as a bulleted list (for backward compatibility)."""
+        """Format errors as a bulleted list."""
         return self.format_errors()
 
 
@@ -65,12 +65,12 @@ def load_yaml_file(
     Returns a dict if successful, None otherwise.
     Validates that the YAML contains a mapping (dict) at the top level.
     """
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            data = yaml.safe_load(handle)
-    except FileNotFoundError:
+    if not path.is_file():
         collector.add(f"Missing YAML file: {path}")
         return None
+
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         collector.add(f"Invalid YAML syntax in {path}: {exc}")
         return None
@@ -144,12 +144,13 @@ def validate_optional_file(
     path: Path, collector: ValidationErrorCollector, context: str
 ) -> bool:
     """Validate optional file and add info if missing. Returns True if valid or doesn't exist."""
-    if path.exists():
-        if not path.is_file():
-            collector.add(f"{context} must be a file when present: {path}")
-            return False
-    else:
+    if not path.exists():
         collector.add_info(f"{context}")
+        return False
+    elif not path.is_file():
+        collector.add(f"{context} must be a file when present: {path}")
+        return False
+
     return True
 
 
@@ -157,12 +158,13 @@ def validate_optional_dir(
     path: Path, collector: ValidationErrorCollector, context: str
 ) -> bool:
     """Validate optional directory and add info if missing. Returns True if valid or doesn't exist."""
-    if path.exists():
-        if not path.is_dir():
-            collector.add(f"{context} must be a directory when present: {path}")
-            return False
-    else:
+    if not path.exists():
         collector.add_info(f"{context}")
+        return False
+    elif not path.is_dir():
+        collector.add(f"{context} must be a directory when present: {path}")
+        return False
+
     return True
 
 
@@ -205,15 +207,11 @@ def validate_package_directory(
 
     # Check if models directory exists
     models_dir = package_dir / "models"
-    if not models_dir.exists():
-        # No models directory is valid - package may not have models
-        collector.add_info("Optional package directory missing: models")
+    if not validate_optional_dir(
+        models_dir, collector, "Optional package directory missing: models"
+    ):
         return
 
-    if not models_dir.is_dir():
-        collector.add(f"models/ must be a directory when present: {models_dir}")
-        return
-
-    # Validate each model directory found
+    # Only validate model directories if models_dir exists
     for model_dir in models_dir.iterdir():
         validate_model_directory(model_dir, collector)

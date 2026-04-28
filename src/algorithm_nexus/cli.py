@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Annotated
 
 try:
     import typer
@@ -43,28 +44,20 @@ def main_callback(ctx: typer.Context) -> None:
 
 @app.command(name="validate")
 def validate(
-    package_path: Path = typer.Argument(
-        ...,
-        help="Path to a Nexus package directory.",
-    ),
+    package_path: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a Nexus package directory.",
+            dir_okay=True,
+            file_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
 ) -> None:
     """Validate Nexus package structure and YAML configuration files."""
     collector = ValidationErrorCollector()
-
-    resolved_path = package_path.resolve()
-
-    if not resolved_path.exists():
-        collector.add(f"Package path does not exist: {resolved_path}")
-        console.print(
-            Panel(
-                str(collector),
-                title="[bold red]Validation Failed[/bold red]",
-                border_style="red",
-            )
-        )
-        raise typer.Exit(code=1)
-
-    validate_package_directory(resolved_path, collector)
+    validate_package_directory(package_path, collector)
 
     if collector.has_errors:
         console.print(

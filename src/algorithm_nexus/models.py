@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class PackageConfig(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    name: str = Field(..., min_length=1, description="Python package name")
+    name: Annotated[str, Field(min_length=1, description="Python package name")]
 
 
 class VLLMPlugins(BaseModel):
@@ -23,12 +23,17 @@ class VLLMPlugins(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    general: str | None = Field(
-        None, description="General vLLM plugin that loads the model class"
-    )
-    io_processors: list[str] | None = Field(
-        None, description="List of vLLM IO processor plugins supported by this model"
-    )
+    general: Annotated[
+        str | None,
+        Field(None, description="General vLLM plugin that loads the model class"),
+    ] = None
+    io_processors: Annotated[
+        list[str] | None,
+        Field(
+            None,
+            description="List of vLLM IO processor plugins supported by this model",
+        ),
+    ] = None
 
 
 class VLLMConfig(BaseModel):
@@ -40,10 +45,14 @@ class VLLMConfig(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    enabled: Literal[True] = Field(
-        ..., description="Whether vLLM serving is enabled for this model"
-    )
-    plugins: VLLMPlugins | None = Field(None, description="vLLM plugins configuration")
+    enabled: Annotated[
+        Literal[True],
+        Field(description="Whether vLLM serving is enabled for this model"),
+    ]
+    plugins: Annotated[
+        VLLMPlugins | None,
+        Field(None, description="vLLM plugins configuration"),
+    ] = None
 
 
 class ModelConfig(BaseModel):
@@ -51,17 +60,24 @@ class ModelConfig(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    id: str = Field(
-        ..., min_length=1, description="Hugging Face model repository identifier"
-    )
-    owner: str | None = Field(
-        None,
-        description="Model owner GitHub identifier. If omitted, ownership defaults to the Nexus package owner.",
-    )
-    vllm: VLLMConfig | None = Field(
-        None,
-        description="vLLM serving configuration. Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the product or candidate distribution variants.",
-    )
+    id: Annotated[
+        str,
+        Field(min_length=1, description="Hugging Face model repository identifier"),
+    ]
+    owner: Annotated[
+        str | None,
+        Field(
+            None,
+            description="Model owner GitHub identifier. If omitted, ownership defaults to the Nexus package owner.",
+        ),
+    ] = None
+    vllm: Annotated[
+        VLLMConfig | None,
+        Field(
+            None,
+            description="vLLM serving configuration. Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the product or candidate distribution variants.",
+        ),
+    ] = None
 
 
 class ModelYAML(BaseModel):
@@ -69,7 +85,7 @@ class ModelYAML(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    model: ModelConfig = Field(..., description="Model configuration")
+    model: Annotated[ModelConfig, Field(description="Model configuration")]
 
 
 class NexusYAML(BaseModel):
@@ -77,4 +93,4 @@ class NexusYAML(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    package: PackageConfig = Field(..., description="Package-level configuration")
+    package: Annotated[PackageConfig, Field(description="Package-level configuration")]
