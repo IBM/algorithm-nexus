@@ -2,245 +2,219 @@
 
 ## Executive Summary
 
-This document proposes a benchmarking systems based on the open-source **Accelerated Discovery
-Orchestrator (`ado`)** framework and the **Ray** distributed computing
-engine.
+This document proposes a benchmarking system for the Algorithm Stack packages
+within Algorithm Nexus.
 
 An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
 scalable execution needs for evaluating **benchmark targets** against defined
 **workloads**. By combining `ado` and Ray with specific **Algorithm Nexus
-Extensions**  and robust **Admin Processes**
-the team can deliver a comprehensive, end-to-end
-benchmarking solution capable of generating repeatable **benchmark results**
-across various **benchmark instances**.
+Extensions**, integration definitions, and robust administrative processes, the
+team can deliver a comprehensive, end-to-end benchmarking solution capable of
+generating repeatable **benchmark results**.
 
-## High-Level Architecture Overview
-
-The proposed system consists of five main pillars:
-
-1. **User/Admin Interface Tier (`ado` Client):** The `ado` CLI and Python API
-    serve as the primary entry point for package owners to discover **benchmark
-    experiments**, configure **benchmarks**, and view **benchmark results**.
-2. **Orchestration & Provenance Tier (`ado` Core):** The `ado` internal
-    protocols handle parameter tracking for **workloads**, automatically track
-    the provenance of data and operations, and manage the structured storage of
-    results across all **benchmark instances**.
-3. **Execution Tier (Ray Engine):** `ado` delegates the actual execution of
-    benchmark instances to a Ray cluster, which handles distributed execution,
-    resource allocation, and worker isolation.
-4. **Nexus Extensions (Packaging Strategy):** All benchmark experiments are
-    integrated as standard Python packages within the Nexus repository.
-    Installing the packages for a specific Nexus version allows users to
-    seamlessly browse and execute available evaluations locally or on the
-    cluster.
-5. **Admin Processes (Governance & Infrastructure):** Defines the operational
-    trust model (e.g., executing trusted code via IBMer submissions and CVE
-    scans), manual sweep oversight, CI automation, and Ray cluster configuration
-    (PVCs and log persistence).
+To fully satisfy these requirements, the design of the Benchmarking System is
+divided into three **Architectural Pillars**: System Architecture (The
+Mechanisms), Operational Architecture (The Infrastructure), and Governance &
+Conventions (The Standards).
 
 ---
 
-## Architecture Details
+## 1. System Architecture (The Mechanisms)
 
-### Standardized Benchmark Packaging Protocol
+This pillar details the technical components, automated mechanisms, and
+execution engines that make up the benchmarking system.
 
-The `ado` extension framework dictates the architecture for defining **benchmark
-experiments**. `ado` enforces strict input/output interfaces for all tools and
-experiments. Because `ado` is purely Python-based, wrapping external frameworks
-simply involves writing a Python class adapter distributed as a standard
-package. Versioning and reproducibility are natively handled by `ado`'s
-data-reuse protocols, which track the exact combination of an experiment name
-and its parameters to define a unique execution. Data dependencies are managed
-either via standard Python package data inclusion or by the experiment's
-internal logic downloading the required workload files at runtime.
+### 1.1 Two-Tiered Packaging Architecture
 
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
+The system utilizes a two-tiered architecture to strictly separate the
+definition of a benchmark experiment from its application to a specific AI
+model.
 
 <!-- markdownlint-disable line-length -->
 
-| Requirement | Name                       | Proposed Solution                                                                                                                                            |
-| :---------- | :------------------------- |:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **REQ 1.1** | Input/Output Specification | `ado` enforces a standard programmatic input/output schema. Experiments natively accept the benchmark target alongside parameterizable kwargs.               |
-| **REQ 1.2** | Python Package             | `ado` and all wrappers are written purely in Python and distributed as standard packages.                                                                    |
-| **REQ 1.3** | Versioning                 | `ado` allows arbitrary parameters (e.g., version strings) to be passed and tracked, satisfying varying versioning approaches. (PARTIAL/SUPPORTING)           |
-| **REQ 1.4** | Reproducible Execution     | `ado`'s provenance tracking guarantees that an experiment name plus specific parameter values defines a unique, repeatable execution. (PARTIAL/SUPPORTING)   |
-| **REQ 1.5** | Lifecycle Management       | `ado` natively provides a flag for experiments to mark deprecation, visible to users to prevent technical debt.                                              |
-| **REQ 1.7** | Required Data              | Workload data is either bundled directly inside the Nexus Python package or the `ado` experiment is programmed to download it dynamically at execution time. |
+| Tier                                        | Component       | Responsibility & Behavior                                                                                                                                                                                                                                                                              |
+| ------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Tier 1: Benchmark Experiment Definition** | `ado` core      | Serves as the core capability engine. It provides the framework to define, package, and execute a self-contained benchmark experiment. It enforces strict input/output interfaces, handles versioning of the experiment logic, and manages the execution provenance independently of the target model. |
+| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: bind a specific target (the model) to a specific `ado` benchmark experiment and a defined workload.                                     |
 
 <!-- markdownlint-enable line-length -->
 
-### Benchmark Registration and Discoverability
+### 1.2 Event & Orchestration Broker
 
-In this area, the architecture leverages standard Python packaging combined with
-`ado`'s native CLI. Benchmark experiments are committed as Python packages
-directly within the Nexus repository. When a user installs a Nexus version,
-`ado` automatically registers the available experiments. Users can use the `ado`
-CLI or database to list registered experiments, defined **benchmarks** (fixed or
-parameterized), and the targets utilizing them.
+**GitHub** acts as the primary interface and event broker for the system. It
+captures user intent and system state changes (e.g., deployments or releases),
+routing these events to the underlying execution infrastructure. It acts as the
+technical bridge between human operations and the execution engine.
 
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
+### 1.3 Execution and Orchestration Engine
 
-<!-- markdownlint-disable line-length -->
+Execution architecture relies on **Ray** and **`ado`**. `ado` leverages **Ray**
+to handle parameter sweeps and single benchmark instances mechanically. `ado`
+data recording capabilities mean if one instance in a sweep fails, `ado`
+continues orchestration and commits successful results to the database. Ray
+allows the underlying experiments to explicitly request hardware resources
+(e.g., `@ray.remote(num_gpus=1)`) via task decorators. Ray also can create
+per-task execution environments, allowing tests with incompatible requirements
+to ado-core or other experiments to execute.
 
-| Requirement | Name                              | Proposed Solution                                                                                                      |
-| :---------- | :-------------------------------- |:-----------------------------------------------------------------------------------------------------------------------|
-| **REQ 2.1** | Benchmark Experiment Registration | Registration is achieved by installing the benchmark package in a virtual env with `ado`.                              |
-| **REQ 2.2** | Benchmark Experiment Discovery    | `ado` provides built-in commands to list and discover all registered benchmark experiments, including deprecated ones. |
-| **REQ 2.3** | Benchmark Registration            | TBD                                                                                                                    |
-| **REQ 2.4** | Benchmark Discovery               | TBD                                                                                                                    |
+### 1.4 Centralized Data & Discovery
 
-<!-- markdownlint-enable line-length -->
+The architecture utilizes `ado` distributed projects capabilities to store data
+. enforcing a uniform schema for results and custom metadata dictionaries.
+Furthermore, `ado`'s automatically registers available experiments upon
+environment installation, providing built-in commands to list and discover
+targets.
 
-### Using the Benchmarking System
-
-Contributors interact with the architecture through Python code and `ado`
-configuration semantics. They are responsible for specifying which benchmark
-they want to use, or if a new one is needed, encapsulating their custom logic
-into a standard Python package that conforms to the `ado` interface.
-
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
+#### System Architecture Requirements Matching
 
 <!-- markdownlint-disable line-length -->
 
-| Requirement | Name                            | Proposed Solution                                                                                                                                                        |
-| :---------- | :------------------------------ |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **REQ 3.1** | Benchmark Specification         | A benchmark is specified by saving an `ado` configuration that binds a benchmark experiment (fixed or parameterizable) to a specific workload (point.yaml or space.yaml) |
-| **REQ 3.2** | Providing Benchmark Experiments | Package owners provide benchmark experiment scripts as new `ado` extensions (custom experiment or actuators), packaged in compliance with Nexus standards. (PARTIAL)     |
-| **REQ 3.3** | Benchmark Experiment Reuse      | Once an experiment is registered in an `ado` environment, it can be universally referenced and reused across different projects.  (PARTIAL)                              |
-
-<!-- markdownlint-enable line-length -->
-
-### Execution and Orchestration
-
-Execution architecture relies on Ray. `ado` leverages `raytune` to handle
-parameter sweeps and single **benchmark instances**. Ray allows experiments to
-explicitly request hardware resources (like GPUs) via task decorators, while
-admins maintain control by setting hard namespace limits. Ray isolates
-individual tasks, meaning if one instance in a sweep fails, the others continue.
-
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
-
-<!-- markdownlint-disable line-length -->
-
-| Requirement | Name                         | Proposed Solution                                                                                                                                                                        |
-| :---------- | :--------------------------- |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **REQ 4.1** | Single and Sweep Execution   | `ado` can execute out-of-the box single benchmark instances and parameter sweeps with any experiment packaged according to the Standardized Benchmark Packaging Protocol outlined above. |
-| **REQ 4.2** | Resource Specification       | Ray allows explicit hardware resource requests (e.g., `@ray.remote(num_gpus=1)`) within the benchmark experiment code.                                                                   |
-| **REQ 4.3** | Resource Limits              | A configured Ray cluster allows admins to set hard quotas and resource limits per instance or set of instances.                                                                          |
-| **REQ 4.4** | Result Capture               | `ado` commits successful benchmark results to the database even if parallel instances fail.                                                                                              |
-| **REQ 4.5** | Standardized Error Reporting | Handled natively via standard Python error handling and custom return payloads within the `ado`.                                                                                         |
-| **REQ 4.6** | Logging                      | Admins will configure the Ray cluster infrastructure to capture and persist Ray logs (including tracebacks), making them accessible without requiring indefinite retention.              |
-| **REQ 4.7** | Self-Contained Execution     | TBD                                                                                                                                                                                      |
-| **REQ 4.8** | Local Execution              | `ado` supports local execution for rapid prototyping by users with sufficient local compute.                                                                                             |
-
-<!-- markdownlint-enable line-length -->
-
-### Data Storage and Analysis
-
-For centralized data tracking, the architecture utilizes `ado` "Distributed
-Projects." This connects the execution engine to a remote database, ensuring all
-**benchmark results** are logged centrally. `ado`'s automatic data-tracking
-enforces a uniform schema across all benchmark instances and allows custom
-metadata dictionaries to be attached to preserve context.
-
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
-
-<!-- markdownlint-disable line-length -->
-
-| Requirement | Name                        | Proposed Solution                                                                                         |
-| :---------- | :-------------------------- |:----------------------------------------------------------------------------------------------------------|
-| **REQ 5.1** | Centralized Results Storage | `ado` provides centralized results storage.                                                               |
-| **REQ 5.2** | Common Results Schema       | `ado`'s enforces a uniform, structured schema for all stored benchmark results.                           |
-| **REQ 5.3** | Custom Metadata Support     | `ado` supports returning and storing custom metadata dicts alongside core quantitative execution results. |
-
-<!-- markdownlint-enable line-length -->
-
-### Admin Execution Environment
-
-The administrative architecture focuses on a trust-based model combined with Ray
-cluster configurations. Nexus will rely on organizational trust—only IBMers can
-submit code, and all packages undergo standard CI/CD CVE scans. Ray runtime
-environments dynamically handle isolated execution for dependencies, and the
-underlying cluster will mount a shared Persistent Filesystem (PVC) to optimize
-performance via data caching.
-
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
-
-<!-- markdownlint-disable line-length -->
-
-| Requirement | Name                  | Proposed Solution                                                                                                                           |
-| :---------- | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| **REQ 6.1** | Admin Execution       | Admin execution is supported securely via trusted IBMer code submissions, CVE scans, and Ray cluster deployment.                            |
-| **REQ 6.2** | Isolated Execution    | Ray dynamically manages and loads package dependencies into isolated worker node environments at execution time to prevent version clashes. |
-| **REQ 6.3** | Persistent Filesystem | Admins will configure the Ray cluster to mount a shared persistent filesystem (PVC) between executions to allow workload dataset caching.   |
-
-<!-- markdownlint-enable line-length -->
-
-### Nexus-Level Orchestration & Review
-
-Global orchestration across multiple packages will utilize `ado`'s native search
-space semantics to define benchmarks independently of individual packages.
-Governance over expensive parameter sweeps is handled manually by admins,
-supplemented by automated CI checks. The mechanism for actually triggering these
-centralized administrative evaluations is pending definition.
-
-<!-- markdownlint-disable-next-line MD024 -->
-#### Requirements Matching
-
-<!-- markdownlint-disable line-length -->
-
-| Requirement | Name                                 | Proposed Solution                                                                                                                 |
-| :---------- | :----------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- |
-| **REQ 7.1** | Nexus-Level Benchmarks Definition    | Nexus-level benchmarks can be defined independently using `ado` configuration semantics (search spaces and wrapper extensions).   |
-| **REQ 7.2** | Admin-Triggered Evaluation Execution | TBD                                                                                                                               |
-| **REQ 7.3** | Sweep Review and Approval            | Admins retain manual/automated review oversight of sweep configurations (e.g., via PR approvals) prior to Ray cluster submission. |
+| Requirement | Name                           | Fulfillment Strategy | Component     | Proposed Solution                                                                                                        |
+| ----------- | ------------------------------ |----------------------| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **REQ 1.1** | Input/Output Specification     | Technology           | `ado` core    | `ado` defines a standard programmatic input/output schema for benchmark experiments                                      |
+| **REQ 1.2** | Python Package                 | Technology           | `ado` core    | `ado` experiments are written purely in Python and distributed as standard packages.                                     |
+| **REQ 1.5** | Lifecycle Management           | Technology           | `ado` core    | `ado` natively provides a flag for experiments to mark deprecation.                                                      |
+| **REQ 2.2** | Benchmark Experiment Discovery | Technology           | `ado` CLI     | `ado` CLI provides built-in commands to list all registered experiments.                                                 |
+| **REQ 2.4** | Benchmark Discovery            | Technology           | nexus         | The nexus CLI will enable listing all benchmarks defined in all packages (or a specific package or for a specific model) |
+| **REQ 3.3** | Benchmark Experiment Reuse     | Technology           | `ado` + nexus | Once registered as described in REQ 2-1, experiments can be universally referenced across projects.                      |
+| **REQ 4.1** | Single & Sweep Execution       | Technology           | Ray + `ado`   | `ado` provides capability executes single instances and parameter sweeps.                                                |
+| **REQ 4.2** | Resource Specification         | Technology           | Ray           | Ray allows a benchmark experiment to make explicit hardware resource requests                                            |
+| **REQ 4.4** | Result Capture                 | Technology           | `ado` DB      | `ado` commits successful benchmark results even if parallel instances fail.                                              |
+| **REQ 4.5** | Standardized Error Reporting   | Technology           | `ado` core    | Handled natively via standard Python error handling and custom ado return payloads.                                      |
+| **REQ 4.8** | Local Execution                | Technology           | `ado` core    | `ado` supports local execution for rapid prototyping on local compute.                                                   |
+| **REQ 5.1** | Centralized Results Storage    | Technology           | `ado` DB      | `ado` provides centralized remote results storage.                                                                       |
+| **REQ 5.2** | Common Results Schema          | Technology           | `ado` core    | `ado` enforces a uniform, structured schema for all stored results.                                                      |
+| **REQ 5.3** | Custom Metadata Support        | Technology           | `ado` DB      | `ado` supports returning custom metadata dicts alongside core results.                                                   |
 
 <!-- markdownlint-enable line-length -->
 
 ---
 
-## Requirements Summary
+## 2. Operational Architecture (Workflows & Infrastructure)
+
+This pillar details how the system is deployed, maintained, triggered, and
+scaled by the administrative team and CI/CD pipelines.
+
+### 2.1 Infrastructure Configuration
+
+Admins configure the **Ray cluster** with hard namespace limits to maintain
+resource quotas during massive sweeps. To optimize performance, the underlying
+cluster mounts a shared Persistent Filesystem (PVC) for workload dataset
+caching. Ray dynamically isolates worker node environments to prevent dependency
+version clashes between concurrent evaluations.
+
+### 2.2 Orchestration Triggers & Automation
+
+The mechanism for triggering centralized administrative evaluations is fully
+automated via **GitHub**. These are triggered mechanically via automated GitHub
+events (such as code deployments or releases) or on-demand utilizing GitHub
+ChatOps. They are executed with a combination of with GitHub Actions (on Event
+or on schedule) and polling Runners. Global orchestration across multiple
+packages utilizes `ado`'s native search space semantics.
+
+#### Operational Requirements Matching
 
 <!-- markdownlint-disable line-length -->
 
-| Requirement | Requirement Area                           | Name                                 | Proposed Solution                                                                                                                                                           |
-| :---------- | :----------------------------------------- | :----------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **REQ 1.1** | Standardized Benchmark Packaging Protocol  | Input/Output Specification           | `ado` enforces a standard programmatic input/output schema. Experiments natively accept the benchmark target alongside parameterizable kwargs.                              |
-| **REQ 1.2** | Standardized Benchmark Packaging Protocol  | Python Package                       | `ado` and all wrappers are written purely in Python and distributed as standard packages with explicitly defined dependencies loaded by Ray.                                |
-| **REQ 1.3** | Standardized Benchmark Packaging Protocol  | Versioning                           | `ado` allows arbitrary parameters (e.g., version strings) to be passed and tracked, satisfying varying versioning approaches.                                               |
-| **REQ 1.4** | Standardized Benchmark Packaging Protocol  | Reproducible Execution               | `ado`'s provenance tracking guarantees that an experiment name plus specific parameter values defines a unique, repeatable execution.                                       |
-| **REQ 1.5** | Standardized Benchmark Packaging Protocol  | Lifecycle Management                 | `ado` natively provides a flag for experiments to mark deprecation, visible to users to prevent technical debt.                                                             |
-| **REQ 1.7** | Standardized Benchmark Packaging Protocol  | Required Data                        | Workload data is either bundled directly inside the Nexus Python package or the `ado` experiment is programmed to download it dynamically at execution time.                |
-| **REQ 2.1** | Benchmark Registration and Discoverability | Benchmark Experiment Registration    | Registration is achieved by committing the benchmark experiment Python package to Nexus. Installing the package registers it with the local `ado` instance.                 |
-| **REQ 2.2** | Benchmark Registration and Discoverability | Benchmark Experiment Discovery       | `ado` CLI & Python API provides built-in commands to list and discover all registered benchmark experiments, including deprecated ones.                                     |
-| **REQ 2.3** | Benchmark Registration and Discoverability | Benchmark Registration               | A benchmark is formally registered by saving an `ado` configuration (YAML or Python) that binds a benchmark experiment (fixed or parameterizable) to a specific workload.   |
-| **REQ 2.4** | Benchmark Registration and Discoverability | Benchmark Discovery                  | By querying the centralized `ado` database, users can discover defined benchmarks and trace which benchmark targets have executed them.                                     |
-| **REQ 3.1** | Using the Benchmarking System              | Benchmark Specification              | Package owners use the `ado` CLI or API to specify the registered benchmark configuration they wish to execute against their target.                                        |
-| **REQ 3.2** | Using the Benchmarking System              | Providing Benchmark Experiments      | Package owners provide custom benchmark experiment scripts as new `ado` extensions, packaged in compliance with Nexus standards.                                            |
-| **REQ 3.3** | Using the Benchmarking System              | Benchmark Experiment Reuse           | Once an experiment is registered in the `ado` environment via a Nexus package, it can be universally referenced and reused across different projects.                       |
-| **REQ 4.1** | Execution and Orchestration                | Single and Sweep Execution           | `ado` uses Ray's built-in samplers and optimizers out-of-the-box for both single benchmark instances and parameter sweeps.                                                  |
-| **REQ 4.2** | Execution and Orchestration                | Resource Specification               | Ray allows explicit hardware resource requests (e.g., `@ray.remote(num_gpus=1)`) within the benchmark experiment code.                                                      |
-| **REQ 4.3** | Execution and Orchestration                | Resource Limits                      | A configured Ray cluster allows admins to set hard quotas and resource limits per instance or set of instances.                                                             |
-| **REQ 4.4** | Execution and Orchestration                | Result Capture                       | Ray isolates instances; `ado` independently commits successful benchmark results to the database even if parallel instances fail.                                           |
-| **REQ 4.5** | Execution and Orchestration                | Standardized Error Reporting         | Handled natively via standard Python error handling and custom return payloads within the `ado` interface.                                                                  |
-| **REQ 4.6** | Execution and Orchestration                | Logging                              | Admins will configure the Ray cluster infrastructure to capture and persist Ray logs (including tracebacks), making them accessible without requiring indefinite retention. |
-| **REQ 4.7** | Execution and Orchestration                | Self-Contained Execution             | Ray spins up isolated, stateless worker processes, ensuring experiments cannot rely on unmanaged pre-existing data on the filesystem.                                       |
-| **REQ 4.8** | Execution and Orchestration                | Local Execution                      | `ado` + Ray natively supports local, single-node execution for rapid prototyping by users with sufficient local compute.                                                    |
-| **REQ 5.1** | Data Storage and Analysis                  | Centralized Results Storage          | `ado` Distributed Projects uses a remote database connection to store and centralize results for cross-model comparison and package owner inspection.                       |
-| **REQ 5.2** | Data Storage and Analysis                  | Common Results Schema                | `ado`'s automatic data-tracking enforces a uniform, structured schema and metadata standard for all stored benchmark results.                                               |
-| **REQ 5.3** | Data Storage and Analysis                  | Custom Metadata Support              | `ado` result interfaces support returning and storing custom metadata dicts alongside core quantitative execution results.                                                  |
-| **REQ 6.1** | Admin Execution Environment                | Admin Execution                      | Admin execution is supported securely via trusted IBMer code submissions, CVE scans, and Ray cluster deployment.                                                            |
-| **REQ 6.2** | Admin Execution Environment                | Isolated Execution                   | Ray dynamically manages and loads package dependencies into isolated worker node environments at execution time to prevent version clashes.                                 |
-| **REQ 6.3** | Admin Execution Environment                | Persistent Filesystem                | Admins will configure the Ray cluster to mount a shared persistent filesystem (PVC) between executions to allow workload dataset caching.                                   |
-| **REQ 7.1** | Nexus-Level Orchestration & Review         | Nexus-Level Benchmarks Definition    | Nexus-level benchmarks can be defined independently using `ado` configuration semantics (search spaces and wrapper extensions).                                             |
-| **REQ 7.2** | Nexus-Level Orchestration & Review         | Admin-Triggered Evaluation Execution | TBD                                                                                                                                                                         |
-| **REQ 7.3** | Nexus-Level Orchestration & Review         | Sweep Review and Approval            | Admins retain manual/automated review oversight of sweep configurations (e.g., via PR approvals) prior to Ray cluster submission.                                           |
+| Requirement | Name                                 | Fulfillment Strategy | Component           | Proposed Solution                                                                                                                                                                                          |
+| ----------- | ------------------------------------ |----------------------| ------------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **REQ 2.1** | Benchmark Experiment Registration    | Technology + Process | `ado`+ nexus        | Users add benchmark experiment packages to a Nexus package and the Nexus pyproject.toml (via uv). They are installed when a given variant of Nexus is installed. [PENDING: Nexus Test Dependency Decision] |
+| **REQ 2.3** | Benchmark Registration               | Technology + Process | `ado` + nexus       | User add benchmarks definitions (see REQ 3.1 for specification) to a defined section of a nexus package model YAML [PENDING: Nexus YAML Structure Decision]                                                |
+| **REQ 4.3** | Resource Limits                      | Technology + Process | Ray Cluster         | Admins configure Ray clusters to set hard quotas per instance.                                                                                                                                             |
+| **REQ 4.6** | Logging                              | Technology + Process | Ray Cluster         | Admins configure infrastructure to persist logs without indefinite retention.                                                                                                                              |
+| **REQ 6.2** | Isolated Execution                   | Technology + Process | `ado` + Ray Runtime | Users can describe the benchmark experiment dependencies in the benchmark experiment package using `ado`+Ray semantics. Ray will dynamically create isolated virtual environments per worker.              |
+| **REQ 6.3** | Persistent Filesystem                | Technology + Process | Ray / K8s           | Admins configure the cluster to mount a shared PVC for dataset caching.                                                                                                                                    |
+| **REQ 7.2** | Admin-Triggered Evaluation Execution | Technology + Process | GitHub              | Triggered via automated GitHub events or on-demand via GitHub ChatOps.                                                                                                                                     |
 
 <!-- markdownlint-enable line-length -->
+
+---
+
+## 3. Governance & Conventions (Policies & Standards)
+
+This pillar outlines the human-in-the-loop requirements, conventions, and
+security policies that contributors must adhere to in order for the technical
+and operational systems to function correctly.
+
+### 3.1 Trust and Security Model
+
+Nexus relies on an organizational trust model. Only authorized IBMers can submit
+code. To enforce security, all packages undergo mandatory standard CI/CD CVE
+scans via GitHub before they are allowed into the execution environment.
+
+### 3.2 Packaging and Versioning Conventions
+
+While `ado` provides the mechanism for versioning and reproducibility,
+contributors are bound by strict conventions to ensure uniqueness and
+reliability.
+
+- **Reproducibility Contract:** Contributors must adhere to the convention that
+  an experiment name plus specific parameter values defines a unique, repeatable
+  execution. Repeatable here means **the experiment instance use an identical
+  process** not produces the same result, as experiments can be stochastic.
+- **Versioning**: ado provides mechanisms for experiment versioning but does not
+  prescribe any. The main convention w.r.t experiment versioning is that
+  whatever mechanism is chosen ensure the **Reproducibility Contract:**
+- **Data Handling Guidelines:** Workload data must either be bundled directly
+  inside the Nexus Python package or programmed to download dynamically at
+  execution time.
+
+### 3.3 Governance of Sweeps
+
+Because parameter sweeps are computationally expensive, they must undergo
+particular scrutiny, with admins retaining manual and automated review
+oversight. Sweep configurations must pass GitHub PR approvals prior to being
+submitted to the Ray cluster for execution.
+
+#### Governance Requirements Matching
+
+<!-- markdownlint-disable line-length -->
+
+| Requirement | Name                            | Fulfillment Strategy    | Component     | Proposed Solution                                                                                                                                        |
+| ----------- | ------------------------------- |-------------------------| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. [PENDING: Versioning Semantics Decision]              |
+| **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`s convention that a given experiment name encodes a unique, repeatable experiment.                                              |
+| **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads dynamically.                                                       |
+| **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As 1.7                                                                                                                                                   |
+| **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a workload.                                                             |
+| **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Package owners provide custom experiments according to the Standardized Package Protocol.                                                                |
+| **REQ 6.1** | Admin Security                  | Process                 | GitHub CI     | Secured via trusted code submissions and mandatory CVE scans.                                                                                            |
+| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. [PENDING: Nexus Repo Layout Decision] |
+| **REQ 7.3** | Sweep Review and Approval       | Process                 | GitHub PRs    | Admins retain review oversight of sweep configurations via GitHub PR workflows.                                                                          |
+
+<!-- markdownlint-enable line-length -->
+
+---
+
+## Open Questions
+
+The following questions/decisions are open and can be resolved in subsequent
+issues.
+
+- Versioning Semantics for REQ 1.3
+- Nexus Test Dependencies Handling for REQ 2.2
+- Nexus Model YAML Structure for REQ 2.3
+- Nexus Repo Layout for REQ 7.1
+
+## How Nexus package developers will use the system
+
+### Contributing a benchmark experiment
+
+Developers write and package the experiment according to the standardized
+packaging protocol (REQ 3-2) i.e. as an ado custom experiment or
+actuator+experiments. They add this package to their Nexus package where it is
+then registered on Nexus install (REQ 2-1).
+
+### Defining a benchmark to use for a model
+
+First developers can:
+
+- use `ado` CLI to discover existing benchmark experiments (REQ 2-2)
+- use `nexus` CLI to discover existing benchmark specifications (REQ 2-4)
+
+They then define their benchmark using an ado configuration (REQ 3-1) adding
+this to the model YAML in their nexus package (REQ 2-3). The benchmark
+configuration can reference any existing benchmark experiment, for example one
+discovered via `ado` CLI, (REQ 3-3). The benchmark configuration can also be
+based on one discovered via the Nexus CLI.
