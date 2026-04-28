@@ -13,9 +13,18 @@ Homepage = "https://github.com/IBM/algorithm-nexus"
 Issues = "https://github.com/IBM/algorithm-nexus/issues"
 Repository = "https://github.com/IBM/algorithm-nexus"
 
+[project.scripts]
+algorithm-nexus = "algorithm_nexus.cli:main"
+
 [project.optional-dependencies]
 candidate = [
   "vllm==0.19.1",
+]
+cli = [
+  "pydantic>=2.13.3",
+  "pyyaml>=6.0.3",
+  "rich>=15.0.0",
+  "typer>=0.25.0",
 ]
 product = [
   "vllm==0.18.0",
@@ -29,8 +38,12 @@ dev = [
   "pre-commit>=4.2.0",
   "ruff>=0.12.0",
 ]
+test = [
+  "pytest>=9.0.3",
+]
 
 [tool.uv]
+package = true
 conflicts = [
   [
     { extra = "ecosystem" },
