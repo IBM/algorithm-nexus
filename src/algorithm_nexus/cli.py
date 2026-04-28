@@ -37,10 +37,7 @@ app = typer.Typer(
 
 @app.callback(invoke_without_command=True)
 def main_callback(ctx: typer.Context) -> None:
-    """Algorithm Nexus CLI - Tools for managing and validating Nexus packages."""
-    if ctx.invoked_subcommand is None:
-        console.print(ctx.get_help())
-        raise typer.Exit()
+    pass
 
 
 @app.command(name="validate")

@@ -14,7 +14,7 @@ Issues = "https://github.com/IBM/algorithm-nexus/issues"
 Repository = "https://github.com/IBM/algorithm-nexus"
 
 [project.scripts]
-algorithm-nexus = "algorithm_nexus.cli:main"
+an = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [

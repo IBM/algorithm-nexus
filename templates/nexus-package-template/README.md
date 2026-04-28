@@ -19,60 +19,52 @@ below to customize it for your model.
    ```
 
 3. **Update `nexus.yaml`**:
-   - Replace `your-package-name` with your package name
-   - Replace `your-model-name` with your model directory name
-   - Update version and agent_skills as needed
+   - Replace `your-package-name` with your Python package name
 
 4. **Update `models/your-model-name/model.yaml`**:
-   - Replace `your-org/your-model-name` with your model ID
-   - Replace `your-gh-id` with the GitHub ID of the model owner if explicitly
-     set.
-   - Configure hardware requirements
-   - Add vLLM configuration if needed (or remove the vllm section)
-   - Update test commands
+   - Replace `your-org/your-model-name` with your Hugging Face model repository
+     ID
+   - Optionally set `owner` with the GitHub username of the model owner
+   - Add vLLM configuration if needed (or remove the commented vllm section)
 
-5. **Implement tests**:
-   - Add actual inference tests in `tests/test_inference.py`
-   - Add vLLM tests in `tests/test_vllm.py` (if using vLLM)
+5. **Add optional documentation**:
+   - Create `models/your-model-name/usage.md` with usage examples (optional)
 
 6. **Validate your package**:
 
    ```bash
-   algorithm-nexus validate /path/to/your-package
+   an validate /path/to/your-package
    ```
 
 ## Package Structure
 
 ```text
 your-package/
-├── nexus.yaml              # Package configuration
-├── models/
-│   └── your-model-name/
-│       ├── model.yaml      # Model configuration
-│       └── tests/
-│           ├── test_inference.py  # Inference tests
-│           └── test_vllm.py       # vLLM tests (if applicable)
-└── README.md
+├── nexus.yaml              # Required: Package configuration
+├── skills/                 # Optional: Agent skills resources
+└── models/
+    └── your-model-name/
+        ├── model.yaml      # Required: Model configuration
+        └── usage.md        # Optional: Usage documentation
 ```
 
 ## Configuration Guidelines
 
-### vLLM Configuration
+### nexus.yaml
 
-- If your model uses vLLM, set `vllm.enabled: true` and provide vLLM testing
-- If not using vLLM, remove the entire `vllm` section from `model.yaml`
-- The `enabled` field must be `true` if the vllm section is present
+- `package.name`: Must match your Python package name (e.g., "terratorch")
 
-### Testing Requirements
+### model.yaml
 
-- All models must have a `tests/` directory with at least one test file
-- Test commands must be specified in `model.testing.commands`
-- If `vllm.enabled: true`, you must provide `model.testing.vllm.commands`
-
-### Hardware Requirements
-
-- Specify CPU requirements (cores and RAM)
-- Optionally specify GPU requirements (type, count, cpu_fallback)
+- `model.id`: Hugging Face model repository identifier (e.g.,
+  "ibm-nasa-geospatial/Prithvi-EO-2.0-300M-TL")
+- `model.owner`: (Optional) GitHub username of the model owner. If omitted,
+  defaults to the Nexus package owner
+- `model.vllm`: (Optional) Only include if your model requires additional vLLM
+  plugins for the candidate or product variants
+  - `enabled`: Must be `true` if the vllm section is present
+  - `plugins.general`: (Optional) General vLLM plugin that loads the model class
+  - `plugins.io_processors`: (Optional) List of vLLM IO processor plugins
 
 ## Documentation
 
@@ -86,7 +78,7 @@ For detailed documentation on Nexus package requirements, see:
 Before submitting your package, ensure it passes validation:
 
 ```bash
-algorithm-nexus validate /path/to/your-package
+an validate /path/to/your-package
 ```
 
 The validator checks:

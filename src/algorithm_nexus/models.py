@@ -7,13 +7,13 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PackageConfig(BaseModel):
     """Package-level configuration."""
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     name: Annotated[str, Field(min_length=1, description="Python package name")]
 
@@ -21,16 +21,15 @@ class PackageConfig(BaseModel):
 class VLLMPlugins(BaseModel):
     """vLLM plugins configuration."""
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     general: Annotated[
         str | None,
-        Field(None, description="General vLLM plugin that loads the model class"),
+        Field(description="General vLLM plugin that loads the model class"),
     ] = None
     io_processors: Annotated[
         list[str] | None,
         Field(
-            None,
             description="List of vLLM IO processor plugins supported by this model",
         ),
     ] = None
@@ -43,7 +42,7 @@ class VLLMConfig(BaseModel):
     and belong to a Nexus Package targeting the product or candidate distribution variants.
     """
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     enabled: Annotated[
         Literal[True],
@@ -51,14 +50,14 @@ class VLLMConfig(BaseModel):
     ]
     plugins: Annotated[
         VLLMPlugins | None,
-        Field(None, description="vLLM plugins configuration"),
+        Field(description="vLLM plugins configuration"),
     ] = None
 
 
 class ModelConfig(BaseModel):
     """Model-level configuration."""
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     id: Annotated[
         str,
@@ -67,14 +66,20 @@ class ModelConfig(BaseModel):
     owner: Annotated[
         str | None,
         Field(
-            None,
+            # Validats the owner field against the GitHub username rules:
+            # https://docs.github.com/en/enterprise-cloud@latest/admin/managing-iam/iam-configuration-reference/username-considerations-for-external-authentication
+            # - Only contains dashes and alphanumeric characters
+            # - Does not start or end with a dash
+            # - Does not contain consecutive dashes
+            # - Has a maximum length of 39 characters
+            pattern=r"^[a-zA-Z0-9]([a-zA-Z0-9]|-[a-zA-Z0-9]){0,38}$",
             description="Model owner GitHub identifier. If omitted, ownership defaults to the Nexus package owner.",
         ),
     ] = None
+
     vllm: Annotated[
         VLLMConfig | None,
         Field(
-            None,
             description="vLLM serving configuration. Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the product or candidate distribution variants.",
         ),
     ] = None
@@ -83,7 +88,7 @@ class ModelConfig(BaseModel):
 class ModelYAML(BaseModel):
     """Root model.yaml structure."""
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     model: Annotated[ModelConfig, Field(description="Model configuration")]
 
@@ -91,6 +96,6 @@ class ModelYAML(BaseModel):
 class NexusYAML(BaseModel):
     """Root nexus.yaml structure."""
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
 
     package: Annotated[PackageConfig, Field(description="Package-level configuration")]

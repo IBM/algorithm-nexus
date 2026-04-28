@@ -114,6 +114,37 @@ class TestModelConfig:
         assert config.id == "org/model"
         assert config.owner == "github-username"
 
+    def test_model_with_invalid_owner_id(self) -> None:
+        """Test model configuration with owner."""
+        data = {
+            "id": "org/model",
+        }
+
+        # starts with a dash
+        data["owner"] = "-github-username"
+        with pytest.raises(ValidationError):
+            ModelConfig(**data)
+
+        # ends with a dash
+        data["owner"] = "github-username-"
+        with pytest.raises(ValidationError):
+            ModelConfig(**data)
+
+        # scontaines consecutive dashes
+        data["owner"] = "github--username"
+        with pytest.raises(ValidationError):
+            ModelConfig(**data)
+
+        # contains an illegal character
+        data["owner"] = "github-usern@me"
+        with pytest.raises(ValidationError):
+            ModelConfig(**data)
+
+        # longer than 39 characters
+        data["owner"] = "ThisGitHubUsernameIsDefinitelyTooLongToBeValid"
+        with pytest.raises(ValidationError):
+            ModelConfig(**data)
+
     def test_vllm_disabled_fails(self) -> None:
         """Test that vLLM enabled=False is rejected."""
         data = {
