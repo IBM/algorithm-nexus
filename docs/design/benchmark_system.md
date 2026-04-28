@@ -77,8 +77,8 @@ them.
 | **REQ 1.5** | Lifecycle Management           | Technology           | `ado` core    | `ado` natively provides a flag for experiments to mark deprecation.                                                      |
 | **REQ 2.2** | Benchmark Experiment Discovery | Technology           | `ado` CLI     | `ado` CLI provides built-in commands to list all registered experiments.                                                 |
 | **REQ 2.4** | Benchmark Discovery            | Technology           | nexus         | The nexus CLI will enable listing all benchmarks defined in all packages (or a specific package or for a specific model) |
-| **REQ 3.3** | Benchmark Experiment Reuse     | Technology           | `ado` + nexus | Once registered as described in REQ 2-1, experiments can be universally referenced across projects.                      |
-| **REQ 4.1** | Single & Sweep Execution       | Technology           | Ray + `ado`   | `ado` provides capability executes single instances and parameter sweeps.                                                |
+| **REQ 3.3** | Benchmark Experiment Reuse     | Technology           | `ado` + nexus | Once registered as described in REQ 2.1, experiments can be universally referenced across projects.                      |
+| **REQ 4.1** | Single & Sweep Execution       | Technology           | Ray + `ado`   | `ado` provides the capability to execute single experiment instances and parameter sweeps.                                                |
 | **REQ 4.2** | Resource Specification         | Technology           | Ray           | Ray allows a benchmark experiment to make explicit hardware resource requests                                            |
 | **REQ 4.4** | Result Capture                 | Technology           | `ado` DB      | `ado` commits successful benchmark results even if parallel instances fail.                                              |
 | **REQ 4.5** | Standardized Error Reporting   | Technology           | `ado` core    | Handled natively via standard Python error handling and custom ado return payloads.                                      |
