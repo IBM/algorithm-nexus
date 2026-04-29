@@ -5,13 +5,26 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import ValidationError
 
-from algorithm_nexus.models import ModelYAML, NexusYAML
+try:
+    from pydantic import ValidationError
+except ImportError:
+    print(
+        "Error: CLI dependencies are not installed.\n"
+        "Please install them with: pip install algorithm-nexus[cli]",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+from algorithm_nexus.models import (
+    AlgorithmNexusModelConfig,
+    AlgorithmNexusPackageConfig,
+)
 
 
 class ValidationErrorCollector:
@@ -120,7 +133,7 @@ def validate_nexus_yaml(
         return
 
     try:
-        NexusYAML.model_validate(data)
+        AlgorithmNexusPackageConfig.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, nexus_yaml_path))
@@ -134,7 +147,7 @@ def validate_model_yaml(model_dir: Path, collector: ValidationErrorCollector) ->
         return
 
     try:
-        ModelYAML.model_validate(data)
+        AlgorithmNexusModelConfig.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, model_yaml_path))

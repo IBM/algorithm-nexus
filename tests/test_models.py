@@ -10,10 +10,10 @@ import yaml
 from pydantic import ValidationError
 
 from algorithm_nexus.models import (
-    ModelConfig,
-    ModelYAML,
-    NexusYAML,
-    PackageConfig,
+    AlgorithmNexusModelConfig,
+    AlgorithmNexusPackageConfig,
+    ModelInfo,
+    NexusPackageInfo,
     VLLMConfig,
 )
 
@@ -26,14 +26,14 @@ class TestPackageConfig:
         data = {
             "name": "test-package",
         }
-        config = PackageConfig(**data)
+        config = NexusPackageInfo(**data)
         assert config.name == "test-package"
 
     def test_missing_name(self) -> None:
         """Test that missing name is detected."""
         data = {}
         with pytest.raises(ValidationError) as exc_info:
-            PackageConfig(**data)
+            NexusPackageInfo(**data)
         assert "name" in str(exc_info.value)
 
 
@@ -85,7 +85,7 @@ class TestModelConfig:
         data = {
             "id": "org/model",
         }
-        config = ModelConfig(**data)
+        config = ModelInfo(**data)
         assert config.id == "org/model"
 
     def test_model_without_vllm(self) -> None:
@@ -93,7 +93,7 @@ class TestModelConfig:
         data = {
             "id": "org/model",
         }
-        config = ModelConfig(**data)
+        config = ModelInfo(**data)
         assert config.id == "org/model"
         assert config.vllm is None
 
@@ -101,8 +101,55 @@ class TestModelConfig:
         """Test that missing model.id is detected."""
         data = {}
         with pytest.raises(ValidationError) as exc_info:
-            ModelConfig(**data)
+            ModelInfo(**data)
         assert "id" in str(exc_info.value)
+
+    def test_valid_model_ids(self) -> None:
+        """Test valid HuggingFace model IDs."""
+        valid_ids = [
+            "org/model",
+            "my-org/my-model",
+            "org123/model456",
+            "a1/b2",  # minimum length (2 chars each)
+            "a" * 42 + "/" + "b" * 42,  # maximum length (42 chars each)
+            "user-name/model-name",
+            "org1-2/model3-4",
+        ]
+        for model_id in valid_ids:
+            data = {"id": model_id}
+            config = ModelInfo(**data)
+            assert config.id == model_id
+
+    def test_invalid_model_ids(self) -> None:
+        """Test invalid HuggingFace model IDs."""
+        invalid_ids = [
+            "org",  # missing slash and model name
+            "/model",  # missing org name
+            "org/",  # missing model name
+            "-org/model",  # starts with dash
+            "org-/model",  # ends with dash
+            "org/-model",  # model starts with dash
+            "org/model-",  # model ends with dash
+            "org--name/model",  # double dash in org
+            "org/model--name",  # double dash in model
+            "123/456",  # digit-only names
+            "123/model",  # digit-only org
+            "org/456",  # digit-only model
+            "o/model",  # org too short (1 char)
+            "org/m",  # model too short (1 char)
+            "a" * 43 + "/model",  # org too long (43 chars)
+            "org/" + "b" * 43,  # model too long (43 chars)
+            "org@name/model",  # illegal character in org
+            "org/model@name",  # illegal character in model
+            "org name/model",  # space in org
+            "org/model name",  # space in model
+            "org/model/extra",  # too many slashes
+        ]
+        for model_id in invalid_ids:
+            data = {"id": model_id}
+            with pytest.raises(ValidationError) as exc_info:
+                ModelInfo(**data)
+            assert "id" in str(exc_info.value).lower()
 
     def test_model_with_owner(self) -> None:
         """Test model configuration with owner."""
@@ -110,7 +157,7 @@ class TestModelConfig:
             "id": "org/model",
             "owner": "github-username",
         }
-        config = ModelConfig(**data)
+        config = ModelInfo(**data)
         assert config.id == "org/model"
         assert config.owner == "github-username"
 
@@ -123,27 +170,27 @@ class TestModelConfig:
         # starts with a dash
         data["owner"] = "-github-username"
         with pytest.raises(ValidationError):
-            ModelConfig(**data)
+            ModelInfo(**data)
 
         # ends with a dash
         data["owner"] = "github-username-"
         with pytest.raises(ValidationError):
-            ModelConfig(**data)
+            ModelInfo(**data)
 
         # scontaines consecutive dashes
         data["owner"] = "github--username"
         with pytest.raises(ValidationError):
-            ModelConfig(**data)
+            ModelInfo(**data)
 
         # contains an illegal character
         data["owner"] = "github-usern@me"
         with pytest.raises(ValidationError):
-            ModelConfig(**data)
+            ModelInfo(**data)
 
         # longer than 39 characters
         data["owner"] = "ThisGitHubUsernameIsDefinitelyTooLongToBeValid"
         with pytest.raises(ValidationError):
-            ModelConfig(**data)
+            ModelInfo(**data)
 
     def test_vllm_disabled_fails(self) -> None:
         """Test that vLLM enabled=False is rejected."""
@@ -154,7 +201,7 @@ class TestModelConfig:
             },
         }
         with pytest.raises(ValidationError) as exc_info:
-            ModelConfig(**data)
+            ModelInfo(**data)
         assert "enabled" in str(exc_info.value).lower()
 
     def test_vllm_with_plugins(self) -> None:
@@ -166,7 +213,7 @@ class TestModelConfig:
                 "plugins": {"io_processors": ["processor1"]},
             },
         }
-        config = ModelConfig(**data)
+        config = ModelInfo(**data)
         assert config.vllm is not None
         assert config.vllm.plugins is not None
         assert config.vllm.plugins.io_processors == ["processor1"]
@@ -182,7 +229,7 @@ class TestModelYAML:
               id: "org/test-model"
             """)
         data = yaml.safe_load(yaml_content)
-        model_yaml = ModelYAML(**data)
+        model_yaml = AlgorithmNexusModelConfig(**data)
         assert model_yaml.model.id == "org/test-model"
 
     def test_model_yaml_with_vllm(self) -> None:
@@ -197,7 +244,7 @@ class TestModelYAML:
                     - "processor1"
             """)
         data = yaml.safe_load(yaml_content)
-        model_yaml = ModelYAML(**data)
+        model_yaml = AlgorithmNexusModelConfig(**data)
         assert model_yaml.model.vllm is not None
         assert model_yaml.model.vllm.plugins is not None
         assert model_yaml.model.vllm.plugins.io_processors == ["processor1"]
@@ -213,7 +260,7 @@ class TestNexusYAML:
               name: "test-package"
             """)
         data = yaml.safe_load(yaml_content)
-        nexus_yaml = NexusYAML(**data)
+        nexus_yaml = AlgorithmNexusPackageConfig(**data)
         assert nexus_yaml.package.name == "test-package"
 
     def test_nexus_yaml_minimal(self) -> None:
@@ -223,5 +270,5 @@ class TestNexusYAML:
               name: "minimal-package"
             """)
         data = yaml.safe_load(yaml_content)
-        nexus_yaml = NexusYAML(**data)
+        nexus_yaml = AlgorithmNexusPackageConfig(**data)
         assert nexus_yaml.package.name == "minimal-package"
