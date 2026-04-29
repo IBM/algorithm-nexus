@@ -8,14 +8,14 @@ below to customize it for your model.
 1. **Copy this template** to create your package:
 
    ```bash
-   cp -r templates/nexus-package-template /path/to/your-package
+   cp -r templates/packages/package-name /path/to/your-package
    cd /path/to/your-package
    ```
 
 2. **Rename the model directory**:
 
    ```bash
-   mv models/your-model-name models/your-actual-model-name
+   mv models/model-name models/your-model-name
    ```
 
 3. **Update `nexus.yaml`**:
