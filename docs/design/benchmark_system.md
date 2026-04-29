@@ -3,7 +3,7 @@
 ## Executive Summary
 
 This document proposes a benchmarking system for the Algorithm Stack packages
-within Algorithm Nexus.
+within Algorithm Nexus based on [the requirements](../requirements/benchmark.md).
 
 An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
@@ -98,9 +98,9 @@ scaled by the administrative team and CI/CD pipelines.
 
 ### 2.1 Infrastructure Configuration
 
-Admins configure the **Ray cluster** with hard namespace limits to maintain
+Admins configure the **Ray cluster** on K8s via KubeRay, with hard namespace limits to maintain
 resource quotas during massive sweeps. To optimize performance, the underlying
-cluster mounts a shared Persistent Filesystem (PVC) for workload dataset
+cluster mounts a shared persistent filesystem (via PVC) for workload dataset
 caching. Ray dynamically isolates worker node environments to prevent dependency
 version clashes between concurrent evaluations.
 
@@ -176,7 +176,7 @@ submitted to the Ray cluster for execution.
 | **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. [PENDING: Versioning Semantics Decision]              |
 | **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`'s convention that a given experiment name encodes a unique, repeatable experiment.                                              |
 | **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads dynamically.                                                       |
-| **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As 1.7                                                                                                                                                   |
+| **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As REQ 1.7                                                                                                                                                   |
 | **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a workload.                                                             |
 | **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Package owners provide custom experiments according to the Standardized Package Protocol.                                                                |
 | **REQ 6.1** | Admin Security                  | Process                 | CI     | Secured via trusted code submissions and mandatory CVE scans.                                                                                            |
