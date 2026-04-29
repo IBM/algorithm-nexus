@@ -1,0 +1,9 @@
+model:
+  id: "example-org/example-model"
+  owner: "example-team"
+
+  vllm:
+    enabled: true
+    plugins:
+      io_processors:
+        - "example-processor"
