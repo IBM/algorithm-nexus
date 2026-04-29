@@ -109,7 +109,7 @@ version clashes between concurrent evaluations.
 The mechanism for triggering centralized administrative evaluations is fully
 automated via **GitHub**. These are triggered mechanically via automated GitHub
 events (such as code deployments or releases) or on-demand utilizing GitHub
-ChatOps. They are executed with a combination of with GitHub Actions (on Event
+ChatOps. They are executed with a combination of GitHub Actions (on Event
 or on schedule) and polling Runners. Global orchestration across multiple
 packages utilizes `ado`'s native search space semantics.
 
