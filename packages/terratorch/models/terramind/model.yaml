@@ -1,0 +1,9 @@
+model:
+  id: "hf/terraminf"
+  
+  vllm:
+    enabled: true
+    plugins:
+      general: "terratorch_tm_segmentation_plugin"
+
+# Made with Bob

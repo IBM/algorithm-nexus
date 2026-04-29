@@ -1,0 +1,7 @@
+model:
+  id: "hf/prithvi"
+  
+  vllm:
+    enabled: true
+
+# Made with Bob

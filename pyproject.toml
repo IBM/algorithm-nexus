@@ -18,6 +18,7 @@ an = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  "terratorch>=1.2.6",
   "vllm==0.19.1",
 ]
 cli = [
