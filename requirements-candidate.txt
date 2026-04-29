@@ -600,8 +600,8 @@ filelock==3.25.2 \
     #   torch
     #   transformers
     #   vllm
-flashinfer-cubin==0.6.6 \
-    --hash=sha256:36508dfc792eb5ecfb15d2c140a7702812e1fa1ab0fb03929b2ed55e3e8191f3
+flashinfer-cubin==0.6.9 \
+    --hash=sha256:11e06a1eb2c61fc9f69cdbca3a6abe7d22e7244fbdcaadbb9f9e0bb65fd335ed
     # via vllm
 flashinfer-python==0.6.6 \
     --hash=sha256:0730ba7c7aad332961933bcebc5119762797161ede57d955f6fd199818ed1d92 \
