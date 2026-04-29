@@ -111,7 +111,8 @@ class TestModelConfig:
             "my-org/my-model",
             "org123/model456",
             "a1/b2",  # minimum length (2 chars each)
-            "a" * 42 + "/" + "b" * 42,  # maximum length (42 chars each)
+            "a" * 42 + "/" + "b" * 42,  # maximum length for org (42 chars)
+            "a" * 42 + "/" + "b" * 96,  # maximum length for model (96 chars)
             "user-name/model-name",
             "org1-2/model3-4",
         ]
@@ -138,7 +139,7 @@ class TestModelConfig:
             "o/model",  # org too short (1 char)
             "org/m",  # model too short (1 char)
             "a" * 43 + "/model",  # org too long (43 chars)
-            "org/" + "b" * 43,  # model too long (43 chars)
+            "org/" + "b" * 97,  # model too long (97 chars)
             "org@name/model",  # illegal character in org
             "org/model@name",  # illegal character in model
             "org name/model",  # space in org

@@ -9,8 +9,10 @@ import re
 import sys
 from typing import Annotated, Literal
 
+from pydantic import AfterValidator
+
 try:
-    from pydantic import BaseModel, ConfigDict, Field, field_validator
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
     print(
         "Error: CLI dependencies are not installed.\n"
@@ -18,6 +20,42 @@ except ImportError:
         file=sys.stderr,
     )
     sys.exit(1)
+
+
+def validate_hf_model_id(v: str) -> str:
+    """Validate HuggingFace model ID format and constraints.
+    https://huggingface.co/docs/hub/en/security-sso-okta-scim#step-5-assign-users-or-groups
+
+    Rules:
+    - Only alphanumeric characters and dashes are accepted
+    - Double dashes (--) are forbidden
+    - Cannot start or end with a dash
+    - Digit-only names are not accepted (must contain at least one letter)
+    - Format: org-name/model-name where both follow the same rules except length
+      - Maximum length is 42 for org-name and 96 for model-name, minimum length is 2 for both
+    """
+    # Combined regex pattern that validates the entire model ID:
+    # - org-name: 2-42 chars, alphanumeric + dashes, no double dashes, must have letter
+    # - model-name: 2-96 chars, same rules as org-name
+    # - Separated by exactly one slash
+    # Split validation into org and model parts to ensure each has at least one letter
+    pattern = re.compile(
+        r"^"
+        r"(?=(?:[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)/)"  # org must contain at least one letter
+        r"(?!.*--)"  # no double dashes in org
+        r"[a-zA-Z0-9][a-zA-Z0-9-]{0,40}[a-zA-Z0-9]"  # org-name: 2-42 chars
+        r"/"  # separator
+        r"(?=(?:[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)$)"  # model must contain at least one letter
+        r"(?!.*--)"  # no double dashes in model
+        r"[a-zA-Z0-9][a-zA-Z0-9-]{0,94}[a-zA-Z0-9]"  # model-name: 2-96 chars
+        r"$"
+    )
+
+    if not pattern.match(v):
+        msg = "Model ID must be in format 'org-name/model-name' where org-name is 2-42 characters and model-name is 2-96 characters. Both must start and end with alphanumeric, contain only alphanumeric and dashes, not have double dashes, and contain at least one letter"
+        raise ValueError(msg)
+
+    return v
 
 
 class NexusPackageInfo(BaseModel):
@@ -73,9 +111,11 @@ class ModelInfo(BaseModel):
     id: Annotated[
         str,
         Field(
-            min_length=1,
+            min_length=5,
+            max_length=139,
             description="Hugging Face model repository identifier",
         ),
+        AfterValidator(validate_hf_model_id),
     ]
 
     owner: Annotated[
@@ -98,50 +138,6 @@ class ModelInfo(BaseModel):
             description="vLLM serving configuration. Only required for models that need additional vLLM plugins and belong to a Nexus Package targeting the product or candidate distribution variants.",
         ),
     ] = None
-
-    @field_validator("id")
-    @classmethod
-    def validate_model_id(cls, v: str) -> str:
-        """Validate HuggingFace model ID format and constraints.
-        https://huggingface.co/docs/hub/en/security-sso-okta-scim#step-5-assign-users-or-groups
-
-        Rules:
-        - Only alphanumeric characters and dashes are accepted
-        - Double dashes (--) are forbidden
-        - Cannot start or end with a dash
-        - Digit-only names are not accepted (must contain at least one letter)
-        - Minimum length is 2 and maximum length is 42 per segment
-        - Format: username/model-name where both follow the same rules
-        """
-        if "/" not in v:
-            msg = "Model ID must be in format 'username/model-name'"
-            raise ValueError(msg)
-
-        parts = v.split("/")
-        if len(parts) != 2:
-            msg = "Model ID must contain exactly one slash"
-            raise ValueError(msg)
-
-        username, model_name = parts
-
-        # Regex pattern for each segment:
-        # - Length: 2-42 characters (first char + 0-40 middle + last char)
-        # - Must start and end with alphanumeric
-        # - Can contain alphanumeric and dashes in the middle
-        # - No double dashes (negative lookahead (?!.*--))
-        # - Must contain at least one letter (positive lookahead (?=.*[a-zA-Z]))
-        segment_pattern = re.compile(
-            r"^(?!.*--)(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9-]{0,40}[a-zA-Z0-9]$"
-        )
-
-        # Validate each segment
-        for part, name in [(username, "username"), (model_name, "model name")]:
-            # Check all constraints via regex
-            if not segment_pattern.match(part):
-                msg = f"{name} must be 2-42 characters, start and end with alphanumeric, contain only alphanumeric and dashes, not have double dashes, and contain at least one letter"
-                raise ValueError(msg)
-
-        return v
 
 
 class AlgorithmNexusModelConfig(BaseModel):
