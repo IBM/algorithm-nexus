@@ -5,7 +5,7 @@ This document provides usage instructions for the example model.
 ## Installation
 
 ```bash
-pip install example-package
+pip install example-nexus-package
 ```
 
 ## Basic Usage

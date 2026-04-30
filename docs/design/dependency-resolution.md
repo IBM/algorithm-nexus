@@ -275,11 +275,11 @@ done
 
 CI **must** verify that all packages listed in each
 `requirements-<variant-extra>.txt` file are resolvable and installable from the
-configured package index.
+configured package index for the linux platform.
 
 ```shell
 for variant in ecosystem candidate product; do
-    uv pip install -r "requirements-${variant}.txt" --reinstall --dry-run
+    uv pip install -r "requirements-${variant}.txt" --reinstall --dry-run --python-platform linux
 done
 ```
 
