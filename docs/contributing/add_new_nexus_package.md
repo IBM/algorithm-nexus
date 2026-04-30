@@ -5,261 +5,164 @@ SPDX-License-Identifier: Apache-2.0
 
 # Contributing a Nexus Package to Algorithm Nexus
 
-This guide walks you through the complete process of contributing a Nexus
-package to Algorithm Nexus, from creating your package to opening a pull
-request.
+This guide walks you through the process of contributing a Nexus package to
+Algorithm Nexus, from creating your package to opening a pull request.
+
+Contributing a Nexus Package requires the user to perform four steps:
+
+1. **Initialize the algorithm Nexus Repository**
+2. **Add Python Package to the Algorithm Nexus Dependencies**
+3. **Create the Algorithm Nexus Metadata Folder**
+4. **Commit Changes and Open a Pull Request**
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-- A Python package published on GitHub or PyPI
-- Models that your package supports
-- `uv` installed on your system
+- A Python package published on GitHub, referred to as `<Python-Package-URL>`.
+- A name you want to give to your Nexus package, referred to as
+  `<package-name>`.
+- `uv` installed on your system.
 - A
   [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
   of the Algorithm Nexus repository checked out locally
 
-## Step 1: Create Your Nexus Package
+## Step 1: Initialize the algorithm Nexus Repository
 
-A Nexus package is a metadata and configuration package that references your
-Python package and defines the models it supports.
-
-### 1.1 Use the Template
-
-Start by copying the Nexus package template:
+Run the commands below from the folder where you have checked out your Algorithm
+Nexus fork.
 
 ```bash
-cp -r templates/nexus-package-template packages/<your-package-name>
+cd algorithm-nexus
+uv sync --group dev --extra cli
+uv run pre-commit install
 ```
 
-Replace `<your-package-name>` with your actual package name (e.g.,
-`terratorch`).
+## Step 2: Add Python Package to the Algorithm Nexus Dependencies
 
-### 1.2 Configure `nexus.yaml`
+First, determine which variant should your package be added to, by reading
+[`Identify The Algorithm Nexus variant for your Package`](#identify-the-algorithm-nexus-variant-for-your-package)
+and add it to each variant it belongs to. Here, let's assume your package should
+be added to the `ecosystem` variant only.
 
-Edit `packages/<your-package-name>/nexus.yaml` to declare your package metadata:
+Run the command below
+
+```bash
+uv add <Python-Package-URL> --extra ecosystem
+```
+
+If the `uv add` step fails, and you are unable to troubleshoot the error,
+continue until the last step and submit your PR anyway. The template contains a
+dedicated section (`I need help with this PR`) where you can describe the issues
+you have encountered.
+
+## Step 3: Create the Algorithm Nexus Metadata Folder
+
+Under `packages/` in the project root create a folder with your package name
+
+```bash
+mkdir packages/<package-name>
+```
+
+Then, create the package configuration file in
+`packages/<package-name>/nexus.yaml`
 
 ```yaml
 package:
-  name: your-package-name # Must match your Python package name
+  name: <package-name>
 ```
 
-See the
-[Nexus Package Configuration](nexus_package.md#31-nexus-package-configuration-nexusyaml)
-for detailed configuration options.
+Finally, validate the package structure with
 
-### 1.3 Configure Model Metadata
+```bash
+uv run an validate packages/<package-name>
+```
 
-For each model your package supports:
+In case of validation errors, the `an` tool will list all the errors. Fix them
+before moving to the next step.
 
-1. Create a directory under `packages/<your-package-name>/models/<model-name>/`
-1. Create a `model.yaml` file with the model configuration:
+You can optionally add models to your Nexus package as described in
+[`Add Models to Your Nexus Package`](#add-models-to-your-nexus-package). Also,
+we provide a full
+[package template](../../templates/packages/package-name/README.md)
+demonstrating a fully populated Nexus package metadata folder.
+
+## Step 4: Commit Changes and Open a Pull Request
+
+Create a new branch to host your latest changes and add files to be committed
+
+```bash
+git checkout -b add-<package-name>-package
+git add packages/<package-name> pyproject.toml uv.lock
+```
+
+Commit your changes and push to the remote repository
+
+```bash
+git commit -s -m "feat(package): Add <package-name> Nexus Package"
+git push origin add-<package-name>-package
+```
+
+Finally, navigate to your work on GitHub and open a Pull request for the newly
+pushed branch to be merged with the Algorithm Nexus main branch. Use the
+`New Nexus Package` pull request template and fill all the required fields.
+
+## Additional Material
+
+### Identify The Algorithm Nexus variant for your Package
+
+If your Python package:
+
+- does **not** declare `vllm` as a default dependency
+- does **not** declare `vllm` as an optional dependency
+
+It belongs to the `ecosystem` variant only.
+
+If your Python package:
+
+- declares `vllm` as a **default (mandatory) dependency**
+
+It belongs to the `candidate` variant only.
+
+If your Python package:
+
+- declares `vllm` as an **optional dependency**
+
+It belongs both to the `ecosystem` and `candidate` variant only. In this case,
+when adding to the `candidate` variant, users must ensure their package is added
+with the optional `vllm` dependency (`package-name[vllm-dependency]`).
+
+### Add Models to Your Nexus Package
+
+In case you want to add one or more models to your Nexus package, follow the
+steps below.
+
+For each model (`<model-name>`) that your package supports:
+
+1. Create a directory under `packages/<package-name>/models/<model-name>/`
+2. Create a `model.yaml` file with the model configuration:
 
    ```yaml
    model:
      id: organization/model-name # Hugging Face model repository identifier
-     owner: github-username # Optional: defaults to package owner
-     vllm: # Optional: required only if the model is served with vLLM
-       enabled: true
-       plugins: # Optional: vLLM plugins required for serving your model
-         general: your_package.vllm_plugin # Optional: vLLM general plugin required for loading your model in vLLM
-         io_processors: # Optional: list of IO Processor plugins that can be used with your model
-           - my_io_processor
+     owner: github-username # Optional: defaults to package owner if omitted
    ```
 
-1. Optionally add a `usage.md` file with usage documentation
+Full details on the model configuration file are available in the
+[Nexus Package Structure Guide](../design/nexus_package.md).
 
-See the
-[Model Configuration](nexus_package.md#32-model-configuration-modelsmodel-namemodelyaml)
-for complete model configuration options.
+### Model Usage Documentation
 
-## Step 2: Validate Your Nexus Package
+Optionally, each model in a Nexus package can provide usage documentation in a
+`usage.md` file in the model subfolder. This should be populated with usage
+examples, description of useful parameters, and any other relevant information.
 
-Before submitting, validate your package structure and configuration:
+### Agent Skills for Nexus Packages
 
-```bash
-# From the repository root
-uv run an validate packages/<your-package-name>
-```
-
-This command checks:
-
-- Required files exist (`nexus.yaml`, `model.yaml` for each model)
-- YAML syntax is valid
-- Configuration follows the required schema
-- All declared models have corresponding directories
-
-Fix any validation errors before proceeding.
-
-## Step 3: Add Your Package to Algorithm Nexus
-
-Your Python package must be added to Algorithm Nexus as a dependency using `uv`.
-The exact command depends on your package's relationship with `vllm`.
-
-Follow the instructions in the sections below to make sure your Python package
-is added properly to the Algorithm Nexus dependencies. Read the
-[Algorithm Nexus Dependency Resolution Process documentation](../design/dependency-resolution.md)
-for full details.
-
-### 3.1 Classify Your Package
-
-Determine which category your package falls into:
-
-#### Ecosystem-Only Packages
-
-Your package is **ecosystem-only** if it:
-
-- Does **not** declare `vllm` as a default dependency
-- Does **not** declare `vllm` as an optional dependency
-
-**Add to ecosystem variant only:**
-
-```bash
-uv add <your-package-name> --optional ecosystem
-```
-
-#### vLLM-Dependent Packages
-
-Your package is **vllm-dependent** if it:
-
-- Declares `vllm` as a **default (mandatory) dependency**
-
-**Add to candidate variant:**
-
-```bash
-uv add <your-package-name> --optional candidate
-```
-
-> [!NOTE] Do not add packages to the `product` variant. Algorithm Nexus
-> maintainers will handle this once product requirements are met.
-
-#### vLLM-Agnostic Packages
-
-Your package is **vllm-agnostic** if it:
-
-- Does **not** declare `vllm` as a default dependency
-- Declares `vllm` as an **optional dependency** (via extras)
-
-**Add to ecosystem variant (without vllm):**
-
-```bash
-uv add <your-package-name> --optional ecosystem
-```
-
-**Add to candidate variant (with vllm):**
-
-```bash
-uv add <your-package-name>[<vllm-extra>] --optional candidate
-```
-
-Replace `<vllm-extra>` with the extra name that enables vllm in your package.
-
-### 3.2 Git-Based Packages
-
-If your package is not yet published on PyPI, you can add it from a Git
-repository:
-
-```bash
-uv add git+https://github.com/<org>/<repository> --optional <variant>
-```
-
-> [!IMPORTANT] SSH-based cloning is not supported. All Git dependencies must be
-> publicly accessible via HTTPS.
-
-### 3.3 Verify Dependency Resolution
-
-After adding your package, verify the lockfile is updated:
-
-```bash
-uv lock --check
-```
-
-For detailed information about dependency resolution, see the
-[Dependency Resolution Design Document](../design/dependency-resolution.md).
-
-## Step 4: Commit Your Changes
-
-Commit your changes with a descriptive message:
-
-```bash
-git add packages/<your-package-name>/
-git add pyproject.toml uv.lock requirements-*.txt
-git commit -s -m "feat(package): Add <your-package-name> Nexus package
-
-- Add Nexus package metadata and model configurations
-- Add <your-package-name> dependency to <variant> variant(s)
-- Update lockfile and requirements exports"
-```
-
-> [!IMPORTANT] The `-s` flag adds a Signed-off-by line, which is required for
-> all contributions. This indicates you accept the
-> [Developer's Certificate of Origin](../../CONTRIBUTING.md#legal). Also, make
-> sure you have installed the pre-commit hooks before committing your changes.
-> This will reduce the likelihood for your contribution to fail the CI workflow.
-
-## Step 5: Open a Pull Request
-
-1. Push your changes to your fork:
-
-   ```bash
-   git push origin <your-branch-name>
-   ```
-
-2. Open a pull request on GitHub using the `New Nexus Package` template, and
-   fill all the required information.
-
-3. Wait for CI checks to complete:
-   - Lockfile consistency checks
-   - Requirements export validation
-   - Package availability verification
-   - Variant-specific dependency resolution checks
-
-## Step 6: Address Review Feedback
-
-Maintainers will review your PR and may request changes:
-
-- Respond to comments and questions
-- Push updates to your branch (the PR will update automatically)
-- Re-request review once changes are complete
-
-## Common Issues and Solutions
-
-### Validation Errors
-
-**Issue**: `an validate` reports errors
-
-**Solution**: Carefully read the error messages and fix the issues in your YAML
-files. Common problems include:
-
-- Missing required fields
-- Invalid YAML syntax
-- Incorrect file paths
-- Model directories without `model.yaml`
-
-### Dependency Conflicts
-
-**Issue**: `uv lock` fails with dependency conflicts
-
-**Solution**: Check if your package has conflicting dependencies with existing
-packages. You may need to:
-
-- Update your package's dependency constraints
-- Coordinate with maintainers about resolving conflicts
-
-If you are unable to resolve the dependency conflicts when adding your package,
-you can still create the PR in draft state, and explicitly state that the
-package cannot be added due to dependency conflicts. The maintainers will help
-you to solve the conflicts, which might require also coordinating with other
-Nexus package owners.
-
-### CI Failures
-
-**Issue**: CI checks fail after opening PR
-
-**Solution**: Carefully read the logs and try to identify the root cause. If
-unable to solve the issue, send a message in the PR to request the maintainers
-help.
+Optionally, each Nexus package can provide agent skills for helping the user
+with using the package and its models. Example agent skills would aid the users
+with models deployment on different target infrastructure (e.g., bare metal,
+Kubernetes, etc.) and with building scripts for evaluating the models.
 
 ## Getting Help
 
@@ -271,8 +174,9 @@ If you encounter issues:
 3. Search existing issues on GitHub
 4. Open a new issue with details about your problem
 
-## Additional Resources
+## References
 
+- [Nexus Package Structure Guide](../design/nexus_package.md)
 - [Nexus Package Requirements](../requirements/nexus_package.md)
 - [Packaging and Dependency Requirements](../requirements/packaging_and_dependency_reqs.md)
 - [Contributing Guidelines](../../CONTRIBUTING.md)

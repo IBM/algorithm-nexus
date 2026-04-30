@@ -90,7 +90,9 @@ issues.
 ## Contributing
 
 This project is currently in closed beta. We are not accepting external
-contributions at this time. For IBM contributors:
+contributions at this time.
+
+For IBM contributors:
 
 - Please, see our [Contributing Guide](CONTRIBUTING.md) for development setup
   and guidelines.

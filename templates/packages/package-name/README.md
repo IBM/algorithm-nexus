@@ -70,7 +70,7 @@ your-package/
 
 For detailed documentation on Nexus package requirements, see:
 
-- [Nexus Package Requirements](../../docs/requirements/nexus_package.md)
+- [Nexus Package Structure Guide](../../../docs/design/nexus_package.md)
 - [Contributing Guide](../../CONTRIBUTING.md)
 
 ## Validation
