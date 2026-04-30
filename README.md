@@ -11,7 +11,7 @@ of multiple models with different dependencies.
 
 ## Roadmap
 
-### Version 0.1 (Enf od April 26, Alpha)
+### Version 0.1 (End of April 26, Alpha)
 
 - **Project requirements for dependencies resolution, Nexus package definition,
   testing and benchmarking**
