@@ -44,6 +44,49 @@ of multiple models with different dependencies.
 - **Models scoreboard implemented** to track the performance of the integrated
   models
 
+## Algorithm Nexus CLI
+
+Algorithm Nexus provides the `an` CLI tool for managing Nexus packages. This
+tool allows the validation of the structure of a Nexus Package.
+
+### Installation
+
+To use the CLI for package configuration validation, clone the repository and
+install with uv:
+
+```bash
+git clone https://github.com/IBM/algorithm-nexus.git
+cd algorithm-nexus
+uv sync --extra cli
+```
+
+### Available Tools
+
+#### Nexus Package Validation
+
+The validation tool checks:
+
+- **Package structure**: Verifies required files (`nexus.yaml`, `model.yaml`)
+  and directories (`tests/`) exist
+- **YAML syntax**: Ensures all configuration files are valid YAML
+- **Schema validation**: Validates configuration against Pydantic models for
+  correct field types and required fields
+- **Cross-validation**: Checks dependencies between configurations (e.g., vLLM
+  enabled requires vLLM testing)
+- **Model declarations**: Ensures all models in `nexus.yaml` have corresponding
+  directories
+
+Example usage:
+
+```bash
+an validate /path/to/package
+```
+
+In case of validation errors a detailed report guides the user to fix the
+issues.
+
+## Getting Started
+
 ## Contributing
 
 This project is currently in closed beta. We are not accepting external
