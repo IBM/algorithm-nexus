@@ -17,13 +17,11 @@ There are four steps to contribute your algorithm package
 
 ## Prerequisites
 
-Before you begin, ensure you have:
+Before you begin, ensure 
 
-- A Python package published on GitHub, referred to as `<Python-Package-URL>`.
-- A name you want to give to your Nexus package, referred to as
-  `<package-name>`.
-- `uv` installed on your system.
-- A
+- Your algorithm package is publically available GitHub at `<Python-Package-URL>`.
+- `uv` is installed on your system.
+- You have a 
   [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
   of the Algorithm Nexus repository checked out locally
 
