@@ -33,7 +33,7 @@ below to customize it for your model.
 6. **Validate your package**:
 
    ```bash
-   an validate /path/to/your-package
+   nexus validate /path/to/your-package
    ```
 
 ## Package Structure
@@ -78,7 +78,7 @@ For detailed documentation on Nexus package requirements, see:
 Before submitting your package, ensure it passes validation:
 
 ```bash
-an validate /path/to/your-package
+nexus validate /path/to/your-package
 ```
 
 The validator checks:
