@@ -48,7 +48,7 @@ be added to the `ecosystem` variant only.
 Run the command below
 
 ```bash
-uv add <Python-Package-URL> --extra ecosystem
+uv add <Python-Package-URL> --optional ecosystem
 ```
 
 If the `uv add` step fails, and you are unable to troubleshoot the error,
@@ -109,7 +109,7 @@ pushed branch to be merged with the Algorithm Nexus main branch. Use the
 
 ## Additional Material
 
-### Identify The Algorithm Nexus variant for your Package
+### Identify The Algorithm Nexus Variant for your Package
 
 If your Python package:
 
