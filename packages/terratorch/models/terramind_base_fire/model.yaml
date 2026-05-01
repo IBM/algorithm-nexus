@@ -4,4 +4,4 @@ model:
     enabled: true
     plugins:
       io_processors:
-        - name: terratorch_tm_segmentation
+        - terratorch_tm_segmentation
