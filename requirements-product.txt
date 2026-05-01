@@ -600,9 +600,9 @@ filelock==3.25.2 \
     #   torch
     #   transformers
     #   vllm
-flashinfer-python==0.6.6 \
-    --hash=sha256:0730ba7c7aad332961933bcebc5119762797161ede57d955f6fd199818ed1d92 \
-    --hash=sha256:078f158636969eec1a0d3dea19c3ca90b426b66df89bbf7b7b8276ce2ec08148
+flashinfer-python==0.6.9 \
+    --hash=sha256:044ed74698b5f6c1e719b32cf95189609166740076c11287e81a38450953de50 \
+    --hash=sha256:46d013119ecd039a5844c4847325b3571f99cdd8fd9e00839bf008c67b15811a
     # via vllm
 frozenlist==1.8.0 \
     --hash=sha256:032efa2674356903cd0261c4317a561a6850f3ac864a63fc1583147fb05a79b0 \
