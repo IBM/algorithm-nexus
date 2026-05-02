@@ -27,7 +27,7 @@ def validate_hf_model_id(v: str) -> str:
     https://huggingface.co/docs/hub/en/security-sso-okta-scim#step-5-assign-users-or-groups
 
     Rules:
-    - Only alphanumeric characters and dashes are accepted
+    - Only alphanumeric characters, dashes, dots, and underscores are accepted
     - Double dashes (--) are forbidden
     - Cannot start or end with a dash
     - Digit-only names are not accepted (must contain at least one letter)
@@ -35,24 +35,24 @@ def validate_hf_model_id(v: str) -> str:
       - Maximum length is 42 for org-name and 96 for model-name, minimum length is 2 for both
     """
     # Combined regex pattern that validates the entire model ID:
-    # - org-name: 2-42 chars, alphanumeric + dashes, no double dashes, must have letter
+    # - org-name: 2-42 chars, alphanumeric + dashes + dots + underscores, no double dashes, must have letter
     # - model-name: 2-96 chars, same rules as org-name
     # - Separated by exactly one slash
     # Split validation into org and model parts to ensure each has at least one letter
     pattern = re.compile(
         r"^"
-        r"(?=(?:[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)/)"  # org must contain at least one letter
+        r"(?=(?:[a-zA-Z0-9._-]*[a-zA-Z][a-zA-Z0-9._-]*)/)"  # org must contain at least one letter
         r"(?!.*--)"  # no double dashes in org
-        r"[a-zA-Z0-9][a-zA-Z0-9-]{0,40}[a-zA-Z0-9]"  # org-name: 2-42 chars
+        r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,40}[a-zA-Z0-9]"  # org-name: 2-42 chars
         r"/"  # separator
-        r"(?=(?:[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9-]*)$)"  # model must contain at least one letter
+        r"(?=(?:[a-zA-Z0-9._-]*[a-zA-Z][a-zA-Z0-9._-]*)$)"  # model must contain at least one letter
         r"(?!.*--)"  # no double dashes in model
-        r"[a-zA-Z0-9][a-zA-Z0-9-]{0,94}[a-zA-Z0-9]"  # model-name: 2-96 chars
+        r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,94}[a-zA-Z0-9]"  # model-name: 2-96 chars
         r"$"
     )
 
     if not pattern.match(v):
-        msg = "Model ID must be in format 'org-name/model-name' where org-name is 2-42 characters and model-name is 2-96 characters. Both must start and end with alphanumeric, contain only alphanumeric and dashes, not have double dashes, and contain at least one letter"
+        msg = "Model ID must be in format 'org-name/model-name' where org-name is 2-42 characters and model-name is 2-96 characters. Both must start and end with alphanumeric, contain only alphanumeric, dashes, dots, and underscores, not have double dashes, and contain at least one letter"
         raise ValueError(msg)
 
     return v
