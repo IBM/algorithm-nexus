@@ -3,7 +3,7 @@ name = "algorithm-nexus"
 version = "0.1.0"
 description = "A comprehensive library for AI model delivery, testing, and benchmarking"
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.12,<3.14"
 license-files = ["LICENSE"]
 authors = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
 maintainers = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
