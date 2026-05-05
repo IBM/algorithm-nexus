@@ -122,6 +122,19 @@ class TestModelConfig:
             "a" * 42 + "/" + "b" * 96,  # maximum length for model (96 chars)
             "user-name/model-name",
             "org1-2/model3-4",
+            "org/model-1.0",  # model with version number
+            "org/model-2.0.1",  # model with semantic version
+            "ibm-nasa-geospatial/Prithvi-EO-2.0-300M-TL",  # real-world example
+            "org.name/model.name",  # dots in both parts
+            "org/model.1.2.3-beta",  # complex version with dots and dash
+            "org/model_name",  # underscore in model name
+            "org_name/model_name",  # underscores in both parts
+            "org/model_v1.0",  # underscore and dot in model
+            "org/my_model-2.0",  # combination of underscore, dash, and dot in model
+            "org_name/model",  # underscore in org name
+            "org.name/model",  # dot in org name
+            "my_org.v2/model",  # underscore and dot in org name
+            "org.v1_test/model-name",  # dots and underscores in org
         ]
         for model_id in valid_ids:
             data = {"id": model_id}
