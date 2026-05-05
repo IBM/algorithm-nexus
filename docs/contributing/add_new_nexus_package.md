@@ -55,6 +55,12 @@ For example, if your package should be added to the `ecosystem` variant run,
 uv add <Python-Package-URL> --optional ecosystem
 ```
 
+> [!NOTE]
+>
+> We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
+> command, to avoid errors with `uv` not being able to sync the dependencies
+> with the local python environment.
+
 If the `uv add` step fails, and you are unable to troubleshoot the error, record
 the error you get and continue on to step 3 and 4.
 

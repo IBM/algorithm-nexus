@@ -24,14 +24,12 @@ The mapping between **distribution package variants** and **optional
 dependencies** is defined as follows:
 
 - **Ecosystem Variant**
-
   - Installation target: `algorithm-nexus[ecosystem]`
   - The dependency graph **must not include** the `vllm` library.
   - Only Algorithm Stack packages associated with the _Ecosystem Algorithm
     Stack_ are included.
 
 - **Candidate Variant**
-
   - Installation target: `algorithm-nexus[candidate]`
   - The dependency graph **must include** the `vllm` library.
   - A **specific version of `vllm` must always be required**.
@@ -145,6 +143,12 @@ All packages are added using the following pattern:
 ```bash
 uv add <package-spec> --optional <variant-extra>
 ```
+
+> [!NOTE]
+>
+> We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
+> command, to avoid errors with `uv` not being able to sync the dependencies
+> with the local python environment.
 
 Where `<variant-extra>` is one of:
 
