@@ -18,6 +18,7 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  "terratorch[vllm]==1.2.7",
   "vllm==0.19.1",
 ]
 cli = [
@@ -26,7 +27,11 @@ cli = [
   "rich>=15.0.0",
   "typer>=0.25.0",
 ]
+ecosystem = [
+  "terratorch>=1.2.7",
+]
 product = [
+  "terratorch[vllm]==1.2.5",
   "vllm==0.18.0",
 ]
 
