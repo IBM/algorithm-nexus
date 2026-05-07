@@ -44,7 +44,7 @@ vllm serve ibm-nasa-geospatial/Prithvi-EO-2.0-300M-TL-Sen1Floods11 \
 - `--enforce-eager`: Uses eager execution mode instead of CUDA graphs
 - `--io-processor-plugin terratorch_segmentation`: Enables the TerraTorch
   segmentation I/O processor plugin (see
-  [TerraTorch I/O Processor Plugins documentation](https://terrastackai.github.io/terratorch/stable/guide/vllm/vllm_io_plugins/))
+  [TerraTorch I/O Processor Plugins documentation](https://torchgeo.org/terratorch/stable/guide/vllm/vllm_io_plugins/))
 - `--enable-mm-embeds`: Enables multimodal embeddings support
 
 The server will start on `http://localhost:8000` by default.
@@ -130,7 +130,7 @@ The model supports two ways to provide input TIFF images:
    ```
 
 Check the
-[Terratorch Segmentation IO Processor plugin documentation](https://terrastackai.github.io/terratorch/stable/guide/vllm/plugins/segmentation_io_plugin/)
+[Terratorch Segmentation IO Processor plugin documentation](https://torchgeo.org/terratorch/stable/guide/vllm/plugins/segmentation_io_plugin/)
 for full details on the input format.
 
 ## Output
@@ -143,12 +143,12 @@ output contains:
 - Pixel values representing different classes (e.g., water, no water)
 
 Check the
-[Terratorch Segmentation IO Processor plugin documentation](https://terrastackai.github.io/terratorch/stable/guide/vllm/plugins/segmentation_io_plugin/)
+[Terratorch Segmentation IO Processor plugin documentation](https://torchgeo.org/terratorch/stable/guide/vllm/plugins/segmentation_io_plugin/)
 for full details on the output formats.
 
 ## Additional Resources
 
-- [TerraTorch Documentation](https://terrastackai.github.io/terratorch/stable/)
-- [TerraTorch vLLM Serving Guide](https://terrastackai.github.io/terratorch/stable/guide/vllm/intro/)
-- [TerraTorch I/O Processor Plugins](https://terrastackai.github.io/terratorch/stable/guide/vllm/vllm_io_plugins/)
+- [TerraTorch Documentation](https://torchgeo.org/terratorch/stable/)
+- [TerraTorch vLLM Serving Guide](https://torchgeo.org/terratorch/stable/guide/vllm/intro/)
+- [TerraTorch I/O Processor Plugins](https://torchgeo.org/terratorch/stable/guide/vllm/vllm_io_plugins/)
 - [vLLM Documentation](https://docs.vllm.ai/)
