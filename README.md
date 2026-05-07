@@ -46,7 +46,7 @@ of multiple models with different dependencies.
 
 ## Algorithm Nexus CLI
 
-Algorithm Nexus provides the `an` CLI tool for managing Nexus packages. This
+Algorithm Nexus provides the `nexus` CLI tool for managing Nexus packages. This
 tool allows the validation of the structure of a Nexus Package.
 
 ### Installation
@@ -79,7 +79,7 @@ The validation tool checks:
 Example usage:
 
 ```bash
-an validate /path/to/package
+nexus validate /path/to/package
 ```
 
 In case of validation errors a detailed report guides the user to fix the
@@ -87,23 +87,12 @@ issues.
 
 ## Getting Started
 
-### Creating a New Nexus Package
-
-Use the provided template to create a new Nexus package:
-
-```bash
-cp -r templates/nexus-package-template /path/to/your-package
-cd /path/to/your-package
-```
-
-Follow the instructions in the template's
-[README](templates/nexus-package-template/README.md) to customize it for your
-model.
-
 ## Contributing
 
 This project is currently in closed beta. We are not accepting external
-contributions at this time. For IBM contributors:
+contributions at this time.
+
+For IBM contributors:
 
 - Please, see our [Contributing Guide](CONTRIBUTING.md) for development setup
   and guidelines.

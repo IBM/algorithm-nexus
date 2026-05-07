@@ -3,7 +3,7 @@ name = "algorithm-nexus"
 version = "0.1.0"
 description = "A comprehensive library for AI model delivery, testing, and benchmarking"
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.12,<3.14"
 license-files = ["LICENSE"]
 authors = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
 maintainers = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
@@ -14,10 +14,11 @@ Issues = "https://github.com/IBM/algorithm-nexus/issues"
 Repository = "https://github.com/IBM/algorithm-nexus"
 
 [project.scripts]
-an = "algorithm_nexus.cli:main"
+nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  "terratorch[vllm]==1.2.7",
   "vllm==0.19.1",
 ]
 cli = [
@@ -26,7 +27,11 @@ cli = [
   "rich>=15.0.0",
   "typer>=0.25.0",
 ]
+ecosystem = [
+  "terratorch>=1.2.7",
+]
 product = [
+  "terratorch[vllm]==1.2.5",
   "vllm==0.18.0",
 ]
 
