@@ -162,9 +162,9 @@ blake3==1.0.8 \
     --hash=sha256:e8ae3689f0c7bfa6ce6ae45cab110e4c3442125c4c23b28f1f097856de26e4d1 \
     --hash=sha256:ef153c5860d5bf1cc71aece69b28097d2a392913eb323d6b52555c875d0439fc
     # via vllm
-cachetools==7.0.6 \
-    --hash=sha256:4e94956cfdd3086f12042cdd29318f5ced3893014f7d0d059bf3ead3f85b7f8b \
-    --hash=sha256:e5d524d36d65703a87243a26ff08ad84f73352adbeafb1cde81e207b456aaf24
+cachetools==7.1.1 \
+    --hash=sha256:0335cd7a0952d2b22327441fb0628139e234c565559eeb91a8a4ac7551c5353d \
+    --hash=sha256:27bdf856d68fd3c71c26c01b5edc312124ed427524d1ddb31aa2b7746fe20d4b
     # via vllm
 cartopy==0.25.0 \
     --hash=sha256:060a7b835c0c4222c1067b6ffb2f9c18458abaa35b6624573a3aa37ecf55f4bf \
