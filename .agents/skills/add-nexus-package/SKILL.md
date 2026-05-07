@@ -56,6 +56,14 @@ Using the above information you can infer the classification of the package:
 Also, ask the user if they want to create usage documentation for any of their
 models. If that's the cas help them draft it.
 
+Note:
+
+- Do not infer any information about the user package name and models and their
+  details. Let thenuser give all the details.
+- If one of the models requires vLLM, ask the user whether vLLM is a required
+  dependency or an optional one. If optional, ask the user which extra dependency
+  from the package should be added.
+
 ## 2. Create New Branch
 
 Create a new git branch named `add-<package-name>-package`
@@ -86,7 +94,7 @@ the template and that are not needed for this package
 ## 4. Validate Package
 
 ```bash
-uv run an validate packages/<package-name>
+uv run nexus validate packages/<package-name>
 ```
 
 Notes:
@@ -135,7 +143,7 @@ package to the dependencies with uv.
 The general command for adding a package to the dependencies is:
 
 ```bash
-uv add <package-name> --optional <variant>
+uv add <package-name> --optional <variant> --no-sync
 ```
 
 The variant depends to the package classification:
@@ -159,6 +167,7 @@ before making any change towards solving the dependency issue.
 
 Commit with DCO sign-off, this is achieved by adding the -s flag to the git
 commit command.
+Make sure the user has pre-commit installed and configured correctly.
 
 Example commit command:
 
@@ -166,7 +175,13 @@ Example commit command:
 git commit -s -m "feat(package): Add <package-name> Nexus package"
 ```
 
+The pre-commit hooks will generate requirements files and fail the commit.
+The requirements files need to be added to the commit and the commit command
+executed once more.
+Ask the user if they want to push the branch to their fork or not.
+
 ## 7. Open Pull Request
 
 Once all the above have been done, create the pull request text by following the
-template in `./assets/templates/new_nexus_package_pr.md`.
+template in `./assets/templates/new_nexus_package_pr.md`. Ask the user if they
+want the PR to be created automatically or not.
