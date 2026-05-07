@@ -19,7 +19,7 @@ nexus = "algorithm_nexus.cli:main"
 [project.optional-dependencies]
 candidate = [
   "terratorch[vllm]==1.2.7",
-  "vllm==0.19.1",
+  "vllm==0.20.0",
 ]
 cli = [
   "pydantic>=2.13.3",
@@ -32,7 +32,7 @@ ecosystem = [
 ]
 product = [
   "terratorch[vllm]==1.2.5",
-  "vllm==0.18.0",
+  "vllm==0.20.0",
 ]
 
 [dependency-groups]
