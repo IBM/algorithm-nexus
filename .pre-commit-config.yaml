@@ -46,9 +46,9 @@ repos:
     rev: 0.11.6
     hooks:
       - id: uv-lock
-        # - id: uv-export
-        #   alias: "uv-export-ecosystem"
-        #   args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=ecosystem", "--output-file=requirements-ecosystem.txt"]
+      - id: uv-export
+        alias: "uv-export-ecosystem"
+        args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=ecosystem", "--output-file=requirements-ecosystem.txt"]
       - id: uv-export
         alias: "uv-export-candidate"
         args: ["--frozen", "--no-emit-project", "--no-default-groups", "--no-header", "--extra=candidate", "--output-file=requirements-candidate.txt"]
