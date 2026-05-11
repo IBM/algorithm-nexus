@@ -1,0 +1,19 @@
+model:
+  # Missing required 'id' field - VALIDATION ERROR
+  owner: "broken-team"
+
+  vllm:
+    enabled: true
+    plugins:
+      io_processors:
+        - "broken-processor"
+  # Missing vllm testing when vllm is enabled - VALIDATION ERROR
+
+  testing:
+    hardware:
+      cpu:
+        cores: 4
+
+    commands:
+      - "pytest tests/"
+    # vllm testing is missing but vllm is defined above

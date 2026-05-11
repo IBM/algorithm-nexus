@@ -1,0 +1,93 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+
+"""Command-line interface for Algorithm Nexus package validation."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+from typing import Annotated
+
+try:
+    import typer
+    from rich.console import Console
+    from rich.panel import Panel
+except ImportError:
+    print(
+        "Error: CLI dependencies are not installed.\n"
+        "Please install them with: pip install algorithm-nexus[cli]",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+from algorithm_nexus.validation import (
+    ValidationErrorCollector,
+    validate_package_directory,
+)
+
+console = Console()
+
+app = typer.Typer(
+    help="Algorithm Nexus CLI - Tools for managing and validating Nexus packages.",
+    add_completion=False,
+    no_args_is_help=True,
+)
+
+
+@app.callback(invoke_without_command=True)
+def main_callback(ctx: typer.Context) -> None:
+    pass
+
+
+@app.command(name="validate")
+def validate(
+    package_path: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a Nexus package directory.",
+            dir_okay=True,
+            file_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ],
+) -> None:
+    """Validate Nexus package structure and YAML configuration files."""
+    collector = ValidationErrorCollector()
+    validate_package_directory(package_path, collector)
+
+    if collector.has_errors:
+        console.print(
+            Panel(
+                collector.format_errors(),
+                title="[bold red]Validation Failed[/bold red]",
+                border_style="red",
+            )
+        )
+        raise typer.Exit(code=1)
+
+    # Build success message
+    success_message = "[green]✓[/green] All validation checks passed"
+
+    if collector.has_info:
+        success_message += (
+            "\n\n[bold]Optional files/directories:[/bold]\n" + collector.format_info()
+        )
+
+    console.print(
+        Panel(
+            success_message,
+            title="[bold green]Validation Successful[/bold green]",
+            border_style="green",
+        )
+    )
+
+
+def main() -> None:
+    """Entry point for the CLI application."""
+    app()
+
+
+if __name__ == "__main__":
+    main()

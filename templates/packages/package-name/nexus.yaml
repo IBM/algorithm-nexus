@@ -1,0 +1,5 @@
+# Nexus Package Configuration Template
+# Replace placeholders with your actual package information
+
+package:
+  name: "your-package-name"  # Replace with your Python package name (e.g., "terratorch", "tokamind")

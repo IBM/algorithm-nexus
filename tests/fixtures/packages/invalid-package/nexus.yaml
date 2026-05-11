@@ -1,0 +1,7 @@
+package:
+  name: "broken-package"
+  # Missing version is OK, but we'll have other issues
+
+models:
+  - broken-model
+  # Note: undeclared-model exists but is not listed here
