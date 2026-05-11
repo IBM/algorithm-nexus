@@ -233,5 +233,5 @@ They then define their benchmark using an ado configuration (REQ 3.1) adding
 this to the model directory of the relevant nexus package (REQ 2.3). The
 benchmark configuration can reference any benchmark experiment registered by the
 Nexus package. If the benchmark experiment they need is not registered by the
-nexus package [they can add it.](#defining-a-benchmark-to-use-for-a-model). The
+nexus package [they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package). The
 benchmark configuration can also be based on one discovered via the Nexus CLI.
