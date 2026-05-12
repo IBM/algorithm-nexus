@@ -1,1 +1,0 @@
-../../../../../.github/PULL_REQUEST_TEMPLATE/new_nexus_package.md

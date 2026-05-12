@@ -1,35 +1,29 @@
 ---
 name: add-nexus-package
-description: Step-by-step guidance for contributing a new Nexus package to Algorithm Nexus, from initial setup through pull request submission. It ensures all configuration files are properly created, validates the package structure, and helps classify and add the package as a dependency. Use when users want to create a new Nexus package and contribute it via a pull request.
+description:
+  Step-by-step guidance for contributing a new Nexus package to Algorithm Nexus,
+  from initial setup through pull request submission. It ensures all
+  configuration files are properly created, validates the package structure, and
+  helps classify and add the package as a dependency. Use when users want to
+  create a new Nexus package and contribute it via a pull request.
 ---
 
 # Add Nexus Package
 
-## Steps
+## Prerequisites
 
-The skill guides users through these steps:
+For creating a Nexus Package you need to have package level information and,
+optionally, if models are included in the package also model level information.
+If this information is not available stop.
 
-1. **Identify package information**: Collect all the information on package and
-   models to identify package classification and models.
-2. **Create New Branch**: Create a new branch for the package addition
-3. **Create Package Structure**: Copy template and create package directory,
-   created thenecessary subfolders and config files.
-4. **Validate Package**: Run `an validate` to check structure
-5. **Add Dependency**: Use `uv add` with correct variant classification
-6. **Commit Changes**: Commit with DCO sign-off
-7. **Open Pull Request**: Use the New Nexus Package PR template
-
-## 1. Identify package information
-
-The main information required for the package are split between package level
-and model level information.
-
-Package level information:
+Package level information
 
 - `package_name` (string, required): Name of the Python package to add (e.g.,
   "terratorch")
+- `is vllm and optional dependency`: The python package can be installed without
+  vLLM in the dependencies, or with vLLM via an optional dependency group.
 
-Model level information: Each model object contains:
+Model level information (for each model):
 
 - `name` (string, required): Model directory name
 - `huggingface_id` (string, required): Hugging Face model repository identifier
@@ -42,146 +36,93 @@ Model level information: Each model object contains:
   - `io_processors` (list of strings, optional): list of io processor plugins
     that the model supports for pre/post processing with vLLM
 
-If one of the models requires vLLM, ask the user whether vLLM is a required
-dependency or an optional one.
+## Steps
 
-Using the above information you can infer the classification of the package:
+Follow the below steps to create the Nexus Package:
 
-- _Ecosystem-Only Packages_: Don't require vLLM neither as a default or optional
-  dependency.
-- _vLLM-Dependent Packages_: Requires vLLM as a mandatory dependency
-- _vLLM-Agnostic Packages_: Declares vLLM as an optional dependency but not as a
-  required one.
+1. **Identify the Nexus Variant**: Identify which nexus variant should the
+   python package be added to.
+2. **Create Nexus Package Structure**: Copy template and create package.
+   directory, created thenecessary subfolders and config files.
+3. **Validate Package**: Run `an validate` to check structure.
+4. **Add Dependency**: Use `uv add` with correct variant classification.
+5. **Suggest Next Steps**: Suggest the user next steps after the Package is
+   created.
 
-Also, ask the user if they want to create usage documentation for any of their
-models. If that's the cas help them draft it.
+## 1. Identify the Nexus Variant
 
-Note:
+Using the prerequisite information you can infer the classification of the
+package:
 
-- Do not infer any information about the user package name and models and their
-  details. Let thenuser give all the details.
-- If one of the models requires vLLM, ask the user whether vLLM is a required
-  dependency or an optional one. If optional, ask the user which extra dependency
-  from the package should be added.
+- Packages that don't require vLLM neither as a default or optional dependency
+  and are added only to the `ecosystem` variant.
 
-## 2. Create New Branch
+- Packages that require vLLM as a mandatory dependency and are added only to the
+  `candidate` variant.
 
-Create a new git branch named `add-<package-name>-package`
+- Packages that declare vLLM as an optional dependency are added to both
+  `ecosystem` and `candidate` variants.
 
-## 3. Create package structure
+## 2. Create package structure
 
-Copy the package template to the final package destination
+Using the template in `templates/nexus-package-template` as example, create a
+folder under `packages/` named after the python package and populate the
+`nexus.yaml` config file with the package level information. For any models, if
+any, create a subfolder with the model name and populate the `model.yaml`
+configuration file using the model level information.
 
-```bash
-cp -r templates/nexus-package-template packages/<package-name>
-```
-
-Then populate the package `nexus.yaml` with the package level information. For
-each model, if any, create a sub folder with the model name and populate the
-`model.yaml` file with the model level information.
-
-If the users have created usage documentation for their models it should be
-placed inside each model subfolder in a file named `usage.md`.
-
-The template `assets/templates/nexus-package-template` provides exampls for the
-package structure and config filaes (package `nexus.yaml` and model
-`model.yaml`).
-
-After populating the package structure, remove any files that are part of
-the template and that are not needed for this package
-(e.g., the sample model folder).
-
-## 4. Validate Package
+## 3. Validate Package
 
 ```bash
 uv run nexus validate packages/<package-name>
 ```
 
-Notes:
+If the validation is successful, the tool will print a success message
+`Validation Successful`. Continue to the next step.
 
-- Ask for user confirmation before running the validation command.
+If the validation is nor successful, it will print `Validation Failed` followed
+by a list of the errors. There are two main reasons for a failure:
 
-### 4.1 Example Package Validation Outputs
+1. A file is missing from the package or model directory.
+2. A Pydantic failure indicating the schema for the package or one of the model
+   configurations file is not correct.
 
-If the validation is successful a message will be printed to the console.
+Keep iterating on the validation until the failures are resolved.
 
-```bash
-╭───────────────────────────────────────────────────────────────────────────────────────────────────────── Validation Successful ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ ✓ All validation checks passed                                                                                                                                                                                                          │
-│                                                                                                                                                                                                                                         │
-│ Optional files/directories:                                                                                                                                                                                                             │
-│ i Optional package directory missing: skills                                                                                                                                                                                            │
-│ i Optional model file missing for 'minimal-model': usage.md                                                                                                                                                                             │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
+## 4. Add Dependency
 
-In case the validation is not successful, the tool will provide a list of issues
-like in the snippet below
+Depending on the variants identified in Step 1, add the python package to
+project dependencies dependencies with uv.
 
-```bash
-╭─────────────────────────────────────────────────────────────────────────────────────────────────────────── Validation Failed ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ ✗ /Users/christian/workspace/algorithm-nexus/tests/fixtures/packages/invalid-package/nexus.yaml                                                                                                                                         │
-│   Field: models                                                                                                                                                                                                                         │
-│   Error: Extra inputs are not permitted                                                                                                                                                                                                 │
-│ ✗ /Users/christian/workspace/algorithm-nexus/tests/fixtures/packages/invalid-package/models/undeclared-model/model.yaml                                                                                                                 │
-│   Field: model.testing                                                                                                                                                                                                                  │
-│   Error: Extra inputs are not permitted                                                                                                                                                                                                 │
-│ ✗ /Users/christian/workspace/algorithm-nexus/tests/fixtures/packages/invalid-package/models/broken-model/model.yaml                                                                                                                     │
-│   Field: model.id                                                                                                                                                                                                                       │
-│   Error: This required field is missing                                                                                                                                                                                                 │
-│ ✗ /Users/christian/workspace/algorithm-nexus/tests/fixtures/packages/invalid-package/models/broken-model/model.yaml                                                                                                                     │
-│   Field: model.testing                                                                                                                                                                                                                  │
-│   Error: Extra inputs are not permitted                                                                                                                                                                                                 │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-## 5. Add Dependency
-
-Depending on the package classification coming out of step 1, add the python
-package to the dependencies with uv.
-
-The general command for adding a package to the dependencies is:
+For each variant, run the following command:
 
 ```bash
 uv add <package-name> --optional <variant> --no-sync
 ```
 
-The variant depends to the package classification:
+If vLLM is an optional dependency, add the package to the `candidate` variant in
+the form `<package-name>[vLLM-dependency]` and to the `ecosystem` variant
+without any extra dependencies related to vLLM.
 
-- `ecosystem`: for Ecosystems-Only and vLLM Agnostic packages
-- `candidate`: for vLLM-Dependent and vLLM Agnostic packages
-
-Notes:
-
-- Never add a package to the `product` variant
-- For packages to be added to multiple variants, run the command once for each
-  variant separately.
-- Do not run `uv add` in any different way other than the above example.
-- Ask for user confirmation before running any command.
-
-In case of failure, help the user troubleshooting the error by interpreting the
-output messages and providing potential solutions. Ask the user for confirmation
-before making any change towards solving the dependency issue.
-
-## 6. Commit Changes\*\*
-
-Commit with DCO sign-off, this is achieved by adding the -s flag to the git
-commit command.
-Make sure the user has pre-commit installed and configured correctly.
-
-Example commit command:
+For each successful `uv add` create the requirement file by running:
 
 ```bash
-git commit -s -m "feat(package): Add <package-name> Nexus package"
+uv export --frozen --no-emit-project --no-default-groups \
+          --no-header --extra=<variant> \
+          --output-file=requirements-<variant>.txt
+
 ```
 
-The pre-commit hooks will generate requirements files and fail the commit.
-The requirements files need to be added to the commit and the commit command
-executed once more.
-Ask the user if they want to push the branch to their fork or not.
+In case of failure of any of the uv add commands, report the error to the user,
+provide some possible causes and solutions but do not attempt changing the
+dependencies of the project to fix the errors. Attempt adding the python package
+to all the variants identified in Step 1, even in case one fails. Do not execute
+the next step in case there are failures in this step.
 
-## 7. Open Pull Request
+## 5. Suggest Next Steps
 
-Once all the above have been done, create the pull request text by following the
-template in `./assets/templates/new_nexus_package_pr.md`. Ask the user if they
-want the PR to be created automatically or not.
+If all the above steps are successful suggest the user what to do next:
+
+- Create a new branch and commit your changes referencing the instructions in
+  `docs/contributing/add_new_nexus_package.md`.
+- Open a PR on GitHub using the `New Nexus Package` template.
