@@ -55,11 +55,11 @@ For example, if your package should be added to the `ecosystem` variant run,
 uv add <Python-Package-URL> --optional ecosystem
 ```
 
-> [!NOTE]
->
-> We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
-> command, to avoid errors with `uv` not being able to sync the dependencies
-> with the local python environment.
+!!! note
+
+    We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
+    command, to avoid errors with `uv` not being able to sync the dependencies
+    with the local python environment.
 
 If the `uv add` step fails, and you are unable to troubleshoot the error, record
 the error you get and continue on to step 3 and 4.
@@ -185,7 +185,7 @@ Kubernetes, etc.) and with building scripts for evaluating the models.
 
 If you encounter issues:
 
-1. Check the [Nexus Package Structure Guide](nexus_package.md)
+1. Check the [Nexus Package Structure Guide](../design/nexus_package.md)
 2. Review the
    [Dependency Resolution Design Document](../design/dependency-resolution.md)
 3. Search existing issues on GitHub
@@ -196,5 +196,5 @@ If you encounter issues:
 - [Nexus Package Structure Guide](../design/nexus_package.md)
 - [Nexus Package Requirements](../requirements/nexus_package.md)
 - [Packaging and Dependency Requirements](../requirements/packaging_and_dependency_reqs.md)
-- [Contributing Guidelines](../../CONTRIBUTING.md)
-- [Maintainers](../../MAINTAINERS.md)
+- Contributing Guidelines: repository root `CONTRIBUTING.md`
+- Maintainers: repository root `MAINTAINERS.md`

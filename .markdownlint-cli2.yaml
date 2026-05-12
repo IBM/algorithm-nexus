@@ -31,5 +31,4 @@ config:
   MD041: false
 
   # MD046/code-block-style - Code block style
-  MD046:
-    style: fenced
+  MD046: false

@@ -59,7 +59,7 @@ Benchmark Experiment)
 This section sets requirements for how benchmark experiments are constructed,
 formatted, standardized, and versioned to ensure reproducibility.
 
-- **REQ 1.1: Input/Output Specification** 
+- **REQ 1.1: Input/Output Specification**
   A benchmark experiment must define its
   inputs and outputs using a standardized system schema. Experiments must accept
   the benchmark target (model or algorithm) as a primary programmatic input, and
