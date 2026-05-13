@@ -117,5 +117,6 @@ In case of failure with uv when adding the algorithm stack package to a variant:
 
 ## 5. Write Report
 
-Write a report of the changes and unresolved issues following the
+Generate a report of the changes and unresolved issues following the
 [New Nexus Package PR template](../../../.github/PULL_REQUEST_TEMPLATE/new_nexus_package.md).
+Save the report as a markdown in a file.
