@@ -11,7 +11,7 @@ of multiple models with different dependencies.
 
 ## Roadmap
 
-### Version 0.1 (Enf od April 26, Alpha)
+### Version 0.1 (Alpha, End of April 26)
 
 - **Project requirements for dependencies resolution, Nexus package definition,
   testing and benchmarking**
@@ -51,13 +51,40 @@ tool allows the validation of the structure of a Nexus Package.
 
 ### Installation
 
-To use the CLI for package configuration validation, clone the repository and
-install with uv:
+#### Install from a release
+
+You can install Algorithm Nexus directly from a published release, depending on
+how you plan to use it.
+
+Install the CLI:
+
+```bash
+uv pip install algorithm-nexus[cli]
+```
+
+Install a dependency variant such as `product`, with dependencies resolved at
+runtime:
+
+`uv pip install algorithm-nexus[product]`
+
+Install a pre-resolved dependency set for a specific release and variant:
+
+```bash
+uv pip install -r https://raw.githubusercontent.com/IBM/algorithm-nexus/refs/tags/{version}/requirements-{variant}.txt
+```
+
+Replace `{version}` with the release tag and `{variant}` with the dependency
+group you want to install, such as `product`, `candidate`, or `ecosystems`.
+
+#### Install from source for development
+
+To develop locally with the CLI, test dependencies, and development tooling,
+clone the repository and install with uv:
 
 ```bash
 git clone https://github.com/IBM/algorithm-nexus.git
 cd algorithm-nexus
-uv sync --extra cli
+uv sync --extra cli --group dev --group test
 ```
 
 ### Available Tools
