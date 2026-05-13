@@ -58,16 +58,17 @@ Follow the below steps to create the Nexus Package:
 
 Using the prerequisite information you can infer the distribution variant the
 algorithm stack package should be added to by following the instructions in
-_Section 4. Variant Association Rules_ of the
-[dependency resolution design document](../../../docs/design/dependency-resolution.md#4-variant-association-rules).
+[Section 4. Variant Association Rules](../../../docs/design/dependency-resolution.md#4-variant-association-rules).
 
 No algorithm stack package can be added to the `product` variant.
 
 ## 2. Create Nexus Package Structure
 
 Using the prerequisite information create the Nexus package structure as
-outlined in _Step 3: Create a Nexus package for your algorithm_ of the
-[Nexus package contributing instructions](../../../docs/contributing/add_new_nexus_package.md#step-3-create-a-nexus-package-for-your-algorithm).
+outlined in
+[Step 3: Create a Nexus package for your algorithm](../../../docs/contributing/add_new_nexus_package.md#step-3-create-a-nexus-package-for-your-algorithm).
+If models are to be included, follow the instructions in
+[Describe the Models in Your Algorithm Package](../../../docs/contributing/add_new_nexus_package.md#describe-the-models-in-your-algorithm-package).
 
 ## 3. Validate the Nexus Package
 
