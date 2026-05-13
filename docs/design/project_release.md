@@ -1,58 +1,54 @@
 # Algorithm Nexus Release
 
-## Summary
-
-Algorithm Nexus releases provide the `nexus` CLI, publish optional dependency
-groups for different installation needs, and are tagged in the repository with
-the corresponding release version. In practice, users can either install just
-the CLI, install a dependency variant directly, or install a pre-resolved
-requirements file for a specific release.
-
 ## Release Definition
 
-Each release includes:
+A release of this project represents a stable point in the software lifecycle.
+Each release is officially designated as a **GitHub Release**, built upon a
+specific Git tag.
 
-- The CLI code and installation of the `nexus` executable.
-- Four optional dependency groups: `cli`, `ecosystems`, `candidate`, and
-  `product`.
-- A git tag that matches the released version.
+---
 
-Release cadence:
+### Release Standards
 
-- Releases happen monthly and should anticipate the product release code freeze
-  by 1 week, giving some buffer for last-minute issues.
-- Between regular releases, a pre-release is released for each newly added
-  package or model.
+| Attribute         | Specification                                             |
+| ----------------- | --------------------------------------------------------- |
+| **Platform**      | Published as a GitHub Release on the official repository. |
+| **Branch Origin** | Created exclusively from the `main` branch.               |
+| **Tagging**       | Follows Semantic Versioning (SemVer).                     |
 
-## Release Usage
+---
 
-Users can use a release in the following ways.
+### Release Payload
 
-### 1. Install CLI
+Each release contains the necessary components to deploy and interact with the
+framework. The following core elements are guaranteed in every distribution:
 
-Install the dependencies needed for the `nexus` CLI.
+| Component                 | Description                                                                                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CLI**                   | The central Command Line Interface tool for project interaction (`nexus`).                                                                                                                 |
+| **Nexus Packages**        | The most recent version of the algorithm stack packages (Nexus).                                                                                                                           |
+| **Distribution Variants** | Three optional and mutually-exclusive dependency groups tailored for specific environments (`ecosystem`, `candidate`, `product`) with pinned requirements in dedicated requirements files. |
 
-```bash
-uv pip install algorithm-nexus[cli]
-```
+---
 
-### 2. Install one of the variants
+### Release versioning
 
-For example, install the `product` variant and let dependencies versions be
-resolved at runtime.
+The versioning of the release follows the
+[Semantic Versioning](https://semver.org/) specification. The version number is
+composed of three parts:
 
-`uv pip install algorithm-nexus[product]`
+- **Major version**: Incremented when the release includes major changes (not
+  compatible with any previous version) in the benchmarking, testing or
+  dependencies validation protocols or breaking changes to the Nexus cli.
+- **Minor version**: Incremented when the release includes new algorithm stack
+  packages.
+- **Patch version**: Incremented for updates to existing Nexus packages (e.g.,
+  adding models, tests, benchmarks or incrementing the algorithm stack package
+  version) and for not breaking changes to the Nexus cli.
 
-### 3. Install one of the variants with pre-resolved dependencies
+### Release cadence
 
-For example, install the `product` variant with dependency versions resolved
-statically by Algorithm Nexus.
-
-```bash
-uv pip install -r https://raw.githubusercontent.com/IBM/algorithm-nexus/refs/tags/{version}/requirements-{variant}.txt
-```
-
-Note that for this installation mode users will have to use the link to the raw
-requirements file and explicitly specify in the URL the version (`{version}`)
-and and the variant (`{variant}`) of the Algorithm Nexus release they want to
-install.
+- At least one release per month.
+- The release for product is the version that is planned or available by the
+  product planning freeze date, by which versions of sotware that go in the
+  product are decided.
