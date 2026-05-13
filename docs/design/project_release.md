@@ -15,6 +15,8 @@ specific Git tag.
 | **Platform**      | Published as a GitHub Release on the official repository. |
 | **Branch Origin** | Created exclusively from the `main` branch.               |
 | **Tagging**       | Follows Semantic Versioning (SemVer).                     |
+| **Documentation** | Accompanied by comprehensive release notes detailing changes, features, and fixes. |
+| **Source Bundle** | Includes a full source release bundle (archives of the repository at that tag). |
 
 ---
 
