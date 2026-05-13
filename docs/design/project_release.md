@@ -48,7 +48,7 @@ composed of three parts:
 
 ### Release cadence
 
-- At least one release per month.
-- The release for product is the version that is planned or available by the
-  product planning freeze date, by which versions of sotware that go in the
-  product are decided.
+- We aim at releasing a new version within a week of adding or updating an
+  algorithm stack package.
+- The release for product is the version that is available by the product
+  planning freeze date.
