@@ -41,10 +41,10 @@ composed of three parts:
   compatible with any previous version) in the benchmarking, testing or
   dependencies validation protocols or breaking changes to the Nexus cli.
 - **Minor version**: Incremented when the release includes new algorithm stack
-  packages.
-- **Patch version**: Incremented for updates to existing Nexus packages (e.g.,
-  adding models, tests, benchmarks or incrementing the algorithm stack package
-  version) and for not breaking changes to the Nexus cli.
+  packages or new models are added to an existing package.
+- **Patch version**: Incremented for updates to existing Nexus packages or
+  models (e.g., adding model tests, benchmarks or incrementing the algorithm
+  stack package version) and for not breaking changes to the Nexus cli.
 
 ### Release cadence
 
