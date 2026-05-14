@@ -10,9 +10,9 @@ package, containing, for example, AI models, to Algorithm Nexus.
 
 There are four steps to contribute your algorithm package
 
-1. \*Setup a local copy of the Algorithm Nexus repository\*\*
+1. **Setup a local copy of the Algorithm Nexus repository**
 2. **Add your algorithm package to the Algorithm Nexus dependencies**
-3. \*_Create a Nexus package for your algorithm_
+3. **Create a Nexus package for your algorithm**
 4. **Commit your changes, push them, and then open a PR with Algorithm Nexus**
 
 ## Prerequisites
@@ -64,6 +64,14 @@ uv add <Python-Package-URL> --optional ecosystem
 If the `uv add` step fails, and you are unable to troubleshoot the error, record
 the error you get and continue on to step 3 and 4.
 
+Then export the requirement file by running:
+
+```bash
+uv export --frozen --no-emit-project --no-default-groups \
+          --no-header --extra=ecosystem \
+          --output-file=requirements-ecosystem.txt
+```
+
 ## Step 3: Create a Nexus package for your algorithm
 
 A Nexus package is a directory with some files that contains metadata about your
@@ -96,7 +104,7 @@ Fix them before moving to the next step.
 Add the files to be committed
 
 ```bash
-git add packages/<package-name> pyproject.toml uv.lock
+git add packages/<package-name> pyproject.toml uv.lock requirements-ecosystem.txt
 ```
 
 Commit your changes and push to your remote fork

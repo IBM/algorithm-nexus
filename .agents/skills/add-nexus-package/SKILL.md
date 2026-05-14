@@ -16,8 +16,12 @@ description:
 To add an algorithm stack package to Algorithm Nexus the below package level
 information is required:
 
-- `package_name` (string, required): Name of the Python package to add (e.g.,
-  "terratorch")
+- `package_name` (string, required): Name of the Nexus package to be added as
+  per the
+  [prerequisites](../../../docs/contributing/add_new_nexus_package.md#prerequisites)
+  in the _Contributing a python algorithm package to Algorithm Nexus_.
+- `package_url` (string, required): URL of the python package repository on
+  GitHub.
 - `is vllm and optional dependency`: The python package can be installed without
   vLLM in the dependencies, or with vLLM via an optional dependency group.
 
@@ -44,17 +48,30 @@ available, stop.
 
 Follow the below steps to create the Nexus Package:
 
-1. **Identify the Nexus Variant**: Identify which nexus variant should the
+1. **Inspect the Algorithm Stack Package Source**: Inspect the code to extract
+   information about the package.
+2. **Identify the Nexus Variant**: Identify which nexus variant should the
    python package be added to.
-2. **Create Nexus Package Structure**: Create the necessary Nexus package folder
+3. **Create Nexus Package Structure**: Create the necessary Nexus package folder
    structure and populate config files.
-3. **Validate the Nexus Package**: Run `nexus validate` to check structure.
-4. **Add Algorithm Stack Package as an Algorithm Nexus Dependency**: Use
+4. **Validate the Nexus Package**: Run `nexus validate` to check structure.
+5. **Add Algorithm Stack Package as an Algorithm Nexus Dependency**: Use
    `uv add` with correct variant classification.
-5. **Write Report**: Write a report of the changes made and any errors
+6. **Write Report**: Write a report of the changes made and any errors
    encountered.
 
-## 1. Identify the Nexus Variant
+## 1. Inspect the Algorithm Stack Package Source
+
+If the python package repository is not checked out locally, clone the
+repository to a temporary location.
+
+Inspect the source code to identify:
+
+- Available models and their Hugging Face ID.
+- Whether the package requires vLLM or not, and if it does whether vLLM is a
+  mandatory or optional requirement.
+
+## 2. Identify the Nexus Variant
 
 Using the prerequisite information you can infer the distribution variant the
 algorithm stack package should be added to by following the instructions in the
@@ -63,7 +80,7 @@ of the dependency resolution design document.
 
 No algorithm stack package can be added to the `product` variant.
 
-## 2. Create Nexus Package Structure
+## 3. Create Nexus Package Structure
 
 Using the prerequisite information create the Nexus package structure as
 outlined in the
@@ -73,7 +90,7 @@ models are to be included, follow the instructions in
 [_Describe the Models in Your Algorithm Package_ section](../../../docs/contributing/add_new_nexus_package.md#describe-the-models-in-your-algorithm-package)
 of the _Contributing a python algorithm package to Algorithm Nexus_ documentat.
 
-## 3. Validate the Nexus Package
+## 4. Validate the Nexus Package
 
 ```bash
 uv run nexus validate packages/<package-name>
@@ -95,23 +112,11 @@ For pydantic failures, iterate on the validation until the failures are
 resolved. If a failure is related to a missing file, check the instructions in
 step 2 to identify and add the missing file, and run the validation again.
 
-## 4. Add Algorithm Stack Package as an Algorithm Nexus Dependency
+## 5. Add Algorithm Stack Package as an Algorithm Nexus Dependency
 
 For each variant the algorithm stack package was identified as belonging to in
-step 1 run:
-
-```bash
-uv add <package-name> --optional <variant> --no-sync
-```
-
-For each successful `uv add` create the requirement file by running:
-
-```bash
-uv export --frozen --no-emit-project --no-default-groups \
-          --no-header --extra=<variant> \
-          --output-file=requirements-<variant>.txt
-
-```
+step 1, follow the instructions in
+[`Step 2: Add your algorithm package to the Algorithm Nexus dependencies`](../../../docs/contributing/add_new_nexus_package.md#step-2-add-your-algorithm-package-to-the-algorithm-nexus-dependencies).
 
 In case of failure with uv when adding the algorithm stack package to a variant:
 
@@ -119,7 +124,7 @@ In case of failure with uv when adding the algorithm stack package to a variant:
 - Do not attempt changing the dependencies of the project to fix the errors.
 - Skip this variant and continue to the next variant if any.
 
-## 5. Write Report
+## 6. Write Report
 
 Generate a report of the changes and unresolved issues following the
 [New Nexus Package PR template](../../../.github/PULL_REQUEST_TEMPLATE/new_nexus_package.md).
