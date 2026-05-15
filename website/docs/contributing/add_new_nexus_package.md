@@ -10,9 +10,9 @@ package, containing, for example, AI models, to Algorithm Nexus.
 
 There are four steps to contribute your algorithm package
 
-1. \*Setup a local copy of the Algorithm Nexus repository\*\*
+1. **Setup a local copy of the Algorithm Nexus repository**
 2. **Add your algorithm package to the Algorithm Nexus dependencies**
-3. \*_Create a Nexus package for your algorithm_
+3. **Create a Nexus package for your algorithm**
 4. **Commit your changes, push them, and then open a PR with Algorithm Nexus**
 
 ## Prerequisites

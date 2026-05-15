@@ -5,8 +5,6 @@ SPDX-License-Identifier: Apache-2.0
 
 # Requirements for Model Testing
 
-**Status:** Approved
-
 ## 1. Introduction
 
 This document outlines the requirements for testing models within Algorithm

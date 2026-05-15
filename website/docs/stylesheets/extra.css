@@ -12,4 +12,25 @@
   content: url("../assets/images/logo-ibm.png");
 }
 
+/* Enhanced navigation hierarchy visualization */
+.md-nav__item .md-nav__item {
+  position: relative;
+  padding-left: 0.6rem;
+}
+
+.md-nav__item .md-nav__item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--md-default-fg-color--lightest);
+  opacity: 0.3;
+}
+
+.md-nav__item .md-nav__item:last-child::before {
+  bottom: 50%;
+}
+
 /* Made with Bob */

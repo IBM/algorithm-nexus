@@ -5,8 +5,6 @@ SPDX-License-Identifier: Apache-2.0
 
 # Requirements for a Nexus Package
 
-**Status:** Approved
-
 ## 1. Introduction
 
 This document outlines the requirements for defining a Nexus package and the

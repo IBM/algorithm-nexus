@@ -7,24 +7,28 @@ Copyright &copy; 2026 IBM Research.
 """
 nav = [
   { "Getting Started" = [
-    { "Overview" = "index.md" },
+    { "Overview" = "getting-started/index.md" },
+    { "Installation" = "getting-started/installation.md" },
+    { "CLI Reference" = "getting-started/cli-reference.md" },
+  ] },
+  { "Contributing" = [
+    { "Overview" = "contributing/index.md" },
+    { "Contributing Guidelines" = "contributing/guidelines.md" },
+    { "Add New Nexus Package" = "contributing/add_new_nexus_package.md" },
+    { "Owner Responsibilities" = "contributing/owner_responsibilities.md" },
   ] },
   { "Design" = [
     { "Overview" = "design/index.md" },
     { "Nexus Package Structure Guide" = "design/nexus_package.md" },
     { "Dependency Resolution" = "design/dependency-resolution.md" },
     { "Benchmarking System" = "design/benchmark_system.md" },
-    { "Website Plan" = "design/zensical_website_plan.md" },
-  ] },
-  { "Contributing" = [
-    { "Overview" = "contributing/index.md" },
-    { "Add New Nexus Package" = "contributing/add_new_nexus_package.md" },
-    { "Owner Responsibilities" = "contributing/owner_responsibilities.md" },
+    { "Project Release" = "design/project_release.md" },
   ] },
   { "Requirements" = [
     { "Overview" = "requirements/index.md" },
     { "Nexus Package" = "requirements/nexus_package.md" },
     { "Model Testing" = "requirements/models_testing.md" },
+    { "Model vLLM" = "requirements/model_vllm.md" },
     { "Packaging and Dependency Management" = "requirements/packaging_and_dependency_reqs.md" },
     { "Benchmarking" = "requirements/benchmark.md" },
   ] },
@@ -53,7 +57,6 @@ features = [
   "navigation.instant",
   "navigation.instant.prefetch",
   "navigation.path",
-  "navigation.sections",
   "navigation.tabs",
   "navigation.tabs.sticky",
   "navigation.top",
@@ -61,6 +64,7 @@ features = [
   "search.highlight",
   "search.share",
   "search.suggest",
+  "toc.integrate",
 ]
 
 [[project.theme.palette]]
@@ -125,6 +129,9 @@ pygments_lang_class = true
 [project.markdown_extensions.pymdownx.magiclink]
 
 [project.markdown_extensions.pymdownx.mark]
+
+[project.markdown_extensions.pymdownx.snippets]
+base_path = [".", "website/docs"]
 
 [project.markdown_extensions.pymdownx.smartsymbols]
 
