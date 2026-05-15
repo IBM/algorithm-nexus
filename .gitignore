@@ -66,4 +66,11 @@ Thumbs.db
 *.bak
 *.orig
 
+# Website build output
 website/site
+website/.cache
+.gh-pages/
+
+# Node.js
+node_modules/
+package-lock.json
