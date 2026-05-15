@@ -31,8 +31,7 @@ It is optional to include models information in the package. However, for a
 model to be included, the following information is required:
 
 - `huggingface_id` (string, required): Hugging Face model repository identifier.
-  Must be unique across all models in the package.
-- `name` (string, required): Use the repo part of the HF ID (e.g., "org/repo").
+- `name` (string, required): Name of the model to be used as folder name.
 - `owner` (string, optional): GitHub username of model owner
 - `requires_vllm` (boolean, required): Whether the model uses vLLM for serving
 - `vllm_plugins` (string, required): If the model uses vLLM it might also
@@ -69,6 +68,9 @@ repository to a temporary location.
 Inspect the source code to identify:
 
 - Available models and their Hugging Face ID.
+  - No two models can have the same Hugging Face ID. If that's the case, stop.
+  - Extract the model name from the Hugging Face ID, i.e. model-name in
+    "org/model-name".
 - Whether the package requires vLLM or not, and if it does whether vLLM is a
   mandatory or optional requirement.
 
@@ -129,4 +131,5 @@ In case of failure with uv when adding the algorithm stack package to a variant:
 
 Generate a report of the changes and unresolved issues following the
 [New Nexus Package PR template](../../../.github/PULL_REQUEST_TEMPLATE/new_nexus_package.md).
-Save the report as a markdown in a file.
+Only add a summary of the changes, without including the rationale behind the
+changes. Save the report as a markdown in a file.
