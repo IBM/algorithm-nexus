@@ -30,8 +30,9 @@ If this information is not available stop.
 It is optional to include models information in the package. However, for a
 model to be included, the following information is required:
 
-- `name` (string, required): Model directory name
-- `huggingface_id` (string, required): Hugging Face model repository identifier
+- `huggingface_id` (string, required): Hugging Face model repository identifier.
+  Must be unique across all models in the package.
+- `name` (string, required): Use the repo part of the HF ID (e.g., "org/repo").
 - `owner` (string, optional): GitHub username of model owner
 - `requires_vllm` (boolean, required): Whether the model uses vLLM for serving
 - `vllm_plugins` (string, required): If the model uses vLLM it might also
