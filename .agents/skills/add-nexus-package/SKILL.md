@@ -22,6 +22,8 @@ information is required:
   in the _Contributing a python algorithm package to Algorithm Nexus_.
 - `package_url` (string, required): URL of the python package repository on
   GitHub.
+- `package_version` (string, required): version of the python package to be
+  added to the dependencies.
 - `is vllm and optional dependency`: The python package can be installed without
   vLLM in the dependencies, or with vLLM via an optional dependency group.
 
@@ -73,6 +75,11 @@ Inspect the source code to identify:
     "org/model-name".
 - Whether the package requires vLLM or not, and if it does whether vLLM is a
   mandatory or optional requirement.
+- The version of the python package to be installed.
+  - If no specific version information is provided by the user, inspect the code
+    to identify the latest release version.
+  - If no latest release version is available, stop and inform the user that a
+    GitHub release is required.
 
 ## 2. Identify the Nexus Variant
 
