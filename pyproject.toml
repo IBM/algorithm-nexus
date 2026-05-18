@@ -29,7 +29,6 @@ cli = [
 ]
 ecosystem = [
   "terratorch>=1.2.7",
-  "tokamind",
 ]
 product = [
   "terratorch[vllm]==1.2.5",
@@ -57,6 +56,3 @@ conflicts = [
     { extra = "product" },
   ],
 ]
-
-[tool.uv.sources]
-tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind.git" }
