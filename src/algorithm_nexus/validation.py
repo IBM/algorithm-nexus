@@ -139,18 +139,24 @@ def validate_nexus_yaml(
             collector.add(format_pydantic_error(error, nexus_yaml_path))
 
 
-def validate_model_yaml(model_dir: Path, collector: ValidationErrorCollector) -> None:
-    """Validate a model's model.yaml file."""
+def validate_model_yaml(
+    model_dir: Path, collector: ValidationErrorCollector
+) -> AlgorithmNexusModelConfig | None:
+    """Validate a model's model.yaml file.
+
+    Returns the validated model config if successful, None otherwise.
+    """
     model_yaml_path = model_dir / "model.yaml"
     data = load_yaml_file(model_yaml_path, collector)
     if data is None:
-        return
+        return None
 
     try:
-        AlgorithmNexusModelConfig.model_validate(data)
+        return AlgorithmNexusModelConfig.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, model_yaml_path))
+        return None
 
 
 def validate_optional_file(
@@ -184,11 +190,14 @@ def validate_optional_dir(
 def validate_model_directory(
     model_dir: Path,
     collector: ValidationErrorCollector,
-) -> None:
-    """Validate a single model directory structure and contents."""
+) -> AlgorithmNexusModelConfig | None:
+    """Validate a single model directory structure and contents.
+
+    Returns the validated model config if successful, None otherwise.
+    """
     if not model_dir.is_dir():
         collector.add(f"Model path is not a directory: {model_dir}")
-        return
+        return None
 
     # Validate optional usage.md
     usage_md = model_dir / "usage.md"
@@ -198,8 +207,8 @@ def validate_model_directory(
         f"Optional model file missing for '{model_dir.name}': usage.md",
     )
 
-    # Validate model.yaml
-    validate_model_yaml(model_dir, collector)
+    # Validate model.yaml and return the config
+    return validate_model_yaml(model_dir, collector)
 
 
 def validate_package_directory(
@@ -225,6 +234,24 @@ def validate_package_directory(
     ):
         return
 
+    # Track HuggingFace model IDs to detect duplicates
+    hf_id_to_models: dict[str, list[str]] = {}
+
     # Only validate model directories if models_dir exists
     for model_dir in models_dir.iterdir():
-        validate_model_directory(model_dir, collector)
+        model_config = validate_model_directory(model_dir, collector)
+
+        # Extract HF ID from validated model config for duplicate checking
+        if model_config is not None:
+            hf_id = model_config.model.id
+            if hf_id not in hf_id_to_models:
+                hf_id_to_models[hf_id] = []
+            hf_id_to_models[hf_id].append(model_dir.name)
+
+    # Check for duplicate HuggingFace model IDs
+    for hf_id, model_names in hf_id_to_models.items():
+        if len(model_names) > 1:
+            models_list = ", ".join(f"'{name}'" for name in sorted(model_names))
+            collector.add(
+                f"Duplicate HuggingFace model ID '{hf_id}' found in models: {models_list}"
+            )
