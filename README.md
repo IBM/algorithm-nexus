@@ -49,7 +49,7 @@ their packages well-formed.
 Choose the section that matches your goal:
 
 - [I want to install algorithm nexus packages in my environment](#installing-algorithm-nexus-packages-in-your-environment)
-- [I want to add contribute my Python library to Algorithm Nexus](#contributing-your-python-library-to-algorithm-nexus)
+- [I want to contribute my Python library to Algorithm Nexus](#contributing-your-python-library-to-algorithm-nexus)
 - [I want to develop Algorithm Nexus itself](#developing-algorithm-nexus)
 
 ### Installing algorithm nexus packages in your environment
