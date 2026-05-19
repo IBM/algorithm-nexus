@@ -2,16 +2,16 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-> **Note:** This project is in the very early stages of planning and
-> development. There is currently no functional code.
-
-This library aims to robustly package a diverse set of AI models and frameworks
-within a unified Python environment, enabling seamless deployment and management
-of multiple models with different dependencies.
+Algorithm Nexus packages a diverse set of AI algorithm stacks — models,
+frameworks, and related tooling — within a unified Python environment. Each
+algorithm stack is described by a **Nexus package**: a small metadata directory
+that records the package's dependencies, models, and validation requirements.
+The `nexus` CLI validates Nexus packages and supports contributors in keeping
+their packages well-formed.
 
 ## Roadmap
 
-### Version 0.1 (Alpha, End of April 26)
+### Version 0.1 (Alpha, End of April 2026)
 
 - **Project requirements for dependencies resolution, Nexus package definition,
   testing and benchmarking**
@@ -21,7 +21,7 @@ of multiple models with different dependencies.
 - **Nexus package and model owner responsibilities defined**
 - **Rules for contributing a new Nexus Package defined**
 - **Initial CI in place**, supporting Nexus package structure validation
-  (without vLLM validation), dependency resolution and models inference testing.
+  (without vLLM validation), dependency resolution and models inference testing
 - **Nexus package for TerraTorch integrated**
 
 ### Version 0.2 (Beta, End of May 2026)
@@ -44,54 +44,116 @@ of multiple models with different dependencies.
 - **Models scoreboard implemented** to track the performance of the integrated
   models
 
-## Algorithm Nexus CLI
+## Installation
 
-Algorithm Nexus provides the `nexus` CLI tool for managing Nexus packages. This
-tool allows the validation of the structure of a Nexus Package.
+Choose the section that matches your goal:
 
-### Installation
+- [I want to install algorithm nexus packages in my environment](#installing-algorithm-nexus-packages-in-your-environment)
+- [I want to add contribute my Python library to Algorithm Nexus](#contributing-your-python-library-to-algorithm-nexus)
+- [I want to develop Algorithm Nexus itself](#developing-algorithm-nexus)
 
-#### Install from a release
+### Installing algorithm nexus packages in your environment
 
-You can install Algorithm Nexus directly from a published release, depending on
-how you plan to use it.
+Algorithm Nexus is **not published to PyPI**. All installs reference a tagged
+[GitHub Release](https://github.com/IBM/algorithm-nexus/releases).
 
-Install the CLI:
+Each release ships three mutually-exclusive dependency variants. Pick the one
+that matches your environment:
 
-```bash
-uv pip install algorithm-nexus[cli]
-```
+| Variant | vLLM included | Intended use |
+| --------- | ------------- | ---------------------------------- |
+| `ecosystem` | No | Research and exploration environments |
+| `candidate` | Yes (latest) | Pre-production evaluation |
+| `product` | Yes (stable pin) | Production deployments |
 
-Install a dependency variant such as `product`, with dependencies resolved at
-runtime:
+#### Install a variant
 
-`uv pip install algorithm-nexus[product]`
-
-Install a pre-resolved dependency set for a specific release and variant:
+Each release tag includes a pinned, hash-verified requirements file for every
+variant. Install using `uv`:
 
 ```bash
 uv pip install -r https://raw.githubusercontent.com/IBM/algorithm-nexus/refs/tags/{version}/requirements-{variant}.txt
 ```
 
-Replace `{version}` with the release tag and `{variant}` with the dependency
-group you want to install, such as `product`, `candidate`, or `ecosystems`.
+Replace `{version}` with the release tag (e.g. `v0.1.0`) and `{variant}` with
+`ecosystem`, `candidate`, or `product`.
 
-#### Install from source for development
+### Contributing your python library to algorithm nexus
 
-To develop locally with the CLI, test dependencies, and development tooling,
-clone the repository and install with uv:
+> **Note:** This project is currently in closed beta. Contributions are open to
+> IBM contributors only.
+
+Contributing a package means adding your Python library as an Algorithm Nexus
+dependency, creating a Nexus package metadata directory under `packages/`, and
+opening a pull request from a fork of the nexus repository.
+
+Before you begin you will need:
+
+- Your algorithm package publicly available on GitHub
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) installed
+- A [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
+  of this repository checked out locally
+
+Set up your local environment:
+
+```bash
+cd algorithm-nexus
+uv sync --group dev --extra cli
+uv run pre-commit install
+```
+
+Then create a branch and follow one of the two paths below.
+
+#### Option A — Coding Agent (Recommended)
+
+An agent skill is available for adding Nexus packages.
+Open the algorithm nexus repository in your coding agent and
+ask it to add your python package to the nexus giving it your package
+repository URL e.g.
+
+```commandline
+Add the package at ${URL} to the nexus
+```
+
+replacing `${URL}` with your packages repo URL.
+
+#### Option B — Manual
+
+Follow the step-by-step guide in
+[`docs/contributing/add_new_nexus_package.md`](docs/contributing/add_new_nexus_package.md),
+which covers variant classification, `nexus.yaml` authoring, dependency
+resolution with `uv add`, and opening a PR.
+
+#### Before opening a pull request
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for DCO sign-off requirements, commit
+message conventions (Conventional Commits / Angular style), and coding style
+checks. All checks must pass before a PR can be merged.
+
+### Developing Algorithm Nexus
+
+For IBM contributors working on the CLI, validation logic, tests, or CI
+infrastructure. This setup is a superset of the package contributor setup — it
+adds the `test` dependency group.
 
 ```bash
 git clone https://github.com/IBM/algorithm-nexus.git
 cd algorithm-nexus
 uv sync --extra cli --group dev --group test
+uv run pre-commit install --install-hooks
+uv run pre-commit install --hook-type commit-msg
 ```
 
-### Available Tools
+Full details on coding standards, legal requirements (DCO), commit conventions,
+and manual lint commands are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-#### Nexus Package Validation
+## CLI Reference
 
-The validation tool checks:
+Algorithm Nexus provides the `nexus` CLI for working with Nexus packages.
+
+### `nexus validate`
+
+Validates the structure and configuration of a Nexus package:
 
 - **Package structure**: Verifies required files (`nexus.yaml`, `model.yaml`)
   and directories (`tests/`) exist
@@ -100,19 +162,14 @@ The validation tool checks:
   correct field types and required fields
 - **Cross-validation**: Checks dependencies between configurations (e.g., vLLM
   enabled requires vLLM testing)
-- **Model declarations**: Ensures all models in `nexus.yaml` have corresponding
-  directories
-
-Example usage:
+- **Model declarations**: Ensures all models declared in `nexus.yaml` have
+  corresponding directories
 
 ```bash
 nexus validate /path/to/package
 ```
 
-In case of validation errors a detailed report guides the user to fix the
-issues.
-
-## Getting Started
+In case of validation errors, a detailed report guides you to fix each issue.
 
 ## Contributing
 
@@ -121,14 +178,13 @@ contributions at this time.
 
 For IBM contributors:
 
-- Please, see our [Contributing Guide](CONTRIBUTING.md) for development setup
-  and guidelines.
-- Read the [guide](./docs/contributing/add_new_nexus_package.md) for
-  step-by-step instructions for contributing a Nexus Package.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+- See [`docs/contributing/add_new_nexus_package.md`](docs/contributing/add_new_nexus_package.md)
+  for step-by-step instructions for contributing a Nexus package.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the
+This project is licensed under the Apache License 2.0 — see the
 [LICENSE](LICENSE) file for details.
 
 ## Maintainers
