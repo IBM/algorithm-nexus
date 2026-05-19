@@ -151,9 +151,16 @@ and manual lint commands are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Algorithm Nexus provides the `nexus` CLI for working with Nexus packages.
 
-### `nexus validate`
+### Validating nexus packages
 
-Validates the structure and configuration of a Nexus package:
+To validate the structure and configuration of a Nexus package run:
+
+
+```bash
+nexus validate /path/to/package
+```
+
+This will examine the following:
 
 - **Package structure**: Verifies required files (`nexus.yaml`, `model.yaml`)
   and directories (`tests/`) exist
@@ -164,10 +171,6 @@ Validates the structure and configuration of a Nexus package:
   enabled requires vLLM testing)
 - **Model declarations**: Ensures all models declared in `nexus.yaml` have
   corresponding directories
-
-```bash
-nexus validate /path/to/package
-```
 
 In case of validation errors, a detailed report guides you to fix each issue.
 
