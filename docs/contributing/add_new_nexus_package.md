@@ -62,6 +62,14 @@ uv export --frozen --no-emit-project --no-default-groups \
 If the `uv add` step fails, and you are unable to troubleshoot the error, record
 the error you get and continue on to step 3 and 4.
 
+Then export the requirement file by running:
+
+```bash
+uv export --frozen --no-emit-project --no-default-groups \
+          --no-header --extra=ecosystem \
+          --output-file=requirements-ecosystem.txt
+```
+
 ## Step 3: Create a Nexus package for your algorithm
 
 A Nexus package is a directory with some files that contains metadata about your
