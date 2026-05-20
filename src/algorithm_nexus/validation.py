@@ -125,18 +125,22 @@ def format_pydantic_error(error: dict[str, Any], file_path: Path) -> str:
 def validate_nexus_yaml(
     package_dir: Path,
     collector: ValidationErrorCollector,
-) -> None:
-    """Validate nexus.yaml."""
+) -> AlgorithmNexusPackageConfig | None:
+    """Validate nexus.yaml.
+
+    Returns the validated package config if successful, None otherwise.
+    """
     nexus_yaml_path = package_dir / "nexus.yaml"
     data = load_yaml_file(nexus_yaml_path, collector)
     if data is None:
-        return
+        return None
 
     try:
-        AlgorithmNexusPackageConfig.model_validate(data)
+        return AlgorithmNexusPackageConfig.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, nexus_yaml_path))
+        return None
 
 
 def validate_model_yaml(
@@ -157,6 +161,43 @@ def validate_model_yaml(
         for error in exc.errors():
             collector.add(format_pydantic_error(error, model_yaml_path))
         return None
+
+
+def validate_benchmark_instances(
+    model_dir: Path,
+    collector: ValidationErrorCollector,
+    registered_experiments: set[str],
+) -> None:
+    """Validate a model's benchmark_instances/ folder.
+
+    Validates that each benchmark instance has a space.yaml file.
+    Does not validate the contents of space.yaml as that is ADO's responsibility.
+    """
+    benchmark_instances_dir = model_dir / "benchmark_instances"
+
+    # benchmark_instances/ is optional
+    if not benchmark_instances_dir.exists():
+        return
+
+    if not benchmark_instances_dir.is_dir():
+        collector.add(
+            f"benchmark_instances must be a directory when present: {benchmark_instances_dir}"
+        )
+        return
+
+    # Validate each benchmark instance folder
+    for instance_dir in benchmark_instances_dir.iterdir():
+        if not instance_dir.is_dir():
+            continue
+
+        space_yaml_path = instance_dir / "space.yaml"
+
+        # Each benchmark instance must have a space.yaml
+        if not space_yaml_path.exists():
+            collector.add(
+                f"[bold]{instance_dir}[/bold]\n"
+                f"  Error: Missing required space.yaml file for benchmark instance '{instance_dir.name}'"
+            )
 
 
 def validate_optional_file(
@@ -190,6 +231,7 @@ def validate_optional_dir(
 def validate_model_directory(
     model_dir: Path,
     collector: ValidationErrorCollector,
+    registered_experiments: set[str],
 ) -> AlgorithmNexusModelConfig | None:
     """Validate a single model directory structure and contents.
 
@@ -207,8 +249,13 @@ def validate_model_directory(
         f"Optional model file missing for '{model_dir.name}': usage.md",
     )
 
-    # Validate model.yaml and return the config
-    return validate_model_yaml(model_dir, collector)
+    # Validate model.yaml
+    model_config = validate_model_yaml(model_dir, collector)
+
+    # Validate optional benchmark_instances/
+    validate_benchmark_instances(model_dir, collector, registered_experiments)
+
+    return model_config
 
 
 def validate_package_directory(
@@ -219,13 +266,46 @@ def validate_package_directory(
         collector.add(f"Package path is not a directory: {package_dir}")
         return
 
-    validate_nexus_yaml(package_dir, collector)
+    # Validate nexus.yaml and extract registered experiments
+    package_config = validate_nexus_yaml(package_dir, collector)
+    registered_experiments: set[str] = set()
+    if package_config and package_config.package.benchmark_packages:
+        # Collect all experiment identifiers from all benchmark packages
+        for pkg in package_config.package.benchmark_packages:
+            registered_experiments.update(pkg.experiments)
+
+        # Validate unique experiment identifiers across all packages
+        all_experiments = []
+        for pkg in package_config.package.benchmark_packages:
+            all_experiments.extend(pkg.experiments)
+        duplicates = {exp for exp in all_experiments if all_experiments.count(exp) > 1}
+        if duplicates:
+            collector.add(
+                f"Duplicate experiment identifiers across benchmark packages in nexus.yaml: {', '.join(sorted(duplicates))}"
+            )
 
     # Validate optional skills directory
     skills_dir = package_dir / "skills"
     validate_optional_dir(
         skills_dir, collector, "Optional package directory missing: skills"
     )
+
+    # Validate optional benchmark_packages directory
+    benchmark_packages_dir = package_dir / "benchmark_packages"
+    if validate_optional_dir(
+        benchmark_packages_dir,
+        collector,
+        "Optional package directory missing: benchmark_packages",
+    ):
+        # Check that each subdirectory is a valid Python package
+        for pkg_dir in benchmark_packages_dir.iterdir():
+            if not pkg_dir.is_dir():
+                continue
+            pyproject_toml = pkg_dir / "pyproject.toml"
+            if not pyproject_toml.exists():
+                collector.add_info(
+                    f"Optional file missing in benchmark_packages/{pkg_dir.name}/: pyproject.toml (required for local benchmark Python package)"
+                )
 
     # Check if models directory exists
     models_dir = package_dir / "models"
@@ -239,7 +319,9 @@ def validate_package_directory(
 
     # Only validate model directories if models_dir exists
     for model_dir in models_dir.iterdir():
-        model_config = validate_model_directory(model_dir, collector)
+        model_config = validate_model_directory(
+            model_dir, collector, registered_experiments
+        )
 
         # Extract HF ID from validated model config for duplicate checking
         if model_config is not None:

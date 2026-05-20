@@ -1,0 +1,10 @@
+entitySpace:
+  - identifier: batch_size
+    propertyDomain:
+      values: [32]
+
+experiments:
+  - actuatorIdentifier: custom_experiments
+    experimentIdentifier: remote-baseline
+
+# Made with Bob

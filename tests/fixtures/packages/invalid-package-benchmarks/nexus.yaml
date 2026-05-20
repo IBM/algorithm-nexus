@@ -1,0 +1,12 @@
+package:
+  name: "test-invalid-benchmarks"
+  benchmark_packages:
+    - requirement_specifier: "valid-package"
+      experiments:
+        - "duplicate-exp"
+        - "valid-exp"
+    - requirement_specifier: "another-package"
+      experiments:
+        - "duplicate-exp"  # Duplicate across packages
+
+# Made with Bob

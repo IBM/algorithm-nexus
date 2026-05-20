@@ -58,12 +58,43 @@ def validate_hf_model_id(v: str) -> str:
     return v
 
 
+class BenchmarkPackage(BaseModel):
+    """Benchmark package registration in nexus.yaml.
+
+    Registers a benchmark package and the experiments it exposes.
+    Each package must follow the ADO custom experiment format.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    requirement_specifier: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Python package requirement target for the benchmark package. May be a Python package name, a URL to a Python package or source repository, or a local path to a Python package within ./packages in the Nexus repository root.",
+        ),
+    ]
+    experiments: Annotated[
+        list[str],
+        Field(
+            min_length=1,
+            description="Experiment identifiers exposed by that benchmark package and made available to models in the Nexus package.",
+        ),
+    ]
+
+
 class NexusPackageInfo(BaseModel):
     """Package-level configuration."""
 
     model_config = ConfigDict(extra="forbid")
 
     name: Annotated[str, Field(min_length=1, description="Python package name")]
+    benchmark_packages: Annotated[
+        list[BenchmarkPackage] | None,
+        Field(
+            description="List of benchmark packages available to models in this package",
+        ),
+    ] = None
 
 
 class VLLMPlugins(BaseModel):

@@ -3,3 +3,18 @@
 
 package:
   name: "your-package-name"  # Replace with your Python package name (e.g., "terratorch", "tokamind")
+
+  # Optional: Register benchmark packages available to models in this package
+  # benchmark_packages:
+  #   - requirement_specifier: "./packages/your-package-name/benchmark_packages/segmentation-benchmarks"
+  #     experiments:
+  #       - "local-segmentation-eval"
+  #       - "local-boundary-eval"
+  #
+  #   - requirement_specifier: "https://github.com/example-org/example-benchmarks"
+  #     experiments:
+  #       - "leaderboard-baseline"
+  #
+  #   - requirement_specifier: "example-benchmark-package"
+  #     experiments:
+  #       - "packaged-baseline"
