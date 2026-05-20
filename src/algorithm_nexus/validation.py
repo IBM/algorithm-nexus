@@ -307,6 +307,11 @@ def validate_package_directory(
                     f"Optional file missing in benchmark_packages/{pkg_dir.name}/: pyproject.toml (required for local benchmark Python package)"
                 )
 
+    # Validate optional package-level benchmark_instances directory
+    # The validate_benchmark_instances function expects a directory that contains benchmark_instances/
+    # So we pass package_dir and it will look for package_dir/benchmark_instances/
+    validate_benchmark_instances(package_dir, collector, registered_experiments)
+
     # Check if models directory exists
     models_dir = package_dir / "models"
     if not validate_optional_dir(

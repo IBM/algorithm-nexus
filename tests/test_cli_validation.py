@@ -240,7 +240,8 @@ class TestMalformedPackageConfig:
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "must contain a YAML mapping at the top level" in result.stdout
+        assert "YAML mapping at the top level" in result.stdout
+        assert "got list" in result.stdout
 
     def test_yaml_string_instead_of_dict(self, temp_package_dir: Path) -> None:
         """Test that YAML containing a string instead of dict is rejected."""
@@ -250,5 +251,5 @@ class TestMalformedPackageConfig:
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "must contain a YAML mapping at the top level" in result.stdout
-        assert "yaml" in result.stdout.lower()
+        assert "YAML mapping at the top level" in result.stdout
+        assert "got str" in result.stdout
