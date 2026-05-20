@@ -21,8 +21,8 @@ The Nexus package serves as a registry entry that:
 - References a Python package with versioned releases on GitHub or PyPI
 - Defines which models are supported by that Python package
 - Enables dependency resolution across all packages in the Algorithm Nexus
-- Can optionally register benchmark experiments and model-specific benchmark
-  definitions for benchmarking workflows
+- Can optionally register benchmark packages and model-specific benchmark
+  instances for benchmarking workflows
 
 ---
 
@@ -35,14 +35,16 @@ following structure:
 ```text
 packages/
 └── <nexus-package-name>/
-    ├── nexus.yaml         # Required package metadata
-    ├── skills             # Optional agent skills resources
-    ├── benchmarks/        # Optional local benchmark experiment package
+    ├── nexus.yaml               # Required package metadata
+    ├── skills                   # Optional agent skills resources
+    ├── benchmark_packages/      # Optional local benchmark packages
     └── models/
         ├── <model-1>/
-        │   ├── model.yaml # Required model metadata
-        │   ├── benchmarks.yaml # Optional per-model benchmark definitions
-        │   └── usage.md   # Optional usage documentation
+        │   ├── model.yaml       # Required model metadata
+        │   ├── benchmark_instances/ # Optional per-model benchmark instances
+        │   │   └── <benchmark-instance-name>/
+        │   │       └── space.yaml   # Required ADO discoveryspace for that benchmark instance
+        │   └── usage.md         # Optional usage documentation
         ├── <model-2>/
         │   └── ...
         └── ...
@@ -51,15 +53,18 @@ packages/
 The required root file is `nexus.yaml`, which declares the Nexus package
 metadata. `skills` is optional and should only be included when the package
 provides agent skills to assist users in using the package. The optional
-`benchmarks/` folder is the standard place for local benchmark experiment code
-and should contain a Python package that follows the
+`benchmark_packages/` folder stores local benchmark packages, and each such
+package should follow the
 [ADO custom experiment](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
-pattern. The `models/` folder is required whenever a Nexus package wants to
+template. The `models/` folder is required whenever a Nexus package wants to
 advertise one or more models, with one sub-folder for each model. Each model
 folder must contain a `model.yaml` file describing the model metadata and
 optional vLLM integration. Each model folder can optionally include a sibling
-`benchmarks.yaml` file to define model-specific benchmark configurations and a
-`usage.md` file to provide users with model-specific usage guidance.
+`benchmark_instances/` folder. Inside `benchmark_instances/`, each benchmark
+instance must have its own sub-folder, and that sub-folder must contain a
+`space.yaml` file defining the full ADO discoveryspace for that specific
+benchmark instance. A `usage.md` file can also be included to provide users with
+model-specific usage guidance.
 
 ---
 
@@ -74,18 +79,17 @@ Python package and its supported models.
 
 `package`
 
-| Field                   | Type     | Required | Description                                                                                                              |
-| ----------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `name`                  | `string` | Yes      | Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI. |
-| `benchmark_experiments` | `list`   | No       | Package-level benchmark experiment registrations available to models in this Nexus package.                              |
+| Field                | Type     | Required | Description                                                                                                              |
+| -------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `name`               | `string` | Yes      | Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI. |
+| `benchmark_packages` | `list`   | No       | Package-level benchmark package registrations available to models in this Nexus package.                                 |
 
-`package.benchmark_experiments[]`
+`package.benchmark_packages[]`
 
-| Field          | Type     | Required | Description                                                                                                       |
-| -------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `name`         | `string` | Yes      | Benchmark experiment identifier. The identifier is expected to resolve to an ADO custom experiment.               |
-| `distribution` | `string` | Yes      | Source of the benchmark experiment. Must be one of `package`, `local`, or `url`.                                  |
-| `url`          | `string` | No       | Required only when `distribution` is `url`; points to a repository that follows the ADO custom experiment format. |
+| Field                   | Type           | Required | Description                                                                                                                                                                                                                         |
+| ----------------------- | -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `requirement_specifier` | `string`       | Yes      | Python package requirement target for the benchmark package. It may be a Python package name, a URL to a Python package or source repository, or a local path to a Python package within `./packages` in the Nexus repository root. |
+| `experiments`           | `list[string]` | Yes      | Experiment identifiers exposed by that benchmark package and made available to models in the Nexus package.                                                                                                                         |
 
 #### 3.1.2. Example
 
@@ -93,22 +97,29 @@ Python package and its supported models.
 package:
   name: "terratorch"
 
-  benchmark_experiments:
-    - name: "native-flood-eval"
-      distribution: "package"
+  benchmark_packages:
+    - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
+      experiments:
+        - "local-segmentation-eval"
+        - "local-boundary-eval"
 
-    - name: "local-segmentation-eval"
-      distribution: "local"
+    - requirement_specifier: "https://github.com/example-org/example-benchmarks"
+      experiments:
+        - "leaderboard-baseline"
 
-    - name: "leaderboard-baseline"
-      distribution: "url"
-      url: "https://github.com/example-org/ado-leaderboard-benchmarks"
+    - requirement_specifier: "example-benchmark-package"
+      experiments:
+        - "packaged-baseline"
 ```
 
-Benchmark experiments are registered only at package level. The `distribution`
-field indicates whether the experiment is exposed directly by the installed
-package, by the package-local [`benchmarks/`](../../packages/terratorch/) Python
-package, or by a remote repository referenced through `url`.
+Benchmark packages are registered only at package level. Each registration uses
+a `requirement_specifier` to identify how the benchmark package is resolved and
+an `experiments` list to declare which experiment identifiers from that package
+are made available to the Nexus package. The `requirement_specifier` may be a
+Python package name, a URL to a Python package or source repository, or a local
+path to a Python package within `./packages` in the Nexus repository root. In
+all cases, the referenced package is expected to follow the ADO custom
+experiment template.
 
 #### 3.1.3. Agent Skills
 
@@ -145,13 +156,6 @@ Each model has its own configuration file defining integration requirements.
 Each model can optionally provide usage documentation in
 `models/<model-name>/usage.md`.
 
-Benchmark configuration should remain separate from
-`models/<model-name>/model.yaml`. When a model defines benchmarks, they should
-be described in a sibling
-[`benchmarks.yaml`](../../packages/terratorch/models/prithvi/) file that
-references one of the package-level registered benchmark experiments and
-provides the parameter mapping to pass to that experiment.
-
 #### 3.2.2. Example
 
 ```yaml
@@ -165,3 +169,15 @@ model:
       io_processors:
         - "terratorch-tm-segmentation"
 ```
+
+#### 3.2.3. Benchmarks
+
+Benchmark configuration should remain separate from
+`models/<model-name>/model.yaml`. When a model defines benchmarks, they should
+be described in a sibling `benchmark_instances/` folder. This folder contains
+one sub-folder per benchmark instance, and each benchmark instance sub-folder
+must provide a
+[`space.yaml`](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace)
+file with the full ADO discoveryspace definition for that benchmark run. The
+experiment referenced in `space.yaml` must be one of the experiment identifiers
+registered through `package.benchmark_packages`.
