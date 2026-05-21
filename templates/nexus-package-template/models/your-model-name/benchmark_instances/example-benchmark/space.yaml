@@ -1,14 +1,14 @@
 # ADO Discoveryspace Configuration for Benchmark Instance
 # This file defines the full ADO discoveryspace for this specific benchmark instance
 
-# Optional: Entity space defining parameter values for the benchmark
-# entitySpace:
-#   - identifier: dataset
-#     propertyDomain:
-#       values: ["sen1floods11"]
-#   - identifier: split
-#     propertyDomain:
-#       values: ["test"]
+# Required: Entity space defining parameter values for the benchmark
+entitySpace:
+  - identifier: dataset
+    propertyDomain:
+      values: ["sen1floods11"]
+  - identifier: split
+    propertyDomain:
+      values: ["test"]
 
 # Required: List of experiments to run
 experiments:
