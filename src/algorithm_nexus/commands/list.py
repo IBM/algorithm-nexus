@@ -21,13 +21,11 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import (
-    ValidationErrorCollector,
     collect_benchmark_data,
-    load_yaml_file,
     output_data,
+    try_load_package_config,
     validate_output_format,
 )
-from algorithm_nexus.models import AlgorithmNexusPackageConfig
 
 console = Console()
 
@@ -58,6 +56,13 @@ def list_packages(
             help="File path to write output to. Only used with -o csv or json.",
         ),
     ] = None,
+    strict: Annotated[
+        bool,
+        typer.Option(
+            "--strict",
+            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+        ),
+    ] = False,
 ) -> None:
     """List all Nexus packages discovered in the packages directory."""
     validate_output_format(output_format)
@@ -73,20 +78,9 @@ def list_packages(
         if not package_dir.is_dir() or package_dir.name.startswith("."):
             continue
 
-        nexus_yaml_path = package_dir / "nexus.yaml"
-        if not nexus_yaml_path.exists():
-            continue
-
-        collector = ValidationErrorCollector()
-        nexus_data = load_yaml_file(nexus_yaml_path, collector)
-        if nexus_data is None or collector.has_errors:
-            continue
-
-        try:
-            package_config = AlgorithmNexusPackageConfig.model_validate(nexus_data)
+        package_config = try_load_package_config(package_dir, warn_on_error=strict)
+        if package_config:
             nexus_packages.append(package_config.package.name)
-        except Exception:  # noqa: S112
-            continue
 
     if not nexus_packages:
         console.print("\n[yellow]No Nexus packages found[/yellow]\n")
@@ -141,6 +135,13 @@ def list_benchmark_packages(
             help="File path to write output to. Only used with -o csv or json.",
         ),
     ] = None,
+    strict: Annotated[
+        bool,
+        typer.Option(
+            "--strict",
+            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+        ),
+    ] = False,
 ) -> None:
     """List all benchmark packages discovered across all Nexus packages.
 
@@ -155,7 +156,7 @@ def list_benchmark_packages(
         raise typer.Exit(code=1)
 
     # Collect all benchmark data
-    benchmark_data = collect_benchmark_data(packages_root)
+    benchmark_data = collect_benchmark_data(packages_root, warn_on_error=strict)
 
     if not benchmark_data:
         console.print(
@@ -251,6 +252,13 @@ def list_benchmark_experiments(
             help="File path to write output to. Only used with -o csv or json.",
         ),
     ] = None,
+    strict: Annotated[
+        bool,
+        typer.Option(
+            "--strict",
+            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+        ),
+    ] = False,
 ) -> None:
     """List all benchmark experiments discovered across all Nexus packages.
 
@@ -264,7 +272,7 @@ def list_benchmark_experiments(
         raise typer.Exit(code=1)
 
     # Collect all benchmark data
-    benchmark_data = collect_benchmark_data(packages_root)
+    benchmark_data = collect_benchmark_data(packages_root, warn_on_error=strict)
 
     if not benchmark_data:
         console.print(

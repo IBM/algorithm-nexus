@@ -60,11 +60,11 @@ Algorithm Nexus is **not published to PyPI**. All installs reference a tagged
 Each release ships three mutually-exclusive dependency variants. Pick the one
 that matches your environment:
 
-| Variant | vLLM included | Intended use |
-| --------- | ------------- | ---------------------------------- |
-| `ecosystem` | No | Research and exploration environments |
-| `candidate` | Yes (latest) | Pre-production evaluation |
-| `product` | Yes (stable pin) | Production deployments |
+| Variant     | vLLM included    | Intended use                          |
+| ----------- | ---------------- | ------------------------------------- |
+| `ecosystem` | No               | Research and exploration environments |
+| `candidate` | Yes (latest)     | Pre-production evaluation             |
+| `product`   | Yes (stable pin) | Production deployments                |
 
 #### Install a variant
 
@@ -91,7 +91,8 @@ Before you begin you will need:
 
 - Your algorithm package publicly available on GitHub
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/) installed
-- A [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
+- A
+  [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
   of this repository checked out locally
 
 Set up your local environment:
@@ -106,10 +107,9 @@ Then create a branch and follow one of the two paths below.
 
 #### Option A — Coding Agent (Recommended)
 
-An agent skill is available for adding Nexus packages.
-Open the algorithm nexus repository in your coding agent and
-ask it to add your python package to the nexus giving it your package
-repository URL e.g.
+An agent skill is available for adding Nexus packages. Open the algorithm nexus
+repository in your coding agent and ask it to add your python package to the
+nexus giving it your package repository URL e.g.
 
 ```commandline
 Add the package at ${URL} to the nexus
@@ -155,7 +155,6 @@ Algorithm Nexus provides the `nexus` CLI for working with Nexus packages.
 
 To validate the structure and configuration of a Nexus package run:
 
-
 ```bash
 nexus validate /path/to/package
 ```
@@ -163,16 +162,93 @@ nexus validate /path/to/package
 This will examine the following:
 
 - **Package structure**: Verifies required files (`nexus.yaml`, `model.yaml`)
-  and directories (`tests/`) exist
+  and directories exist
 - **YAML syntax**: Ensures all configuration files are valid YAML
 - **Schema validation**: Validates configuration against Pydantic models for
   correct field types and required fields
-- **Cross-validation**: Checks dependencies between configurations (e.g., vLLM
-  enabled requires vLLM testing)
-- **Model declarations**: Ensures all models declared in `nexus.yaml` have
-  corresponding directories
+- **Cross-validation**: Checks dependencies between configurations
+- **Model declarations**: Ensures all models have corresponding directories
+- **Duplicate detection**: Checks for duplicate HuggingFace model IDs
 
 In case of validation errors, a detailed report guides you to fix each issue.
+
+### Discovering packages and benchmarks
+
+Algorithm Nexus provides commands to discover and list packages, benchmark
+packages, and experiments across your repository.
+
+#### List all Nexus packages
+
+```bash
+nexus list packages [PACKAGES_ROOT]
+```
+
+Lists all valid Nexus packages found in the packages directory (default:
+`./packages`). Supports JSON and CSV output formats with `-o json` or `-o csv`.
+Use `--strict` to show warnings for packages that fail to load.
+
+**Example:**
+
+```bash
+nexus list packages ./packages --strict
+```
+
+#### List benchmark packages
+
+```bash
+nexus list benchmark-packages [PACKAGES_ROOT]
+```
+
+Lists all benchmark packages registered across Nexus packages. Shows which Nexus
+packages use each benchmark package. Filter by a specific Nexus package with
+`--nexus-package`.
+
+**Example:**
+
+```bash
+nexus list benchmark-packages ./packages --nexus-package terratorch
+```
+
+#### List benchmark experiments
+
+```bash
+nexus list benchmark-experiments [PACKAGES_ROOT]
+```
+
+Lists all benchmark experiments with their associated benchmark packages and
+Nexus packages. Filter by a specific Nexus package with `--nexus-package`.
+
+**Example:**
+
+```bash
+nexus list benchmark-experiments ./packages -o json
+```
+
+#### Get benchmark requirements
+
+```bash
+nexus get benchmark-requirements NEXUS_PACKAGE [PACKAGES_ROOT]
+```
+
+Retrieves the benchmark requirement specifiers for a specific Nexus package.
+Output in requirements.txt format with `-o txt` for use with pip.
+
+**Example:**
+
+```bash
+nexus get benchmark-requirements terratorch ./packages -o txt --output-file requirements.txt
+```
+
+### Output formats
+
+Most list commands support multiple output formats:
+
+- **Table** (default): Human-readable table output
+- **JSON** (`-o json`): Machine-readable JSON format
+- **CSV** (`-o csv`): Comma-separated values for spreadsheets
+- **TXT** (`-o txt`): Requirements file format (get commands only)
+
+Use `--output-file` to write output to a file instead of stdout.
 
 ## Contributing
 
@@ -182,7 +258,8 @@ contributions at this time.
 For IBM contributors:
 
 - See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
-- See [`docs/contributing/add_new_nexus_package.md`](docs/contributing/add_new_nexus_package.md)
+- See
+  [`docs/contributing/add_new_nexus_package.md`](docs/contributing/add_new_nexus_package.md)
   for step-by-step instructions for contributing a Nexus package.
 
 ## License

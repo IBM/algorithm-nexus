@@ -213,8 +213,13 @@ def output_data(
 
 def collect_benchmark_data(
     packages_root: Path,
+    warn_on_error: bool = False,
 ) -> dict[str, dict[str, list[str]]]:
     """Collect benchmark package data from all nexus packages.
+
+    Args:
+        packages_root: Root directory containing package directories
+        warn_on_error: If True, print warnings to stderr for failed loads
 
     Returns:
         Dictionary mapping benchmark_package -> experiment_id -> [nexus_package_names]
@@ -233,6 +238,12 @@ def collect_benchmark_data(
         collector = ValidationErrorCollector()
         nexus_data = load_yaml_file(nexus_yaml_path, collector)
         if nexus_data is None or collector.has_errors:
+            if warn_on_error:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+                    f"Failed to load nexus.yaml"
+                )
             continue
 
         try:
@@ -249,7 +260,13 @@ def collect_benchmark_data(
                         if exp_id not in benchmark_data[req_spec]:
                             benchmark_data[req_spec][exp_id] = []
                         benchmark_data[req_spec][exp_id].append(package_name)
-        except Exception:  # noqa: S112
+        except Exception as e:  # noqa: S112
+            if warn_on_error:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+                    f"Invalid package configuration ({type(e).__name__})"
+                )
             continue
 
     return benchmark_data
@@ -257,11 +274,13 @@ def collect_benchmark_data(
 
 def try_load_package_config(
     package_dir: Path,
+    warn_on_error: bool = False,
 ) -> AlgorithmNexusPackageConfig | None:
     """Attempt to load and validate a package configuration.
 
     Args:
         package_dir: Directory containing the nexus.yaml file
+        warn_on_error: If True, print warnings to stderr for failed loads
 
     Returns:
         Validated AlgorithmNexusPackageConfig if successful, None otherwise
@@ -273,11 +292,23 @@ def try_load_package_config(
     collector = ValidationErrorCollector()
     nexus_data = load_yaml_file(nexus_yaml_path, collector)
     if nexus_data is None or collector.has_errors:
+        if warn_on_error:
+            error_console = Console(stderr=True)
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+                f"Failed to load nexus.yaml"
+            )
         return None
 
     try:
         return AlgorithmNexusPackageConfig.model_validate(nexus_data)
-    except Exception:  # noqa: S112
+    except Exception as e:  # noqa: S112
+        if warn_on_error:
+            error_console = Console(stderr=True)
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+                f"Invalid package configuration ({type(e).__name__})"
+            )
         return None
 
 
