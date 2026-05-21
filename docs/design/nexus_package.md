@@ -21,8 +21,8 @@ The Nexus package serves as a registry entry that:
 - References a Python package with versioned releases on GitHub or PyPI
 - Defines which models are supported by that Python package
 - Enables dependency resolution across all packages in the Algorithm Nexus
-- Can optionally register benchmark packages and model-specific benchmark
-  instances for benchmarking workflows
+- Can optionally register benchmark packages, package-level baseline benchmark
+  instances, and model-specific benchmark instances for benchmarking workflows
 
 ---
 
@@ -38,6 +38,9 @@ packages/
     ├── nexus.yaml               # Required package metadata
     ├── skills                   # Optional agent skills resources
     ├── benchmark_packages/      # Optional local benchmark packages
+    ├── benchmark_instances/     # Optional package-level baseline benchmark instances
+    │   └── <benchmark-instance-name>/
+    │       └── space.yaml       # Required ADO discoveryspace for that benchmark instance
     └── models/
         ├── <model-1>/
         │   ├── model.yaml       # Required model metadata
@@ -56,15 +59,18 @@ provides agent skills to assist users in using the package. The optional
 `benchmark_packages/` folder stores local benchmark packages, and each such
 package should follow the
 [ADO custom experiment](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
-template. The `models/` folder is required whenever a Nexus package wants to
-advertise one or more models, with one sub-folder for each model. Each model
-folder must contain a `model.yaml` file describing the model metadata and
-optional vLLM integration. Each model folder can optionally include a sibling
-`benchmark_instances/` folder. Inside `benchmark_instances/`, each benchmark
-instance must have its own sub-folder, and that sub-folder must contain a
-`space.yaml` file defining the full ADO discoveryspace for that specific
-benchmark instance. A `usage.md` file can also be included to provide users with
-model-specific usage guidance.
+template. A Nexus package can also optionally define a top-level
+`benchmark_instances/` folder for baseline experiments that live at package
+scope rather than under a specific model. Each benchmark instance in that folder
+must have its own sub-folder containing a `space.yaml` file. The `models/`
+folder is required whenever a Nexus package wants to advertise one or more
+models, with one sub-folder for each model. Each model folder must contain a
+`model.yaml` file describing the model metadata and optional vLLM integration.
+Each model folder can optionally include a sibling `benchmark_instances/`
+folder. Inside `benchmark_instances/`, each benchmark instance must have its own
+sub-folder, and that sub-folder must contain a `space.yaml` file defining the
+full ADO discoveryspace for that specific benchmark instance. A `usage.md` file
+can also be included to provide users with model-specific usage guidance.
 
 ---
 
@@ -173,10 +179,11 @@ model:
 #### 3.2.3. Benchmarks
 
 Benchmark configuration should remain separate from
-`models/<model-name>/model.yaml`. When a model defines benchmarks, they should
-be described in a sibling `benchmark_instances/` folder. This folder contains
-one sub-folder per benchmark instance, and each benchmark instance sub-folder
-must provide a
+`models/<model-name>/model.yaml`. When a Nexus package defines baseline
+benchmarks, they should be described in a top-level `benchmark_instances/`
+folder in the package root. When a model defines model-specific benchmarks, they
+should be described in a sibling `benchmark_instances/` folder. In either
+location, each benchmark instance must have its own sub-folder that provides a
 [`space.yaml`](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace)
 file with the full ADO discoveryspace definition for that benchmark run. The
 experiment referenced in `space.yaml` must be one of the experiment identifiers
