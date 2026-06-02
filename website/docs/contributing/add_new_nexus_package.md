@@ -45,24 +45,30 @@ git checkout -b add-<package-name>-package
 
 ## Step 2: Add your algorithm package to the Algorithm Nexus dependencies
 
-First, determine which variants your package should be added to, by reading
-[`Identify The Algorithm Nexus variant for your Package`](#identify-the-algorithm-nexus-variant-for-your-package).
-Then add it to each of this variants using `uv`.
+1. Determine which variants your package should be added to, by reading
+   [`Identify The Algorithm Nexus variant for your Package`](#identify-the-algorithm-nexus-variant-for-your-package).
+2. Add it to each of these variants using `uv`.
+3. Export requirements
 
 For example, if your package should be added to the `ecosystem` variant run,
 
 ```bash
-uv add <Python-Package-URL> --optional ecosystem
+uv add <Python-Package-URL> --optional ecosystem --no-sync
+uv export --frozen --no-emit-project --no-default-groups \
+          --no-header --extra=ecosystem \
+          --output-file=requirements-ecosystem.txt
 ```
-
-!!! note
-
-    We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
-    command, to avoid errors with `uv` not being able to sync the dependencies
-    with the local python environment.
 
 If the `uv add` step fails, and you are unable to troubleshoot the error, record
 the error you get and continue on to step 3 and 4.
+
+Then export the requirement file by running:
+
+```bash
+uv export --frozen --no-emit-project --no-default-groups \
+          --no-header --extra=ecosystem \
+          --output-file=requirements-ecosystem.txt
+```
 
 ## Step 3: Create a Nexus package for your algorithm
 
@@ -96,7 +102,7 @@ Fix them before moving to the next step.
 Add the files to be committed
 
 ```bash
-git add packages/<package-name> pyproject.toml uv.lock
+git add packages/<package-name> pyproject.toml uv.lock requirements-ecosystem.txt
 ```
 
 Commit your changes and push to your remote fork

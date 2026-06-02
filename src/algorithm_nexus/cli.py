@@ -6,13 +6,10 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
-from typing import Annotated
 
 try:
     import typer
     from rich.console import Console
-    from rich.panel import Panel
 except ImportError:
     print(
         "Error: CLI dependencies are not installed.\n"
@@ -21,10 +18,13 @@ except ImportError:
     )
     sys.exit(1)
 
-from algorithm_nexus.validation import (
-    ValidationErrorCollector,
-    validate_package_directory,
+from algorithm_nexus.commands.get import get_benchmark_requirements
+from algorithm_nexus.commands.list import (
+    list_benchmark_experiments,
+    list_benchmark_packages,
+    list_packages,
 )
+from algorithm_nexus.commands.validate import validate
 
 console = Console()
 
@@ -34,54 +34,36 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
+# Create subcommand group for 'list'
+list_app = typer.Typer(
+    help="List various resources in Nexus packages.",
+    no_args_is_help=True,
+)
+app.add_typer(list_app, name="list")
+
+# Create subcommand group for 'get'
+get_app = typer.Typer(
+    help="Get specific information about Nexus packages.",
+    no_args_is_help=True,
+)
+app.add_typer(get_app, name="get")
+
 
 @app.callback(invoke_without_command=True)
 def main_callback(ctx: typer.Context) -> None:
     pass
 
 
-@app.command(name="validate")
-def validate(
-    package_path: Annotated[
-        Path,
-        typer.Argument(
-            help="Path to a Nexus package directory.",
-            dir_okay=True,
-            file_okay=False,
-            readable=True,
-            resolve_path=True,
-        ),
-    ],
-) -> None:
-    """Validate Nexus package structure and YAML configuration files."""
-    collector = ValidationErrorCollector()
-    validate_package_directory(package_path, collector)
+# Register validate command
+app.command(name="validate")(validate)
 
-    if collector.has_errors:
-        console.print(
-            Panel(
-                collector.format_errors(),
-                title="[bold red]Validation Failed[/bold red]",
-                border_style="red",
-            )
-        )
-        raise typer.Exit(code=1)
+# Register list commands
+list_app.command(name="packages")(list_packages)
+list_app.command(name="benchmark-packages")(list_benchmark_packages)
+list_app.command(name="benchmark-experiments")(list_benchmark_experiments)
 
-    # Build success message
-    success_message = "[green]✓[/green] All validation checks passed"
-
-    if collector.has_info:
-        success_message += (
-            "\n\n[bold]Optional files/directories:[/bold]\n" + collector.format_info()
-        )
-
-    console.print(
-        Panel(
-            success_message,
-            title="[bold green]Validation Successful[/bold green]",
-            border_style="green",
-        )
-    )
+# Register get commands
+get_app.command(name="benchmark-requirements")(get_benchmark_requirements)
 
 
 def main() -> None:
@@ -91,3 +73,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# Made with Bob

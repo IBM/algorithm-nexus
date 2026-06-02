@@ -77,16 +77,16 @@ class TestValidPackageStructure:
         """Test validation with multiple models."""
         create_valid_nexus_yaml(temp_package_dir)
 
-        # Create model structures
-        for model_name in ["model-1", "model-2"]:
+        # Create model structures with unique HF IDs
+        for i, model_name in enumerate(["model-1", "model-2"], start=1):
             model_dir = temp_package_dir / "models" / model_name
             model_dir.mkdir(parents=True)
 
             model_yaml = model_dir / "model.yaml"
             model_yaml.write_text(
-                dedent("""
+                dedent(f"""
                     model:
-                      id: "org/model"
+                      id: "org/model-{i}"
                     """)
             )
 
@@ -96,6 +96,90 @@ class TestValidPackageStructure:
 
         assert result.exit_code == 0
         assert "Validation Successful" in result.stdout
+
+
+class TestDuplicateHuggingFaceModelIds:
+    """Tests for duplicate HuggingFace model ID detection."""
+
+    def test_duplicate_hf_model_ids_detected(self, temp_package_dir: Path) -> None:
+        """Test that duplicate HuggingFace model IDs are detected."""
+        create_valid_nexus_yaml(temp_package_dir)
+
+        # Create two models with the same HF ID
+        for model_name in ["model-1", "model-2"]:
+            model_dir = temp_package_dir / "models" / model_name
+            model_dir.mkdir(parents=True)
+
+            model_yaml = model_dir / "model.yaml"
+            model_yaml.write_text(
+                dedent("""
+                    model:
+                      id: "org/duplicate-model"
+                    """)
+            )
+
+        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+
+        assert result.exit_code == 1
+        assert "Duplicate HuggingFace model ID" in result.stdout
+        assert "org/duplicate-model" in result.stdout
+        assert "model-1" in result.stdout
+        assert "model-2" in result.stdout
+
+    def test_unique_hf_model_ids_pass_validation(self, temp_package_dir: Path) -> None:
+        """Test that unique HuggingFace model IDs pass validation."""
+        create_valid_nexus_yaml(temp_package_dir)
+
+        # Create models with different HF IDs
+        for i, model_name in enumerate(["model-1", "model-2", "model-3"]):
+            model_dir = temp_package_dir / "models" / model_name
+            model_dir.mkdir(parents=True)
+
+            model_yaml = model_dir / "model.yaml"
+            model_yaml.write_text(
+                dedent(f"""
+                    model:
+                      id: "org/unique-model-{i}"
+                    """)
+            )
+
+        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+
+        assert result.exit_code == 0
+        assert "Validation Successful" in result.stdout
+
+    def test_duplicate_detection_with_invalid_model(
+        self, temp_package_dir: Path
+    ) -> None:
+        """Test that duplicate detection works even when one model has validation errors."""
+        create_valid_nexus_yaml(temp_package_dir)
+
+        # Create first model with duplicate ID
+        model_dir_1 = temp_package_dir / "models" / "model-1"
+        model_dir_1.mkdir(parents=True)
+        (model_dir_1 / "model.yaml").write_text(
+            dedent("""
+                model:
+                  id: "org/duplicate-model"
+                """)
+        )
+
+        # Create second model with duplicate ID but missing required field
+        model_dir_2 = temp_package_dir / "models" / "model-2"
+        model_dir_2.mkdir(parents=True)
+        (model_dir_2 / "model.yaml").write_text(
+            dedent("""
+                model:
+                  id: "org/duplicate-model"
+                """)
+        )
+
+        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+
+        assert result.exit_code == 1
+        # Should report the duplicate even if there are other errors
+        assert "Duplicate HuggingFace model ID" in result.stdout
+        assert "org/duplicate-model" in result.stdout
 
 
 class TestMissingModelConfig:
@@ -156,7 +240,8 @@ class TestMalformedPackageConfig:
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "must contain a YAML mapping at the top level" in result.stdout
+        assert "YAML mapping at the top level" in result.stdout
+        assert "got list" in result.stdout
 
     def test_yaml_string_instead_of_dict(self, temp_package_dir: Path) -> None:
         """Test that YAML containing a string instead of dict is rejected."""
@@ -166,5 +251,5 @@ class TestMalformedPackageConfig:
         result = runner.invoke(app, ["validate", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "must contain a YAML mapping at the top level" in result.stdout
-        assert "yaml" in result.stdout.lower()
+        assert "YAML mapping at the top level" in result.stdout
+        assert "got str" in result.stdout

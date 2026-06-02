@@ -6,6 +6,9 @@ config:
   # Default state for all rules
   default: true
 
+  # MD001/heading-increment - Heading levels should only increment by one level at a time
+  MD001: false
+
   # MD013/line-length - Line length
   MD013:
     line_length: 120

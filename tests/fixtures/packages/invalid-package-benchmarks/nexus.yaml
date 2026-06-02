@@ -1,0 +1,13 @@
+package:
+  name: "test-invalid-benchmarks"
+  benchmark_packages:
+    - requirement_specifier: "./packages/test-package-benchmarks/benchmark_packages/segmentation-benchmarks"
+      experiments:
+        - "duplicate-exp"
+        - "valid-exp"
+        - local-boundary-eval
+    - requirement_specifier: "another-package"
+      experiments:
+        - "duplicate-exp"  # Duplicate across packages
+
+# Made with Bob

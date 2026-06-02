@@ -1,0 +1,13 @@
+entitySpace:
+  - identifier: dataset
+    propertyDomain:
+      values: ["sen1floods11"]
+  - identifier: split
+    propertyDomain:
+      values: ["test"]
+
+experiments:
+  - actuatorIdentifier: custom_experiments
+    experimentIdentifier: local-segmentation-eval
+
+# Made with Bob

@@ -1,0 +1,15 @@
+package:
+  name: "test-package-benchmarks"
+  benchmark_packages:
+    - requirement_specifier: "./packages/test-package-benchmarks/benchmark_packages/segmentation-benchmarks"
+      experiments:
+        - "local-segmentation-eval"
+        - "local-boundary-eval"
+    - requirement_specifier: "https://github.com/example-org/ado-benchmarks"
+      experiments:
+        - "remote-baseline"
+    - requirement_specifier: "example-benchmark-package"
+      experiments:
+        - "packaged-baseline"
+
+# Made with Bob

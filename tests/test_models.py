@@ -302,3 +302,178 @@ class TestNexusYAML:
         nexus_yaml = AlgorithmNexusPackageConfig.model_validate(data)
 
         assert nexus_yaml.package.name == "minimal-package"
+
+
+class TestBenchmarkPackage:
+    """Tests for BenchmarkPackage model."""
+
+    def test_valid_benchmark_package(self) -> None:
+        """Test valid benchmark package configuration."""
+        data = {
+            "requirement_specifier": "my-benchmark-package>=1.0.0",
+            "experiments": ["exp-1", "exp-2"],
+        }
+        bench_pkg = AlgorithmNexusPackageConfig.model_validate(
+            {"package": {"name": "test", "benchmark_packages": [data]}}
+        )
+
+        assert bench_pkg.package.benchmark_packages is not None
+        assert len(bench_pkg.package.benchmark_packages) == 1
+        assert (
+            bench_pkg.package.benchmark_packages[0].requirement_specifier
+            == "my-benchmark-package>=1.0.0"
+        )
+        assert bench_pkg.package.benchmark_packages[0].experiments == ["exp-1", "exp-2"]
+
+    def test_benchmark_package_with_url(self) -> None:
+        """Test benchmark package with URL requirement specifier."""
+        data = {
+            "requirement_specifier": "git+https://github.com/org/repo.git",
+            "experiments": ["exp-1"],
+        }
+        bench_pkg = AlgorithmNexusPackageConfig.model_validate(
+            {"package": {"name": "test", "benchmark_packages": [data]}}
+        )
+
+        assert bench_pkg.package.benchmark_packages is not None
+        assert (
+            bench_pkg.package.benchmark_packages[0].requirement_specifier
+            == "git+https://github.com/org/repo.git"
+        )
+
+    def test_benchmark_package_with_local_path(self) -> None:
+        """Test benchmark package with local path requirement specifier."""
+        data = {
+            "requirement_specifier": "./packages/my-benchmark",
+            "experiments": ["exp-1"],
+        }
+        bench_pkg = AlgorithmNexusPackageConfig.model_validate(
+            {"package": {"name": "test", "benchmark_packages": [data]}}
+        )
+
+        assert bench_pkg.package.benchmark_packages is not None
+        assert (
+            bench_pkg.package.benchmark_packages[0].requirement_specifier
+            == "./packages/my-benchmark"
+        )
+
+    def test_benchmark_package_empty_experiments_fails(self) -> None:
+        """Test that empty experiments list is rejected."""
+        data = {
+            "requirement_specifier": "my-benchmark-package",
+            "experiments": [],
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "experiments" in str(exc_info.value).lower()
+
+    def test_benchmark_package_missing_requirement_specifier_fails(self) -> None:
+        """Test that missing requirement_specifier is rejected."""
+        data = {
+            "experiments": ["exp-1"],
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "requirement_specifier" in str(exc_info.value)
+
+    def test_benchmark_package_missing_experiments_fails(self) -> None:
+        """Test that missing experiments is rejected."""
+        data = {
+            "requirement_specifier": "my-benchmark-package",
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "experiments" in str(exc_info.value)
+
+    def test_benchmark_package_empty_requirement_specifier_fails(self) -> None:
+        """Test that empty requirement_specifier is rejected."""
+        data = {
+            "requirement_specifier": "",
+            "experiments": ["exp-1"],
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "requirement_specifier" in str(exc_info.value).lower()
+
+    def test_benchmark_package_extra_fields_forbidden(self) -> None:
+        """Test that extra fields are forbidden (extra='forbid')."""
+        data = {
+            "requirement_specifier": "my-benchmark-package",
+            "experiments": ["exp-1"],
+            "extra_field": "not allowed",
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "extra_field" in str(exc_info.value).lower()
+
+    def test_benchmark_package_invalid_experiments_type(self) -> None:
+        """Test that invalid experiments type is rejected."""
+        data = {
+            "requirement_specifier": "my-benchmark-package",
+            "experiments": "not-a-list",
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            AlgorithmNexusPackageConfig.model_validate(
+                {"package": {"name": "test", "benchmark_packages": [data]}}
+            )
+
+        assert "experiments" in str(exc_info.value).lower()
+
+    def test_multiple_benchmark_packages(self) -> None:
+        """Test multiple benchmark packages in a single nexus package."""
+        data = [
+            {
+                "requirement_specifier": "benchmark-pkg-1",
+                "experiments": ["exp-1"],
+            },
+            {
+                "requirement_specifier": "benchmark-pkg-2",
+                "experiments": ["exp-2", "exp-3"],
+            },
+        ]
+        bench_pkg = AlgorithmNexusPackageConfig.model_validate(
+            {"package": {"name": "test", "benchmark_packages": data}}
+        )
+
+        assert bench_pkg.package.benchmark_packages is not None
+        assert len(bench_pkg.package.benchmark_packages) == 2
+        assert (
+            bench_pkg.package.benchmark_packages[0].requirement_specifier
+            == "benchmark-pkg-1"
+        )
+        assert (
+            bench_pkg.package.benchmark_packages[1].requirement_specifier
+            == "benchmark-pkg-2"
+        )
+
+    def test_nexus_package_without_benchmark_packages(self) -> None:
+        """Test that benchmark_packages is optional."""
+        data = {"package": {"name": "test"}}
+        nexus_pkg = AlgorithmNexusPackageConfig.model_validate(data)
+
+        assert nexus_pkg.package.benchmark_packages is None
+
+    def test_nexus_package_with_null_benchmark_packages(self) -> None:
+        """Test that benchmark_packages can be explicitly null."""
+        data = {"package": {"name": "test", "benchmark_packages": None}}
+        nexus_pkg = AlgorithmNexusPackageConfig.model_validate(data)
+
+        assert nexus_pkg.package.benchmark_packages is None
+
+
+# Made with Bob
