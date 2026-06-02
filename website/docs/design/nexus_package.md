@@ -101,21 +101,21 @@ Python package and its supported models.
 
 ```yaml
 package:
-  name: "terratorch"
+    name: "terratorch"
 
-  benchmark_packages:
-    - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
-      experiments:
-        - "local-segmentation-eval"
-        - "local-boundary-eval"
+    benchmark_packages:
+        - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
+          experiments:
+              - "local-segmentation-eval"
+              - "local-boundary-eval"
 
-    - requirement_specifier: "https://github.com/example-org/example-benchmarks"
-      experiments:
-        - "leaderboard-baseline"
+        - requirement_specifier: "https://github.com/example-org/example-benchmarks"
+          experiments:
+              - "leaderboard-baseline"
 
-    - requirement_specifier: "example-benchmark-package"
-      experiments:
-        - "packaged-baseline"
+        - requirement_specifier: "example-benchmark-package"
+          experiments:
+              - "packaged-baseline"
 ```
 
 Benchmark packages are registered only at package level. Each registration uses
@@ -166,14 +166,14 @@ Each model can optionally provide usage documentation in
 
 ```yaml
 model:
-  id: "ibm-esa-geospatial/TerraMind-base-Flood"
-  owner: "ibm-esa-geospatial-team"
+    id: "ibm-esa-geospatial/TerraMind-base-Flood"
+    owner: "ibm-esa-geospatial-team"
 
-  vllm:
-    enabled: true
-    plugins:
-      io_processors:
-        - "terratorch-tm-segmentation"
+    vllm:
+        enabled: true
+        plugins:
+            io_processors:
+                - "terratorch-tm-segmentation"
 ```
 
 #### 3.2.3. Benchmarks

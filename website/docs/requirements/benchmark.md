@@ -105,9 +105,9 @@ benchmarks and benchmark experiments.
 - **REQ 2.3: Benchmark Registration** The system must provide a method to define
   and register a **benchmark**:
 - either as
-  1. a combination of a parameterizable benchmark experiment and a benchmark
-     workload
-  2. a fixed benchmark experiment
+    1. a combination of a parameterizable benchmark experiment and a benchmark
+       workload
+    2. a fixed benchmark experiment
 
 - **REQ 2.4: Benchmark Discovery** The system must provide a method for user to
   list the registered benchmarks and the models/algorithms using them.

@@ -24,24 +24,24 @@ The mapping between **distribution package variants** and **optional
 dependencies** is defined as follows:
 
 - **Ecosystem Variant**
-  - Installation target: `algorithm-nexus[ecosystem]`
-  - The dependency graph **must not include** the `vllm` library.
-  - Only Algorithm Stack packages associated with the _Ecosystem Algorithm
-    Stack_ are included.
+    - Installation target: `algorithm-nexus[ecosystem]`
+    - The dependency graph **must not include** the `vllm` library.
+    - Only Algorithm Stack packages associated with the _Ecosystem Algorithm
+      Stack_ are included.
 
 - **Candidate Variant**
-  - Installation target: `algorithm-nexus[candidate]`
-  - The dependency graph **must include** the `vllm` library.
-  - A **specific version of `vllm` must always be required**.
-  - Only Algorithm Stack packages associated with the _Candidate Algorithm
-    Stack_ are included.
+    - Installation target: `algorithm-nexus[candidate]`
+    - The dependency graph **must include** the `vllm` library.
+    - A **specific version of `vllm` must always be required**.
+    - Only Algorithm Stack packages associated with the _Candidate Algorithm
+      Stack_ are included.
 
 - **Product Variant**
-  - Installation target: `algorithm-nexus[product]`
-  - The dependency graph **must include** the `vllm` library.
-  - A **specific, pinned version of `vllm` must always be required**.
-  - Only Algorithm Stack packages associated with the _Product Algorithm Stack_
-    are included.
+    - Installation target: `algorithm-nexus[product]`
+    - The dependency graph **must include** the `vllm` library.
+    - A **specific, pinned version of `vllm` must always be required**.
+    - Only Algorithm Stack packages associated with the _Product Algorithm
+      Stack_ are included.
 
 Because different variants may result in mutually incompatible dependency
 graphs, uv is relied upon to isolate and resolve dependencies per variant.

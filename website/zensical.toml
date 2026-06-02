@@ -22,6 +22,7 @@ nav = [
     { "Nexus Package Structure Guide" = "design/nexus_package.md" },
     { "Dependency Resolution" = "design/dependency-resolution.md" },
     { "Benchmarking System" = "design/benchmark_system.md" },
+    { "Benchmark Integration Design" = "design/benchmark_integration_design.md" },
     { "Project Release" = "design/project_release.md" },
   ] },
   { "Requirements" = [

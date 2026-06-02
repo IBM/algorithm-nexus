@@ -194,16 +194,16 @@ The following questions/decisions are open and can be resolved in subsequent
 issues.
 
 - Versioning Semantics for REQ 1.3
-  - Rules and conventions for versioning benchmark experiments
+    - Rules and conventions for versioning benchmark experiments
 - Nexus Test Dependencies Handling for REQ 2.2
-  - The process for validating that the benchmark packages referenced by a nexus
-    package can be installed together
+    - The process for validating that the benchmark packages referenced by a
+      nexus package can be installed together
 - Nexus Model Benchmark Specification Decision for REQ 2.3
-  - Exact YAML metadata and directory structure used to add a Nexus Model
-    benchmark specification
+    - Exact YAML metadata and directory structure used to add a Nexus Model
+      benchmark specification
 - Nexus Repo Layout for REQ 7.1
-  - Exact YAML metadata and directory structure used to add a Nexus benchmark
-    specification
+    - Exact YAML metadata and directory structure used to add a Nexus benchmark
+      specification
 
 ## How Nexus package developers will use the system
 
