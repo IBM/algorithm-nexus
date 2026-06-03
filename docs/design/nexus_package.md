@@ -83,14 +83,14 @@ Python package and its supported models.
 
 #### 3.1.1. Fields Summary
 
-`package`
+##### `package`
 
 | Field                | Type     | Required | Description                                                                                                              |
 | -------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `name`               | `string` | Yes      | Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI. |
 | `benchmark_packages` | `list`   | No       | Package-level benchmark package registrations available to models in this Nexus package.                                 |
 
-`package.benchmark_packages[]`
+##### `package.benchmark_packages[]`
 
 | Field                   | Type           | Required | Description                                                                                                                                                                                                                         |
 | ----------------------- | -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

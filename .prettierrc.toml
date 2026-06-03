@@ -1,0 +1,4 @@
+# Prettier configuration
+tabWidth = 4
+useTabs = false
+proseWrap = "always"

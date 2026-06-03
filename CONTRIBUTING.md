@@ -1,8 +1,9 @@
 # Contributing
 
-> **Note:** This project is currently in closed beta. We are not accepting
-> external contributions at this time. This guide is intended for IBM
-> contributors only.
+!!! note
+
+    This project is currently in closed beta. We are not accepting external
+    contributions at this time. This guide is intended for IBM contributors only.
 
 ## For IBM Contributors
 
@@ -126,22 +127,22 @@ commit. To set up pre-commit hooks:
 
 1. Install development dependencies (includes pre-commit and all linting tools):
 
-   ```commandline
-   uv sync --group dev
-   ```
+    ```commandline
+    uv sync --group dev
+    ```
 
 2. Install the git hook scripts:
 
-   ```commandline
-   pre-commit install --install-hooks
-   pre-commit install --hook-type commit-msg
-   ```
+    ```commandline
+    pre-commit install --install-hooks
+    pre-commit install --hook-type commit-msg
+    ```
 
 3. (Optional) Run against all files:
 
-   ```commandline
-   pre-commit run --all-files
-   ```
+    ```commandline
+    pre-commit run --all-files
+    ```
 
 Once installed, the hooks will run automatically on `git commit`. If any checks
 fail, the commit will be aborted and you'll need to fix the issues before

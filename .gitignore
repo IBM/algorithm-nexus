@@ -67,8 +67,8 @@ Thumbs.db
 *.orig
 
 # Website build output
-website/site
-website/.cache
+site/
+.cache/
 .gh-pages/
 
 # Node.js

@@ -12,7 +12,9 @@ variants.
 Use this documentation site to quickly understand how Algorithm Nexus is
 organized and how to contribute packages and models.
 
-- Start with the [Design](design/index.md) section to understand package layout,
+- Start by browsing the [Getting Started](getting-started/index.md) section to
+  learn how to install and use the Algorithm Nexus and the `nexus` CLI.
+- Review [Design](design/index.md) section to understand package layout,
   dependency resolution, and the current website design direction.
 - Use the [Contributing](contributing/index.md) section if you want to add a new
   Nexus package or understand package owner responsibilities.
