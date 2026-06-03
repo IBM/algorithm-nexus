@@ -33,4 +33,29 @@
   bottom: 50%;
 }
 
+/* Table styling - prevent text wrapping in cells */
+.md-typeset table:not([class]) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Allow table descriptions to wrap while keeping field names on one line */
+.md-typeset table:not([class]) td:first-child,
+.md-typeset table:not([class]) th:first-child {
+    white-space: nowrap;
+}
+
+/* Underline h5 headings */
+.md-typeset h5 {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
 /* Made with Bob */
