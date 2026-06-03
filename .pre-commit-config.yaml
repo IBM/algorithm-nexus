@@ -17,7 +17,7 @@ repos:
 
   # Ruff - Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.6
+    rev: v0.15.15
     hooks:
       - id: ruff
         args: [--fix]
@@ -43,7 +43,7 @@ repos:
 
   # UV lock check
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.6
+    rev: 0.11.18
     hooks:
       - id: uv-lock
       - id: uv-export
@@ -58,13 +58,13 @@ repos:
 
   # Copywrite - License header management
   - repo: https://github.com/hashicorp/copywrite
-    rev: v0.25.2
+    rev: v0.25.3
     hooks:
       - id: add-headers
 
   # Markdownlint - Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.0
+    rev: v0.22.1
     hooks:
       - id: markdownlint-cli2
 
@@ -76,14 +76,14 @@ repos:
 
   # Tombi - TOML formatting
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v0.9.19
+    rev: v1.1.1
     hooks:
       - id: tombi-format
         args: ["--offline"]
 
   # Standard pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
