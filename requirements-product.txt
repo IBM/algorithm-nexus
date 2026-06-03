@@ -2871,9 +2871,9 @@ triton==3.6.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     # via
     #   torch
     #   xgrammar
-typer==0.25.0 \
-    --hash=sha256:123eaf9f19bb40fd268310e12a542c0c6b4fab9c98d9d23342a01ff95e3ce930 \
-    --hash=sha256:ac01b48823d3db9a83c9e164338057eadbb1c9957a2a6b4eeb486669c560b5dc
+typer==0.26.7 \
+    --hash=sha256:5c87cfbc5d34491c5346ebf49c23e18d56ccb863268d3a8d592b26087c2f5e58 \
+    --hash=sha256:e314a34c617e419c091b2830dda3ea1f257134ff593061a8f5b9717ab8dddb3a
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
