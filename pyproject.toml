@@ -28,6 +28,7 @@ cli = [
   "typer>=0.25.0",
 ]
 ecosystem = [
+  "bmfm-targets",
   "terratorch>=1.2.7",
 ]
 product = [
@@ -57,3 +58,6 @@ conflicts = [
     { extra = "product" },
   ],
 ]
+
+[tool.uv.sources]
+bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
