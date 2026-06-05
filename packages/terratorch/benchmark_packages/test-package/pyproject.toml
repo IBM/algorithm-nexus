@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Custom experiment package for terratorch benchmarks"
 requires-python = ">=3.10"
 dependencies = [
-  "orchestrator",
+  "ado-core",
 ]
 
 [project.entry-points."ado.custom_experiments"]
