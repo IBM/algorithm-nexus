@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,19 @@ except ImportError:
 from algorithm_nexus.models import AlgorithmNexusPackageConfig
 
 console = Console()
+
+
+def strip_ansi_codes(text: str) -> str:
+    """Remove ANSI escape sequences from text.
+
+    Args:
+        text: Text potentially containing ANSI codes
+
+    Returns:
+        Text with ANSI codes removed
+    """
+    ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+    return ansi_escape.sub("", text)
 
 
 class ValidationErrorCollector:

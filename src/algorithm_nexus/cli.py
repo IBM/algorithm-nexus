@@ -24,6 +24,7 @@ from algorithm_nexus.commands.list import (
     list_benchmark_packages,
     list_packages,
 )
+from algorithm_nexus.commands.run import run_benchmarks
 from algorithm_nexus.commands.validate import validate
 
 console = Console()
@@ -48,6 +49,13 @@ get_app = typer.Typer(
 )
 app.add_typer(get_app, name="get")
 
+# Create subcommand group for 'run'
+run_app = typer.Typer(
+    help="Execute benchmarks and operations.",
+    no_args_is_help=True,
+)
+app.add_typer(run_app, name="run")
+
 
 @app.callback(invoke_without_command=True)
 def main_callback(ctx: typer.Context) -> None:
@@ -64,6 +72,9 @@ list_app.command(name="benchmark-experiments")(list_benchmark_experiments)
 
 # Register get commands
 get_app.command(name="benchmark-requirements")(get_benchmark_requirements)
+
+# Register run commands
+run_app.command(name="benchmarks")(run_benchmarks)
 
 
 def main() -> None:
