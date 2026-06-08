@@ -87,16 +87,16 @@ project-wide reference.
 | `id` | string | Yes | The canonical identifier referenced in experiment manifests. |
 | `description` | string | Yes | Human-readable description of the abstract problem being evaluated. |
 | `dimensions` | list | Yes | The canonical dimensions on which this benchmark is evaluated. Each entry specifies the dimension name, an optional domain of valid values, and human-readable descriptions of those values. See dimension fields below. |
-| `metrics` | list of strings | No | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`. |
+| `metrics` | list of strings | No | Canonical metric names for this benchmark. |
 | `owner` | string | No | Team or individual responsible for maintaining this definition. |
 
 **Dimension fields:**
 
 | Field | Type | Required | Description |
 | ----- | ---- | -------- | ----------- |
-| `name` | string | Yes | Canonical dimension name. Must match the `dimension_name` used in experiment manifests. |
+| `name` | string | Yes | Canonical dimension name. |
 | `description` | string | No | Human-readable description of what this dimension represents. |
-| `domain` | PropertyDomain | No | Valid values for this dimension, expressed as an `ado` `PropertyDomain` (see `orchestrator/schema/domain.py`). If omitted, any value is accepted. For profile-mapped dimensions this constrains the `logical_name` values an experiment may define. For direct-mapped dimensions this constrains the raw parameter values passed through. |
+| `domain` | PropertyDomain | No | Valid values for this dimension. If omitted, any value is accepted.  |
 | `value_descriptions` | map | No | Human-readable description of each named value in `domain.values`, keyed by value name. This is the canonical definition of what each value means — experiment authors use this to understand the intended semantics when implementing their `profile_mapping`. Only applicable when `domain` uses a fixed `values` list. |
 
 <!-- markdownlint-enable line-length -->
@@ -192,7 +192,7 @@ separate wrapper experiment should be defined for each.
 | ----- | ---- | -------- | ----------- |
 | `logical_benchmark` | string | **Yes** | The `id` of the logical benchmark this experiment targets. |
 | `target_mapping` | string | **Yes** | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier). Names the *parameter key*; the *value* for a specific run is supplied by the benchmark instance (e.g. the enclosing model definition). |
-| `experiment_id` | string | No | The `ado` experiment identifier. Derived automatically from the enclosing experiment; may be included for documentation clarity or in a concretized record. |
+| `experiment_id` | string | No | The `ado` experiment identifier.  |
 | `dimensions` | list | No | Maps the experiment's internal parameters to the canonical dimensions defined by the logical benchmark. A manifest with no `dimensions` is valid — results are associated with the `logical_benchmark` and target only. |
 | `metric_mapping` | map | No | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
 
