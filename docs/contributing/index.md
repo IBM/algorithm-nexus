@@ -8,4 +8,5 @@ integration.
 
 - [General Contributing Guidelines](./guidelines.md)
 - [Contributing a Python Algorithm Package to Algorithm Nexus](./add_new_nexus_package.md)
+- [Contributing a Benchmark for a Model](./add_benchmark.md)
 - [Nexus Package and Model Owner Responsibilities](./owner_responsibilities.md)
