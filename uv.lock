@@ -38,7 +38,7 @@ version = "1.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "psutil" },
     { name = "pyyaml" },
@@ -181,7 +181,8 @@ name = "albucore"
 version = "0.0.24"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "opencv-python-headless" },
     { name = "simsimd" },
     { name = "stringzilla" },
@@ -197,7 +198,8 @@ version = "2.0.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "albucore" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "opencv-python-headless" },
     { name = "pydantic" },
     { name = "pyyaml" },
@@ -227,6 +229,7 @@ cli = [
 ecosystem = [
     { name = "bmfm-targets" },
     { name = "terratorch", version = "1.2.8", source = { registry = "https://pypi.org/simple" } },
+    { name = "tokamind" },
 ]
 product = [
     { name = "terratorch", version = "1.2.5", source = { registry = "https://pypi.org/simple" }, extra = ["vllm"], marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -255,6 +258,7 @@ requires-dist = [
     { name = "terratorch", marker = "extra == 'ecosystem'", specifier = ">=1.2.7" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'candidate'", specifier = "==1.2.7" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'product'", specifier = "==1.2.5" },
+    { name = "tokamind", marker = "extra == 'ecosystem'", git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?rev=OS_v1.0" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.25.0" },
     { name = "vllm", marker = "extra == 'candidate'", specifier = "==0.19.1" },
     { name = "vllm", marker = "extra == 'product'", specifier = "==0.18.0" },
@@ -281,7 +285,7 @@ dependencies = [
     { name = "h5py" },
     { name = "legacy-api-wrap" },
     { name = "natsort" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "scipy" },
@@ -495,7 +499,7 @@ dependencies = [
     { name = "igraph" },
     { name = "litdata" },
     { name = "numexpr" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "omegaconf" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "peft" },
@@ -582,7 +586,7 @@ version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "torch" },
     { name = "tqdm" },
@@ -598,7 +602,7 @@ version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "pyproj" },
     { name = "pyshp" },
@@ -646,7 +650,7 @@ version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anndata" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "requests" },
     { name = "s3fs" },
     { name = "tiledbsoma" },
@@ -778,7 +782,7 @@ dependencies = [
     { name = "attrs" },
     { name = "furl" },
     { name = "jsonschema" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pathlib2" },
     { name = "pillow" },
     { name = "psutil" },
@@ -909,7 +913,8 @@ name = "contourpy"
 version = "1.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -1101,7 +1106,8 @@ dependencies = [
     { name = "httpx" },
     { name = "huggingface-hub" },
     { name = "importlib-metadata" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
     { name = "regex" },
     { name = "requests" },
@@ -1205,7 +1211,7 @@ name = "fast-array-utils"
 version = "1.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f5/86/7345025275bd19b1303bb6267133982f4e95309f85a39529036566cf3b29/fast_array_utils-1.4.1.tar.gz", hash = "sha256:466512aa0e19ebfb2f8d7ae8736fc81b5724e9bf1a7958474206c17b8e991e9c", size = 336422, upload-time = "2026-04-10T10:05:51.039Z" }
 wheels = [
@@ -1214,7 +1220,7 @@ wheels = [
 
 [package.optional-dependencies]
 accel = [
-    { name = "numba" },
+    { name = "numba", version = "0.65.1", source = { registry = "https://pypi.org/simple" } },
 ]
 sparse = [
     { name = "scipy" },
@@ -1387,7 +1393,7 @@ dependencies = [
     { name = "click" },
     { name = "einops" },
     { name = "ninja" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "nvidia-cudnn-frontend" },
     { name = "nvidia-cutlass-dsl" },
     { name = "nvidia-ml-py" },
@@ -1407,7 +1413,7 @@ name = "focal-loss-torch"
 version = "0.1.2"
 source = { git = "https://github.com/mathiaszinnen/focal_loss_torch.git#69fd65795f2688c2c302029f383f1b58978c1123" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "torch" },
 ]
 
@@ -1530,7 +1536,7 @@ dependencies = [
     { name = "h5py" },
     { name = "lightning" },
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "omegaconf" },
     { name = "pandas", version = "3.0.3", source = { registry = "https://pypi.org/simple" } },
     { name = "scikit-image" },
@@ -1550,7 +1556,8 @@ name = "geopandas"
 version = "1.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pandas", version = "3.0.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
@@ -1568,7 +1575,7 @@ name = "gguf"
 version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "tqdm" },
@@ -1677,7 +1684,8 @@ name = "h5py"
 version = "3.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/db/33/acd0ce6863b6c0d7735007df01815403f5589a21ff8c2e1ee2587a38f548/h5py-3.16.0.tar.gz", hash = "sha256:a0dbaad796840ccaa67a4c144a0d0c8080073c34c76d5a6941d6818678ef2738", size = 446526, upload-time = "2026-03-06T13:49:08.07Z" }
 wheels = [
@@ -1908,7 +1916,8 @@ name = "imageio"
 version = "2.37.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b1/84/93bcd1300216ea50811cee96873b84a1bebf8d0489ffaf7f2a3756bab866/imageio-2.37.3.tar.gz", hash = "sha256:bbb37efbfc4c400fcd534b367b91fcd66d5da639aaa138034431a1c5e0a41451", size = 389673, upload-time = "2026-03-09T11:31:12.573Z" }
@@ -2222,7 +2231,8 @@ dependencies = [
     { name = "certifi" },
     { name = "hydra-core" },
     { name = "lightly-utils" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pydantic" },
     { name = "python-dateutil" },
     { name = "pytorch-lightning" },
@@ -2243,7 +2253,8 @@ name = "lightly-utils"
 version = "0.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/12/3a/fc1c006440cef68bd618056633aea5ae50c1ceee1b8eeb25e101df8e6ded/lightly_utils-0.0.2.tar.gz", hash = "sha256:a351f3d600f0ab08d12f294725c6457ae000645cb0a1083d0845cb196ccfe698", size = 32683, upload-time = "2021-07-08T13:14:43.134Z" }
@@ -2293,7 +2304,7 @@ dependencies = [
     { name = "boto3" },
     { name = "filelock" },
     { name = "lightning-utilities" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "obstore" },
     { name = "requests" },
     { name = "tifffile" },
@@ -2324,6 +2335,14 @@ wheels = [
 name = "llvmlite"
 version = "0.44.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/89/6a/95a3d3610d5c75293d5dbbb2a76480d5d4eeba641557b69fe90af6c5b84e/llvmlite-0.44.0.tar.gz", hash = "sha256:07667d66a5d150abed9157ab6c0b9393c9356f229784a4385c02f99e94fc94d4", size = 171880, upload-time = "2025-01-20T11:14:41.342Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/15/86/e3c3195b92e6e492458f16d233e58a1a812aa2bfbef9bdd0fbafcec85c60/llvmlite-0.44.0-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:1d671a56acf725bf1b531d5ef76b86660a5ab8ef19bb6a46064a705c6ca80aad", size = 28132297, upload-time = "2025-01-20T11:13:32.57Z" },
@@ -2336,6 +2355,22 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/1b/656f5a357de7135a3777bd735cc7c9b8f23b4d37465505bd0eaf4be9befe/llvmlite-0.44.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:46224058b13c96af1365290bdfebe9a6264ae62fb79b2b55693deed11657a8bf", size = 42361904, upload-time = "2025-01-20T11:14:22.949Z" },
     { url = "https://files.pythonhosted.org/packages/d8/e1/12c5f20cb9168fb3464a34310411d5ad86e4163c8ff2d14a2b57e5cc6bac/llvmlite-0.44.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:aa0097052c32bf721a4efc03bd109d335dfa57d9bffb3d4c24cc680711b8b4fc", size = 41184245, upload-time = "2025-01-20T11:14:31.731Z" },
     { url = "https://files.pythonhosted.org/packages/d0/81/e66fc86539293282fd9cb7c9417438e897f369e79ffb62e1ae5e5154d4dd/llvmlite-0.44.0-cp313-cp313-win_amd64.whl", hash = "sha256:2fb7c4f2fb86cbae6dca3db9ab203eeea0e22d73b99bc2341cdf9de93612e930", size = 30331193, upload-time = "2025-01-20T11:14:38.578Z" },
+]
+
+[[package]]
+name = "llvmlite"
+version = "0.47.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/88/a8952b6d5c21e74cbf158515b779666f692846502623e9e3c39d8e8ba25f/llvmlite-0.47.0.tar.gz", hash = "sha256:62031ce968ec74e95092184d4b0e857e444f8fdff0b8f9213707699570c33ccc", size = 193614, upload-time = "2026-03-31T18:29:53.497Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fa/48/4b7fe0e34c169fa2f12532916133e0b219d2823b540733651b34fdac509a/llvmlite-0.47.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:306a265f408c259067257a732c8e159284334018b4083a9e35f67d19792b164f", size = 37232769, upload-time = "2026-03-31T18:28:43.735Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/4b/e3f2cd17822cf772a4a51a0a8080b0032e6d37b2dbe8cfb724eac4e31c52/llvmlite-0.47.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5853bf26160857c0c2573415ff4efe01c4c651e59e2c55c2a088740acfee51cd", size = 56275178, upload-time = "2026-03-31T18:28:48.342Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/55/a3b4a543185305a9bdf3d9759d53646ed96e55e7dfd43f53e7a421b8fbae/llvmlite-0.47.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:003bcf7fa579e14db59c1a1e113f93ab8a06b56a4be31c7f08264d1d4072d077", size = 55128632, upload-time = "2026-03-31T18:28:52.901Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/f5/d281ae0f79378a5a91f308ea9fdb9f9cc068fddd09629edc0725a5a8fde1/llvmlite-0.47.0-cp312-cp312-win_amd64.whl", hash = "sha256:f3079f25bdc24cd9d27c4b2b5e68f5f60c4fdb7e8ad5ee2b9b006007558f9df7", size = 38138692, upload-time = "2026-03-31T18:28:57.147Z" },
+    { url = "https://files.pythonhosted.org/packages/77/6f/4615353e016799f80fa52ccb270a843c413b22361fadda2589b2922fb9b0/llvmlite-0.47.0-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:a3c6a735d4e1041808434f9d440faa3d78d9b4af2ee64d05a66f351883b6ceec", size = 37232771, upload-time = "2026-03-31T18:29:01.324Z" },
+    { url = "https://files.pythonhosted.org/packages/31/b8/69f5565f1a280d032525878a86511eebed0645818492feeb169dfb20ae8e/llvmlite-0.47.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2699a74321189e812d476a43d6d7f652f51811e7b5aad9d9bba842a1c7927acb", size = 56275178, upload-time = "2026-03-31T18:29:05.748Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/da/b32cafcb926fb0ce2aa25553bf32cb8764af31438f40e2481df08884c947/llvmlite-0.47.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6c6951e2b29930227963e53ee152441f0e14be92e9d4231852102d986c761e40", size = 55128632, upload-time = "2026-03-31T18:29:11.235Z" },
+    { url = "https://files.pythonhosted.org/packages/46/9f/4898b44e4042c60fafcb1162dfb7014f6f15b1ec19bf29cfea6bf26df90d/llvmlite-0.47.0-cp313-cp313-win_amd64.whl", hash = "sha256:c2e9adf8698d813a9a5efb2d4370caf344dbc1e145019851fee6a6f319ba760e", size = 38138695, upload-time = "2026-03-31T18:29:15.43Z" },
 ]
 
 [[package]]
@@ -2437,7 +2472,8 @@ dependencies = [
     { name = "cycler" },
     { name = "fonttools" },
     { name = "kiwisolver" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyparsing" },
@@ -2508,7 +2544,7 @@ version = "1.11.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonschema" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pillow" },
     { name = "pydantic" },
     { name = "pydantic-extra-types", extra = ["pycountry"], marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
@@ -2724,9 +2760,17 @@ wheels = [
 name = "numba"
 version = "0.61.2"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
 dependencies = [
-    { name = "llvmlite" },
-    { name = "numpy" },
+    { name = "llvmlite", version = "0.44.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/a0/e21f57604304aa03ebb8e098429222722ad99176a4f979d34af1d1ee80da/numba-0.61.2.tar.gz", hash = "sha256:8750ee147940a6637b80ecf7f95062185ad8726c8c28a2295b8ec1160a196f7d", size = 2820615, upload-time = "2025-04-09T02:58:07.659Z" }
 wheels = [
@@ -2743,12 +2787,33 @@ wheels = [
 ]
 
 [[package]]
+name = "numba"
+version = "0.65.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llvmlite", version = "0.47.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f6/c5/db2ac3685833d626c0dcae6bd2330cd68433e1fd248d15f70998160d3ad7/numba-0.65.1.tar.gz", hash = "sha256:19357146c32fe9ed25059ab915e8465fb13951cf6b0aace3826b76886373ab23", size = 2765600, upload-time = "2026-04-24T02:02:56.551Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/57/bc/76f8f8c5cf9adee47fdb7bbb03be8900f76f902d451d7477cf12b845e1de/numba-0.65.1-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:ac3f1e77c352dd0ea9712732c2d8f9ca507717435eec5b5013bf138ac33c4a08", size = 2681371, upload-time = "2026-04-24T02:02:26.105Z" },
+    { url = "https://files.pythonhosted.org/packages/69/47/a415af0283e4db0398104c6d1c11c9861a98dc67a7aa442a7769ed5d6196/numba-0.65.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:52bc6f3ceb8fcaff9b2ae26b4c6b1e9fee39db8d355534c0fe4f39a901246b84", size = 3802467, upload-time = "2026-04-24T02:02:27.712Z" },
+    { url = "https://files.pythonhosted.org/packages/46/36/246f73ec99cfeab2f2cb2ce7d4218766cc36a2da418901223f4f4da9c813/numba-0.65.1-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:90ca10b3463bae0bd70589726fe3c77d01d6b5fc86bee54bcdf9fb6b47c28977", size = 3502628, upload-time = "2026-04-24T02:02:29.763Z" },
+    { url = "https://files.pythonhosted.org/packages/db/9e/3c679b2ee078425b9e99a91e44f8d132a6830d8ccce5227bc5e9181aeed8/numba-0.65.1-cp312-cp312-win_amd64.whl", hash = "sha256:5971c632be2a2351500431f46213821dba8d02b18a9f7d02fd36bd2743e41a6a", size = 2750611, upload-time = "2026-04-24T02:02:31.477Z" },
+    { url = "https://files.pythonhosted.org/packages/79/37/14a4579049c1eb673afd0de0cb4842982acd55b9ce2643e763db858bcea0/numba-0.65.1-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:1735c15c1134a5108b4d6a5c77fc0947924ea066a738dc09a52008c13df9cad3", size = 2681344, upload-time = "2026-04-24T02:02:33.65Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/22/b8d873f6466b20aa563fc9b33acd48dec89a07803ddaa2f1c8ca1cd33126/numba-0.65.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:c09f49117ef255e1f1c6dad0c7a1ed39868243862a73be5706793241a3755f1b", size = 3810619, upload-time = "2026-04-24T02:02:36.041Z" },
+    { url = "https://files.pythonhosted.org/packages/62/08/e16a8b5d9a018962ebb5c66be662317cde32b9f5dab08441f90bed5522fb/numba-0.65.1-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:594a8680b3fadac99e97e489b1fd89007177e5336713745c3b769528c635a464", size = 3509783, upload-time = "2026-04-24T02:02:38.245Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/a5/03c970d57f4c1741354837353ce39fb5206952ae1dba8922d29c86f64805/numba-0.65.1-cp313-cp313-win_amd64.whl", hash = "sha256:85be74c0d036842699a30058f82fb88fc5ffdc59f7615cab5792ea92914c9b62", size = 2750534, upload-time = "2026-04-24T02:02:39.903Z" },
+]
+
+[[package]]
 name = "numcodecs"
 version = "0.15.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/63/fc/bb532969eb8236984ba65e4f0079a7da885b8ac0ce1f0835decbb3938a62/numcodecs-0.15.1.tar.gz", hash = "sha256:eeed77e4d6636641a2cc605fbc6078c7a8f2cc40f3dfa2b3f61e52e6091b04ff", size = 6267275, upload-time = "2025-02-10T10:23:33.254Z" }
 wheels = [
@@ -2767,7 +2832,7 @@ name = "numexpr"
 version = "2.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/2f/fdba158c9dbe5caca9c3eca3eaffffb251f2fb8674bf8e2d0aed5f38d319/numexpr-2.14.1.tar.gz", hash = "sha256:4be00b1086c7b7a5c32e31558122b7b80243fe098579b170967da83f3152b48b", size = 119400, upload-time = "2025-10-13T16:17:27.351Z" }
 wheels = [
@@ -2801,6 +2866,14 @@ wheels = [
 name = "numpy"
 version = "2.2.6"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/76/21/7d2a95e4bba9dc13d043ee156a356c0a8f0c6309dff6b21b4d71a073b8a8/numpy-2.2.6.tar.gz", hash = "sha256:e29554e2bef54a90aa5cc07da6ce955accb83f21ab5de01a62c8478897b264fd", size = 20276440, upload-time = "2025-05-17T22:38:04.611Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/82/5d/c00588b6cf18e1da539b45d3598d3557084990dcc4331960c15ee776ee41/numpy-2.2.6-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:41c5a21f4a04fa86436124d388f6ed60a9343a6f767fced1a8a71c3fbca038ff", size = 20875348, upload-time = "2025-05-17T21:34:39.648Z" },
@@ -2833,6 +2906,46 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/76/95/bef5b37f29fc5e739947e9ce5179ad402875633308504a52d188302319c8/numpy-2.2.6-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:8e9ace4a37db23421249ed236fdcdd457d671e25146786dfc96835cd951aa7c1", size = 18385260, upload-time = "2025-05-17T21:43:05.189Z" },
     { url = "https://files.pythonhosted.org/packages/09/04/f2f83279d287407cf36a7a8053a5abe7be3622a4363337338f2585e4afda/numpy-2.2.6-cp313-cp313t-win32.whl", hash = "sha256:038613e9fb8c72b0a41f025a7e4c3f0b7a1b5d768ece4796b674c8f3fe13efff", size = 6377225, upload-time = "2025-05-17T21:43:16.254Z" },
     { url = "https://files.pythonhosted.org/packages/67/0e/35082d13c09c02c011cf21570543d202ad929d961c02a147493cb0c2bdf5/numpy-2.2.6-cp313-cp313t-win_amd64.whl", hash = "sha256:6031dd6dfecc0cf9f668681a37648373bddd6421fff6c66ec1624eed0180ee06", size = 12771374, upload-time = "2025-05-17T21:43:35.479Z" },
+]
+
+[[package]]
+name = "numpy"
+version = "2.4.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/ad/fed0499ce6a338d2a03ebae59cd15093910c8875328855781952abf6c2fe/numpy-2.4.6.tar.gz", hash = "sha256:f3a3570c4a2a16746ac2c31a7c7c7b0c186b95ce902e33db6f28094ed7387dda", size = 20735807, upload-time = "2026-05-18T23:37:14.07Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/95/2a/3d7b5ac8aac24feaf9ad7ed58f45b0bbc06d37e4338ae84c9f2298b570f9/numpy-2.4.6-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:001fbb8e08d942dd57599e781f2472269ee7f2755fae407b4f67b2f0b17da3f1", size = 16689119, upload-time = "2026-05-18T23:33:54.065Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/12/92c4c131527599e8288d6918e888d88726f84d805d784b771f32408aeaef/numpy-2.4.6-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ebfb099f8dcf083deef3ac1ca4c1503f387cf76296fcb3816b66f5ecb5f54fdb", size = 14699246, upload-time = "2026-05-18T23:33:57.621Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/fe/c0a6b7b2ca128a8fb228575147073b660656734b8ebe4d76c8fd748dcc79/numpy-2.4.6-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:3213d622a0283a39a93d188f3cf72b26862df52fbb4ca3697f51705016523d41", size = 5204410, upload-time = "2026-05-18T23:34:00.302Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/d4/9770d14ba719432bb90a421bfd443872ed0f70f7264b64bec12ea363d5fd/numpy-2.4.6-cp312-cp312-macosx_14_0_x86_64.whl", hash = "sha256:357cc07a6d7b0b182ff02249616a03742827ebb1277546b5c7cd7f7620a45698", size = 6551240, upload-time = "2026-05-18T23:34:02.852Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/c6/50a46a6205feba2343f1d6d17438107c5dc491ed1c736e6ea68689fd906b/numpy-2.4.6-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:5f9fb9157b4ce2971008323afe46053787b526ef624fea915b261468a8421a0f", size = 15671012, upload-time = "2026-05-18T23:34:05.485Z" },
+    { url = "https://files.pythonhosted.org/packages/99/60/14115e6364fa676c5397c2ad3004e527e9aa487abf5d0706ec81bbd08529/numpy-2.4.6-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:90f9849678c75fe7afa2d348ac842c168b0a4d3d61919687216dfc547976d853", size = 16645538, upload-time = "2026-05-18T23:34:09.265Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/c5/693cbe59e57db94d2231fa519ca3978dc9e19da5a8f088588f5c6e947ff2/numpy-2.4.6-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:c1a2af6c6ef86344a6b0db6b97834208bf598db514f2b155042439b62605601a", size = 17020706, upload-time = "2026-05-18T23:34:13.053Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/fc/85b7c4eff9b4966ade25c2273cf7e7012e92366c032058653934b37de044/numpy-2.4.6-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:e5805d5a22fd19c8ccff10a9561f9df94436b0545619ea579db2d3c35294bce2", size = 18368541, upload-time = "2026-05-18T23:34:17.024Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/81/e1b27545deedce7f4a0b348618c6b62d74e36a4dc9ccd42f3eb2f85eee32/numpy-2.4.6-cp312-cp312-win32.whl", hash = "sha256:e3eeb0aabd6bd5ce64faae67e9935203a6991b4bc2a485a767fbafb2c5125f45", size = 5962825, upload-time = "2026-05-18T23:34:20.3Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/ca/feab00bd44aa5fe1ad2c18f08b4d3bb92e26484b0b1d1443897809ed528c/numpy-2.4.6-cp312-cp312-win_amd64.whl", hash = "sha256:d8e8286dd7cea7895157318d1b91cdacac64c479f3cbc8dce548331728484751", size = 12321687, upload-time = "2026-05-18T23:34:23.095Z" },
+    { url = "https://files.pythonhosted.org/packages/63/cf/5a6d34850a39d1093558564f77ee8e8e0bee5061151b8f05a55711001ec7/numpy-2.4.6-cp312-cp312-win_arm64.whl", hash = "sha256:4081eb135ac24158bd51cdfbef16f1c64df7063b1143f24731387137c092bec8", size = 10221482, upload-time = "2026-05-18T23:34:25.876Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/82/bdab26d7438c6791ca31b7c024ca37c1eab8b726ba236129005cd4a06e45/numpy-2.4.6-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:511dbaf848decaaaf4b4ca48032619fb3138710c4bf7da7617765edad1ef96b0", size = 16684648, upload-time = "2026-05-18T23:34:29.41Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/30/a80189bcc7f5e4258b3fbc3968d909d1756f54d023299ecc39ad6fdb9ef8/numpy-2.4.6-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:bf162abab1c1a736333192707cef898e735a5ca00f38f27eeedf44b39d9e85eb", size = 14693902, upload-time = "2026-05-18T23:34:33.013Z" },
+    { url = "https://files.pythonhosted.org/packages/97/12/70b5d0d7c15e1ebb8a6a84a8caa1d19e181d84fb58bb6d70aca29099dec1/numpy-2.4.6-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:043191bfa8eab18c776647b62723ac9dddece59743b13f49b2016094129c2b3f", size = 5198992, upload-time = "2026-05-18T23:34:36.132Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/8c/ebd2a8f8a83541f8d38cc5667e8c2b69cecfd30da6e45693e8158857d44b/numpy-2.4.6-cp313-cp313-macosx_14_0_x86_64.whl", hash = "sha256:6180d8b35af935aed8ece3a85e0a43f87393ae0ac87c8d2c8bd2c993f7270ef3", size = 6546944, upload-time = "2026-05-18T23:34:38.484Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/c5/7b863a97a91671a0338f4253bd3b5a3d3852f0692dae91711c9f4a10e787/numpy-2.4.6-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:72fbe16c6fac95aedf5937fa873445cec2110be35d8a4e9433d7501fd98dae6b", size = 15669392, upload-time = "2026-05-18T23:34:41.257Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/9d/3584b9984ca4c047aea75214ce1a4c4c73d849bd71b604264b7f5653f8a8/numpy-2.4.6-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a7830bab239b79cda9c08c2da014761cafb48da6150e1da17ac06283f43b6089", size = 16633220, upload-time = "2026-05-18T23:34:45.075Z" },
+    { url = "https://files.pythonhosted.org/packages/05/ae/7c67fba23bd98caec7c99261f3a16072ade14813486b0282cb29846de832/numpy-2.4.6-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:ef4aea96ce4d3b074422cb4f2f64e216bf9e213004bb58ecfdf50ea02ea8eb9a", size = 17020800, upload-time = "2026-05-18T23:34:49.065Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/5d/3b6725cb31d983c5e66916f5d36f6d7e5521129e4c4404d64f918292a5b6/numpy-2.4.6-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:dfa20cc6ca228e6b155b11da03825975ce66aea520985dbbddf0f2a5a495c605", size = 18357600, upload-time = "2026-05-18T23:34:52.709Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/da/2ccc6c2fe8898dee01d90c75c5f5f914a23daf99e3e0f59516a08760c8b5/numpy-2.4.6-cp313-cp313-win32.whl", hash = "sha256:56b39e5e0622a09a25bf5baf62f4bcf0cb8a41ae6e2819cf49bbc5a74c083f91", size = 5961134, upload-time = "2026-05-18T23:34:55.618Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/cd/9cc4dc876fb065d5c220aae4d5e14826b2715331bb7618ce1fb07a679d99/numpy-2.4.6-cp313-cp313-win_amd64.whl", hash = "sha256:c4fc99836233ea196540b17ab0983aff60ed07941751930f5f4d05bc3b3b7359", size = 12318598, upload-time = "2026-05-18T23:34:58.928Z" },
+    { url = "https://files.pythonhosted.org/packages/39/1e/c0bcba1f8694116485fe28fd1be698c278fcda4141c5b0e53a2aed8b12a8/numpy-2.4.6-cp313-cp313-win_arm64.whl", hash = "sha256:a7c711e21628b52034bb5ab8d1bce291f752fcc5e92accc615778acee1ff4778", size = 10222272, upload-time = "2026-05-18T23:35:02.167Z" },
+    { url = "https://files.pythonhosted.org/packages/63/6d/cc5619247c8f4204e507f5883528372e4ac4bb189e579fb859a12e480b1f/numpy-2.4.6-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:112b06a867b235ef466ed3508ddf0238050df9c727cafb5301ac385b899189a1", size = 14821197, upload-time = "2026-05-18T23:35:05.468Z" },
+    { url = "https://files.pythonhosted.org/packages/00/58/f1c39161c87d9e9bed660f1ed4bafc0e403d5ec9650b6dd77aead07d489b/numpy-2.4.6-cp313-cp313t-macosx_14_0_arm64.whl", hash = "sha256:eaf7fa2de5c0be8ae6ff8e9bea2ccd725e980541244521d8d4b5f3354a27babe", size = 5326287, upload-time = "2026-05-18T23:35:08.693Z" },
+    { url = "https://files.pythonhosted.org/packages/af/57/3917ab0fd97f271a8694513581b8a36c655f111c446852c302f04ccdb6fc/numpy-2.4.6-cp313-cp313t-macosx_14_0_x86_64.whl", hash = "sha256:7265a2f3d436e54ef9f2b52b5c937e6be778781bd97a590319d7348f1c1ca997", size = 6646763, upload-time = "2026-05-18T23:35:11.459Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/0f/037e64c494b67581ae18193d770adef354c41f3f2c8ebf865602d949bf8f/numpy-2.4.6-cp313-cp313t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f74a575920ab21fe304421a3fc28793d82e299cae9eccb37084e9fc7f3617c20", size = 15728070, upload-time = "2026-05-18T23:35:14.79Z" },
+    { url = "https://files.pythonhosted.org/packages/21/a6/5d2bae9c9542eb4df16dc9c46dc79c186e9bad53805dfa5399a6023c6db0/numpy-2.4.6-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ede83e07a75dd06bc501566c1eca2afc0d61677c1472ac9ad93fdee6e638a48d", size = 16681752, upload-time = "2026-05-18T23:35:18.836Z" },
+    { url = "https://files.pythonhosted.org/packages/92/14/23d1dfb410ae362cd59ce53e936b1513d545eb40db3949ced632e19a459e/numpy-2.4.6-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:68bb27509ac1b9a3443094260f6326150663b06abe40b73a2f81160623da5b67", size = 17086024, upload-time = "2026-05-18T23:35:22.52Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/6e/23595a2c642cdf3bc567877064bdd7f91c8b0038a4453cf2daf7248eafe9/numpy-2.4.6-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:a0df0043bdb289bde1f62da130d20df23d58b45429f752bc7a8fc5325a225ecd", size = 18403398, upload-time = "2026-05-18T23:35:26.398Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/90/0ac3bc947217e66dec77e7cbc6a1979d1af70b6461b82f620d3bccd5e4c8/numpy-2.4.6-cp313-cp313t-win32.whl", hash = "sha256:29a287e0cf63ff528da061de6b9f64a4618da591ca1046aafc54062e40ca7eab", size = 6084971, upload-time = "2026-05-18T23:35:29.387Z" },
+    { url = "https://files.pythonhosted.org/packages/77/71/5673e351671a1d2bd6063b91b44f70c0affea7d1516fa7a6572941ba4aa1/numpy-2.4.6-cp313-cp313t-win_amd64.whl", hash = "sha256:25c692919ac5a01f170a3bfcd62d745b24fd095c353d50812637d6fcab442e75", size = 12458532, upload-time = "2026-05-18T23:35:32.175Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/88/19d3503c5046e688f049274b27a3ef3d771152fa80d3ba3d01a3dff61abe/numpy-2.4.6-cp313-cp313t-win_arm64.whl", hash = "sha256:1e978ec1e8bd0e0e4de6bb75de9d30cbb74db6b6a2bb727618613703ca0167dd", size = 10291881, upload-time = "2026-05-18T23:35:35.465Z" },
 ]
 
 [[package]]
@@ -2880,7 +2993,7 @@ name = "nvidia-cudnn-cu12"
 version = "9.10.2.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12" },
+    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/41/e79269ce215c857c935fd86bcfe91a451a584dfc27f1e068f568b9ad1ab7/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:c9132cc3f8958447b4910a1720036d9eff5928cc3179b0a51fb6d167c6cc87d8", size = 705026878, upload-time = "2025-06-06T21:52:51.348Z" },
@@ -2906,7 +3019,7 @@ name = "nvidia-cufft-cu12"
 version = "11.3.3.83"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/bc/7771846d3a0272026c416fbb7e5f4c1f146d6d80704534d0b187dd6f4800/nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:848ef7224d6305cdb2a4df928759dca7b1201874787083b6e7550dd6765ce69a", size = 193109211, upload-time = "2025-03-07T01:44:56.873Z" },
@@ -2938,9 +3051,9 @@ name = "nvidia-cusolver-cu12"
 version = "11.7.3.90"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12" },
-    { name = "nvidia-cusparse-cu12" },
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
+    { name = "nvidia-cusparse-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/32/f7cd6ce8a7690544d084ea21c26e910a97e077c9b7f07bf5de623ee19981/nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:db9ed69dbef9715071232caa9b69c52ac7de3a95773c2db65bdba85916e4e5c0", size = 267229841, upload-time = "2025-03-07T01:46:54.356Z" },
@@ -2953,7 +3066,7 @@ name = "nvidia-cusparse-cu12"
 version = "12.5.8.93"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bc/f7/cd777c4109681367721b00a106f491e0d0d15cfa1fd59672ce580ce42a97/nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9b6c161cb130be1a07a27ea6923df8141f3c295852f4b260c65f18f3e0a091dc", size = 288117129, upload-time = "2025-03-07T01:47:40.407Z" },
@@ -2988,7 +3101,7 @@ version = "4.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cuda-python" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "typing-extensions" },
 ]
 wheels = [
@@ -3142,7 +3255,8 @@ name = "opencv-python-headless"
 version = "4.13.0.92"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/79/42/2310883be3b8826ac58c3f2787b9358a2d46923d61f88fedf930bc59c60c/opencv_python_headless-4.13.0.92-cp37-abi3-macosx_13_0_arm64.whl", hash = "sha256:1a7d040ac656c11b8c38677cc8cccdc149f98535089dbe5b081e80a4e5903209", size = 46247192, upload-time = "2026-02-05T07:01:35.187Z" },
@@ -3330,7 +3444,7 @@ name = "pandas"
 version = "2.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "python-dateutil", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pytz", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "tzdata", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -3372,7 +3486,7 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "python-dateutil", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "tzdata", marker = "(sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
@@ -3454,7 +3568,7 @@ name = "patsy"
 version = "1.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/be/44/ed13eccdd0519eff265f44b670d46fbb0ec813e2274932dc1c0e48520f7d/patsy-1.0.2.tar.gz", hash = "sha256:cdc995455f6233e90e22de72c37fcadb344e7586fb83f06696f54d92f8ce74c0", size = 399942, upload-time = "2025-10-20T16:17:37.535Z" }
 wheels = [
@@ -3468,7 +3582,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "accelerate" },
     { name = "huggingface-hub" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "psutil" },
     { name = "pyyaml" },
@@ -3825,7 +3939,8 @@ name = "pycocotools"
 version = "2.0.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a2/df/32354b5dda963ffdfc8f75c9acf8828ef7890723a4ed57bb3ff2dc1d6f7e/pycocotools-2.0.11.tar.gz", hash = "sha256:34254d76da85576fcaf5c1f3aa9aae16b8cb15418334ba4283b800796bd1993d", size = 25381, upload-time = "2025-12-15T22:31:46.148Z" }
 wheels = [
@@ -4026,8 +4141,8 @@ version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "joblib" },
-    { name = "llvmlite" },
-    { name = "numba" },
+    { name = "llvmlite", version = "0.47.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "numba", version = "0.65.1", source = { registry = "https://pypi.org/simple" } },
     { name = "scikit-learn" },
     { name = "scipy" },
 ]
@@ -4042,7 +4157,8 @@ version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/49/d4/12f86b1ed09721363da4c09622464b604c851a9223fc0c6b393fb2012208/pyogrio-0.12.1.tar.gz", hash = "sha256:e548ab705bb3e5383693717de1e6c76da97f3762ab92522cb310f93128a75ff1", size = 303289, upload-time = "2025-11-28T19:04:53.341Z" }
@@ -4374,7 +4490,8 @@ dependencies = [
     { name = "certifi" },
     { name = "click" },
     { name = "cligj" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pyparsing" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f6/88/edb4b66b6cb2c13f123af5a3896bf70c0cbe73ab3cd4243cb4eb0212a0f6/rasterio-1.5.0.tar.gz", hash = "sha256:1e0ea56b02eea4989b36edf8e58a5a3ef40e1b7edcb04def2603accd5ab3ee7b", size = 452184, upload-time = "2026-01-05T16:06:47.169Z" }
@@ -4404,7 +4521,7 @@ name = "rdata"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "typing-extensions" },
     { name = "xarray" },
@@ -4581,7 +4698,8 @@ name = "rioxarray"
 version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pyproj" },
     { name = "rasterio" },
@@ -4598,7 +4716,7 @@ version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "pandera" },
     { name = "scikit-learn" },
@@ -4763,8 +4881,8 @@ dependencies = [
     { name = "matplotlib" },
     { name = "natsort" },
     { name = "networkx" },
-    { name = "numba" },
-    { name = "numpy" },
+    { name = "numba", version = "0.65.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "patsy" },
@@ -4791,7 +4909,8 @@ dependencies = [
     { name = "imageio" },
     { name = "lazy-loader" },
     { name = "networkx" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "scipy" },
@@ -4832,7 +4951,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "joblib" },
     { name = "narwhals" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "scipy" },
     { name = "threadpoolctl" },
 ]
@@ -4857,7 +4977,7 @@ name = "scikit-misc"
 version = "0.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/02/71/d6d2d1710fb56473817b0520212d33874069952dcb417614f6dd24efb51e/scikit_misc-0.5.2.tar.gz", hash = "sha256:49fa30e4051b341edc7422db66a12c0f59d468729285bfe644d10924dc51be0a", size = 298626, upload-time = "2025-11-03T11:56:30.08Z" }
 wheels = [
@@ -4876,7 +4996,8 @@ name = "scipy"
 version = "1.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0", size = 30573822, upload-time = "2026-02-23T00:26:24.851Z" }
 wheels = [
@@ -4931,7 +5052,7 @@ version = "0.13.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/86/59/a451d7420a77ab0b98f7affa3a1d78a313d2f7281a57afb1a34bae8ab412/seaborn-0.13.2.tar.gz", hash = "sha256:93e60a40988f4d65e9f4885df477e2fdaff6b73a9ded434c1ab356dd57eefff7", size = 1457696, upload-time = "2024-01-25T13:21:52.551Z" }
@@ -4945,7 +5066,8 @@ version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
     { name = "safetensors" },
     { name = "timm" },
@@ -5064,7 +5186,8 @@ name = "shapely"
 version = "2.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4d/bc/0989043118a27cccb4e906a46b7565ce36ca7b57f5a18b78f4f1b0f72d9d/shapely-2.1.2.tar.gz", hash = "sha256:2ed4ecb28320a433db18a5bf029986aa8afcfd740745e78847e330d5d94922a9", size = 315489, upload-time = "2025-09-24T13:51:41.432Z" }
 wheels = [
@@ -5175,7 +5298,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anndata" },
     { name = "attrs" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "pyarrow" },
     { name = "pyarrow-hotfix" },
@@ -5219,7 +5342,7 @@ name = "statsmodels"
 version = "0.14.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "patsy" },
@@ -5350,7 +5473,8 @@ dependencies = [
     { name = "absl-py" },
     { name = "grpcio" },
     { name = "markdown" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "protobuf" },
@@ -5377,7 +5501,7 @@ name = "tensorboardx"
 version = "2.6.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "protobuf" },
 ]
@@ -5418,7 +5542,7 @@ dependencies = [
     { name = "jsonargparse", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "lightly", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "lightning", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "numpy", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pyarrow", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pycocotools", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "python-box", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -5475,7 +5599,7 @@ dependencies = [
     { name = "jsonargparse", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "lightly", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "lightning", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "numpy", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pyarrow", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pycocotools", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "python-box", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -5523,7 +5647,7 @@ dependencies = [
     { name = "jsonargparse" },
     { name = "lightly" },
     { name = "lightning" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pyarrow" },
     { name = "pycocotools" },
     { name = "python-box" },
@@ -5571,7 +5695,8 @@ name = "tifffile"
 version = "2026.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b7/38/5e2ecef5af2f4fd4a89bb8d6240de9458bab4d51a4cbd97aeb3a0cd618e2/tifffile-2026.6.1.tar.gz", hash = "sha256:626c892c0e899d959b9438e7c0e1491dc154a7fead1f1f37a991724a50eceba9", size = 429694, upload-time = "2026-05-31T23:57:12.165Z" }
 wheels = [
@@ -5616,7 +5741,7 @@ name = "tiledb"
 version = "0.36.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cd/e0/e0dd6b387b7d07c8b514409a966ed0dae3ef16bd6f4511a076a8e3f9223e/tiledb-0.36.1.tar.gz", hash = "sha256:f7e1088e277efb8bf868842698b7c2e0c5cc4ad9bb24eb0efd6bb1a499832f40", size = 391417, upload-time = "2026-02-25T19:07:39.224Z" }
@@ -5663,7 +5788,7 @@ name = "tiledb-vector-search"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "scikit-learn" },
     { name = "tiledb" },
     { name = "tiledb-cloud" },
@@ -5689,7 +5814,7 @@ dependencies = [
     { name = "anndata" },
     { name = "attrs" },
     { name = "more-itertools" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
     { name = "pyarrow" },
     { name = "scanpy" },
@@ -5723,6 +5848,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/08/54/ece85b0eef3700c90db8271a43669b05a0ebbe2edb1962329c34374a297e/timm-1.0.27.tar.gz", hash = "sha256:315dfe63186ca9fb7ff941268941231fd5be259f2b4bb4afa28560ae1015cb9a", size = 2439861, upload-time = "2026-05-08T19:38:36.844Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1f/2e/26bab7686ff4aed48f8f5f6c23e2aa37b7a37ddd9effe3aa61e908fd518f/timm-1.0.27-py3-none-any.whl", hash = "sha256:5ff07c9ddf53cbada88eab1c93ff175c64cab683b5a2fddf863bcee985926f89", size = 2589280, upload-time = "2026-05-08T19:38:35.034Z" },
+]
+
+[[package]]
+name = "tokamind"
+version = "0.1.0"
+source = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?rev=OS_v1.0#be61c05a7c10933be1e84cd82f41e15788dd9797" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "psutil" },
+    { name = "pyyaml" },
+    { name = "scipy" },
+    { name = "torch" },
 ]
 
 [[package]]
@@ -5893,7 +6030,7 @@ dependencies = [
     { name = "fiona" },
     { name = "kornia" },
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "omegaconf" },
     { name = "pillow" },
     { name = "pyproj" },
@@ -5933,7 +6070,7 @@ dependencies = [
     { name = "lightly" },
     { name = "lightning" },
     { name = "matplotlib" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "3.0.3", source = { registry = "https://pypi.org/simple" } },
     { name = "pillow" },
     { name = "pyproj" },
@@ -5957,7 +6094,7 @@ version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "lightning-utilities", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "numpy", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "torch", marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
@@ -5980,7 +6117,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "lightning-utilities", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
-    { name = "numpy", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "packaging", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "torch", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
 ]
@@ -5994,7 +6131,8 @@ name = "torchvision"
 version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
     { name = "torch" },
 ]
@@ -6032,7 +6170,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "huggingface-hub" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "regex" },
@@ -6147,8 +6286,8 @@ name = "umap-learn"
 version = "0.5.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numba" },
-    { name = "numpy" },
+    { name = "numba", version = "0.65.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pynndescent" },
     { name = "scikit-learn" },
     { name = "scipy" },
@@ -6263,8 +6402,8 @@ dependencies = [
     { name = "model-hosting-container-standards" },
     { name = "msgspec" },
     { name = "ninja" },
-    { name = "numba" },
-    { name = "numpy" },
+    { name = "numba", version = "0.61.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "nvidia-cudnn-frontend" },
     { name = "nvidia-cutlass-dsl" },
     { name = "openai" },
@@ -6348,8 +6487,8 @@ dependencies = [
     { name = "model-hosting-container-standards" },
     { name = "msgspec" },
     { name = "ninja" },
-    { name = "numba" },
-    { name = "numpy" },
+    { name = "numba", version = "0.61.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "nvidia-cudnn-frontend" },
     { name = "nvidia-cutlass-dsl" },
     { name = "openai" },
@@ -6570,7 +6709,8 @@ name = "xarray"
 version = "2026.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pandas", version = "3.0.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
@@ -6586,7 +6726,7 @@ version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "apache-tvm-ffi" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pydantic" },
     { name = "torch" },
     { name = "transformers" },
@@ -6670,7 +6810,7 @@ dependencies = [
     { name = "asciitree" },
     { name = "fasteners", marker = "sys_platform != 'emscripten'" },
     { name = "numcodecs" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/32/ea/0413ba001248790ccf766703d8fe034b8bbc7e45b03352d855837f956579/zarr-2.18.0.tar.gz", hash = "sha256:c3b7d2c85b8a42b0ad0ad268a36fb6886ca852098358c125c6b126a417e0a598", size = 3602143, upload-time = "2024-05-07T21:33:13.236Z" }
 wheels = [
@@ -6685,7 +6825,7 @@ dependencies = [
     { name = "donfig" },
     { name = "google-crc32c" },
     { name = "numcodecs" },
-    { name = "numpy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "packaging" },
     { name = "typing-extensions" },
 ]

@@ -30,6 +30,7 @@ cli = [
 ecosystem = [
   "bmfm-targets",
   "terratorch>=1.2.7",
+  "tokamind",
 ]
 product = [
   "terratorch[vllm]==1.2.5",
@@ -61,3 +62,4 @@ conflicts = [
 
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
+tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", rev = "OS_v1.0" }
