@@ -62,4 +62,4 @@ conflicts = [
 
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
-tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", rev = "OS_v1.0" }
+tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }

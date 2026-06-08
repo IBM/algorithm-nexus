@@ -258,7 +258,7 @@ requires-dist = [
     { name = "terratorch", marker = "extra == 'ecosystem'", specifier = ">=1.2.7" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'candidate'", specifier = "==1.2.7" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'product'", specifier = "==1.2.5" },
-    { name = "tokamind", marker = "extra == 'ecosystem'", git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?rev=OS_v1.0" },
+    { name = "tokamind", marker = "extra == 'ecosystem'", git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?tag=OS_v2.0" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.25.0" },
     { name = "vllm", marker = "extra == 'candidate'", specifier = "==0.19.1" },
     { name = "vllm", marker = "extra == 'product'", specifier = "==0.18.0" },
@@ -5853,7 +5853,7 @@ wheels = [
 [[package]]
 name = "tokamind"
 version = "0.1.0"
-source = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?rev=OS_v1.0#be61c05a7c10933be1e84cd82f41e15788dd9797" }
+source = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?tag=OS_v2.0#40acef326253e6e30d962b4b8da06716cf2f1263" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "psutil" },
