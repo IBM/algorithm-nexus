@@ -78,16 +78,17 @@ exported from an experiment (for example, to populate a leaderboard query), a
 consumer can concretize a full routing record by injecting the experiment
 identifier at that point.
 
-### 3.1 Tier 1: Universal Core Keys
-
-Every manifest must declare the following fields:
+### 3.1 Top-Level Fields
 
 <!-- markdownlint-disable line-length -->
 
 | Field | Type | Required | Description | Example |
 | ------- | ---- | -------- | ------------- | ------- |
-| `logical_benchmark` | string | Yes | An agreed-upon identifier for the abstract problem this experiment evaluates. | `inference_serving`, `max_cut_solver` |
-| `target_mapping` | string | Yes | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier). This names the *parameter key*; the *value* of that parameter for a specific run comes from the benchmark instance (e.g., the enclosing model definition). | `model_name`, `model_id` |
+| `logical_benchmark` | string | **Yes** | An agreed-upon identifier for the abstract problem this experiment evaluates. Without this field the system cannot route to any leaderboard. | `inference_serving`, `max_cut_solver` |
+| `target_mapping` | string | **Yes** | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier). Names the *parameter key*; the *value* for a specific run is supplied by the benchmark instance (e.g., the enclosing model definition). | `model_name`, `model_id` |
+| `experiment_id` | string | No | The `ado` experiment identifier. Derived automatically from the enclosing experiment definition and does not need to be declared in the manifest. May be included explicitly for documentation clarity or to produce a self-contained concretized record. | `guide_llm_runner` |
+| `routing_axes` | list | No | Leaderboard dimensions beyond the target. A manifest with no `routing_axes` is valid — results will be aggregated for the `logical_benchmark` filtered only by target. Most experiments will define at least one axis. | See Section 3.2. |
+| `metric_mapping` | map | No | Translates per-experiment metric names to canonical benchmark-level names. Only required when metric names need to be harmonized across experiments targeting the same logical benchmark. | See Section 3.4. |
 
 <!-- markdownlint-enable line-length -->
 
