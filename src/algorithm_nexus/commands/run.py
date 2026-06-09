@@ -125,6 +125,55 @@ class BenchmarkManager:
             console.print("Install it from: https://cli.github.com/")
             raise typer.Exit(code=1)
 
+    def _parse_instance_path(self, instance_path: Path) -> tuple[str, str, str]:
+        """Parse benchmark instance path to extract package, model, and instance names.
+
+        Args:
+            instance_path: Path to benchmark instance directory
+
+        Returns:
+            Tuple of (package_name, model_name, instance_name)
+            For package-level instances, model_name will be "base"
+
+        Raises:
+            ValueError: If the instance path format is invalid
+        """
+        # Parse instance path:
+        # - Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
+        # - Package-level: packages/<package>/benchmark_instances/<instance>
+        parts = str(instance_path).split("/")
+
+        if len(parts) < 2:
+            raise ValueError(
+                f"Invalid benchmark instance path format: {instance_path}. "
+                "Expected: packages/<package>/benchmark_instances/<instance> or "
+                "packages/<package>/models/<model>/benchmark_instances/<instance>"
+            )
+
+        package_name = parts[1]
+
+        # Check if this is a package-level or model-level benchmark instance
+        if len(parts) > 2 and parts[2] == "benchmark_instances":
+            # Package-level: packages/<package>/benchmark_instances/<instance>
+            if len(parts) < 4:
+                raise ValueError(
+                    f"Invalid package-level benchmark instance path: {instance_path}. "
+                    "Expected: packages/<package>/benchmark_instances/<instance>"
+                )
+            model_name = "base"
+            instance_name = parts[3]
+        else:
+            # Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
+            if len(parts) < 6:
+                raise ValueError(
+                    f"Invalid model-level benchmark instance path: {instance_path}. "
+                    "Expected: packages/<package>/models/<model>/benchmark_instances/<instance>"
+                )
+            model_name = parts[3]
+            instance_name = parts[5]
+
+        return package_name, model_name, instance_name
+
     def find_benchmark_instances(self, changed_files: list[str]) -> list[Path]:
         """Find benchmark instance directories from changed files.
 
@@ -419,11 +468,10 @@ class BenchmarkManager:
         # Extract PR number from URL
         pr_number = self.pr_url.rstrip("/").split("/")[-1]
 
-        # Parse instance path: packages/<package>/models/<model>/benchmark_instances/<instance>
-        parts = str(instance_path).split("/")
-        package_name = parts[1] if len(parts) > 1 else "unknown"
-        model_name = parts[3] if len(parts) > 3 else "unknown"
-        instance_name = parts[5] if len(parts) > 5 else "unknown"
+        # Parse instance path to get package, model, and instance names
+        package_name, model_name, instance_name = self._parse_instance_path(
+            instance_path
+        )
 
         # Create descriptive name: space-pr123-package-model-instance
         space_name = f"space-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
@@ -582,11 +630,10 @@ class BenchmarkManager:
                 # Extract PR number from URL
                 pr_number = self.pr_url.rstrip("/").split("/")[-1]
 
-                # Parse instance path: packages/<package>/models/<model>/benchmark_instances/<instance>
-                parts = str(instance_path).split("/")
-                package_name = parts[1] if len(parts) > 1 else "unknown"
-                model_name = parts[3] if len(parts) > 3 else "unknown"
-                instance_name = parts[5] if len(parts) > 5 else "unknown"
+                # Parse instance path to get package, model, and instance names
+                package_name, model_name, instance_name = self._parse_instance_path(
+                    instance_path
+                )
 
                 # Create descriptive name: randomwalk-pr123-package-model-instance
                 operation_name = f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
