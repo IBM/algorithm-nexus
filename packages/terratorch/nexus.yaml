@@ -1,2 +1,11 @@
 package:
   name: terratorch
+
+  # Register benchmark packages with custom experiments
+  benchmark_packages:
+    - requirement_specifier: "./packages/terratorch/benchmark_packages/test-package"
+      experiments:
+        - "echo_experiment"
+    - requirement_specifier: "https://github.com/christian-pinto/test-ado-custom-experiment"
+      experiments:
+        - "echo_experiment_2"
