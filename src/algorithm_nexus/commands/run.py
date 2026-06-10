@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-import copy
 import json
 import re
 import subprocess
@@ -17,6 +16,11 @@ from typing import Annotated, Any
 try:
     import typer
     import yaml
+    from orchestrator.core.operation.config import (
+        DiscoveryOperationConfiguration,
+        DiscoveryOperationEnum,
+        OperatorReference,
+    )
     from rich.console import Console
 except ImportError:
     print(
@@ -27,22 +31,43 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import strip_ansi_codes
+from algorithm_nexus.models import BenchmarkExecutionResult
 
 console = Console()
+console_err = Console(stderr=True)
 
-# Random walk operation template as a dictionary constant
-RANDOM_WALK_OPERATION_TEMPLATE = {
-    "metadata": {
-        "name": "randomwalk-all",
-        "description": "Perform a random walk on all points in a space",
-    },
-    "spaces": ["<will be set by ado>"],
-    "operation": {
-        "module": {
-            "operatorName": "random_walk",
-            "operationType": "search",
-        },
-        "parameters": {
+
+# Random walk operation template using DiscoveryOperationConfiguration
+def create_random_walk_operation_config(
+    space_id: str,
+    metadata_name: str = "randomwalk-all",
+    metadata_description: str = "Perform a random walk on all points in a space",
+    custom_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Create a random walk operation configuration.
+
+    Args:
+        space_id: The discovery space identifier
+        metadata_name: Name for the operation metadata
+        metadata_description: Description for the operation metadata
+        custom_metadata: Additional custom metadata fields
+
+    Returns:
+        Dictionary representation of the operation configuration
+    """
+    metadata_dict = {
+        "name": metadata_name,
+        "description": metadata_description,
+    }
+    if custom_metadata:
+        metadata_dict.update(custom_metadata)
+
+    config = DiscoveryOperationConfiguration(
+        module=OperatorReference(
+            operatorName="random_walk",
+            operationType=DiscoveryOperationEnum.SEARCH,
+        ),
+        parameters={
             "numberEntities": "all",
             "singleMeasurement": True,
             "samplerConfig": {
@@ -50,8 +75,13 @@ RANDOM_WALK_OPERATION_TEMPLATE = {
                 "samplerType": "generator",
             },
         },
-    },
-}
+    )
+
+    return {
+        "metadata": metadata_dict,
+        "spaces": [space_id],
+        "operation": config.model_dump(mode="json"),
+    }
 
 
 class BenchmarkManager:
@@ -79,12 +109,6 @@ class BenchmarkManager:
         self.repo_root = Path.cwd()
         self.temp_dir_obj = None
 
-        if remote_context_file and not remote_context_file.exists():
-            console.print(
-                f"[red]Error:[/red] Remote context file not found: {remote_context_file}"
-            )
-            raise typer.Exit(code=1)
-
     def get_changed_files(self) -> list[str]:
         """Get list of changed files from the PR using gh CLI.
 
@@ -100,12 +124,12 @@ class BenchmarkManager:
             )
             return [line.strip() for line in result.stdout.split("\n") if line.strip()]
         except subprocess.CalledProcessError as e:
-            console.print(f"[red]Error:[/red] Failed to fetch PR diff: {e}")
-            console.print("Make sure 'gh' is installed and authenticated")
+            console_err.print(f"[red]Error:[/red] Failed to fetch PR diff: {e}")
+            console_err.print("Make sure 'gh' is installed and authenticated")
             raise typer.Exit(code=1)
         except FileNotFoundError:
-            console.print("[red]Error:[/red] GitHub CLI (gh) is not installed")
-            console.print("Install it from: https://cli.github.com/")
+            console_err.print("[red]Error:[/red] GitHub CLI (gh) is not installed")
+            console_err.print("Install it from: https://cli.github.com/")
             raise typer.Exit(code=1)
 
     def _parse_instance_path(self, instance_path: Path) -> tuple[str, str, str]:
@@ -205,9 +229,9 @@ class BenchmarkManager:
             console.print("[green]✓[/green] Successfully checked out PR code")
 
         except subprocess.CalledProcessError as e:
-            console.print(f"[red]Error:[/red] Failed to checkout PR: {e}")
+            console_err.print(f"[red]Error:[/red] Failed to checkout PR: {e}")
             if e.stderr:
-                console.print(f"  {e.stderr}")
+                console_err.print(f"  {e.stderr}")
             self.cleanup_temp_dir()
             raise typer.Exit(code=1)
 
@@ -220,7 +244,7 @@ class BenchmarkManager:
                 self.temp_dir_obj = None
                 console.print("[green]✓[/green] Temporary directory cleaned up")
             except Exception as e:
-                console.print(
+                console_err.print(
                     f"[yellow]Warning:[/yellow] Failed to clean up temporary directory: {e}"
                 )
 
@@ -332,30 +356,23 @@ class BenchmarkManager:
                             packages.add(bench_pkg["requirement_specifier"])
 
         except Exception as e:
-            console.print(
+            console_err.print(
                 f"[yellow]Warning:[/yellow] Could not determine benchmark packages for {instance_path}: {e}"
             )
             return set()
 
         return packages
 
-    def execute_benchmark(self, instance_path: Path) -> dict[str, Any]:
+    def execute_benchmark(self, instance_path: Path) -> BenchmarkExecutionResult:
         """Execute a benchmark instance using ADO CLI.
 
         Args:
             instance_path: Path to benchmark instance directory
 
         Returns:
-            Execution result dictionary
+            Execution result
         """
-        result = {
-            "instance_path": str(instance_path),
-            "status": "unknown",
-            "message": "",
-            "space_id": None,
-            "operation_id": None,
-            "ray_job_id": None,
-        }
+        result = BenchmarkExecutionResult(instance_path=str(instance_path))
 
         # Prepare remote config once for this benchmark instance
         remote_config_for_space = None
@@ -417,44 +434,44 @@ class BenchmarkManager:
             space_id = self._create_discoveryspace(
                 space_yaml_path, instance_path, remote_config_for_space
             )
-            result["space_id"] = space_id
+            result.space_id = space_id
             console.print(f"  [green]✓[/green] Successfully created space: {space_id}")
 
             console.print(f"  Creating operation for space: {space_id}")
             operation_result = self._create_operation(
                 space_id, instance_path, remote_config_for_operation
             )
-            result["operation_id"] = operation_result["operation_id"]
-            result["ray_job_id"] = operation_result.get("ray_job_id")
+            result.operation_id = operation_result["operation_id"]
+            result.ray_job_id = operation_result.get("ray_job_id")
 
-            result["status"] = "success"
+            result.status = "success"
             message_parts = [
                 f"Successfully created space {space_id} and operation {operation_result['operation_id']}"
             ]
-            if result["ray_job_id"]:
-                message_parts.append(f"Ray job ID: {result['ray_job_id']}")
-            result["message"] = strip_ansi_codes(" | ".join(message_parts))
+            if result.ray_job_id:
+                message_parts.append(f"Ray job ID: {result.ray_job_id}")
+            result.message = strip_ansi_codes(" | ".join(message_parts))
 
             console.print(
                 f"  [green]✓[/green] Successfully created operation: {operation_result['operation_id'] or 'pending'}"
             )
-            if result["ray_job_id"]:
-                console.print(f"  [green]✓[/green] Ray job ID: {result['ray_job_id']}")
+            if result.ray_job_id:
+                console.print(f"  [green]✓[/green] Ray job ID: {result.ray_job_id}")
 
         except FileNotFoundError as e:
-            result["status"] = "failed"
-            result["message"] = f"File not found: {e}"
-            console.print(f"  [red]✗[/red] Failed: {result['message']}")
+            result.status = "failed"
+            result.message = f"File not found: {e}"
+            console_err.print(f"  [red]✗[/red] Failed: {result.message}")
 
         except subprocess.CalledProcessError as e:
-            result["status"] = "failed"
-            result["message"] = f"ADO CLI error: {e.stderr or str(e)}"
-            console.print(f"  [red]✗[/red] Failed: {result['message']}")
+            result.status = "failed"
+            result.message = f"ADO CLI error: {strip_ansi_codes(e.stderr or str(e))}"
+            console_err.print(f"  [red]✗[/red] Failed: {result.message}")
 
         except Exception as e:
-            result["status"] = "failed"
-            result["message"] = f"Execution error: {e}"
-            console.print(f"  [red]✗[/red] Failed: {result['message']}")
+            result.status = "failed"
+            result.message = f"Execution error: {strip_ansi_codes(str(e))}"
+            console_err.print(f"  [red]✗[/red] Failed: {result.message}")
 
         finally:
             # Clean up temporary remote config files
@@ -651,15 +668,6 @@ class BenchmarkManager:
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
-            # Use the template constant and make a deep copy to avoid modifying the original
-            operation_config = copy.deepcopy(RANDOM_WALK_OPERATION_TEMPLATE)
-
-            operation_config["spaces"] = [space_id]
-
-            # Ensure metadata section exists
-            if "metadata" not in operation_config:
-                operation_config["metadata"] = {}
-
             # Generate descriptive name and description from instance path
             if instance_path:
                 # Extract PR number from URL
@@ -673,20 +681,24 @@ class BenchmarkManager:
                 # Create descriptive name: randomwalk-pr123-package-model-instance
                 operation_name = f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
                 operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+            else:
+                operation_name = "randomwalk-all"
+                operation_description = "Perform a random walk on all points in a space"
 
-                # Update metadata with descriptive name and description
-                operation_config["metadata"]["name"] = operation_name
-                operation_config["metadata"]["description"] = operation_description
-
-            # Add custom algorithm-nexus fields to metadata
-            if "algorithm-nexus" not in operation_config["metadata"]:
-                operation_config["metadata"]["algorithm-nexus"] = {}
-
-            operation_config["metadata"]["algorithm-nexus"].update(
-                {
+            # Create custom metadata with algorithm-nexus fields
+            custom_metadata = {
+                "algorithm-nexus": {
                     "pr_url": self.pr_url,
                     "instance_path": str(instance_path) if instance_path else None,
                 }
+            }
+
+            # Create operation config using the factory function
+            operation_config = create_random_walk_operation_config(
+                space_id=space_id,
+                metadata_name=operation_name,
+                metadata_description=operation_description,
+                custom_metadata=custom_metadata,
             )
 
             yaml.dump(operation_config, tmp_file)
@@ -795,9 +807,9 @@ class BenchmarkManager:
                 for instance_path in benchmark_instances:
                     console.print(f"\nProcessing: {instance_path}")
                     exec_result = self.execute_benchmark(instance_path)
-                    results["instances"].append(exec_result)
+                    results["instances"].append(exec_result.model_dump())
 
-                    if exec_result["status"] == "success":
+                    if exec_result.status == "success":
                         successful += 1
                     else:
                         failed += 1
@@ -808,8 +820,6 @@ class BenchmarkManager:
                 console.print(f"  Successful: {successful}")
                 console.print(f"  Failed: {failed}")
                 console.print("=" * 60)
-
-                results["summary"] = {"successful": successful, "failed": failed}
             else:
                 for instance_path in benchmark_instances:
                     console.print(f"  {instance_path}")
@@ -833,6 +843,10 @@ def run_benchmarks(
         typer.Option(
             "--remote",
             help="Execute operations on remote Ray cluster using the specified context file",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
         ),
     ] = None,
     context: Annotated[
@@ -840,6 +854,10 @@ def run_benchmarks(
         typer.Option(
             "--context",
             help="Path to ADO context YAML file (samplestore context)",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
         ),
     ] = None,
     list_only: Annotated[
@@ -887,10 +905,10 @@ def run_benchmarks(
             raise typer.Exit(code=1)
 
     except KeyboardInterrupt:
-        console.print("\n[yellow]Interrupted by user[/yellow]")
+        console_err.print("\n[yellow]Interrupted by user[/yellow]")
         raise typer.Exit(code=130)
     except Exception as e:
-        console.print(f"[red]Error:[/red] {e}")
+        console_err.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(code=1)
 
 

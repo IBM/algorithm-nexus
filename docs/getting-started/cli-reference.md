@@ -270,6 +270,14 @@ The command outputs a JSON file with the following structure:
 }
 ```
 
+When running in local mode (`--remote` **not** set in the cli), the `ray_job_id`
+field will be `null`, while the `operation_id` field will contain the`ado`
+operation ID. When running in remote mode (`--remote` set in the cli), the
+`ray_job_id` field will contain the Ray job ID, while `operation_id` will be
+`null`. In the latter case, users will have to inspect the Ray job logs to
+extract the `ado` operation ID. In case of failure of one or more of the
+benchmark instances, the message fields will contain the reason for the failure.
+
 **Exit Codes:**
 
 - `0`: All benchmarks executed successfully
