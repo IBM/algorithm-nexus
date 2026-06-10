@@ -79,23 +79,6 @@ class BenchmarkManager:
         self.repo_root = Path.cwd()
         self.temp_dir_obj = None
 
-        if execute:
-            # Check if ado CLI is available
-            try:
-                result = subprocess.run(  # noqa: S603
-                    ["ado", "-h"],  # noqa: S607
-                    capture_output=True,
-                    check=False,
-                )
-                if not result.stdout and not result.stderr:
-                    raise FileNotFoundError("ado command produced no output")
-            except FileNotFoundError:
-                console.print(
-                    "[red]Error:[/red] ADO CLI is not installed or not in PATH.\n"
-                    "Install it from: https://github.com/IBM/ado"
-                )
-                raise typer.Exit(code=1)
-
         if remote_context_file and not remote_context_file.exists():
             console.print(
                 f"[red]Error:[/red] Remote context file not found: {remote_context_file}"
@@ -138,41 +121,34 @@ class BenchmarkManager:
         Raises:
             ValueError: If the instance path format is invalid
         """
-        # Parse instance path:
+        # Parse instance path using regex:
         # - Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
         # - Package-level: packages/<package>/benchmark_instances/<instance>
-        parts = str(instance_path).split("/")
+        import re
 
-        if len(parts) < 2:
-            raise ValueError(
-                f"Invalid benchmark instance path format: {instance_path}. "
-                "Expected: packages/<package>/benchmark_instances/<instance> or "
-                "packages/<package>/models/<model>/benchmark_instances/<instance>"
-            )
+        path_str = str(instance_path)
 
-        package_name = parts[1]
+        # Try model-level pattern first
+        model_pattern = r"^packages/([^/]+)/models/([^/]+)/benchmark_instances/([^/]+)$"
+        match = re.match(model_pattern, path_str)
+        if match:
+            package_name, model_name, instance_name = match.groups()
+            return package_name, model_name, instance_name
 
-        # Check if this is a package-level or model-level benchmark instance
-        if len(parts) > 2 and parts[2] == "benchmark_instances":
-            # Package-level: packages/<package>/benchmark_instances/<instance>
-            if len(parts) < 4:
-                raise ValueError(
-                    f"Invalid package-level benchmark instance path: {instance_path}. "
-                    "Expected: packages/<package>/benchmark_instances/<instance>"
-                )
+        # Try package-level pattern
+        package_pattern = r"^packages/([^/]+)/benchmark_instances/([^/]+)$"
+        match = re.match(package_pattern, path_str)
+        if match:
+            package_name, instance_name = match.groups()
             model_name = "base"
-            instance_name = parts[3]
-        else:
-            # Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
-            if len(parts) < 6:
-                raise ValueError(
-                    f"Invalid model-level benchmark instance path: {instance_path}. "
-                    "Expected: packages/<package>/models/<model>/benchmark_instances/<instance>"
-                )
-            model_name = parts[3]
-            instance_name = parts[5]
+            return package_name, model_name, instance_name
 
-        return package_name, model_name, instance_name
+        # If neither pattern matches, raise an error
+        raise ValueError(
+            f"Invalid benchmark instance path format: {instance_path}. "
+            "Expected: packages/<package>/benchmark_instances/<instance> or "
+            "packages/<package>/models/<model>/benchmark_instances/<instance>"
+        )
 
     def find_benchmark_instances(self, changed_files: list[str]) -> list[Path]:
         """Find benchmark instance directories from changed files.
@@ -186,15 +162,15 @@ class BenchmarkManager:
         benchmark_dirs = set()
 
         for file_path in changed_files:
-            if "benchmark_instances/" in file_path:
-                parts = file_path.split("benchmark_instances/")
-                if len(parts) >= 2:
-                    instance_parts = parts[1].split("/")
-                    if instance_parts:
-                        instance_dir = (
-                            f"{parts[0]}benchmark_instances/{instance_parts[0]}"
-                        )
-                        benchmark_dirs.add(Path(instance_dir))
+            path = Path(file_path)
+            if "benchmark_instances" in path.parts:
+                # Find the index of 'benchmark_instances' in the path parts
+                bench_idx = path.parts.index("benchmark_instances")
+                # Ensure there's at least one part after 'benchmark_instances'
+                if bench_idx + 1 < len(path.parts):
+                    # Reconstruct path up to and including the first directory after 'benchmark_instances'
+                    instance_dir = Path(*path.parts[: bench_idx + 2])
+                    benchmark_dirs.add(instance_dir)
 
         return sorted(benchmark_dirs)
 
@@ -206,37 +182,19 @@ class BenchmarkManager:
 
             console.print(f"Creating temporary clone in {temp_path}")
 
-            result = subprocess.run(  # noqa: S603
-                ["git", "remote", "get-url", "origin"],  # noqa: S607
-                capture_output=True,
-                text=True,
-                check=True,
-                cwd=self.repo_root,
-            )
-            repo_url = result.stdout.strip()
-
-            pr_number = self.pr_url.rstrip("/").split("/")[-1]
-
-            console.print("Cloning repository...")
+            # Use gh CLI to clone the repo directly from the PR URL
+            console.print("Cloning repository using gh CLI...")
             subprocess.run(  # noqa: S603
-                [  # noqa: S607
-                    "git",
-                    "clone",
-                    "--depth",
-                    "1",
-                    "--no-single-branch",
-                    repo_url,
-                    str(temp_path),
-                ],
+                ["gh", "repo", "clone", self.pr_url, str(temp_path)],  # noqa: S607
                 capture_output=True,
                 text=True,
                 check=True,
             )
 
-            # Use gh CLI to checkout the PR - it handles fetching the PR ref
-            console.print(f"Checking out PR #{pr_number} using gh CLI...")
+            # Use gh CLI to checkout the PR using the URL
+            console.print("Checking out PR using gh CLI...")
             subprocess.run(  # noqa: S603
-                ["gh", "pr", "checkout", pr_number],  # noqa: S607
+                ["gh", "pr", "checkout", self.pr_url],  # noqa: S607
                 capture_output=True,
                 text=True,
                 check=True,
@@ -323,30 +281,30 @@ class BenchmarkManager:
             repo_root = self.repo_root
 
             space_yaml_path = repo_root / instance_path / "space.yaml"
-            if not space_yaml_path.exists():
-                return packages
+            if not space_yaml_path.is_file():
+                return set()
 
-            with open(space_yaml_path) as f:
-                space_config = yaml.safe_load(f)
+            space_config = yaml.safe_load(space_yaml_path.read_text())
 
             experiment_ids = set()
-            if "experiments" in space_config:
-                for exp in space_config["experiments"]:
-                    if isinstance(exp, dict) and "experimentIdentifier" in exp:
-                        experiment_ids.add(exp["experimentIdentifier"])
+            for exp in space_config.get("experiments", []):
+                if isinstance(exp, dict) and "experimentIdentifier" in exp:
+                    experiment_ids.add(exp["experimentIdentifier"])
 
             if not experiment_ids:
-                return packages
+                return set()
 
             current_path = repo_root / instance_path
             nexus_yaml_path = None
 
-            while current_path != repo_root and current_path.parent != current_path:
-                potential_nexus = current_path / "nexus.yaml"
-                if potential_nexus.exists():
+            # Find the deepest nexus.yaml file up to repo_root
+            for parent in [current_path, *current_path.parents]:
+                if parent == repo_root.parent:
+                    break
+                potential_nexus = parent / "nexus.yaml"
+                if potential_nexus.is_file():
                     nexus_yaml_path = potential_nexus
                     break
-                current_path = current_path.parent
 
             if not nexus_yaml_path:
                 parts = instance_path.parts
@@ -356,10 +314,9 @@ class BenchmarkManager:
                         nexus_yaml_path = potential_nexus
 
             if not nexus_yaml_path or not nexus_yaml_path.exists():
-                return packages
+                return set()
 
-            with open(nexus_yaml_path) as f:
-                nexus_config = yaml.safe_load(f)
+            nexus_config = yaml.safe_load(nexus_yaml_path.read_text())
 
             if (
                 "package" in nexus_config
@@ -378,6 +335,7 @@ class BenchmarkManager:
             console.print(
                 f"[yellow]Warning:[/yellow] Could not determine benchmark packages for {instance_path}: {e}"
             )
+            return set()
 
         return packages
 
@@ -399,6 +357,11 @@ class BenchmarkManager:
             "ray_job_id": None,
         }
 
+        # Prepare remote config once for this benchmark instance
+        remote_config_for_space = None
+        remote_config_for_operation = None
+        temp_remote_configs = []
+
         try:
             # Use repo_root which is set to either local or checked out directory
             space_yaml_path = self.repo_root / instance_path / "space.yaml"
@@ -406,13 +369,61 @@ class BenchmarkManager:
             if not space_yaml_path.exists():
                 raise FileNotFoundError(f"space.yaml not found in {instance_path}")
 
+            # If in remote mode, create remote configs with benchmark packages
+            if self.remote_context_file:
+                benchmark_packages = self.get_benchmark_packages_for_instance(
+                    instance_path
+                )
+
+                if benchmark_packages:
+                    console.print(
+                        f"  Installing benchmark packages in Ray environment: {', '.join(benchmark_packages)}"
+                    )
+                    # Create base remote config with benchmark packages
+                    base_remote_config = self._create_or_update_remote_config(
+                        benchmark_packages, self.remote_context_file, self.repo_root
+                    )
+                    temp_remote_configs.append(base_remote_config)
+
+                    # Load base config for space creation
+                    base_config = yaml.safe_load(base_remote_config.read_text()) or {}
+
+                    # Use base config for operation (without wait: true override)
+                    remote_config_for_operation = base_remote_config
+                else:
+                    # No benchmark packages, use original config
+                    base_config = (
+                        yaml.safe_load(self.remote_context_file.read_text()) or {}
+                    )
+
+                    # Use original config for operation
+                    remote_config_for_operation = self.remote_context_file
+
+                # Create temporary config for space creation with wait: true
+                space_config = base_config.copy()
+                space_config["wait"] = True
+
+                with tempfile.NamedTemporaryFile(
+                    mode="w",
+                    suffix=".yaml",
+                    delete=False,
+                    prefix="remote_config_space_",
+                ) as tmp_file:
+                    yaml.dump(space_config, tmp_file, default_flow_style=False)
+                    remote_config_for_space = Path(tmp_file.name)
+                    temp_remote_configs.append(remote_config_for_space)
+
             console.print(f"  Creating ADO discoveryspace for: {instance_path}")
-            space_id = self._create_discoveryspace(space_yaml_path, instance_path)
+            space_id = self._create_discoveryspace(
+                space_yaml_path, instance_path, remote_config_for_space
+            )
             result["space_id"] = space_id
             console.print(f"  [green]✓[/green] Successfully created space: {space_id}")
 
             console.print(f"  Creating operation for space: {space_id}")
-            operation_result = self._create_operation(space_id, instance_path)
+            operation_result = self._create_operation(
+                space_id, instance_path, remote_config_for_operation
+            )
             result["operation_id"] = operation_result["operation_id"]
             result["ray_job_id"] = operation_result.get("ray_job_id")
 
@@ -445,20 +456,31 @@ class BenchmarkManager:
             result["message"] = f"Execution error: {e}"
             console.print(f"  [red]✗[/red] Failed: {result['message']}")
 
+        finally:
+            # Clean up temporary remote config files
+            for temp_config in temp_remote_configs:
+                temp_config.unlink(missing_ok=True)
+
         return result
 
-    def _create_discoveryspace(self, space_yaml_path: Path, instance_path: Path) -> str:
+    def _create_discoveryspace(
+        self,
+        space_yaml_path: Path,
+        instance_path: Path,
+        remote_config: Path | None = None,
+    ) -> str:
         """Create a discoveryspace using ado CLI.
 
         Args:
             space_yaml_path: Path to space.yaml file
             instance_path: Path to benchmark instance directory
+            remote_config: Optional path to remote configuration file (with wait: true for space creation)
 
         Returns:
             Created space identifier
         """
-        with open(space_yaml_path) as f:
-            space_config = yaml.safe_load(f)
+
+        space_config = yaml.safe_load(space_yaml_path.read_text())
 
         # Ensure metadata section exists
         if "metadata" not in space_config:
@@ -493,17 +515,20 @@ class BenchmarkManager:
         )
 
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
+            mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
             yaml.dump(space_config, tmp_file)
             temp_space_path = tmp_file.name
 
-        try:
             cmd = ["ado"]
 
             # Add context file if provided
             if self.context_file:
                 cmd.extend(["--context", str(self.context_file)])
+
+            # Add remote flag if in remote mode
+            if remote_config:
+                cmd.extend(["--remote", str(remote_config)])
 
             cmd.extend(["create", "discoveryspace", "-f", temp_space_path])
 
@@ -535,8 +560,6 @@ class BenchmarkManager:
                         f"Stdout: {result.stdout[:300]}\n"
                         f"Stderr: {result.stderr[:300]}"
                     )
-        finally:
-            Path(temp_space_path).unlink(missing_ok=True)
 
     def _create_or_update_remote_config(
         self,
@@ -557,8 +580,7 @@ class BenchmarkManager:
         if repo_root is None:
             repo_root = self.repo_root
         if base_config_path and base_config_path.exists():
-            with open(base_config_path) as f:
-                remote_config = yaml.safe_load(f) or {}
+            remote_config = yaml.safe_load(base_config_path.read_text()) or {}
         else:
             remote_config = {}
 
@@ -575,25 +597,34 @@ class BenchmarkManager:
         existing_source_packages = set(remote_config["packages"]["fromSource"])
 
         for pkg in benchmark_packages:
-            # Check if package is a local path (relative or absolute)
-            pkg_path = Path(pkg)
-
-            # Try to resolve relative to repo_root first
-            if not pkg_path.is_absolute():
-                pkg_path = repo_root / pkg_path
-
-            # Check if the resolved path exists and is a valid package source
-            if pkg_path.exists() and (
-                pkg_path.is_dir() or pkg_path.suffix in [".whl", ".tar.gz", ".zip"]
+            # Check if package is a GitHub URL
+            if pkg.startswith(
+                ("https://github.com/", "http://github.com/", "git@github.com:")
             ):
-                # Resolve to absolute path for local packages
-                resolved_path = str(pkg_path.resolve())
-                if resolved_path not in existing_source_packages:
-                    remote_config["packages"]["fromSource"].append(resolved_path)
+                # Add git+ prefix for GitHub URLs if not already present
+                git_url = pkg if pkg.startswith("git+") else f"git+{pkg}"
+                if git_url not in existing_pypi_packages:
+                    remote_config["packages"]["fromPyPI"].append(git_url)
             else:
-                # Treat as PyPI package
-                if pkg not in existing_pypi_packages:
-                    remote_config["packages"]["fromPyPI"].append(pkg)
+                # Check if package is a local path (relative or absolute)
+                pkg_path = Path(pkg)
+
+                # Try to resolve relative to repo_root first
+                if not pkg_path.is_absolute():
+                    pkg_path = repo_root / pkg_path
+
+                # Check if the resolved path exists and is a valid package source
+                if pkg_path.exists() and (
+                    pkg_path.is_dir() or pkg_path.suffix in [".whl", ".tar.gz", ".zip"]
+                ):
+                    # Resolve to absolute path for local packages
+                    resolved_path = str(pkg_path.resolve())
+                    if resolved_path not in existing_source_packages:
+                        remote_config["packages"]["fromSource"].append(resolved_path)
+                else:
+                    # Treat as PyPI package
+                    if pkg not in existing_pypi_packages:
+                        remote_config["packages"]["fromPyPI"].append(pkg)
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=False, prefix="remote_config_"
@@ -602,19 +633,23 @@ class BenchmarkManager:
             return Path(tmp_file.name)
 
     def _create_operation(
-        self, space_id: str, instance_path: Path | None = None
+        self,
+        space_id: str,
+        instance_path: Path | None = None,
+        remote_config: Path | None = None,
     ) -> dict[str, str | None]:
         """Create and execute an operation using ado CLI.
 
         Args:
             space_id: Discovery space identifier
             instance_path: Optional path to benchmark instance (for package resolution)
+            remote_config: Optional path to remote configuration file
 
         Returns:
             Dictionary with operation_id and ray_job_id (if remote execution)
         """
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
+            mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
             # Use the template constant and make a deep copy to avoid modifying the original
             operation_config = copy.deepcopy(RANDOM_WALK_OPERATION_TEMPLATE)
@@ -655,24 +690,8 @@ class BenchmarkManager:
             )
 
             yaml.dump(operation_config, tmp_file)
+            tmp_file.flush()
             operation_config_path = tmp_file.name
-
-        remote_config_to_use = self.remote_context_file
-        temp_remote_config = None
-
-        try:
-            if self.remote_context_file and instance_path:
-                benchmark_packages = self.get_benchmark_packages_for_instance(
-                    instance_path
-                )
-                if benchmark_packages:
-                    console.print(
-                        f"  Installing benchmark packages in Ray environment: {', '.join(benchmark_packages)}"
-                    )
-                    temp_remote_config = self._create_or_update_remote_config(
-                        benchmark_packages, self.remote_context_file, self.repo_root
-                    )
-                    remote_config_to_use = temp_remote_config
 
             cmd = ["ado"]
 
@@ -681,8 +700,8 @@ class BenchmarkManager:
                 cmd.extend(["--context", str(self.context_file)])
 
             # The remote config goes right after the ado command (and context if present)
-            if remote_config_to_use:
-                cmd.extend(["--remote", str(remote_config_to_use)])
+            if remote_config:
+                cmd.extend(["--remote", str(remote_config)])
 
             cmd.extend(
                 [
@@ -708,7 +727,7 @@ class BenchmarkManager:
 
             # Extract Ray job ID (starts with raysubmit_) for remote execution
             ray_job_id = None
-            if remote_config_to_use:
+            if remote_config:
                 ray_match = re.search(r"(raysubmit_\w+)", combined_output)
                 if ray_match:
                     ray_job_id = strip_ansi_codes(ray_match.group(1))
@@ -731,11 +750,6 @@ class BenchmarkManager:
                 "operation_id": operation_id,
                 "ray_job_id": ray_job_id,
             }
-
-        finally:
-            Path(operation_config_path).unlink(missing_ok=True)
-            if temp_remote_config:
-                temp_remote_config.unlink(missing_ok=True)
 
     def run(self) -> dict[str, Any]:
         """Main execution method.
@@ -862,8 +876,7 @@ def run_benchmarks(
         )
         results = manager.run()
 
-        with open(output, "w") as f:
-            json.dump(results, f, indent=2)
+        Path(output).write_text(json.dumps(results, indent=2))
         console.print(f"\nResults written to: {output}")
 
         if (

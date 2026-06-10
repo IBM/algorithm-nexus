@@ -177,8 +177,9 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
-- `--list-only`: List benchmarks without executing them (dry-run mode)
-- `--output <path>`: Output results to JSON file (default: `output.json`)
+- `--list-only`: List benchmark instances without executing them
+- `--output <path>`: Output file path for execution results (default:
+  `output.json`)
 
 **Behavior:**
 
@@ -190,11 +191,30 @@ The command automatically:
 4. Executes the benchmarks (unless `--list-only` is specified)
 5. Writes results to the output file
 
+**Benchmark Instance Detection:**
+
+A benchmark instance is detected as changed if any file within its directory is
+modified in the PR. This includes:
+
+- Changes to `space.yaml` files
+- Changes to any other files in the `benchmark_instances/<instance-name>/`
+  directory
+- New benchmark instance directories (any new folder under
+  `benchmark_instances/`)
+
+The detection works for both:
+
+- **Model-level instances**:
+  `packages/<package>/models/<model>/benchmark_instances/<instance>/`
+- **Package-level instances**:
+  `packages/<package>/benchmark_instances/<instance>/`
+
 !!! note
 
     When not running in remote mode (`--remote` not set), the benchmark instances will be executed with
     `ado` in the local environment. It is the user responsibility to ensure that the required
-    benchmark packages are installed in the local python environment.
+    benchmark packages are installed in the local python environment. Benchmark packages are listed for
+    each nexus package in the `nexus.yaml` configuration.
 
 **Examples:**
 
@@ -235,12 +255,12 @@ The command outputs a JSON file with the following structure:
 {
     "instances": [
         {
-            "instance_path": "packages/terratorch/models/prithvi/benchmark_instances/test_benchmark",
+            "instance_path": "packages/<package>/models/<model>/benchmark_instances/test_benchmark",
             "status": "success",
-            "message": "Successfully created space space-abc123-default and operation raysubmit_xyz789",
-            "space_id": "space-abc123-default",
-            "operation_id": "raysubmit_xyz789",
-            "ray_job_id": "raysubmit_xyz789"
+            "message": "Successfully created space space-a009d7-default and operation None | Ray job ID: raysubmit_snRVd4ZqTTKcaR3W",
+            "space_id": "space-a009d7-default",
+            "operation_id": "randomwalk-123456-default",
+            "ray_job_id": "raysubmit_snRVd4ZqTTKcaR3W"
         }
     ],
     "summary": {
