@@ -22,6 +22,7 @@ candidate = [
   "vllm==0.19.1",
 ]
 cli = [
+  "ado-core>=1.8.0",
   "pydantic>=2.13.3",
   "pyyaml>=6.0.3",
   "rich>=15.0.0",

@@ -151,11 +151,6 @@ Execute benchmarks from a GitHub Pull Request. This command identifies new or
 changed benchmark instances in a PR and optionally executes them using the `ado`
 CLI.
 
-!!! warning
-
-    This command requires [`ado` to be installed](https://ibm.github.io/ado/getting-started/install/)
-    in the local python environment.
-
 **Usage:**
 
 ```bash
