@@ -444,12 +444,20 @@ class BenchmarkManager:
             result.operation_id = operation_result["operation_id"]
             result.ray_job_id = operation_result.get("ray_job_id")
 
-            result.status = "success"
-            message_parts = [
-                f"Successfully created space {space_id} and operation {operation_result['operation_id']}"
-            ]
+            # Set status to "started" if Ray job was successfully started, otherwise "success"
             if result.ray_job_id:
-                message_parts.append(f"Ray job ID: {result.ray_job_id}")
+                result.status = "started"
+                message_parts = [
+                    f"Successfully started on Ray cluster with job ID: {result.ray_job_id}"
+                ]
+                if result.operation_id:
+                    message_parts.append(f"Operation ID: {result.operation_id}")
+                message_parts.append(f"Space ID: {space_id}")
+            else:
+                result.status = "success"
+                message_parts = [
+                    f"Successfully created space {space_id} and operation {operation_result['operation_id']}"
+                ]
             result.message = strip_ansi_codes(" | ".join(message_parts))
 
             console.print(
@@ -860,11 +868,11 @@ def run_benchmarks(
             readable=True,
         ),
     ] = None,
-    list_only: Annotated[
+    dry_run: Annotated[
         bool,
         typer.Option(
-            "--list-only",
-            help="List benchmarks without executing them",
+            "--dry-run",
+            help="List benchmarks without executing them (dry run)",
         ),
     ] = False,
     output: Annotated[
@@ -888,7 +896,7 @@ def run_benchmarks(
     try:
         manager = BenchmarkManager(
             pr_url=pr,
-            execute=not list_only,
+            execute=not dry_run,
             remote_context_file=remote,
             context_file=context,
         )
@@ -897,11 +905,7 @@ def run_benchmarks(
         Path(output).write_text(json.dumps(results, indent=2))
         console.print(f"\nResults written to: {output}")
 
-        if (
-            not list_only
-            and results.get("summary")
-            and results["summary"]["failed"] > 0
-        ):
+        if not dry_run and results.get("summary") and results["summary"]["failed"] > 0:
             raise typer.Exit(code=1)
 
     except KeyboardInterrupt:

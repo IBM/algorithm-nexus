@@ -1,0 +1,7 @@
+name: prithvi
+version: 1.0.0
+description: Test fixture for prithvi model
+experiments:
+  - local-segmentation-eval
+
+# Made with Bob

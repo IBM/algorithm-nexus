@@ -194,7 +194,7 @@ class BenchmarkExecutionResult(BaseModel):
 
     instance_path: Annotated[str, Field(description="Path to the benchmark instance")]
     status: Annotated[
-        Literal["success", "failed", "unknown"],
+        Literal["success", "failed", "started", "unknown"],
         Field(description="Execution status"),
     ] = "unknown"
     message: Annotated[

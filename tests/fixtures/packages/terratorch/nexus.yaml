@@ -1,0 +1,7 @@
+name: terratorch
+version: 1.0.0
+description: Test fixture for terratorch package
+models:
+  - prithvi
+
+# Made with Bob

@@ -157,6 +157,11 @@ CLI.
 nexus run benchmarks --pr <pr_url> [OPTIONS]
 ```
 
+!!! warning
+
+    This command requires the [GitHub CLI (`gh`)](https://cli.github.com/) to be installed and
+    configured in the command execution environment.
+
 **Required Options:**
 
 - `--pr <pr_url>`: GitHub Pull Request URL (e.g.,
@@ -172,7 +177,7 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
-- `--list-only`: List benchmark instances without executing them
+- `--dry-run`: List benchmark instances without executing them (dry run)
 - `--output <path>`: Output file path for execution results (default:
   `output.json`)
 
@@ -183,7 +188,7 @@ The command automatically:
 1. Checks if the local repository is on the same commit as the PR
 2. If not, checks out the PR code to a temporary directory
 3. Analyzes the PR to find new or changed benchmark instances
-4. Executes the benchmarks (unless `--list-only` is specified)
+4. Executes the benchmarks (unless `--dry-run` is specified)
 5. Writes results to the output file
 
 **Benchmark Instance Detection:**
@@ -213,10 +218,10 @@ The detection works for both:
 
 **Examples:**
 
-List benchmarks in a PR without executing:
+List benchmarks in a PR without executing (dry run):
 
 ```bash
-nexus run benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 --list-only
+nexus run benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 --dry-run
 ```
 
 Execute benchmarks locally:
@@ -318,10 +323,10 @@ nexus get benchmark-requirements my-package
 Execute benchmarks from a GitHub PR to validate changes:
 
 ```bash
-# First, check what benchmarks would be executed (dry-run)
+# First, check what benchmarks would be executed (dry run)
 nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
-  --list-only
+  --dry-run
 
 # Execute benchmarks locally
 nexus run benchmarks \
