@@ -257,11 +257,7 @@ The command outputs a JSON file with the following structure:
             "operation_id": "randomwalk-123456-default",
             "ray_job_id": "raysubmit_snRVd4ZqTTKcaR3W"
         }
-    ],
-    "summary": {
-        "successful": 1,
-        "failed": 0
-    }
+    ]
 }
 ```
 
