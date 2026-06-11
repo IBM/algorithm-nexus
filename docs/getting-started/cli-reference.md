@@ -262,7 +262,22 @@ nexus run benchmarks \
 
 **Output Format:**
 
-The command outputs results in JSON or YAML format with the following structure:
+By default, the command outputs results in a human-readable format showing the
+status, message, and IDs for each benchmark instance.
+
+To get structured output (JSON or YAML), use the `--output-format` option:
+
+```bash
+# Print JSON to console
+algorithm-nexus run packages/terratorch/models/prithvi/benchmark_instances/flood-test \
+  --output-format json
+
+# Print YAML to console
+algorithm-nexus run packages/terratorch/models/prithvi/benchmark_instances/flood-test \
+  --output-format yaml
+```
+
+The structured output (JSON) has the following format:
 
 ```json
 {
@@ -279,12 +294,6 @@ The command outputs results in JSON or YAML format with the following structure:
 }
 ```
 
-When `--output-file` is not specified and no `--output-format` is given, results
-are printed to screen in a human-readable format showing the status, message,
-and IDs for each benchmark instance. Use `--output-format json` or
-`--output-format yaml` to print structured output to console without saving to a
-file.
-
 **Status Values:**
 
 - `success`: Benchmark completed successfully (local execution)
@@ -297,7 +306,7 @@ file.
 | Field          | Local Mode (`--remote` not set)                                              | Remote Mode (`--remote` set)                                                 |
 | -------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `status`       | `success` (on success)<br>`failed` (on error)<br>`unknown` (if undetermined) | `started` (on success)<br>`failed` (on error)<br>`unknown` (if undetermined) |
-| `operation_id` | ADO operation ID                                                             | May be `null` initially\*                                                    |
+| `operation_id` | ADO operation ID                                                             | `null`                                                                       |
 | `ray_job_id`   | `null`                                                                       | Ray job ID                                                                   |
 | Notes          | Operation completes locally                                                  | Job submitted to Ray cluster                                                 |
 

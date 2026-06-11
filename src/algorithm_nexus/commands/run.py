@@ -28,6 +28,10 @@ try:
         PackageConfiguration,
         RemoteExecutionContext,
     )
+    from orchestrator.modules.operators.randomwalk import (
+        BaseSamplerConfiguration,
+        RandomWalkParameters,
+    )
     from orchestrator.utilities.output import pydantic_model_as_yaml
     from rich.console import Console
 except ImportError:
@@ -81,14 +85,14 @@ def create_random_walk_operation_config(
             operatorName="random_walk",
             operationType=DiscoveryOperationEnum.SEARCH,
         ),
-        parameters={
-            "numberEntities": "all",
-            "singleMeasurement": True,
-            "samplerConfig": {
-                "mode": "sequential",
-                "samplerType": "generator",
-            },
-        },
+        parameters=RandomWalkParameters(
+            numberEntities="all",
+            singleMeasurement=True,
+            samplerConfig=BaseSamplerConfiguration(
+                samplerType="generator",
+                mode="sequential",
+            ),
+        ),
     )
 
     return DiscoveryOperationResourceConfiguration(
