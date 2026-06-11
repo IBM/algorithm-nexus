@@ -178,8 +178,12 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
 - `--dry-run`: List benchmark instances without executing them (dry run)
-- `--output <path>`: Output file path for execution results (default:
-  `output.json`)
+- `--output-file <path>`: Output file path for execution results. If not
+  specified, results are printed to screen.
+- `-o, --output-format <format>`: Output format: 'json' or 'yaml'. Can be used
+  with or without `--output-file`. When used without `--output-file`, prints
+  formatted output to console. When used with `--output-file`, overrides format
+  inference from file extension (defaults to json).
 
 **Behavior:**
 
@@ -239,25 +243,34 @@ nexus run benchmarks \
   --context path/to/ado-context.yaml
 ```
 
-Execute benchmarks and save results to a custom file:
+Execute benchmarks and save results to a file:
 
 ```bash
 nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
-  --output benchmark_results.json
+  --output-file benchmark_results.json
+```
+
+Execute benchmarks and save results in YAML format:
+
+```bash
+nexus run benchmarks \
+  --pr https://github.com/IBM/algorithm-nexus/pull/123 \
+  --output-file results.yaml \
+  --output-format yaml
 ```
 
 **Output Format:**
 
-The command outputs a JSON file with the following structure:
+The command outputs results in JSON or YAML format with the following structure:
 
 ```json
 {
     "instances": [
         {
             "instance_path": "packages/<package>/models/<model>/benchmark_instances/test_benchmark",
-            "status": "success",
-            "message": "Successfully created space space-a009d7-default and operation None | Ray job ID: raysubmit_snRVd4ZqTTKcaR3W",
+            "status": "started",
+            "message": "Successfully started on Ray cluster with job ID: raysubmit_snRVd4ZqTTKcaR3W | Space ID: space-a009d7-default",
             "space_id": "space-a009d7-default",
             "operation_id": "randomwalk-123456-default",
             "ray_job_id": "raysubmit_snRVd4ZqTTKcaR3W"
@@ -266,13 +279,27 @@ The command outputs a JSON file with the following structure:
 }
 ```
 
-When running in local mode (`--remote` **not** set in the cli), the `ray_job_id`
-field will be `null`, while the `operation_id` field will contain the`ado`
-operation ID. When running in remote mode (`--remote` set in the cli), the
-`ray_job_id` field will contain the Ray job ID, while `operation_id` will be
-`null`. In the latter case, users will have to inspect the Ray job logs to
-extract the `ado` operation ID. In case of failure of one or more of the
-benchmark instances, the message fields will contain the reason for the failure.
+When `--output-file` is not specified and no `--output-format` is given, results
+are printed to screen in a human-readable format showing the status, message,
+and IDs for each benchmark instance. Use `--output-format json` or
+`--output-format yaml` to print structured output to console without saving to a
+file.
+
+**Status Values:**
+
+- `success`: Benchmark completed successfully (local execution)
+- `started`: Benchmark started on Ray cluster (remote execution)
+- `failed`: Benchmark execution failed
+- `unknown`: Status could not be determined
+
+When running in local mode (`--remote` **not** set), the `ray_job_id` field will
+be `null` and status will be `success`, while the `operation_id` field will
+contain the `ado` operation ID. When running in remote mode (`--remote` set),
+the `ray_job_id` field will contain the Ray job ID, status will be `started`,
+and `operation_id` may be `null` initially. In the latter case, users will have
+to inspect the Ray job logs to extract the `ado` operation ID once execution
+completes. In case of failure, the message field will contain the reason for the
+failure.
 
 **Exit Codes:**
 
@@ -337,7 +364,7 @@ nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
   --remote config/remote-context.yaml \
   --context config/ado-context.yaml \
-  --output pr123_results.json
+  --output-file pr123_results.json
 ```
 
 The command will:

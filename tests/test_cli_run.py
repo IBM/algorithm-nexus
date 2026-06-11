@@ -212,10 +212,8 @@ class TestCreateRandomWalkOperationConfig:
     def test_create_config_with_custom_metadata(self) -> None:
         """Test creating config with custom metadata."""
         custom_meta = {
-            "algorithm-nexus": {
-                "pr_url": "https://github.com/test/repo/pull/123",
-                "instance_path": "packages/test/benchmark_instances/test",
-            }
+            "algorithm-nexus.pr_url": "https://github.com/test/repo/pull/123",
+            "algorithm-nexus.instance_path": "packages/test/benchmark_instances/test",
         }
 
         config = create_random_walk_operation_config(
@@ -227,12 +225,13 @@ class TestCreateRandomWalkOperationConfig:
 
         assert config["metadata"]["name"] == "custom-walk"
         assert config["metadata"]["description"] == "Custom walk description"
+        # Custom metadata is stored in the labels field
         assert (
-            config["metadata"]["algorithm-nexus"]["pr_url"]
+            config["metadata"]["labels"]["algorithm-nexus.pr_url"]
             == "https://github.com/test/repo/pull/123"
         )
         assert (
-            config["metadata"]["algorithm-nexus"]["instance_path"]
+            config["metadata"]["labels"]["algorithm-nexus.instance_path"]
             == "packages/test/benchmark_instances/test"
         )
 

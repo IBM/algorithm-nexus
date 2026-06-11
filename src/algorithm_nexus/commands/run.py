@@ -16,10 +16,17 @@ from typing import Annotated, Any
 try:
     import typer
     import yaml
+    from orchestrator.core.discoveryspace.config import DiscoverySpaceConfiguration
     from orchestrator.core.operation.config import (
+        ConfigurationMetadata,
         DiscoveryOperationConfiguration,
         DiscoveryOperationEnum,
+        DiscoveryOperationResourceConfiguration,
         OperatorReference,
+    )
+    from orchestrator.core.remotecontext.config import (
+        PackageConfiguration,
+        RemoteExecutionContext,
     )
     from rich.console import Console
 except ImportError:
@@ -31,13 +38,16 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import strip_ansi_codes
-from algorithm_nexus.models import BenchmarkExecutionResult
+from algorithm_nexus.models import (
+    AlgorithmNexusPackageConfig,
+    BenchmarkExecutionResult,
+)
 
 console = Console()
 console_err = Console(stderr=True)
 
 
-# Random walk operation template using DiscoveryOperationConfiguration
+# Random walk operation template using DiscoveryOperationResourceConfiguration
 def create_random_walk_operation_config(
     space_id: str,
     metadata_name: str = "randomwalk-all",
@@ -55,14 +65,17 @@ def create_random_walk_operation_config(
     Returns:
         Dictionary representation of the operation configuration
     """
-    metadata_dict = {
-        "name": metadata_name,
-        "description": metadata_description,
-    }
+    # Build metadata with custom fields
+    labels = {}
     if custom_metadata:
-        metadata_dict.update(custom_metadata)
+        labels.update(custom_metadata)
+    metadata = ConfigurationMetadata(
+        name=metadata_name,
+        description=metadata_description,
+        labels=labels or None,
+    )
 
-    config = DiscoveryOperationConfiguration(
+    operation = DiscoveryOperationConfiguration(
         module=OperatorReference(
             operatorName="random_walk",
             operationType=DiscoveryOperationEnum.SEARCH,
@@ -77,11 +90,14 @@ def create_random_walk_operation_config(
         },
     )
 
-    return {
-        "metadata": metadata_dict,
-        "spaces": [space_id],
-        "operation": config.model_dump(mode="json"),
-    }
+    config = DiscoveryOperationResourceConfiguration(
+        metadata=metadata,
+        spaces=[space_id],
+        operation=operation,
+        actuatorConfigurationIdentifiers=[],
+    )
+
+    return config.model_dump(mode="json")
 
 
 class BenchmarkManager:
@@ -308,12 +324,28 @@ class BenchmarkManager:
             if not space_yaml_path.is_file():
                 return set()
 
-            space_config = yaml.safe_load(space_yaml_path.read_text())
+            # Load space configuration using DiscoverySpaceConfiguration
+            space_config_dict = yaml.safe_load(space_yaml_path.read_text())
+            space_config = DiscoverySpaceConfiguration(**space_config_dict)
 
+            # Extract experiment identifiers
             experiment_ids = set()
-            for exp in space_config.get("experiments", []):
-                if isinstance(exp, dict) and "experimentIdentifier" in exp:
-                    experiment_ids.add(exp["experimentIdentifier"])
+            if space_config.experiments:
+                # experiments can be either a list of ExperimentReference or MeasurementSpaceConfiguration
+                if isinstance(space_config.experiments, list):
+                    # List of ExperimentReference objects
+                    for exp in space_config.experiments:
+                        experiment_ids.add(exp.experimentIdentifier)
+                else:
+                    # MeasurementSpaceConfiguration with experiments field
+                    if (
+                        hasattr(space_config.experiments, "experiments")
+                        and space_config.experiments.experiments
+                    ):
+                        for exp in space_config.experiments.experiments:
+                            # Experiment objects have 'identifier' not 'experimentIdentifier'
+                            if hasattr(exp, "identifier"):
+                                experiment_ids.add(exp.identifier)
 
             if not experiment_ids:
                 return set()
@@ -340,20 +372,15 @@ class BenchmarkManager:
             if not nexus_yaml_path or not nexus_yaml_path.exists():
                 return set()
 
-            nexus_config = yaml.safe_load(nexus_yaml_path.read_text())
+            # Load nexus config using AlgorithmNexusPackageConfig
+            nexus_config_dict = yaml.safe_load(nexus_yaml_path.read_text())
+            nexus_config = AlgorithmNexusPackageConfig(**nexus_config_dict)
 
-            if (
-                "package" in nexus_config
-                and "benchmark_packages" in nexus_config["package"]
-            ):
-                for bench_pkg in nexus_config["package"]["benchmark_packages"]:
-                    if (
-                        "experiments" in bench_pkg
-                        and "requirement_specifier" in bench_pkg
-                    ):
-                        pkg_experiments = set(bench_pkg["experiments"])
-                        if experiment_ids & pkg_experiments:
-                            packages.add(bench_pkg["requirement_specifier"])
+            if nexus_config.package.benchmark_packages:
+                for bench_pkg in nexus_config.package.benchmark_packages:
+                    pkg_experiments = set(bench_pkg.experiments)
+                    if experiment_ids & pkg_experiments:
+                        packages.add(bench_pkg.requirement_specifier)
 
         except Exception as e:
             console_err.print(
@@ -383,7 +410,7 @@ class BenchmarkManager:
             # Use repo_root which is set to either local or checked out directory
             space_yaml_path = self.repo_root / instance_path / "space.yaml"
 
-            if not space_yaml_path.exists():
+            if not space_yaml_path.is_file():
                 raise FileNotFoundError(f"space.yaml not found in {instance_path}")
 
             # If in remote mode, create remote configs with benchmark packages
@@ -402,23 +429,33 @@ class BenchmarkManager:
                     )
                     temp_remote_configs.append(base_remote_config)
 
-                    # Load base config for space creation
-                    base_config = yaml.safe_load(base_remote_config.read_text()) or {}
+                    # Load base config for space creation using RemoteExecutionContext
+                    base_config_dict = (
+                        yaml.safe_load(base_remote_config.read_text()) or {}
+                    )
+                    base_remote_context = RemoteExecutionContext(**base_config_dict)
 
                     # Use base config for operation (without wait: true override)
                     remote_config_for_operation = base_remote_config
                 else:
                     # No benchmark packages, use original config
-                    base_config = (
+                    base_config_dict = (
                         yaml.safe_load(self.remote_context_file.read_text()) or {}
                     )
+                    base_remote_context = RemoteExecutionContext(**base_config_dict)
 
                     # Use original config for operation
                     remote_config_for_operation = self.remote_context_file
 
                 # Create temporary config for space creation with wait: true
-                space_config = base_config.copy()
-                space_config["wait"] = True
+                # Create a new RemoteExecutionContext with wait=True
+                space_remote_context = RemoteExecutionContext(
+                    executionType=base_remote_context.executionType,
+                    packages=base_remote_context.packages,
+                    wait=True,
+                    envVars=base_remote_context.envVars,
+                    additionalFiles=base_remote_context.additionalFiles,
+                )
 
                 with tempfile.NamedTemporaryFile(
                     mode="w",
@@ -426,7 +463,11 @@ class BenchmarkManager:
                     delete=False,
                     prefix="remote_config_space_",
                 ) as tmp_file:
-                    yaml.dump(space_config, tmp_file, default_flow_style=False)
+                    yaml.dump(
+                        space_remote_context.model_dump(mode="json"),
+                        tmp_file,
+                        default_flow_style=False,
+                    )
                     remote_config_for_space = Path(tmp_file.name)
                     temp_remote_configs.append(remote_config_for_space)
 
@@ -505,11 +546,11 @@ class BenchmarkManager:
             Created space identifier
         """
 
-        space_config = yaml.safe_load(space_yaml_path.read_text())
+        # Load the space configuration from YAML
+        space_config_dict = yaml.safe_load(space_yaml_path.read_text())
 
-        # Ensure metadata section exists
-        if "metadata" not in space_config:
-            space_config["metadata"] = {}
+        # Parse the configuration using DiscoverySpaceConfiguration
+        space_config = DiscoverySpaceConfiguration(**space_config_dict)
 
         # Generate descriptive name and description from instance path
         # Extract PR number from URL
@@ -524,25 +565,22 @@ class BenchmarkManager:
         space_name = f"space-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
         space_description = f"Discovery space for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
 
-        # Update metadata with descriptive name and description
-        space_config["metadata"]["name"] = space_name
-        space_config["metadata"]["description"] = space_description
+        # Build custom labels with algorithm-nexus fields
+        labels = space_config.metadata.labels or {}
+        labels["algorithm-nexus.pr_url"] = self.pr_url
+        labels["algorithm-nexus.instance_path"] = str(instance_path)
 
-        # Add custom algorithm-nexus fields to metadata
-        if "algorithm-nexus" not in space_config["metadata"]:
-            space_config["metadata"]["algorithm-nexus"] = {}
-
-        space_config["metadata"]["algorithm-nexus"].update(
-            {
-                "pr_url": self.pr_url,
-                "instance_path": str(instance_path),
-            }
+        # Update metadata with descriptive name, description, and labels
+        space_config.metadata = ConfigurationMetadata(
+            name=space_name,
+            description=space_description,
+            labels=labels,
         )
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
-            yaml.dump(space_config, tmp_file)
+            yaml.dump(space_config.model_dump(mode="json"), tmp_file)
             temp_space_path = tmp_file.name
 
             cmd = ["ado"]
@@ -604,22 +642,23 @@ class BenchmarkManager:
         """
         if repo_root is None:
             repo_root = self.repo_root
-        if base_config_path and base_config_path.exists():
-            remote_config = yaml.safe_load(base_config_path.read_text()) or {}
-        else:
-            remote_config = {}
 
-        if "packages" not in remote_config:
-            remote_config["packages"] = {}
+        # Load existing remote config (base_config_path existence is validated by CLI)
+        if not base_config_path:
+            raise ValueError(
+                "base_config_path must be provided with a valid RemoteExecutionContext configuration"
+            )
 
-        if "fromPyPI" not in remote_config["packages"]:
-            remote_config["packages"]["fromPyPI"] = []
+        remote_config_dict = yaml.safe_load(base_config_path.read_text()) or {}
+        remote_config = RemoteExecutionContext(**remote_config_dict)
 
-        if "fromSource" not in remote_config["packages"]:
-            remote_config["packages"]["fromSource"] = []
+        # Get existing packages
+        existing_pypi_packages = set(remote_config.packages.fromPyPI)
+        existing_source_packages = set(remote_config.packages.fromSource)
 
-        existing_pypi_packages = set(remote_config["packages"]["fromPyPI"])
-        existing_source_packages = set(remote_config["packages"]["fromSource"])
+        # Process benchmark packages
+        new_pypi_packages = list(existing_pypi_packages)
+        new_source_packages = list(existing_source_packages)
 
         for pkg in benchmark_packages:
             # Check if package is a GitHub URL
@@ -629,7 +668,7 @@ class BenchmarkManager:
                 # Add git+ prefix for GitHub URLs if not already present
                 git_url = pkg if pkg.startswith("git+") else f"git+{pkg}"
                 if git_url not in existing_pypi_packages:
-                    remote_config["packages"]["fromPyPI"].append(git_url)
+                    new_pypi_packages.append(git_url)
             else:
                 # Check if package is a local path (relative or absolute)
                 pkg_path = Path(pkg)
@@ -645,16 +684,26 @@ class BenchmarkManager:
                     # Resolve to absolute path for local packages
                     resolved_path = str(pkg_path.resolve())
                     if resolved_path not in existing_source_packages:
-                        remote_config["packages"]["fromSource"].append(resolved_path)
+                        new_source_packages.append(resolved_path)
                 else:
                     # Treat as PyPI package
                     if pkg not in existing_pypi_packages:
-                        remote_config["packages"]["fromPyPI"].append(pkg)
+                        new_pypi_packages.append(pkg)
+
+        # Update packages configuration
+        remote_config.packages = PackageConfiguration(
+            fromPyPI=new_pypi_packages,
+            fromSource=new_source_packages,
+        )
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=False, prefix="remote_config_"
         ) as tmp_file:
-            yaml.dump(remote_config, tmp_file, default_flow_style=False)
+            yaml.dump(
+                remote_config.model_dump(mode="json"),
+                tmp_file,
+                default_flow_style=False,
+            )
             return Path(tmp_file.name)
 
     def _create_operation(
@@ -695,10 +744,10 @@ class BenchmarkManager:
 
             # Create custom metadata with algorithm-nexus fields
             custom_metadata = {
-                "algorithm-nexus": {
-                    "pr_url": self.pr_url,
-                    "instance_path": str(instance_path) if instance_path else None,
-                }
+                "algorithm-nexus.pr_url": self.pr_url,
+                "algorithm-nexus.instance_path": str(instance_path)
+                if instance_path
+                else "",
             }
 
             # Create operation config using the factory function
@@ -875,13 +924,21 @@ def run_benchmarks(
             help="List benchmarks without executing them (dry run)",
         ),
     ] = False,
-    output: Annotated[
-        Path,
+    output_file: Annotated[
+        Path | None,
         typer.Option(
-            "--output",
-            help="Output results to JSON file",
+            "--output-file",
+            help="Output file path for execution results. If not specified, results are printed to screen.",
         ),
-    ] = Path("output.json"),
+    ] = None,
+    output_format: Annotated[
+        str | None,
+        typer.Option(
+            "-o",
+            "--output-format",
+            help="Output format: 'json' or 'yaml'. Only used with --output-file.",
+        ),
+    ] = None,
 ) -> None:
     """Execute benchmarks from a GitHub Pull Request.
 
@@ -893,6 +950,12 @@ def run_benchmarks(
     commit as the PR. If not, it will checkout the PR code in a temporary
     directory.
     """
+    from algorithm_nexus.commands.utils import validate_output_format
+
+    # Validate output format if specified
+    if output_format:
+        validate_output_format(output_format, allow_yaml=True, allow_csv=False)
+
     try:
         manager = BenchmarkManager(
             pr_url=pr,
@@ -902,8 +965,75 @@ def run_benchmarks(
         )
         results = manager.run()
 
-        Path(output).write_text(json.dumps(results, indent=2))
-        console.print(f"\nResults written to: {output}")
+        # Output results
+        # Determine output format
+        if output_format:
+            fmt = output_format
+        elif output_file and (
+            output_file.suffix == ".yaml" or output_file.suffix == ".yml"
+        ):
+            fmt = "yaml"
+        elif output_file:
+            fmt = "json"
+        else:
+            fmt = None  # Human-readable format for console
+
+        # Output results
+        if output_file:
+            if fmt == "yaml":
+                output_file.write_text(
+                    yaml.dump(results, default_flow_style=False, sort_keys=False)
+                )
+            else:
+                output_file.write_text(json.dumps(results, indent=2))
+
+            console.print(f"\nResults written to: {output_file}")
+        else:
+            # Print to console
+            if fmt == "json":
+                console.print()  # Blank line before output
+                console.print(json.dumps(results, indent=2))
+            elif fmt == "yaml":
+                console.print()  # Blank line before output
+                console.print(
+                    yaml.dump(results, default_flow_style=False, sort_keys=False)
+                )
+            else:
+                # Human-readable format
+                console.print("\n[bold]Benchmark Execution Results[/bold]\n")
+
+                if not results.get("instances"):
+                    console.print("[yellow]No benchmark instances found[/yellow]")
+                else:
+                    for instance in results["instances"]:
+                        instance_path = instance.get("instance_path", "Unknown")
+                        status = instance.get("status", "unknown")
+                        message = instance.get("message", "")
+
+                        # Color code based on status
+                        if status == "success":
+                            status_display = f"[green]{status}[/green]"
+                        elif status == "started":
+                            status_display = f"[cyan]{status}[/cyan]"
+                        elif status == "failed":
+                            status_display = f"[red]{status}[/red]"
+                        else:
+                            status_display = f"[yellow]{status}[/yellow]"
+
+                        console.print(f"[bold]{instance_path}[/bold]")
+                        console.print(f"  Status: {status_display}")
+
+                        if message:
+                            console.print(f"  Message: {message}")
+
+                        if instance.get("space_id"):
+                            console.print(f"  Space ID: {instance['space_id']}")
+                        if instance.get("operation_id"):
+                            console.print(f"  Operation ID: {instance['operation_id']}")
+                        if instance.get("ray_job_id"):
+                            console.print(f"  Ray Job ID: {instance['ray_job_id']}")
+
+                        console.print()  # Empty line between instances
 
         if not dry_run and results.get("summary") and results["summary"]["failed"] > 0:
             raise typer.Exit(code=1)
