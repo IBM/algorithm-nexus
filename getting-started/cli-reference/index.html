@@ -747,6 +747,51 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#nexus-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        nexus run
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="nexus run">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subcommands_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Subcommands
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Subcommands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nexus-run-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        nexus run benchmarks
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -785,6 +830,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Getting Package Information
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-benchmarks-from-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Running Benchmarks from a Pull Request
       </span>
     </span>
   </a>
@@ -1578,31 +1634,226 @@ Nexus packages.</p>
 <p><strong>Example:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>nexus<span class="w"> </span>get<span class="w"> </span>benchmark-requirements<span class="w"> </span>terratorch
 </span></code></pre></div>
+<h2 id="nexus-run">nexus run<a class="headerlink" href="#nexus-run" title="Permanent link">&para;</a></h2>
+<p>Execute benchmark instances.</p>
+<h3 id="subcommands_2">Subcommands<a class="headerlink" href="#subcommands_2" title="Permanent link">&para;</a></h3>
+<h4 id="nexus-run-benchmarks">nexus run benchmarks<a class="headerlink" href="#nexus-run-benchmarks" title="Permanent link">&para;</a></h4>
+<p>Execute benchmarks from a GitHub Pull Request. This command identifies new or
+changed benchmark instances in a PR and optionally executes them using the <code>ado</code>
+CLI.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>&lt;pr_url&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This command requires the <a href="https://cli.github.com/">GitHub CLI (<code>gh</code>)</a> to be installed and
+configured in the command execution environment.</p>
+</div>
+<p><strong>Required Options:</strong></p>
+<ul>
+<li><code>--pr &lt;pr_url&gt;</code>: GitHub Pull Request URL (e.g.,
+  <code>https://github.com/IBM/algorithm-nexus/pull/123</code>)</li>
+</ul>
+<p><strong>Optional Flags:</strong></p>
+<ul>
+<li><code>--remote &lt;path&gt;</code>: Execute operations on a remote Ray cluster using the
+  specified configuration file. When provided, the command automatically
+  installs the required benchmark packages in the Ray environment. Read
+  <a href="https://ibm.github.io/ado/getting-started/remote_run/"><code>Running ado on remote Ray clusters</code></a>
+  to discover the remote context configuration format.</li>
+<li><code>--context &lt;path&gt;</code>: Path to ADO context YAML file (samplestore context). Read
+  <a href="https://ibm.github.io/ado/resources/metastore/#working-with-contexts"><code>Working with Contexts</code></a>
+  to discover how to manage contexts.</li>
+<li><code>--dry-run</code>: List benchmark instances without executing them (dry run)</li>
+<li><code>--output-file &lt;path&gt;</code>: Output file path for execution results. If not
+  specified, results are printed to screen.</li>
+<li><code>-o, --output-format &lt;format&gt;</code>: Output format: 'json' or 'yaml'. Can be used
+  with or without <code>--output-file</code>. When used without <code>--output-file</code>, prints
+  formatted output to console. When used with <code>--output-file</code>, overrides format
+  inference from file extension (defaults to json).</li>
+</ul>
+<p><strong>Behavior:</strong></p>
+<p>The command automatically:</p>
+<ol>
+<li>Checks if the local repository is on the same commit as the PR</li>
+<li>If not, checks out the PR code to a temporary directory</li>
+<li>Analyzes the PR to find new or changed benchmark instances</li>
+<li>Executes the benchmarks (unless <code>--dry-run</code> is specified)</li>
+<li>Writes results to the output file</li>
+</ol>
+<p><strong>Benchmark Instance Detection:</strong></p>
+<p>A benchmark instance is detected as changed if any file within its directory is
+modified in the PR. This includes:</p>
+<ul>
+<li>Changes to <code>space.yaml</code> files</li>
+<li>Changes to any other files in the <code>benchmark_instances/&lt;instance-name&gt;/</code>
+  directory</li>
+<li>New benchmark instance directories (any new folder under
+  <code>benchmark_instances/</code>)</li>
+</ul>
+<p>The detection works for both:</p>
+<ul>
+<li><strong>Model-level instances</strong>:
+  <code>packages/&lt;package&gt;/models/&lt;model&gt;/benchmark_instances/&lt;instance&gt;/</code></li>
+<li><strong>Package-level instances</strong>:
+  <code>packages/&lt;package&gt;/benchmark_instances/&lt;instance&gt;/</code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When not running in remote mode (<code>--remote</code> not set), the benchmark instances will be executed with
+<code>ado</code> in the local environment. It is the user responsibility to ensure that the required
+benchmark packages are installed in the local python environment. Benchmark packages are listed for
+each nexus package in the <code>nexus.yaml</code> configuration.</p>
+</div>
+<p><strong>Examples:</strong></p>
+<p>List benchmarks in a PR without executing (dry run):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span>--dry-run
+</span></code></pre></div>
+<p>Execute benchmarks locally:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123
+</span></code></pre></div>
+<p>Execute benchmarks on a remote Ray cluster:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>--remote<span class="w"> </span>path/to/remote-context.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>--context<span class="w"> </span>path/to/ado-context.yaml
+</span></code></pre></div>
+<p>Execute benchmarks and save results to a file:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>--output-file<span class="w"> </span>benchmark_results.json
+</span></code></pre></div>
+<p>Execute benchmarks and save results in YAML format:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>--output-file<span class="w"> </span>results.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span>--output-format<span class="w"> </span>yaml
+</span></code></pre></div>
+<p><strong>Output Format:</strong></p>
+<p>By default, the command outputs results in a human-readable format showing the
+status, message, and IDs for each benchmark instance.</p>
+<p>To get structured output (JSON or YAML), use the <code>--output-format</code> option:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Print JSON to console</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>packages/terratorch/models/prithvi/benchmark_instances/flood-test<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>--output-format<span class="w"> </span>json
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># Print YAML to console</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>packages/terratorch/models/prithvi/benchmark_instances/flood-test<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span>--output-format<span class="w"> </span>yaml
+</span></code></pre></div>
+<p>The structured output (JSON) has the following format:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="nt">&quot;instances&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">        </span><span class="p">{</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">            </span><span class="nt">&quot;instance_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;packages/&lt;package&gt;/models/&lt;model&gt;/benchmark_instances/test_benchmark&quot;</span><span class="p">,</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">            </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;started&quot;</span><span class="p">,</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">            </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Successfully started on Ray cluster with job ID: raysubmit_snRVd4ZqTTKcaR3W | Space ID: space-a009d7-default&quot;</span><span class="p">,</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">            </span><span class="nt">&quot;space_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;space-a009d7-default&quot;</span><span class="p">,</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">            </span><span class="nt">&quot;operation_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;randomwalk-123456-default&quot;</span><span class="p">,</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">            </span><span class="nt">&quot;ray_job_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;raysubmit_snRVd4ZqTTKcaR3W&quot;</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">    </span><span class="p">]</span>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Status Values:</strong></p>
+<ul>
+<li><code>success</code>: Benchmark completed successfully (local execution)</li>
+<li><code>started</code>: Benchmark started on Ray cluster (remote execution)</li>
+<li><code>failed</code>: Benchmark execution failed</li>
+<li><code>unknown</code>: Status could not be determined</li>
+</ul>
+<p><strong>Execution Mode Comparison:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Local Mode (<code>--remote</code> not set)</th>
+<th>Remote Mode (<code>--remote</code> set)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td><code>success</code> (on success)<br><code>failed</code> (on error)<br><code>unknown</code> (if undetermined)</td>
+<td><code>started</code> (on success)<br><code>failed</code> (on error)<br><code>unknown</code> (if undetermined)</td>
+</tr>
+<tr>
+<td><code>operation_id</code></td>
+<td>ADO operation ID</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>ray_job_id</code></td>
+<td><code>null</code></td>
+<td>Ray job ID</td>
+</tr>
+<tr>
+<td>Notes</td>
+<td>Operation completes locally</td>
+<td>Job submitted to Ray cluster</td>
+</tr>
+</tbody>
+</table>
+<p>When <code>operation_id</code> is <code>null</code> (in remote mode), users will need to inspect the
+Ray job logs to extract the ADO operation ID once execution completes.</p>
+<p>In case of failure (either mode), the <code>status</code> will be <code>failed</code> and the
+<code>message</code> field will contain the reason for the failure.</p>
+<p><strong>Exit Codes:</strong></p>
+<ul>
+<li><code>0</code>: All benchmarks executed successfully</li>
+<li><code>1</code>: One or more benchmarks failed or an error occurred</li>
+<li><code>130</code>: Interrupted by user (Ctrl+C)</li>
+</ul>
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="validating-a-new-package">Validating a New Package<a class="headerlink" href="#validating-a-new-package" title="Permanent link">&para;</a></h3>
 <p>When creating a new Nexus package, validate its structure:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Navigate to your package directory</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">cd</span><span class="w"> </span>packages/my-new-package
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Validate the package</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>nexus<span class="w"> </span>validate<span class="w"> </span>.
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Navigate to your package directory</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nb">cd</span><span class="w"> </span>packages/my-new-package
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Validate the package</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>nexus<span class="w"> </span>validate<span class="w"> </span>.
 </span></code></pre></div>
 <h3 id="listing-available-resources">Listing Available Resources<a class="headerlink" href="#listing-available-resources" title="Permanent link">&para;</a></h3>
 <p>View all packages and their resources:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># List all packages</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># List all benchmark packages</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-packages
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># List all benchmark experiments</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># List all packages</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># List all benchmark packages</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-packages
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># List all benchmark experiments</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
 </span></code></pre></div>
 <h3 id="getting-package-information">Getting Package Information<a class="headerlink" href="#getting-package-information" title="Permanent link">&para;</a></h3>
 <p>Retrieve specific information about a package:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Get benchmark requirements for a package</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>nexus<span class="w"> </span>get<span class="w"> </span>benchmark-requirements<span class="w"> </span>my-package
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Get benchmark requirements for a package</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>nexus<span class="w"> </span>get<span class="w"> </span>benchmark-requirements<span class="w"> </span>my-package
 </span></code></pre></div>
+<h3 id="running-benchmarks-from-a-pull-request">Running Benchmarks from a Pull Request<a class="headerlink" href="#running-benchmarks-from-a-pull-request" title="Permanent link">&para;</a></h3>
+<p>Execute benchmarks from a GitHub PR to validate changes:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># First, check what benchmarks would be executed (dry run)</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--dry-run
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="c1"># Execute benchmarks locally</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="c1"># Execute benchmarks on a remote Ray cluster</span>
+</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a>nexus<span class="w"> </span>run<span class="w"> </span>benchmarks<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">  </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-13"><a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="w">  </span>--remote<span class="w"> </span>config/remote-context.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-14"><a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="w">  </span>--context<span class="w"> </span>config/ado-context.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-15"><a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="w">  </span>--output-file<span class="w"> </span>pr123_results.json
+</span></code></pre></div>
+<p>The command will:</p>
+<ol>
+<li>Automatically detect if your local repo is on the PR commit</li>
+<li>Checkout the PR code if needed (to a temporary directory)</li>
+<li>Find all new or changed benchmark instances</li>
+<li>Execute them and report results</li>
+</ol>
 <h2 id="exit-codes">Exit Codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
 <p>All commands follow standard Unix exit code conventions:</p>
 <ul>
