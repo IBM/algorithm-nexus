@@ -2982,10 +2982,10 @@ uvloop==0.22.1 ; platform_python_implementation != 'PyPy' and sys_platform != 'c
     --hash=sha256:e047cc068570bac9866237739607d1313b9253c3051ad84738cbb095be0537b2 \
     --hash=sha256:fe94b4564e865d968414598eea1a6de60adba0c040ba4ed05ac1300de402cd42
     # via uvicorn
-vllm==0.18.0 \
-    --hash=sha256:0bc51491598f4bcd161b693b27cbe2864082d6c49fa9065965d94b371f6ae8ef \
-    --hash=sha256:66a2c5bcf1bdf8de3e63b9fee067754068108cd510c65ffba70ff4368c33cba8 \
-    --hash=sha256:9a1bee091db8dbb4664a2a09cd9c61912e9912a44af1ce12b8593a231d05971c
+vllm==0.22.0 \
+    --hash=sha256:0fbe1ff32e9ad82c56b002de11b061ca6b5b8a256cd11473946d2222115ed267 \
+    --hash=sha256:6d41581a9e5288cd69278518a550c6d7ce510ae27a506556a3427d01284be7fe \
+    --hash=sha256:c387a977e35795e8f77b009e019e69722963819c26b55e4a679e09d4279ae35d
     # via
     #   algorithm-nexus
     #   terratorch

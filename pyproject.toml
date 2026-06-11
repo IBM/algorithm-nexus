@@ -19,7 +19,7 @@ nexus = "algorithm_nexus.cli:main"
 [project.optional-dependencies]
 candidate = [
   "terratorch[vllm]==1.2.7",
-  "vllm==0.19.1",
+  "vllm==0.22.0",
 ]
 cli = [
   "ado-core>=1.8.0",
@@ -35,7 +35,7 @@ ecosystem = [
 ]
 product = [
   "terratorch[vllm]==1.2.5",
-  "vllm==0.18.0",
+  "vllm==0.22.0",
 ]
 
 [dependency-groups]
