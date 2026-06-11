@@ -524,9 +524,9 @@ filelock==3.29.1 \
 flashinfer-cubin==0.6.6 \
     --hash=sha256:36508dfc792eb5ecfb15d2c140a7702812e1fa1ab0fb03929b2ed55e3e8191f3
     # via vllm
-flashinfer-python==0.6.6 \
-    --hash=sha256:0730ba7c7aad332961933bcebc5119762797161ede57d955f6fd199818ed1d92 \
-    --hash=sha256:078f158636969eec1a0d3dea19c3ca90b426b66df89bbf7b7b8276ce2ec08148
+flashinfer-python==0.6.12 \
+    --hash=sha256:0c7a01e586b4796810d974cbf13a9c0eb2ade6a94d12e3220cf7782a1c09b8d3 \
+    --hash=sha256:bed67f9c46d81dd22611dfef2787998fc412b2fe2648d9e7d336861dda912694
     # via vllm
 fonttools==4.63.0 \
     --hash=sha256:1e874792a8212b44583ea02189d9e693906b2f78b261f372f95d6c563210ac1d \
