@@ -197,8 +197,8 @@ charset-normalizer==3.4.7 \
     --hash=sha256:f59ad4c0e8f6bba240a9bb85504faa1ab438237199d4cce5f622761507b8f6a6 \
     --hash=sha256:fea24543955a6a729c45a73fe90e08c743f0b3334bbf3201e6c4bc1b0c7fa464
     # via requests
-clearml==1.18.0 \
-    --hash=sha256:fe53ffcfdb0799150ad5ae1ca95bdbd568e570cbde2e35a65474e36606a899d0
+clearml==2.0.2 \
+    --hash=sha256:6d17724eb297a71ff66fdcd157d0cfa7978c857bdce6b339ef1b3927a959c79a
     # via bmfm-targets
 click==8.4.1 \
     --hash=sha256:482be17c6991b8c19c5429a1e995d9b0efdbb63172824c41f99965dc0ade8ec2 \
