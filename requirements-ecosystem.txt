@@ -283,9 +283,9 @@ deprecated==1.3.1 \
     --hash=sha256:597bfef186b6f60181535a29fbe44865ce137a5079f295b479886c82729d5f3f \
     --hash=sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223
     # via numcodecs
-diffusers==0.37.1 \
-    --hash=sha256:0537c0b28cb53cf39d6195489bcf8f833986df556c10f5e28ab7427b86fc8b90 \
-    --hash=sha256:2346c21f77f835f273b7aacbaada1c34a596a3a2cc6ddc99d149efcd0ec298fa
+diffusers==0.38.0 \
+    --hash=sha256:18e53f9e539096320470f62c6360a6fd5727ff28cffda566265316e13fcdb612 \
+    --hash=sha256:1e094ec5c16f18c42fb89d37f07a94cf9aab3ebbe527ab059c609597b8857626
     # via terratorch
 donfig==0.8.1.post1 \
     --hash=sha256:2a3175ce74a06109ff9307d90a230f81215cbac9a751f4d1c6194644b8204f9d \
