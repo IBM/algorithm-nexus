@@ -671,9 +671,9 @@ legacy-api-wrap==1.5 \
     # via
     #   anndata
     #   scanpy
-lightly==1.5.22 \
-    --hash=sha256:58694433dd85ec371cb532dba3fea9465009d36e4afac67e53dbf464dba69e2a \
-    --hash=sha256:7bb8939976ea5e8fabb20d049812700d51e44f6461f15510a784afd1252a3dbd
+lightly==1.5.24 \
+    --hash=sha256:86b7d53146cb7b404a5d27f63b647a3fb34e2a1ea05bc231c6a188dd26dfffce \
+    --hash=sha256:be5934212f62188cf1a4670d3fd1816925ec6a089567e01904f618d8db64e084
     # via terratorch
 lightly-utils==0.0.2 \
     --hash=sha256:57eaa99044bbdab428cc67cd336491096cd406c21b50f15ce51150c1a10843e9 \
