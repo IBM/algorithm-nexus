@@ -395,8 +395,8 @@ cuda-bindings==12.9.4 \
 cuda-pathfinder==1.5.5 \
     --hash=sha256:0228c023f95d1480f143ef5c8922d27a2ab052087a942e81dc289c9eb8f91689
     # via cuda-bindings
-cuda-python==12.9.4 \
-    --hash=sha256:d2cacea882a69863f1e7d27ee71d75f0684f4c76910aff839067e4f89c902279
+cuda-python==12.9.7 \
+    --hash=sha256:23a1fc406d491eef7a7e985095725cb7b20a04a7bd9b7a66400e5c86e082e0aa
     # via nvidia-cutlass-dsl-libs-base
 cycler==0.12.1 \
     --hash=sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30 \
