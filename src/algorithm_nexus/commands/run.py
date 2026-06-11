@@ -53,7 +53,7 @@ def create_random_walk_operation_config(
     metadata_name: str = "randomwalk-all",
     metadata_description: str = "Perform a random walk on all points in a space",
     custom_metadata: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+) -> DiscoveryOperationResourceConfiguration:
     """Create a random walk operation configuration.
 
     Args:
@@ -63,7 +63,7 @@ def create_random_walk_operation_config(
         custom_metadata: Additional custom metadata fields
 
     Returns:
-        Dictionary representation of the operation configuration
+        DiscoveryOperationResourceConfiguration object
     """
     # Build metadata with custom fields
     labels = {}
@@ -90,14 +90,12 @@ def create_random_walk_operation_config(
         },
     )
 
-    config = DiscoveryOperationResourceConfiguration(
+    return DiscoveryOperationResourceConfiguration(
         metadata=metadata,
         spaces=[space_id],
         operation=operation,
         actuatorConfigurationIdentifiers=[],
     )
-
-    return config.model_dump(mode="json")
 
 
 class BenchmarkManager:
@@ -326,29 +324,22 @@ class BenchmarkManager:
 
             # Load space configuration using DiscoverySpaceConfiguration
             space_config_dict = yaml.safe_load(space_yaml_path.read_text())
-            space_config = DiscoverySpaceConfiguration(**space_config_dict)
+            space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
 
             # Extract experiment identifiers
-            experiment_ids = set()
-            if space_config.experiments:
-                # experiments can be either a list of ExperimentReference or MeasurementSpaceConfiguration
-                if isinstance(space_config.experiments, list):
-                    # List of ExperimentReference objects
-                    for exp in space_config.experiments:
-                        experiment_ids.add(exp.experimentIdentifier)
-                else:
-                    # MeasurementSpaceConfiguration with experiments field
-                    if (
-                        hasattr(space_config.experiments, "experiments")
-                        and space_config.experiments.experiments
-                    ):
-                        for exp in space_config.experiments.experiments:
-                            # Experiment objects have 'identifier' not 'experimentIdentifier'
-                            if hasattr(exp, "identifier"):
-                                experiment_ids.add(exp.identifier)
+            # Convert experiments to reference list for easier processing
+            space_config_with_refs = (
+                space_config.convert_experiments_to_reference_list()
+            )
 
-            if not experiment_ids:
+            if not space_config_with_refs.experiments:
                 return set()
+
+            # After conversion, experiments is a list of ExperimentReference
+            experiment_ids: set[str] = {
+                exp_ref.experimentIdentifier  # type: ignore[union-attr]
+                for exp_ref in space_config_with_refs.experiments  # type: ignore[union-attr]
+            }
 
             current_path = repo_root / instance_path
             nexus_yaml_path = None
@@ -374,7 +365,7 @@ class BenchmarkManager:
 
             # Load nexus config using AlgorithmNexusPackageConfig
             nexus_config_dict = yaml.safe_load(nexus_yaml_path.read_text())
-            nexus_config = AlgorithmNexusPackageConfig(**nexus_config_dict)
+            nexus_config = AlgorithmNexusPackageConfig.model_validate(nexus_config_dict)
 
             if nexus_config.package.benchmark_packages:
                 for bench_pkg in nexus_config.package.benchmark_packages:
@@ -433,7 +424,9 @@ class BenchmarkManager:
                     base_config_dict = (
                         yaml.safe_load(base_remote_config.read_text()) or {}
                     )
-                    base_remote_context = RemoteExecutionContext(**base_config_dict)
+                    base_remote_context = RemoteExecutionContext.model_validate(
+                        base_config_dict
+                    )
 
                     # Use base config for operation (without wait: true override)
                     remote_config_for_operation = base_remote_config
@@ -442,7 +435,9 @@ class BenchmarkManager:
                     base_config_dict = (
                         yaml.safe_load(self.remote_context_file.read_text()) or {}
                     )
-                    base_remote_context = RemoteExecutionContext(**base_config_dict)
+                    base_remote_context = RemoteExecutionContext.model_validate(
+                        base_config_dict
+                    )
 
                     # Use original config for operation
                     remote_config_for_operation = self.remote_context_file
@@ -550,7 +545,7 @@ class BenchmarkManager:
         space_config_dict = yaml.safe_load(space_yaml_path.read_text())
 
         # Parse the configuration using DiscoverySpaceConfiguration
-        space_config = DiscoverySpaceConfiguration(**space_config_dict)
+        space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
 
         # Generate descriptive name and description from instance path
         # Extract PR number from URL
@@ -650,7 +645,7 @@ class BenchmarkManager:
             )
 
         remote_config_dict = yaml.safe_load(base_config_path.read_text()) or {}
-        remote_config = RemoteExecutionContext(**remote_config_dict)
+        remote_config = RemoteExecutionContext.model_validate(remote_config_dict)
 
         # Get existing packages
         existing_pypi_packages = set(remote_config.packages.fromPyPI)
@@ -758,7 +753,7 @@ class BenchmarkManager:
                 custom_metadata=custom_metadata,
             )
 
-            yaml.dump(operation_config, tmp_file)
+            yaml.dump(operation_config.model_dump(mode="json"), tmp_file)
             tmp_file.flush()
             operation_config_path = tmp_file.name
 
@@ -887,6 +882,69 @@ class BenchmarkManager:
             self.cleanup_temp_dir()
 
 
+def _write_results_to_file(
+    results: dict[str, Any], output_file: Path, fmt: str
+) -> None:
+    """Write benchmark results to a file in the specified format."""
+    if fmt == "yaml":
+        output_file.write_text(
+            yaml.dump(results, default_flow_style=False, sort_keys=False)
+        )
+    else:
+        output_file.write_text(json.dumps(results, indent=2))
+
+    console.print(f"\nResults written to: {output_file}")
+
+
+def _print_structured_results(results: dict[str, Any], fmt: str) -> None:
+    """Print benchmark results in structured format (JSON or YAML)."""
+    console.print()  # Blank line before output
+    if fmt == "json":
+        console.print(json.dumps(results, indent=2))
+    else:  # yaml
+        console.print(yaml.dump(results, default_flow_style=False, sort_keys=False))
+
+
+def _get_status_display(status: str) -> str:
+    """Get color-coded status display string."""
+    status_colors = {
+        "success": "green",
+        "started": "cyan",
+        "failed": "red",
+    }
+    color = status_colors.get(status, "yellow")
+    return f"[{color}]{status}[/{color}]"
+
+
+def _print_human_readable_results(results: dict[str, Any]) -> None:
+    """Print benchmark results in human-readable format."""
+    console.print("\n[bold]Benchmark Execution Results[/bold]\n")
+
+    if not results.get("instances"):
+        console.print("[yellow]No benchmark instances found[/yellow]")
+        return
+
+    for instance in results["instances"]:
+        instance_path = instance.get("instance_path", "Unknown")
+        status = instance.get("status", "unknown")
+        message = instance.get("message", "")
+
+        console.print(f"[bold]{instance_path}[/bold]")
+        console.print(f"  Status: {_get_status_display(status)}")
+
+        if message:
+            console.print(f"  Message: {message}")
+
+        if instance.get("space_id"):
+            console.print(f"  Space ID: {instance['space_id']}")
+        if instance.get("operation_id"):
+            console.print(f"  Operation ID: {instance['operation_id']}")
+        if instance.get("ray_job_id"):
+            console.print(f"  Ray Job ID: {instance['ray_job_id']}")
+
+        console.print()  # Empty line between instances
+
+
 def run_benchmarks(
     pr: Annotated[
         str,
@@ -929,6 +987,8 @@ def run_benchmarks(
         typer.Option(
             "--output-file",
             help="Output file path for execution results. If not specified, results are printed to screen.",
+            dir_okay=False,
+            writable=True,
         ),
     ] = None,
     output_format: Annotated[
@@ -980,60 +1040,15 @@ def run_benchmarks(
 
         # Output results
         if output_file:
-            if fmt == "yaml":
-                output_file.write_text(
-                    yaml.dump(results, default_flow_style=False, sort_keys=False)
-                )
-            else:
-                output_file.write_text(json.dumps(results, indent=2))
-
-            console.print(f"\nResults written to: {output_file}")
+            # fmt is guaranteed to be a string when output_file is provided
+            # (either from output_format, file extension, or defaulted to "json")
+            if fmt is None:
+                fmt = "json"  # Default fallback (should never happen based on logic above)
+            _write_results_to_file(results, output_file, fmt)
+        elif fmt in ("json", "yaml"):
+            _print_structured_results(results, fmt)
         else:
-            # Print to console
-            if fmt == "json":
-                console.print()  # Blank line before output
-                console.print(json.dumps(results, indent=2))
-            elif fmt == "yaml":
-                console.print()  # Blank line before output
-                console.print(
-                    yaml.dump(results, default_flow_style=False, sort_keys=False)
-                )
-            else:
-                # Human-readable format
-                console.print("\n[bold]Benchmark Execution Results[/bold]\n")
-
-                if not results.get("instances"):
-                    console.print("[yellow]No benchmark instances found[/yellow]")
-                else:
-                    for instance in results["instances"]:
-                        instance_path = instance.get("instance_path", "Unknown")
-                        status = instance.get("status", "unknown")
-                        message = instance.get("message", "")
-
-                        # Color code based on status
-                        if status == "success":
-                            status_display = f"[green]{status}[/green]"
-                        elif status == "started":
-                            status_display = f"[cyan]{status}[/cyan]"
-                        elif status == "failed":
-                            status_display = f"[red]{status}[/red]"
-                        else:
-                            status_display = f"[yellow]{status}[/yellow]"
-
-                        console.print(f"[bold]{instance_path}[/bold]")
-                        console.print(f"  Status: {status_display}")
-
-                        if message:
-                            console.print(f"  Message: {message}")
-
-                        if instance.get("space_id"):
-                            console.print(f"  Space ID: {instance['space_id']}")
-                        if instance.get("operation_id"):
-                            console.print(f"  Operation ID: {instance['operation_id']}")
-                        if instance.get("ray_job_id"):
-                            console.print(f"  Ray Job ID: {instance['ray_job_id']}")
-
-                        console.print()  # Empty line between instances
+            _print_human_readable_results(results)
 
         if not dry_run and results.get("summary") and results["summary"]["failed"] > 0:
             raise typer.Exit(code=1)

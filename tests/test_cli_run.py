@@ -6,6 +6,7 @@
 from pathlib import Path
 
 import pytest
+from orchestrator.core.operation.config import DiscoveryOperationResourceConfiguration
 
 from algorithm_nexus.commands.run import (
     BenchmarkManager,
@@ -196,18 +197,20 @@ class TestCreateRandomWalkOperationConfig:
 
     def test_create_basic_config(self) -> None:
         """Test creating basic operation config."""
-        config = create_random_walk_operation_config(space_id="test-space-123")
+        config: DiscoveryOperationResourceConfiguration = (
+            create_random_walk_operation_config(space_id="test-space-123")
+        )
 
-        assert config["spaces"] == ["test-space-123"]
-        assert config["metadata"]["name"] == "randomwalk-all"
+        assert config.spaces == ["test-space-123"]
+        assert config.metadata.name == "randomwalk-all"
         assert (
-            config["metadata"]["description"]
+            config.metadata.description
             == "Perform a random walk on all points in a space"
         )
-        assert config["operation"]["module"]["operatorName"] == "random_walk"
-        assert config["operation"]["module"]["operationType"] == "search"
-        assert config["operation"]["parameters"]["numberEntities"] == "all"
-        assert config["operation"]["parameters"]["singleMeasurement"] is True
+        assert config.operation.module.operatorName == "random_walk"
+        assert config.operation.module.operationType == "search"
+        assert config.operation.parameters["numberEntities"] == "all"
+        assert config.operation.parameters["singleMeasurement"] is True
 
     def test_create_config_with_custom_metadata(self) -> None:
         """Test creating config with custom metadata."""
@@ -216,22 +219,25 @@ class TestCreateRandomWalkOperationConfig:
             "algorithm-nexus.instance_path": "packages/test/benchmark_instances/test",
         }
 
-        config = create_random_walk_operation_config(
-            space_id="test-space-123",
-            metadata_name="custom-walk",
-            metadata_description="Custom walk description",
-            custom_metadata=custom_meta,
+        config: DiscoveryOperationResourceConfiguration = (
+            create_random_walk_operation_config(
+                space_id="test-space-123",
+                metadata_name="custom-walk",
+                metadata_description="Custom walk description",
+                custom_metadata=custom_meta,
+            )
         )
 
-        assert config["metadata"]["name"] == "custom-walk"
-        assert config["metadata"]["description"] == "Custom walk description"
+        assert config.metadata.name == "custom-walk"
+        assert config.metadata.description == "Custom walk description"
         # Custom metadata is stored in the labels field
+        assert config.metadata.labels is not None
         assert (
-            config["metadata"]["labels"]["algorithm-nexus.pr_url"]
+            config.metadata.labels["algorithm-nexus.pr_url"]
             == "https://github.com/test/repo/pull/123"
         )
         assert (
-            config["metadata"]["labels"]["algorithm-nexus.instance_path"]
+            config.metadata.labels["algorithm-nexus.instance_path"]
             == "packages/test/benchmark_instances/test"
         )
 

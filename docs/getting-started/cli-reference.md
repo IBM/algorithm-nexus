@@ -292,14 +292,20 @@ file.
 - `failed`: Benchmark execution failed
 - `unknown`: Status could not be determined
 
-When running in local mode (`--remote` **not** set), the `ray_job_id` field will
-be `null` and status will be `success`, while the `operation_id` field will
-contain the `ado` operation ID. When running in remote mode (`--remote` set),
-the `ray_job_id` field will contain the Ray job ID, status will be `started`,
-and `operation_id` may be `null` initially. In the latter case, users will have
-to inspect the Ray job logs to extract the `ado` operation ID once execution
-completes. In case of failure, the message field will contain the reason for the
-failure.
+**Execution Mode Comparison:**
+
+| Field          | Local Mode (`--remote` not set)                                              | Remote Mode (`--remote` set)                                                 |
+| -------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `status`       | `success` (on success)<br>`failed` (on error)<br>`unknown` (if undetermined) | `started` (on success)<br>`failed` (on error)<br>`unknown` (if undetermined) |
+| `operation_id` | ADO operation ID                                                             | May be `null` initially\*                                                    |
+| `ray_job_id`   | `null`                                                                       | Ray job ID                                                                   |
+| Notes          | Operation completes locally                                                  | Job submitted to Ray cluster                                                 |
+
+When `operation_id` is `null` (in remote mode), users will need to inspect the
+Ray job logs to extract the ADO operation ID once execution completes.
+
+In case of failure (either mode), the `status` will be `failed` and the
+`message` field will contain the reason for the failure.
 
 **Exit Codes:**
 
