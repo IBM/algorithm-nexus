@@ -28,6 +28,7 @@ try:
         PackageConfiguration,
         RemoteExecutionContext,
     )
+    from orchestrator.utilities.output import pydantic_model_as_yaml
     from rich.console import Console
 except ImportError:
     print(
@@ -458,12 +459,10 @@ class BenchmarkManager:
                     delete=False,
                     prefix="remote_config_space_",
                 ) as tmp_file:
-                    yaml.dump(
-                        space_remote_context.model_dump(mode="json"),
-                        tmp_file,
-                        default_flow_style=False,
-                    )
                     remote_config_for_space = Path(tmp_file.name)
+                    remote_config_for_space.write_text(
+                        pydantic_model_as_yaml(space_remote_context)
+                    )
                     temp_remote_configs.append(remote_config_for_space)
 
             console.print(f"  Creating ADO discoveryspace for: {instance_path}")
@@ -575,8 +574,8 @@ class BenchmarkManager:
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
-            yaml.dump(space_config.model_dump(mode="json"), tmp_file)
             temp_space_path = tmp_file.name
+            Path(temp_space_path).write_text(pydantic_model_as_yaml(space_config))
 
             cmd = ["ado"]
 
@@ -694,12 +693,9 @@ class BenchmarkManager:
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=False, prefix="remote_config_"
         ) as tmp_file:
-            yaml.dump(
-                remote_config.model_dump(mode="json"),
-                tmp_file,
-                default_flow_style=False,
-            )
-            return Path(tmp_file.name)
+            temp_path = Path(tmp_file.name)
+            temp_path.write_text(pydantic_model_as_yaml(remote_config))
+            return temp_path
 
     def _create_operation(
         self,
@@ -753,9 +749,10 @@ class BenchmarkManager:
                 custom_metadata=custom_metadata,
             )
 
-            yaml.dump(operation_config.model_dump(mode="json"), tmp_file)
-            tmp_file.flush()
             operation_config_path = tmp_file.name
+            Path(operation_config_path).write_text(
+                pydantic_model_as_yaml(operation_config)
+            )
 
             cmd = ["ado"]
 
@@ -882,27 +879,26 @@ class BenchmarkManager:
             self.cleanup_temp_dir()
 
 
+def _format_results(results: dict[str, Any], fmt: str) -> str:
+    """Format benchmark results as JSON or YAML string."""
+    if fmt == "json":
+        return json.dumps(results, indent=2)
+    else:  # yaml
+        return yaml.safe_dump(results, default_flow_style=False, sort_keys=False)
+
+
 def _write_results_to_file(
     results: dict[str, Any], output_file: Path, fmt: str
 ) -> None:
     """Write benchmark results to a file in the specified format."""
-    if fmt == "yaml":
-        output_file.write_text(
-            yaml.dump(results, default_flow_style=False, sort_keys=False)
-        )
-    else:
-        output_file.write_text(json.dumps(results, indent=2))
-
+    output_file.write_text(_format_results(results, fmt))
     console.print(f"\nResults written to: {output_file}")
 
 
 def _print_structured_results(results: dict[str, Any], fmt: str) -> None:
     """Print benchmark results in structured format (JSON or YAML)."""
     console.print()  # Blank line before output
-    if fmt == "json":
-        console.print(json.dumps(results, indent=2))
-    else:  # yaml
-        console.print(yaml.dump(results, default_flow_style=False, sort_keys=False))
+    console.print(_format_results(results, fmt))
 
 
 def _get_status_display(status: str) -> str:
