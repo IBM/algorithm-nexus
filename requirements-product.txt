@@ -308,9 +308,9 @@ colorama==0.4.6 ; sys_platform == 'win32' \
     #   tqdm
     #   typer
     #   uvicorn
-compressed-tensors==0.13.0 \
-    --hash=sha256:23893824d3498ea3f1a829f14a8fa85f9a5e76a34c711a038b8d7c619ca9a67c \
-    --hash=sha256:3518799c9baf034eb642efb551db6b0537b8713d45a64fe4def26f7f8d6cabec
+compressed-tensors==0.17.1 \
+    --hash=sha256:a651b9f3d1e77d1f7d7c2887141e316fdc5a2994660a8291baa064d28baf04a7 \
+    --hash=sha256:c6a9e96361564d1b66bde9ae236a7176c139675a8f863d8f26274cbda4932db7
     # via vllm
 contourpy==1.3.3 \
     --hash=sha256:023b44101dfe49d7d53932be418477dba359649246075c996866106da069af69 \
