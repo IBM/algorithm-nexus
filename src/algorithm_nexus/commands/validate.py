@@ -22,7 +22,13 @@ except ImportError:
     )
     sys.exit(1)
 
-from algorithm_nexus.commands.utils import ValidationErrorCollector, load_yaml_file
+from algorithm_nexus.commands.utils import (
+    ValidationErrorCollector,
+    get_status_color,
+    load_yaml_file,
+    print_structured_results,
+    validate_output_format,
+)
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
@@ -274,7 +280,7 @@ def validate_package_directory(
             )
 
 
-def validate(
+def validate_package(
     package_path: Annotated[
         Path,
         typer.Argument(
@@ -315,6 +321,203 @@ def validate(
             border_style="green",
         )
     )
+
+
+def _print_validation_table(
+    all_results: list[dict[str, Any]], total: int, total_success: int, total_failed: int
+) -> None:
+    """Print validation results in human-readable table format.
+
+    Args:
+        all_results: List of validation result dictionaries
+        total: Total number of instances
+        total_success: Number of successful validations
+        total_failed: Number of failed validations
+    """
+    from rich.table import Table
+
+    # Output results summary
+    console.print("\n" + "=" * 60)
+    console.print("[bold]Validation Summary:[/bold]")
+    console.print(f"  Total instances: {total}")
+    console.print(f"  Successful: {total_success}")
+    console.print(f"  Failed: {total_failed}")
+    console.print("=" * 60)
+
+    table = Table(title="\nValidation Results", show_header=True)
+    table.add_column("Instance", style="cyan")
+    table.add_column("Status", style="bold")
+    table.add_column("Issues")
+
+    for result in all_results:
+        # Use shared status color function
+        status = result["status"]
+        color = get_status_color(status)
+        status_style = (
+            f"[{color}]✓ PASS[/{color}]"
+            if status == "success"
+            else f"[{color}]✗ FAIL[/{color}]"
+        )
+        issues = []
+        if result.get("errors"):
+            issues.extend([f"E: {e}" for e in result["errors"]])
+        if result.get("warnings"):
+            issues.extend([f"W: {w}" for w in result["warnings"]])
+        issues_str = "\n".join(issues) if issues else "-"
+
+        table.add_row(
+            result["instance"],
+            status_style,
+            issues_str,
+        )
+
+    console.print(table)
+
+
+def validate_benchmarks(
+    pr_url: Annotated[
+        str | None,
+        typer.Option(
+            "--pr",
+            help="GitHub Pull Request URL (e.g., https://github.com/IBM/algorithm-nexus/pull/123). "
+            "If not provided, validates all benchmark instances.",
+        ),
+    ] = None,
+    packages_root: Annotated[
+        Path,
+        typer.Option(
+            "--packages-root",
+            help="Path to packages directory",
+        ),
+    ] = Path("./packages"),
+    package: Annotated[
+        str | None,
+        typer.Option(
+            "--package",
+            help="Validate only benchmark instances from a specific package",
+        ),
+    ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            help="Show detailed validation output",
+        ),
+    ] = False,
+    fail_fast: Annotated[
+        bool,
+        typer.Option(
+            "--fail-fast",
+            help="Stop validation on first error",
+        ),
+    ] = False,
+    output_format: Annotated[
+        str | None,
+        typer.Option(
+            "-o",
+            "--output-format",
+            help="Output format: 'json', 'yaml', or 'table' (default: table)",
+        ),
+    ] = None,
+) -> None:
+    """Validate benchmark instances.
+
+    This command supports three modes:
+    1. PR mode: Validate instances modified in a PR (provide pr_url)
+    2. All mode: Validate all benchmark instances (no pr_url)
+    3. Package mode: Validate instances from a specific package (use --package)
+
+    The command:
+    - Installs required benchmark packages in isolated virtual environments
+    - Validates each instance with ADO dry-run
+    - Reports validation results
+    """
+    from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+    # Validate output format if specified
+    if output_format:
+        validate_output_format(
+            output_format, allow_yaml=True, allow_csv=False, allow_table=True
+        )
+
+    # Validate package exists if package filter is specified
+    if package and not pr_url:
+        package_path = packages_root / package
+        if not package_path.is_dir():
+            console.print(
+                f"[red]Error:[/red] Package '{package}' not found in {packages_root.resolve()}"
+            )
+            console.print(
+                "\nTo see available packages, run: [cyan]nexus list packages[/cyan]"
+            )
+            raise typer.Exit(code=1)
+
+    try:
+        # Create BenchmarkManager based on mode
+        if pr_url:
+            # PR mode
+            manager = BenchmarkManager(pr_url=pr_url, execute=False)
+            results = manager.validate(
+                packages_root=None,
+                package_filter=None,
+                verbose=verbose,
+                fail_fast=fail_fast,
+            )
+        else:
+            # All or package mode
+            # Create a dummy manager for validation (no PR URL needed)
+            manager = BenchmarkManager(pr_url="", execute=False)
+            results = manager.validate(
+                packages_root=packages_root,
+                package_filter=package,
+                verbose=verbose,
+                fail_fast=fail_fast,
+            )
+
+        # Extract results
+        all_results = results.get("instances", [])
+        summary = results.get("summary", {})
+        total_success = summary.get("successful", 0)
+        total_failed = summary.get("failed", 0)
+        total = summary.get("total", len(all_results))
+
+        # Determine output format (default to table for human-readable)
+        fmt = output_format or "table"
+
+        # Format output based on requested format
+        if fmt in ("json", "yaml"):
+            # Structured output (JSON or YAML)
+            output_data = {
+                "pr_url": pr_url,
+                "summary": {
+                    "total": total,
+                    "successful": total_success,
+                    "failed": total_failed,
+                },
+                "instances": all_results,
+            }
+            print_structured_results(output_data, fmt)
+        else:
+            # Human-readable table output (default)
+            _print_validation_table(all_results, total, total_success, total_failed)
+
+        # Exit with error if any validation failed
+        if total_failed > 0:
+            raise typer.Exit(code=1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(code=130)
+    except typer.Exit:
+        # Re-raise typer.Exit to preserve exit codes
+        raise
+    except Exception as e:
+        console.print(f"\n[red]Error:[/red] {e}")
+        if verbose:
+            import traceback
+
+            console.print(traceback.format_exc())
+        raise typer.Exit(code=1)
 
 
 # Made with Bob
