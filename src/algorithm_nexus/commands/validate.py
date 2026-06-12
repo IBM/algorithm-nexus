@@ -380,6 +380,18 @@ def validate_benchmarks(
 
     from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
 
+    # Validate package exists if package filter is specified
+    if package and not pr_url:
+        package_path = packages_root / package
+        if not package_path.is_dir():
+            console.print(
+                f"[red]Error:[/red] Package '{package}' not found in {packages_root.resolve()}"
+            )
+            console.print(
+                "\nTo see available packages, run: [cyan]nexus list packages[/cyan]"
+            )
+            raise typer.Exit(code=1)
+
     try:
         # Create BenchmarkManager based on mode
         if pr_url:

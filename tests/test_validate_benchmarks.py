@@ -259,5 +259,67 @@ class TestValidateBenchmarksCommand:
         )
         # If we get here, the test passed (no exception raised)
 
+    def test_validate_benchmarks_nonexistent_package(self, tmp_path, capsys):
+        """Test validate benchmarks with nonexistent package."""
+        import typer
+
+        from algorithm_nexus.commands.validate import validate_benchmarks
+
+        # Create a packages directory with some packages
+        packages_root = tmp_path / "packages"
+        packages_root.mkdir()
+        (packages_root / "existing-package").mkdir()
+
+        # Should raise typer.Exit when package doesn't exist
+        with pytest.raises(typer.Exit) as exc_info:
+            validate_benchmarks(
+                pr_url=None,
+                packages_root=packages_root,
+                package="nonexistent-package",
+                verbose=False,
+                fail_fast=False,
+                output_format="table",
+            )
+        assert exc_info.value.exit_code == 1
+
+        # Verify error message includes suggestion to use nexus list packages
+        captured = capsys.readouterr()
+        assert "nexus list packages" in captured.out
+
+    def test_validate_benchmarks_existing_package(self, tmp_path):
+        """Test validate benchmarks with existing package."""
+        from algorithm_nexus.commands.validate import validate_benchmarks
+
+        # Create a packages directory with the target package
+        packages_root = tmp_path / "packages"
+        packages_root.mkdir()
+        (packages_root / "test-package").mkdir()
+
+        # Mock BenchmarkManager to avoid actual validation
+        with patch(
+            "algorithm_nexus.commands.benchmark_manager.BenchmarkManager"
+        ) as mock_manager_class:
+            mock_manager = MagicMock()
+            mock_manager.validate.return_value = {
+                "instances": [],
+                "summary": {
+                    "total": 0,
+                    "successful": 0,
+                    "failed": 0,
+                },
+            }
+            mock_manager_class.return_value = mock_manager
+
+            # Should not raise an error when package exists
+            validate_benchmarks(
+                pr_url=None,
+                packages_root=packages_root,
+                package="test-package",
+                verbose=False,
+                fail_fast=False,
+                output_format="table",
+            )
+            # If we get here, the test passed (no exception raised)
+
 
 # Made with Bob
