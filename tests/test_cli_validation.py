@@ -68,7 +68,7 @@ class TestValidPackageStructure:
         create_valid_nexus_yaml(temp_package_dir)
         create_valid_model_structure(temp_package_dir)
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 0
         assert "Validation Successful" in result.stdout
@@ -92,7 +92,7 @@ class TestValidPackageStructure:
 
             (model_dir / "usage.md").write_text("# Usage")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 0
         assert "Validation Successful" in result.stdout
@@ -118,7 +118,7 @@ class TestDuplicateHuggingFaceModelIds:
                     """)
             )
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "Duplicate HuggingFace model ID" in result.stdout
@@ -143,7 +143,7 @@ class TestDuplicateHuggingFaceModelIds:
                     """)
             )
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 0
         assert "Validation Successful" in result.stdout
@@ -174,7 +174,7 @@ class TestDuplicateHuggingFaceModelIds:
                 """)
         )
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         # Should report the duplicate even if there are other errors
@@ -193,7 +193,7 @@ class TestMissingModelConfig:
         model_dir.mkdir(parents=True)
         (model_dir / "usage.md").write_text("# Usage")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "Missing YAML file" in result.stdout
@@ -204,7 +204,7 @@ class TestMissingPackageConfig:
 
     def test_missing_nexus_yaml(self, temp_package_dir: Path) -> None:
         """Test that missing nexus.yaml is detected."""
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "nexus.yaml" in result.stdout
@@ -214,7 +214,7 @@ class TestMissingPackageConfig:
         nexus_yaml = temp_package_dir / "nexus.yaml"
         nexus_yaml.write_text("")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "empty" in result.stdout.lower()
@@ -228,7 +228,7 @@ class TestMalformedPackageConfig:
         nexus_yaml = temp_package_dir / "nexus.yaml"
         nexus_yaml.write_text("package:\n  name: [invalid yaml")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
 
@@ -237,7 +237,7 @@ class TestMalformedPackageConfig:
         nexus_yaml = temp_package_dir / "nexus.yaml"
         nexus_yaml.write_text("- item1\n- item2\n")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "YAML mapping at the top level" in result.stdout
@@ -248,7 +248,7 @@ class TestMalformedPackageConfig:
         nexus_yaml = temp_package_dir / "nexus.yaml"
         nexus_yaml.write_text("just a string\n")
 
-        result = runner.invoke(app, ["validate", str(temp_package_dir)])
+        result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
         assert "YAML mapping at the top level" in result.stdout

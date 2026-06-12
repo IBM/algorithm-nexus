@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator
 
@@ -187,6 +187,33 @@ class AlgorithmNexusPackageConfig(BaseModel):
     package: Annotated[
         NexusPackageInfo, Field(description="Package-level configuration")
     ]
+
+
+class ValidationResult(BaseModel):
+    """Result of validating a benchmark instance."""
+
+    success: Annotated[bool, Field(description="Whether validation succeeded")]
+    instance_path: Annotated[str, Field(description="Path to the benchmark instance")]
+    errors: Annotated[list[str], Field(description="List of validation errors")]
+    warnings: Annotated[list[str], Field(description="List of validation warnings")]
+
+    @property
+    def status(self) -> str:
+        """Computed status based on success field."""
+        return "success" if self.success else "failed"
+
+    def to_summary_dict(self) -> dict[str, Any]:
+        """Convert to summary dictionary.
+
+        Returns:
+            Dictionary with instance, status, errors, and warnings
+        """
+        return {
+            "instance": self.instance_path,
+            "status": self.status,
+            "errors": self.errors,
+            "warnings": self.warnings,
+        }
 
 
 class BenchmarkExecutionResult(BaseModel):

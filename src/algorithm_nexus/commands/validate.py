@@ -274,7 +274,7 @@ def validate_package_directory(
             )
 
 
-def validate(
+def validate_package(
     package_path: Annotated[
         Path,
         typer.Argument(
@@ -315,6 +315,165 @@ def validate(
             border_style="green",
         )
     )
+
+
+def validate_benchmarks(
+    pr_url: Annotated[
+        str | None,
+        typer.Option(
+            "--pr",
+            help="GitHub Pull Request URL (e.g., https://github.com/IBM/algorithm-nexus/pull/123). "
+            "If not provided, validates all benchmark instances.",
+        ),
+    ] = None,
+    packages_root: Annotated[
+        Path,
+        typer.Option(
+            "--packages-root",
+            help="Path to packages directory",
+        ),
+    ] = Path("./packages"),
+    package: Annotated[
+        str | None,
+        typer.Option(
+            "--package",
+            help="Validate only benchmark instances from a specific package",
+        ),
+    ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            help="Show detailed validation output",
+        ),
+    ] = False,
+    fail_fast: Annotated[
+        bool,
+        typer.Option(
+            "--fail-fast",
+            help="Stop validation on first error",
+        ),
+    ] = False,
+    output_format: Annotated[
+        str,
+        typer.Option(
+            "--output-format",
+            help="Output format (table or json)",
+        ),
+    ] = "table",
+) -> None:
+    """Validate benchmark instances.
+
+    This command supports three modes:
+    1. PR mode: Validate instances modified in a PR (provide pr_url)
+    2. All mode: Validate all benchmark instances (no pr_url)
+    3. Package mode: Validate instances from a specific package (use --package)
+
+    The command:
+    - Installs required benchmark packages in isolated virtual environments
+    - Validates each instance with ADO dry-run
+    - Reports validation results
+    """
+    import json
+
+    from rich.table import Table
+
+    from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+    try:
+        # Create BenchmarkManager based on mode
+        if pr_url:
+            # PR mode
+            manager = BenchmarkManager(pr_url=pr_url, execute=False)
+            results = manager.validate(
+                packages_root=None,
+                package_filter=None,
+                verbose=verbose,
+                fail_fast=fail_fast,
+            )
+        else:
+            # All or package mode
+            # Create a dummy manager for validation (no PR URL needed)
+            manager = BenchmarkManager(pr_url="", execute=False)
+            results = manager.validate(
+                packages_root=packages_root,
+                package_filter=package,
+                verbose=verbose,
+                fail_fast=fail_fast,
+            )
+
+        # Extract results
+        all_results = results.get("instances", [])
+        summary = results.get("summary", {})
+        total_success = summary.get("successful", 0)
+        total_failed = summary.get("failed", 0)
+        total = summary.get("total", len(all_results))
+
+        # Output results summary
+        console.print("\n" + "=" * 60)
+        console.print("[bold]Validation Summary:[/bold]")
+        console.print(f"  Total instances: {total}")
+        console.print(f"  Successful: {total_success}")
+        console.print(f"  Failed: {total_failed}")
+        console.print("=" * 60)
+
+        # Format output based on requested format
+        if output_format == "json":
+            json_output = json.dumps(
+                {
+                    "pr_url": pr_url,
+                    "total": total,
+                    "successful": total_success,
+                    "failed": total_failed,
+                    "results": all_results,
+                },
+                indent=2,
+            )
+            console.print("\n" + json_output)
+        elif output_format == "table":
+            table = Table(title="\nValidation Results", show_header=True)
+            table.add_column("Instance", style="cyan")
+            table.add_column("Status", style="bold")
+            table.add_column("Issues")
+
+            for result in all_results:
+                status_style = (
+                    "[green]✓ PASS[/green]"
+                    if result["status"] == "success"
+                    else "[red]✗ FAIL[/red]"
+                )
+                issues = []
+                if result.get("errors"):
+                    issues.extend([f"E: {e}" for e in result["errors"]])
+                if result.get("warnings"):
+                    issues.extend([f"W: {w}" for w in result["warnings"]])
+                issues_str = "\n".join(issues) if issues else "-"
+
+                table.add_row(
+                    result["instance"],
+                    status_style,
+                    issues_str,
+                )
+
+            console.print(table)
+
+        # Exit with error if any validation failed
+        if total_failed > 0:
+            raise typer.Exit(code=1)
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted by user[/yellow]")
+        raise typer.Exit(code=130)
+    except typer.Exit:
+        # Re-raise typer.Exit to preserve exit codes
+        raise
+    except Exception as e:
+        console.print(f"\n[red]Error:[/red] {e}")
+        if verbose:
+            import traceback
+
+            console.print(traceback.format_exc())
+        raise typer.Exit(code=1)
 
 
 # Made with Bob

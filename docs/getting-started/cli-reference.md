@@ -33,31 +33,126 @@ nexus --version
 
 ## nexus validate
 
+Validate various aspects of Nexus packages.
+
+### Subcommands
+
+#### nexus validate package
+
 Validate the structure and configuration of a Nexus package directory.
 
-### Usage
+**Usage:**
 
 ```bash
-nexus validate <package_path>
+nexus validate package <package_path>
 ```
 
-### Arguments
+**Arguments:**
 
 - `package_path` (required): Path to a Nexus package directory to validate
 
-### Examples
+**Examples:**
 
 Validate a package in the current directory:
 
 ```bash
-nexus validate .
+nexus validate package .
 ```
 
 Validate a package at a specific path:
 
 ```bash
-nexus validate packages/my-package
+nexus validate package packages/my-package
 ```
+
+#### nexus validate benchmarks
+
+Validate benchmark instances in three modes: PR changes, all instances, or
+specific package.
+
+**Usage:**
+
+```bash
+# Validate PR changes
+nexus validate benchmarks --pr <pr_url> [OPTIONS]
+
+# Validate all benchmark instances
+nexus validate benchmarks [OPTIONS]
+
+# Validate specific package
+nexus validate benchmarks --package <package_name> [OPTIONS]
+```
+
+**Options:**
+
+- `--pr URL`: GitHub Pull Request URL (e.g.,
+  `https://github.com/IBM/algorithm-nexus/pull/123`). If not provided, validates
+  all benchmark instances.
+- `--packages-root PATH`: Path to packages directory (default: `./packages`)
+- `--package NAME`: Validate only benchmark instances from a specific package
+- `--verbose`: Show detailed validation output
+- `--fail-fast`: Stop validation on first error
+- `--output-format [table|json]`: Output format (default: `table`)
+
+**Examples:**
+
+Validate benchmarks in a PR:
+
+```bash
+nexus validate benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123
+```
+
+Validate all benchmark instances:
+
+```bash
+nexus validate benchmarks
+```
+
+Validate only instances from a specific package:
+
+```bash
+nexus validate benchmarks --package terratorch
+```
+
+Validate with verbose output:
+
+```bash
+nexus validate benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 --verbose
+```
+
+Validate and stop on first error:
+
+```bash
+nexus validate benchmarks --fail-fast
+```
+
+Get results in JSON format:
+
+```bash
+nexus validate benchmarks --output-format json
+```
+
+**How it works:**
+
+1. **Discovery**: Finds benchmark instances based on mode:
+    - PR mode: Analyzes PR diff to find modified instances
+    - All mode: Scans packages directory for all instances
+    - Package mode: Finds instances in specified package
+2. **Dependency Resolution**: Groups instances by required benchmark packages
+3. **Isolation**: Creates temporary virtual environments for each dependency set
+4. **Installation**: Installs required benchmark packages using `uv` (10-100x
+   faster) or `pip`
+5. **Validation**: Validates each instance's `space.yaml` structure using
+   Pydantic models and ADO dry-run
+6. **Reporting**: Displays results in table or JSON format with validation
+   status, errors, and warnings
+
+**Requirements:**
+
+- For PR mode: GitHub CLI (`gh`) must be installed and authenticated
+- `uv` is recommended for faster package installation (optional, falls back to
+  `pip`)
+- ADO must be included as a dependency in benchmark packages
 
 ## nexus list
 
