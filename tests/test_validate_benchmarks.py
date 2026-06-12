@@ -99,14 +99,18 @@ class TestAdoValidator:
 
     def test_validate_space_yaml_syntax_missing_file(self):
         """Test validation with missing file."""
-        result = validate_space_yaml_syntax(Path("/nonexistent/space.yaml"))
+        result = validate_space_yaml_syntax(
+            base_path=Path("/nonexistent"), instance_path="benchmark_instances/test"
+        )
         assert not result.success
         assert len(result.errors) > 0
         assert "not found" in result.errors[0].lower()
 
     def test_validate_space_yaml_syntax_valid(self, tmp_path):
         """Test validation with valid space.yaml."""
-        space_yaml = tmp_path / "space.yaml"
+        instance_dir = tmp_path / "test_instance"
+        instance_dir.mkdir()
+        space_yaml = instance_dir / "space.yaml"
         space_yaml.write_text(
             """
 entitySpace:
@@ -120,22 +124,30 @@ experiments:
 """
         )
 
-        result = validate_space_yaml_syntax(space_yaml)
+        result = validate_space_yaml_syntax(
+            base_path=tmp_path, instance_path="test_instance"
+        )
         assert result.success
         assert len(result.errors) == 0
 
     def test_validate_space_yaml_syntax_invalid_yaml(self, tmp_path):
         """Test validation with invalid YAML."""
-        space_yaml = tmp_path / "space.yaml"
+        instance_dir = tmp_path / "test_instance"
+        instance_dir.mkdir()
+        space_yaml = instance_dir / "space.yaml"
         space_yaml.write_text("invalid: yaml: content:")
 
-        result = validate_space_yaml_syntax(space_yaml)
+        result = validate_space_yaml_syntax(
+            base_path=tmp_path, instance_path="test_instance"
+        )
         assert not result.success
         assert len(result.errors) > 0
 
     def test_validate_space_yaml_syntax_missing_experiments(self, tmp_path):
         """Test validation with missing experiments section."""
-        space_yaml = tmp_path / "space.yaml"
+        instance_dir = tmp_path / "test_instance"
+        instance_dir.mkdir()
+        space_yaml = instance_dir / "space.yaml"
         space_yaml.write_text(
             """
 entitySpace:
@@ -143,7 +155,9 @@ entitySpace:
 """
         )
 
-        result = validate_space_yaml_syntax(space_yaml)
+        result = validate_space_yaml_syntax(
+            base_path=tmp_path, instance_path="test_instance"
+        )
         # Should succeed but have warnings
         assert result.success
         assert len(result.warnings) > 0
@@ -235,17 +249,15 @@ class TestValidateBenchmarksCommand:
 
         from algorithm_nexus.commands.validate import validate_benchmarks
 
-        # Should complete successfully
-        with pytest.raises(SystemExit) as exc_info:
-            validate_benchmarks(
-                pr_url="https://github.com/test/repo/pull/1",
-                packages_root=Path("./packages"),
-                verbose=False,
-                fail_fast=False,
-                output_format="table",
-            )
-        # Exit code 0 or None means success
-        assert exc_info.value.code in (0, None)
+        # Should complete successfully without raising SystemExit (only raises on failure)
+        validate_benchmarks(
+            pr_url="https://github.com/test/repo/pull/1",
+            packages_root=Path("./packages"),
+            verbose=False,
+            fail_fast=False,
+            output_format="table",
+        )
+        # If we get here, the test passed (no exception raised)
 
 
 # Made with Bob

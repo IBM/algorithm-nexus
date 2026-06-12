@@ -1176,11 +1176,13 @@ class BenchmarkManager:
                             continue
 
                     # Validate this instance
-                    space_yaml_path = self.repo_root / instance / "space.yaml"
-
                     console.print("  Running validation...")
 
-                    result = validate_with_ado(space_yaml_path, venv_path)
+                    result = validate_with_ado(
+                        base_path=self.repo_root,
+                        instance_path=str(instance),
+                        venv_path=venv_path,
+                    )
 
                     # Convert ValidationResult to summary dict
                     all_results.append(result.to_summary_dict())

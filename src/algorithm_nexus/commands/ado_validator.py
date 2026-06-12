@@ -28,11 +28,12 @@ from algorithm_nexus.models import ValidationResult
 console = Console()
 
 
-def validate_space_yaml_syntax(space_yaml_path: Path) -> ValidationResult:
+def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> ValidationResult:
     """Validate space.yaml YAML syntax and basic structure using DiscoverySpaceConfiguration.
 
     Args:
-        space_yaml_path: Path to space.yaml file
+        base_path: Base path (e.g., repo root or temp directory)
+        instance_path: Relative path to the benchmark instance from base_path
 
     Returns:
         ValidationResult with syntax validation results
@@ -40,13 +41,16 @@ def validate_space_yaml_syntax(space_yaml_path: Path) -> ValidationResult:
     errors = []
     warnings = []
 
+    # Construct full path to space.yaml
+    space_yaml_path = base_path / instance_path / "space.yaml"
+
     try:
         # Check if file exists
-        if not space_yaml_path.exists():
+        if not space_yaml_path.is_file():
             errors.append(f"File not found: {space_yaml_path}")
             return ValidationResult(
                 success=False,
-                instance_path=str(space_yaml_path.parent),
+                instance_path=instance_path,
                 errors=errors,
                 warnings=warnings,
             )
@@ -55,15 +59,15 @@ def validate_space_yaml_syntax(space_yaml_path: Path) -> ValidationResult:
         space_config_dict = yaml.safe_load(space_yaml_path.read_text())
 
         # Validate using DiscoverySpaceConfiguration
-        DiscoverySpaceConfiguration.model_validate(space_config_dict)
+        space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
 
-        # Check for optional but common sections
-        if not space_config_dict.get("experiments"):
+        # Check for optional but common sections using the validated model
+        if not space_config.experiments:
             warnings.append("No 'experiments' section found in space.yaml")
-        elif len(space_config_dict.get("experiments", [])) == 0:
+        elif len(space_config.experiments) == 0:
             warnings.append("'experiments' list is empty")
 
-        if "entitySpace" not in space_config_dict:
+        if not space_config.entitySpace:
             warnings.append("No 'entitySpace' section found in space.yaml")
 
     except yaml.YAMLError as e:
@@ -79,21 +83,23 @@ def validate_space_yaml_syntax(space_yaml_path: Path) -> ValidationResult:
 
     return ValidationResult(
         success=len(errors) == 0,
-        instance_path=str(space_yaml_path.parent),
+        instance_path=instance_path,
         errors=errors,
         warnings=warnings,
     )
 
 
 def validate_with_ado(
-    space_yaml_path: Path,
+    base_path: Path,
+    instance_path: str,
     venv_path: Path,
     dry_run: bool = True,
 ) -> ValidationResult:
     """Run ADO validation in isolated virtual environment.
 
     Args:
-        space_yaml_path: Path to space.yaml file
+        base_path: Base path (e.g., repo root or temp directory)
+        instance_path: Relative path to the benchmark instance from base_path
         venv_path: Path to virtual environment with ADO installed
         dry_run: Whether to perform dry-run validation (default: True)
 
@@ -104,7 +110,7 @@ def validate_with_ado(
     warnings = []
 
     # First validate syntax
-    syntax_result = validate_space_yaml_syntax(space_yaml_path)
+    syntax_result = validate_space_yaml_syntax(base_path, instance_path)
     errors.extend(syntax_result.errors)
     warnings.extend(syntax_result.warnings)
 
@@ -112,7 +118,7 @@ def validate_with_ado(
         # Don't proceed with ADO validation if syntax is invalid
         return ValidationResult(
             success=False,
-            instance_path=str(space_yaml_path.parent),
+            instance_path=instance_path,
             errors=errors,
             warnings=warnings,
         )
@@ -126,13 +132,16 @@ def validate_with_ado(
         )
         return ValidationResult(
             success=False,
-            instance_path=str(space_yaml_path.parent),
+            instance_path=instance_path,
             errors=errors,
             warnings=warnings,
         )
 
     # Validate with ADO using dry-run mode
     try:
+        # Construct full path to space.yaml
+        space_yaml_path = base_path / instance_path / "space.yaml"
+
         # Use ado create space with --dry-run flag
         # Run from the benchmark instance directory to support relative paths in space.yaml
         result = subprocess.run(  # noqa: S603
@@ -165,7 +174,7 @@ def validate_with_ado(
 
     return ValidationResult(
         success=len(errors) == 0,
-        instance_path=str(space_yaml_path.parent),
+        instance_path=instance_path,
         errors=errors,
         warnings=warnings,
     )
