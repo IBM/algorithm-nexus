@@ -92,7 +92,7 @@ nexus validate benchmarks --package <package_name> [OPTIONS]
 - `--package NAME`: Validate only benchmark instances from a specific package
 - `--verbose`: Show detailed validation output
 - `--fail-fast`: Stop validation on first error
-- `--output-format [table|json]`: Output format (default: `table`)
+- `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
 
 **Examples:**
 
@@ -130,6 +130,16 @@ Get results in JSON format:
 
 ```bash
 nexus validate benchmarks --output-format json
+# or using the short form
+nexus validate benchmarks -o json
+```
+
+Get results in YAML format:
+
+```bash
+nexus validate benchmarks --output-format yaml
+# or using the short form
+nexus validate benchmarks -o yaml
 ```
 
 **How it works:**

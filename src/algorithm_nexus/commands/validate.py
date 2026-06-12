@@ -22,7 +22,13 @@ except ImportError:
     )
     sys.exit(1)
 
-from algorithm_nexus.commands.utils import ValidationErrorCollector, load_yaml_file
+from algorithm_nexus.commands.utils import (
+    ValidationErrorCollector,
+    get_status_color,
+    load_yaml_file,
+    print_structured_results,
+    validate_output_format,
+)
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
@@ -317,6 +323,57 @@ def validate_package(
     )
 
 
+def _print_validation_table(
+    all_results: list[dict[str, Any]], total: int, total_success: int, total_failed: int
+) -> None:
+    """Print validation results in human-readable table format.
+
+    Args:
+        all_results: List of validation result dictionaries
+        total: Total number of instances
+        total_success: Number of successful validations
+        total_failed: Number of failed validations
+    """
+    from rich.table import Table
+
+    # Output results summary
+    console.print("\n" + "=" * 60)
+    console.print("[bold]Validation Summary:[/bold]")
+    console.print(f"  Total instances: {total}")
+    console.print(f"  Successful: {total_success}")
+    console.print(f"  Failed: {total_failed}")
+    console.print("=" * 60)
+
+    table = Table(title="\nValidation Results", show_header=True)
+    table.add_column("Instance", style="cyan")
+    table.add_column("Status", style="bold")
+    table.add_column("Issues")
+
+    for result in all_results:
+        # Use shared status color function
+        status = result["status"]
+        color = get_status_color(status)
+        status_style = (
+            f"[{color}]✓ PASS[/{color}]"
+            if status == "success"
+            else f"[{color}]✗ FAIL[/{color}]"
+        )
+        issues = []
+        if result.get("errors"):
+            issues.extend([f"E: {e}" for e in result["errors"]])
+        if result.get("warnings"):
+            issues.extend([f"W: {w}" for w in result["warnings"]])
+        issues_str = "\n".join(issues) if issues else "-"
+
+        table.add_row(
+            result["instance"],
+            status_style,
+            issues_str,
+        )
+
+    console.print(table)
+
+
 def validate_benchmarks(
     pr_url: Annotated[
         str | None,
@@ -355,12 +412,13 @@ def validate_benchmarks(
         ),
     ] = False,
     output_format: Annotated[
-        str,
+        str | None,
         typer.Option(
+            "-o",
             "--output-format",
-            help="Output format (table or json)",
+            help="Output format: 'json', 'yaml', or 'table' (default: table)",
         ),
-    ] = "table",
+    ] = None,
 ) -> None:
     """Validate benchmark instances.
 
@@ -374,11 +432,13 @@ def validate_benchmarks(
     - Validates each instance with ADO dry-run
     - Reports validation results
     """
-    import json
-
-    from rich.table import Table
-
     from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+    # Validate output format if specified
+    if output_format:
+        validate_output_format(
+            output_format, allow_yaml=True, allow_csv=False, allow_table=True
+        )
 
     # Validate package exists if package filter is specified
     if package and not pr_url:
@@ -421,53 +481,25 @@ def validate_benchmarks(
         total_failed = summary.get("failed", 0)
         total = summary.get("total", len(all_results))
 
-        # Output results summary
-        console.print("\n" + "=" * 60)
-        console.print("[bold]Validation Summary:[/bold]")
-        console.print(f"  Total instances: {total}")
-        console.print(f"  Successful: {total_success}")
-        console.print(f"  Failed: {total_failed}")
-        console.print("=" * 60)
+        # Determine output format (default to table for human-readable)
+        fmt = output_format or "table"
 
         # Format output based on requested format
-        if output_format == "json":
-            json_output = json.dumps(
-                {
-                    "pr_url": pr_url,
+        if fmt in ("json", "yaml"):
+            # Structured output (JSON or YAML)
+            output_data = {
+                "pr_url": pr_url,
+                "summary": {
                     "total": total,
                     "successful": total_success,
                     "failed": total_failed,
-                    "results": all_results,
                 },
-                indent=2,
-            )
-            console.print("\n" + json_output)
-        elif output_format == "table":
-            table = Table(title="\nValidation Results", show_header=True)
-            table.add_column("Instance", style="cyan")
-            table.add_column("Status", style="bold")
-            table.add_column("Issues")
-
-            for result in all_results:
-                status_style = (
-                    "[green]✓ PASS[/green]"
-                    if result["status"] == "success"
-                    else "[red]✗ FAIL[/red]"
-                )
-                issues = []
-                if result.get("errors"):
-                    issues.extend([f"E: {e}" for e in result["errors"]])
-                if result.get("warnings"):
-                    issues.extend([f"W: {w}" for w in result["warnings"]])
-                issues_str = "\n".join(issues) if issues else "-"
-
-                table.add_row(
-                    result["instance"],
-                    status_style,
-                    issues_str,
-                )
-
-            console.print(table)
+                "instances": all_results,
+            }
+            print_structured_results(output_data, fmt)
+        else:
+            # Human-readable table output (default)
+            _print_validation_table(all_results, total, total_success, total_failed)
 
         # Exit with error if any validation failed
         if total_failed > 0:

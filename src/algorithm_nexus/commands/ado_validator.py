@@ -93,7 +93,6 @@ def validate_with_ado(
     base_path: Path,
     instance_path: str,
     venv_path: Path,
-    dry_run: bool = True,
 ) -> ValidationResult:
     """Run ADO validation in isolated virtual environment.
 
@@ -101,7 +100,6 @@ def validate_with_ado(
         base_path: Base path (e.g., repo root or temp directory)
         instance_path: Relative path to the benchmark instance from base_path
         venv_path: Path to virtual environment with ADO installed
-        dry_run: Whether to perform dry-run validation (default: True)
 
     Returns:
         ValidationResult with ADO validation results
