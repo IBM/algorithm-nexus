@@ -79,13 +79,13 @@ reference.
 
 <!-- markdownlint-disable line-length -->
 
-| Field         | Type            | Required | Description                                                                                                                                                                                                    |
-| ------------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`          | string          | Yes      | The canonical identifier referenced in experiment manifests.                                                                                                                                                   |
-| `description` | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                                                            |
-| `dimensions`  | list            | Yes      | The dimensions on which this benchmark is evaluated. Each entry specifies the dimension name, an optional domain of valid values, and human-readable descriptions of those values. See dimension fields below. |
-| `metrics`     | list of strings | No       | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`.                                                                                      |
-| `owner`       | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                                                |
+| Field                 | Type            | Required | Description                                                                                                                                                                                                    |
+| --------------------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkIdentifier` | string          | Yes      | The canonical identifier referenced in experiment manifests.                                                                                                                                                   |
+| `description`         | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                                                            |
+| `dimensions`          | list            | Yes      | The dimensions on which this benchmark is evaluated. Each entry specifies the dimension name, an optional domain of valid values, and human-readable descriptions of those values. See dimension fields below. |
+| `metrics`             | list of strings | No       | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`.                                                                                      |
+| `owner`               | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                                                |
 
 **Dimension fields:**
 
@@ -101,7 +101,7 @@ reference.
 ### 2.3 Example: Inference Serving
 
 ```yaml
-id: inference_serving
+benchmarkIdentifier: inference_serving
 description: >
     Evaluation of AI model inference serving throughput and latency under
     controlled traffic conditions.
@@ -159,14 +159,14 @@ A benchmark binding serves two purposes:
 
 <!-- markdownlint-disable line-length -->
 
-| Field              | Type   | Required | Description                                                                                                                                                                                                             |
-| ------------------ | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `logicalBenchmark` | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                                              |
-| `targetNapping`    | string | **Yes**  | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier).                                                                                                                 |
-| `experimentid`     | string | No       | The `ado` experiment identifier.                                                                                                                                                                                        |
-| `staticFilters`    | list   | No       | Sets experiment internal parameters to set values implicitly required by the logical benchmark                                                                                                                          |
-| `dimensionMapping` | list   | No       | Maps the experiment's internal parameters to the canonical dimensions defined by the logical benchmark. A manifest with no `dimensions` is valid — results are associated with the `logical_benchmark` and target only. |
-| `metricNapping`    | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                       |
+| Field                  | Type   | Required | Description                                                                                                                                                                                                             |
+| ---------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                                              |
+| `targetNapping`        | string | **Yes**  | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier).                                                                                                                 |
+| `experimentIdentifier` | string | No       | The `ado` experiment identifier.                                                                                                                                                                                        |
+| `staticFilters`        | list   | No       | Sets experiment internal parameters to set values implicitly required by the logical benchmark                                                                                                                          |
+| `dimensionMapping`     | list   | No       | Maps the experiment's internal parameters to the canonical dimensions defined by the logical benchmark. A manifest with no `dimensions` is valid — results are associated with the `logical_benchmark` and target only. |
+| `metricNapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                       |
 
 <!-- markdownlint-enable line-length -->
 
@@ -239,9 +239,9 @@ metric names to the same canonical name defined by the logical benchmark.
 ### 3.3 Example: `guide_llm_runner`
 
 ```yaml
-logicalBenchmark: inference_serving
+benchmarkIdentifier: inference_serving
 targetMapping: model_name
-experimentid: guide_llm_runner
+experimentIdentifier: guide_llm_runner
 
 dimensionMappings:
     - dimension:
@@ -272,7 +272,7 @@ dimensionMappings:
             domain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-metric_mapping:
+metricMapping:
     - benchmark:
           identifier: throughput_tokens_per_second
       experiment:
@@ -308,7 +308,7 @@ A deterministic routing key can be constructed from a result and its
 experiment's manifest:
 
 ```text
-{logical_benchmark}-{experiment_id}-{dimension1=value}-{dimension2=value}
+{experimentIdentifier}-{experimentIdentifier}-{dimension1=value}-{dimension2=value}
 ```
 
 Dimensions are sorted alphabetically. For example:
@@ -343,9 +343,9 @@ A second experiment, `vllm_bench_runner`, targets the same logical benchmark
 with entirely different internal parameter and metric names:
 
 ```yaml
-logicalBenchmark: inference_serving
+benchmarkIdentifier: inference_serving
 targetMapping: model_name
-experimentid: vllm_bench_runner
+experimentIdentifier: vllm_bench_runner
 
 dimensionMappings:
     - dimension:
@@ -376,7 +376,7 @@ dimensionMappings:
             domain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-metric_mapping:
+metricMapping:
     - benchmark:
           identifier: throughput_tokens_per_second
       experiment:
