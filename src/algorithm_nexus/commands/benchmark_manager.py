@@ -212,6 +212,10 @@ class BenchmarkManager:
         else:
             console.print(f"\n[bold]Mode:[/bold] {mode_name} all benchmark instances")
 
+        # Print packages root when not in PR mode
+        if not self.pr_url and packages_root:
+            console.print(f"Packages root: {packages_root.resolve()}")
+
         console.print("=" * 60)
 
     def _print_instances_found(
