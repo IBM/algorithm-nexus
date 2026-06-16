@@ -105,7 +105,7 @@ package:
               - "<experiment-id>"
 ```
 
-Each `requirement_specifier` must resolve to a Python package that contains an `ado` experiment.
+Each `requirement_specifier` must resolve to a Python package that contains an `ado` custom experiment.
 
 Validate the updated package configuration:
 
