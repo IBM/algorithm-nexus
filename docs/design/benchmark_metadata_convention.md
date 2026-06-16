@@ -93,7 +93,7 @@ reference.
 | ------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------- |
 | `name`              | string         | Yes      | Canonical dimension name.                                                                   |
 | `description`       | string         | No       | Human-readable description of what this dimension represents.                               |
-| `domain`            | PropertyDomain | No       | Valid values for this dimension. If omitted, an open categorical domain is assumed.         |
+| `domain`            | orchestrator.schema.PropertyDomain | No       | Valid values for this dimension. If omitted, an open categorical domain is assumed.         |
 | `valueDescriptions` | map            | No       | For categorical domains a human-readable description of each category, keyed by value name. |
 
 <!-- markdownlint-enable line-length -->
@@ -133,7 +133,7 @@ metrics:
     - time_to_first_token_ms
 owner: "@vllm-team"
 ```
-
+See [the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/) for more information about the types of domains that can be specified.  
 ---
 
 ## 3. Benchmark Binding
@@ -162,11 +162,11 @@ A benchmark binding serves two purposes:
 | Field                  | Type   | Required | Description                                                                                                                                                                                                             |
 | ---------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                                              |
-| `targetNapping`        | string | **Yes**  | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier).                                                                                                                 |
+| `targetMapping`        | string | **Yes**  | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier).                                                                                                                 |
 | `experimentIdentifier` | string | No       | The `ado` experiment identifier.                                                                                                                                                                                        |
-| `staticFilters`        | list   | No       | Sets experiment internal parameters to set values implicitly required by the logical benchmark                                                                                                                          |
 | `dimensionMapping`     | list   | No       | Maps the experiment's internal parameters to the canonical dimensions defined by the logical benchmark. A manifest with no `dimensions` is valid — results are associated with the `logical_benchmark` and target only. |
-| `metricNapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                       |
+| `staticFilters`        | list   | No       | Sets experiment internal parameters to set values implicitly required by the logical benchmark                                                                                                                          |
+| `metricMapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                       |
 
 <!-- markdownlint-enable line-length -->
 
@@ -219,7 +219,7 @@ queries.
 staticFilters:
     - property:
           identifier: "<experiment-parameter-name>"
-      value: "<categorical-value-from-logical-benchmark-domain>"
+      value: "<experiment-parameter-value>"
 ```
 
 **Metric mapping:**
