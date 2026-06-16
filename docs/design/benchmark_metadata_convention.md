@@ -14,14 +14,14 @@ in a standardized, domain-agnostic way.
 The design rests on two complementary artifacts:
 
 1. **Logical Benchmark Definition** — a declarative description of an abstract
-   benchmark problem: what dimensions it is evaluated on and what values those
-   dimensions can take. This is the shared contract that all experiments
+   benchmark problem: what properties it is evaluated on and what values those
+   properties can take. This is the shared contract that all experiments
    targeting the same problem must conform to.
 
-2. **Experiment Manifest** — metadata declared inside an `ado` experiment that
-   maps the experiment's internal parameters and metrics to the dimensions and
-   metric names of a logical benchmark. This tells the system how to extract and
-   label the relevant results from that experiment's data.
+2. **Experiment Manifest** — metadata that maps an `ado` experiment's internal
+   properties and metrics to the properties and metric names of a logical
+   benchmark. This tells the system how to extract and label the relevant
+   results from that experiment's data.
 
 Together, these two artifacts allow the benchmarking system to remain agnostic
 to domain-specific concepts. All domain knowledge is expressed by the benchmark
@@ -42,11 +42,11 @@ experiments:
 
 <!-- markdownlint-disable line-length -->
 
-| Challenge                                       | Description                                                                                                                                                                                                                                                                                                               | Design Requirement                                                                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **Heterogeneous Tooling for Homogeneous Tasks** | Different experiments may evaluate the same logical problem. For example, both `vllm-bench` and `guide-llm` measure inference-serving performance, but the system has no way to know they can address the same benchmark.                                                                                                 | The system must have a standardized way to recognize that disparate experiments can execute the same benchmark. |
-| **Ambiguous and Domain-Specific Parameters**    | Benchmarking domains are too diverse to share a fixed schema. A synthetic math benchmark has no "dataset" column; a quantum max-cut benchmark is characterized by `graph_type` and `node_count`.                                                                                                                          | The system must support dynamic, per-benchmark, dimensions.                                                     |
-| **Workload Parameter Fragmentation**            | Defining a workload often involves a matrix of runtime parameters. If results are differentiated by raw parameter values, results from minor variations (`concurrency=100` vs `concurrency=105`) can never be aggregated. Further, the parameters required to run the same benchmark with different may be very different | The design must allow related parameter combinations to be collapsed into a single canonical value.             |
+| Challenge                                       | Description                                                                                                                                                                                                                                                                                                                          | Design Requirement                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Heterogeneous Tooling for Homogeneous Tasks** | Different experiments may evaluate the same logical problem. For example, both `vllm-bench` and `guide-llm` measure inference-serving performance, but the system has no way to know they can address the same benchmark.                                                                                                            | The system must have a standardized way to recognize that disparate experiments can execute the same benchmark. |
+| **Ambiguous and Domain-Specific Properties**    | Benchmarking domains are too diverse to share a fixed schema. A synthetic math benchmark has no "dataset" column; a quantum max-cut benchmark is characterized by `graph_type` and `node_count`.                                                                                                                                     | The system must support dynamic, per-benchmark, properties.                                                     |
+| **Workload Property Fragmentation**             | Defining a workload often involves a matrix of runtime properties. If results are differentiated by raw property values, results from minor variations (`concurrency=100` vs `concurrency=105`) can never be aggregated. Further, the properties required to run the same benchmark with different experiments may be very different | The design must allow related property combinations to be collapsed into a single canonical value.              |
 
 <!-- markdownlint-enable line-length -->
 
@@ -60,14 +60,14 @@ A **logical benchmark** is an abstract, domain-specific definition of a
 benchmark problem. It defines:
 
 - a unique identifier
-- the **dimensions** on which the benchmark is evaluated (e.g. `dataset`,
-  `workload`) and the valid values each dimension may take
+- the **properties** on which the benchmark is evaluated (e.g. `dataset`,
+  `workload`) and the valid values each property may take
 - the canonical **metric names** that results should be reported under
 
-The logical benchmark definition is the shared contract. Any experiment that
-claims to target a logical benchmark must conform to its dimension names and
-values. This is what allows the benchmarking system to aggregate results from
-different experiments without any domain-specific logic of its own.
+For an experiment to target a logical benchmark it must provide a mapping of its
+property names and values to the logical benchmark's. This is what allows the
+benchmarking system to aggregate results from different experiments without any
+domain-specific logic of its own.
 
 Logical benchmark definitions are stored at the top level of the Algorithm Nexus
 repository, above individual packages, so they are available as a project-wide
@@ -79,22 +79,21 @@ reference.
 
 <!-- markdownlint-disable line-length -->
 
-| Field                 | Type            | Required | Description                                                                                                                                                                                                    |
-| --------------------- | --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `benchmarkIdentifier` | string          | Yes      | The canonical identifier referenced in experiment manifests.                                                                                                                                                   |
-| `description`         | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                                                            |
-| `dimensions`          | list            | Yes      | The dimensions on which this benchmark is evaluated. Each entry specifies the dimension name, an optional domain of valid values, and human-readable descriptions of those values. See dimension fields below. |
-| `metrics`             | list of strings | No       | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`.                                                                                      |
-| `owner`               | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                                                |
+| Field                 | Type            | Required | Description                                                                                                                                                                       |
+| --------------------- | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkIdentifier` | string          | Yes      | The canonical identifier referenced in experiment manifests.                                                                                                                      |
+| `description`         | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                               |
+| `properties`          | list            | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
+| `metrics`             | list of strings | No       | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`.                                                         |
+| `owner`               | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
 
-**Dimension fields:**
+**Property fields:**
 
-| Field               | Type           | Required | Description                                                                                 |
-| ------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------- |
-| `name`              | string         | Yes      | Canonical dimension name.                                                                   |
-| `description`       | string         | No       | Human-readable description of what this dimension represents.                               |
-| `domain`            | orchestrator.schema.PropertyDomain | No       | Valid values for this dimension. If omitted, an open categorical domain is assumed.         |
-| `valueDescriptions` | map            | No       | For categorical domains a human-readable description of each category, keyed by value name. |
+| Field        | Type                               | Required | Description                                                                        |
+| ------------ | ---------------------------------- | -------- | ---------------------------------------------------------------------------------- |
+| `identifier` | string                             | Yes      | Canonical property identifier.                                                     |
+| `metadata`   | string                             | No       | Metadata about what this property represents. Can include e.g. description         |
+| `domain`     | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
 
 <!-- markdownlint-enable line-length -->
 
@@ -105,52 +104,41 @@ benchmarkIdentifier: inference_serving
 description: >
     Evaluation of AI model inference serving throughput and latency under
     controlled traffic conditions.
-dimensions:
+properties:
     - identifier: dataset
-      description: "Dataset used for inference requests."
-      # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
+      metadata:
+          description: "Dataset used for inference requests."
+          # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
 
     - identifier: workload
-      description: "Traffic pattern or workload profile."
+      metadata:
+          description: "Traffic pattern or workload profile."
       domain:
           values: ["steady_state_heavy", "poisson_bursty", "light_load"]
-      valueDescriptions:
-          steady_state_heavy: >
-              Sustained high-concurrency load with a constant request arrival
-              rate. Represents a production serving scenario under heavy
-              continuous traffic. Experiments must use a fixed/constant traffic
-              shape with concurrency >= 100.
-          poisson_bursty: >
-              Variable load with Poisson-distributed request arrivals.
-              Represents bursty traffic with unpredictable inter-arrival times.
-              Experiments must use a Poisson traffic distribution.
-          light_load: >
-              Low-concurrency baseline load. Establishes minimum performance
-              characteristics under light traffic. Experiments must use
-              concurrency < 100.
 metrics:
     - throughput_tokens_per_second
     - time_to_first_token_ms
 owner: "@vllm-team"
 ```
-See [the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/) for more information about the types of domains that can be specified.  
----
+
+See
+[the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/)
+for more information about the types of domains that can be specified.
 
 ## 3. Benchmark Binding
 
 ### 3.1 Concept
 
-An experiment declares its participation in a logical benchmark through a
-**benchark binding** — a block of metadata stored in the `metadata` field of the
-`ado` experiment schema. Any expeirment can define multiple benchmark bindings.
+The ability of an experiment to run a logical benchmark is declared by a
+**benchmark binding**.
 
 A benchmark binding serves two purposes:
 
-1. **Declaration** — it defines a logical benchmark this experiment maps to
+1. **Declaration** — it defines the logical benchmark an experiment maps to
 
-2. **Mapping** — it describes how the experiment's internal parameter names and
-   metric names correspond to the canonical dimensions and metric names defined
-   by the logical benchmark. This allows the system to extract and consistently
+2. **Mapping** — it describes how the experiment's internal property names and
+   metric names correspond to the canonical property and metric names defined by
+   the logical benchmark. This allows the system to extract and consistently
    label results from this experiment without any domain-specific knowledge.
 
 ### 3.2 Schema
@@ -159,57 +147,57 @@ A benchmark binding serves two purposes:
 
 <!-- markdownlint-disable line-length -->
 
-| Field                  | Type   | Required | Description                                                                                                                                                                                                             |
-| ---------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                                              |
-| `targetMapping`        | string | **Yes**  | The name of the experiment parameter that carries the benchmark target (model or algorithm identifier).                                                                                                                 |
-| `experimentIdentifier` | string | No       | The `ado` experiment identifier.                                                                                                                                                                                        |
-| `dimensionMapping`     | list   | No       | Maps the experiment's internal parameters to the canonical dimensions defined by the logical benchmark. A manifest with no `dimensions` is valid — results are associated with the `logical_benchmark` and target only. |
-| `staticFilters`        | list   | No       | Sets experiment internal parameters to set values implicitly required by the logical benchmark                                                                                                                          |
-| `metricMapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                       |
+| Field                  | Type   | Required | Description                                                                                                                                                                                       |
+| ---------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `experimentIdentifier` | string | **Yes**  | The `ado` experiment identifier.                                                                                                                                                                  |
+| `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                        |
+| `targetNapping`        | string | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
+| `staticFilters`        | list   | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
+| `propertyMapping`      | list   | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
+| `metricNapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
 
 <!-- markdownlint-enable line-length -->
 
-**Dimension Mapping:**
+**Property Mapping:**
 
-Each entry in `dimensionMapping` specifies how one or more experiment parameters
-map to canonical benchmark dimensions. Two types of mapping are possible:
+Each entry in `propertyMapping` specifies how one or more experiment properties
+map to canonical benchmark properties. Two types of mapping are possible:
 
-- _field mapping_: A 1-to-1 mapping for logical benchmark dimensionsx
+- _field mapping_: A 1-to-1 mapping for logical benchmark properties
     - Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"
 - _categorical value mapping_: 1-to-many mapping for the values of a categorical
-  logical benchmark dimensions
+  logical benchmark properties
     - Allows translating "WHERE logical_dim = CategoryA" to e.g. "WHERE
       exp_param_1 > X and exp_param_2 = y"
 
-**Field mapping** — maps an experiment parameter to a benchmark dimension.
+**Field mapping** — maps an experiment property to a benchmark property.
 
 ```yaml
-dimensionMapping:
-    - dimension:
-          identifier: "<logical-benchmark-dimension-name>"
-      experimentParameter:
-          identifier: "<experiment-parameter-name>"
+propertyMapping:
+    - benchmark:
+          identifier: "<logical-benchmark-property-name>"
+      experiment:
+          identifier: "<experiment-property-name>"
 ```
 
 **Categorical value mapping** — maps one or more values of a categorical
-benchmark dimension to a set of (experiment parameter:allowed value set) pairs.
+benchmark property to a set of (experiment property:allowed value set) pairs.
 
 ```yaml
-dimensionMapping:
+propertyMapping:
     - categoricalValue:
-          dimension:
-              identifier: "<logical-benchmark-dimension-name>"
+          property:
+              identifier: "<logical-benchmark-property-name>"
           value: "<categorical-value-from-logical-benchmark-domain>"
       predicate:
-          - identifier: "<experiment-parameter-name>"
+          - identifier: "<experiment-property-name>"
             domain: <PropertyDomain>
           - ...
 ```
 
 **Static Filters:**
 
-Static filters allow setting a parameter of the experiment to a value that's
+Static filters allow setting a property of the experiment to a value that's
 implicit in the logical benchmark. For example, the benchmark experiment may
 have two modes, "debug" and "production", and one should be used for a
 particular logical benchmark, essentially adding "AND production == True" to all
@@ -218,8 +206,8 @@ queries.
 ```yaml
 staticFilters:
     - property:
-          identifier: "<experiment-parameter-name>"
-      value: "<experiment-parameter-value>"
+          identifier: "<experiment-property-name>"
+      value: "<experiment-property-value>"
 ```
 
 **Metric mapping:**
@@ -227,9 +215,9 @@ staticFilters:
 ```yaml
 metricMapping:
    benchmark:
-      identifier: <canonical benchmark name>
+      identifier: <canonical-benchmark-property-name>
     experiment:
-      identifier: <experiment target property name>
+      identifier: <experiment-target-property-name>
 ```
 
 Metrics not listed are passed through under their original names. For two
@@ -241,15 +229,18 @@ metric names to the same canonical name defined by the logical benchmark.
 ```yaml
 benchmarkIdentifier: inference_serving
 targetMapping: model_name
-experimentIdentifier: guide_llm_runner
+experiment:
+    actuatorIdentifier: vllm_performance
+    experimentIdentifier: guide_llm_runner
+    experimentVersion: 2.0.0 # The binding only uses the major version
 
-dimensionMappings:
-    - dimension:
+propertyMappings:
+    - benchmark:
           identifier: dataset
-      experimentParameter:
+      experiment:
           identifier: input_data_path # guide-llm's internal param name
     - categoricalValue:
-          dimension:
+          property:
               identifier: workload
           value: steady_state_heavy
       predicate:
@@ -261,7 +252,7 @@ dimensionMappings:
                 domainRange: [100, 1000]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
-          dimension:
+          property:
               identifier: workload
           value: steady_state_heavy
       predicate:
@@ -293,14 +284,14 @@ With a logical benchmark definition and one or more experiment benchmark
 bindings in place, the system can answer aggregation queries without any
 domain-specific logic:
 
-- The logical benchmark defines **what dimensions** exist and **what values**
+- The logical benchmark defines **what properties** exist and **what values**
   they can take.
 - Each benchmark binding defines **how to query** one experiment's results for
-  those dimensions and **how to label** them consistently.
+  those properties and **how to label** them consistently.
 
 A leaderboard is simply a query over a subset of the logical benchmark's
-dimensions. Omitting a dimension aggregates across all its values; specifying
-one filters to it.
+properties. Omitting a property aggregates across all its values; specifying one
+filters to it.
 
 ### 4.2 Routing Key
 
@@ -308,10 +299,10 @@ A deterministic routing key can be constructed from a result and its
 experiment's manifest:
 
 ```text
-{experimentIdentifier}-{experimentIdentifier}-{dimension1=value}-{dimension2=value}
+{experimentIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
 ```
 
-Dimensions are sorted alphabetically. For example:
+Properties are sorted alphabetically. For example:
 
 ```text
 inference_serving-guide_llm_runner-dataset=sharegpt-workload=steady_state_heavy
@@ -320,11 +311,11 @@ inference_serving-guide_llm_runner-dataset=sharegpt-workload=steady_state_heavy
 The routing key identifies a specific leaderboard slot. Leaderboard queries can
 match on any prefix or subset of these components.
 
-### 4.3 Dynamic Dimension Resolution
+### 4.3 Dynamic Property Resolution
 
-Dimension resolution — mapping from raw experiment parameters to canonical
-benchmark values — is performed **at query time**. This means only one database
-of raw results needs to be maintained.
+Property resolution — mapping from raw experiment properties to canonical
+benchmark properties — is performed **at query time**. This means only one
+database of raw results needs to be maintained.
 
 The leaderboard population process for a given query:
 
@@ -332,28 +323,30 @@ The leaderboard population process for a given query:
    `logicalBenchmark`.
 2. For each experiment, use the benchmark binding for the logical benchmark to
    construct a query against the result store (using the experiment's own
-   internal parameter names as the filter criteria).
-3. Rename result dataframe columns using `dimensions` (dimension names) and
-   `metricMapping` (metric names).
+   internal property names as the filter criteria).
+3. Rename result dataframe columns using `propertyMapping` and `metricMapping`
+   (metric names).
 4. Merge the resulting dataframes. All share the same canonical column names.
 
 ### 4.4 Cross-Experiment Aggregation Example
 
 A second experiment, `vllm_bench_runner`, targets the same logical benchmark
-with entirely different internal parameter and metric names:
+with entirely different internal property and metric names:
 
 ```yaml
 benchmarkIdentifier: inference_serving
+experiment:
+    actuatorIdentifier: vllm_performance
+    experimentIdentifier: vllm_bench_runner
+    experimentVersion: 1.0.0
 targetMapping: model_name
-experimentIdentifier: vllm_bench_runner
-
-dimensionMappings:
-    - dimension:
+propertyMappings:
+    - benchmark:
           identifier: dataset
-      experimentParameter:
+      experiment:
           identifier: dataset_path # guide-llm's internal param name
     - categoricalValue:
-          dimension:
+          property:
               identifier: workload
           value: steady_state_heavy
       predicate:
@@ -365,7 +358,7 @@ dimensionMappings:
                 domainRange: [100, 99999]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
-          dimension:
+          property:
               identifier: workload
           value: light_load
       predicate:
@@ -411,40 +404,36 @@ will:
 
 Logical benchmark definition files are stored at the top level of the Algorithm
 Nexus repository, enabling CI to validate that any manifest declaring a
-`logical_benchmark` references a known definition, and that its dimension names
+`logical_benchmark` references a known definition, and that its property names
 and profile `logical_name` values conform to that definition's schema.
 
 ### 5.3 Benchmark Binding Ownership
 
-The benchmark binding is owned by the experiment author. Because metadata lives
-at experiment level rather than benchmark instance level, updating the dimension
-mappings for all instances of an experiment requires only updating the
-experiment's manifest. No per-instance updates are needed.
+The benchmark binding is owned by the relevant experiment author.
 
 ---
 
 ## 6. Benchmark Binding Versioning
 
-When a benchmark binding changes, the system has two sources of routing
-information:
+A benchmark binding only can change if:
 
-- **Stored run metadata** — the manifest captured in the `ado` discoveryspace
-  result record at execution time.
-- **Current experiment metadata** — the manifest in the latest version of the
-  experiment in the `ado` actuator registry.
-
-These two sources together cover the main change scenarios:
-
-<!-- markdownlint-disable line-length -->
-
-| Change type                                           | Handling                                                                                                                              |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Experiment renames an internal parameter              | Stored run metadata retains the original mapping; old results continue to route correctly.                                            |
-| New `dimension_name` (benchmark dimension is renamed) | Effectively a new dimension. The experiment author can add a legacy entry in the new manifest to re-route old results if needed.      |
-| New dimension added with updated mapping              | Can be addressed by adding a legacy profile entry in the new manifest, or by updating metadata on historical results in the database. |
-| New benchmark metadata, no parameter changes          | The current experiment manifest can be applied to historical results to route them under the new metadata.                            |
-
-<!-- markdownlint-enable line-length -->
+- The experiment property names or values used change
+    - This should result in a new experiment major version and a new binding
+    - The binding for the previous experiment major version can be kept
+- The logical benchmark property names or values change
+    - If the original logical benchmark parameters/values and mappings are now
+      invalid, the existing logical benchmarks and bindings can be updated in
+      place
+    - If the original logical benchmark parameters/values and mappings are still
+      valid, a new logical benchmark should be created
+- Additional experiment properties are added that must be set to **non-default
+  values** AND only experiment minor version changes
+    - The binding must be changed - different sets of experiment data will be
+      aggregated
+    - Note: This applies to **non-default values** only - by ado versioning
+      convention a minor version change means that the new parameters with
+      default values measure output metrics the same way as previous experiment
+      with same major version but without those parameters
 
 ---
 
@@ -452,9 +441,15 @@ These two sources together cover the main change scenarios:
 
 ### 7.1 Benchmark Binding Location
 
-Benchmark bindings are stored in the `metadata` field of the `ado` `Experiment`
-schema. This field is currently an untyped `dict`; a Pydantic model for the
-manifest schema can be contributed to the `ado` library to add validation.
+Benchmark bindings are stored along with logical benchmarks in top level of
+Nexus package. For example, each logical benchmark can be a YAML file in a
+top-level directory of Nexus. The structure of this YAML can be
+
+```yaml
+logicalBenchmark:
+   ... #logical benchmark fields
+- #List of benchmark bindings
+```
 
 ### 7.2 `target_mapping` and the Implicit Benchmark Target
 
@@ -463,18 +458,18 @@ establishes that the benchmark target is implicit from the enclosing model
 definition for model-level benchmark instances. The `target_mapping` field is
 complementary, not conflicting:
 
-- `target_mapping` in the manifest names the **experiment parameter key** that
-  carries the target identifier (e.g. `model_name`).
-- The **value** of that parameter for a specific benchmark instance is
-  determined by the enclosing model definition.
+- `target_mapping` in the benchmark binding names the **experiment property**
+  that carries the target identifier (e.g. `model_name`).
+- The **value** of that property for a specific benchmark instance is determined
+  by the enclosing model definition.
 
-For example, if the manifest declares `target_mapping: model_name`, and a
-model-level benchmark instance is defined for `ibm/granite-3b`, the leaderboard
-system knows that `model_name=ibm/granite-3b` is the target for that result.
+For example, if the benchmark binding declares `target_mapping: model_name`, and
+a model-level benchmark instance is defined for `ibm/granite-3b`, the
+leaderboard system knows that `model_name=ibm/granite-3b` is the target for that
+result.
 
 ### 7.3 Benchmark Package Registration and Instances
 
 The existing `nexus.yaml` benchmark package registrations and
-`benchmark_instances/space.yaml` `ado` discoveryspace definitions remain
-unchanged. The benchmark binding is an additional artifact inside the experiment
-package and does not alter the Nexus package structure.
+`benchmark_instances/space.yaml` remain unchanged. The benchmark binding is an
+additional artifact and does not alter the Nexus package structure.
