@@ -1173,7 +1173,7 @@ class BenchmarkManager:
                                 errors=["Failed to install dependencies"],
                                 warnings=[],
                             )
-                            all_results.append(failed_result.to_summary_dict())
+                            all_results.append(failed_result.model_dump())
                             total_failed += 1
                             if fail_fast:
                                 break
@@ -1189,7 +1189,7 @@ class BenchmarkManager:
                     )
 
                     # Convert ValidationResult to summary dict
-                    all_results.append(result.to_summary_dict())
+                    all_results.append(result.model_dump())
 
                     if result.success:
                         console.print("  [green]✓[/green] Validation passed")

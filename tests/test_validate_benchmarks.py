@@ -178,9 +178,9 @@ entitySpace:
         assert len(result.warnings) == 1
         assert result.status == "success"
 
-        # Test to_summary_dict
-        summary = result.to_summary_dict()
-        assert summary["instance"] == "/test/path"
+        # Test model_dump
+        summary = result.model_dump()
+        assert summary["instance_path"] == "/test/path"
         assert summary["status"] == "success"
         assert summary["errors"] == []
         assert summary["warnings"] == ["test warning"]
@@ -233,7 +233,7 @@ class TestValidateBenchmarksCommand:
         mock_manager.validate.return_value = {
             "instances": [
                 {
-                    "instance": "test1",
+                    "instance_path": "test1",
                     "status": "success",
                     "errors": [],
                     "warnings": [],

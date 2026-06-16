@@ -44,31 +44,23 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
     # Construct full path to space.yaml
     space_yaml_path = base_path / instance_path / "space.yaml"
 
-    try:
-        # Check if file exists
-        if not space_yaml_path.is_file():
-            errors.append(f"File not found: {space_yaml_path}")
-            return ValidationResult(
-                success=False,
-                instance_path=instance_path,
-                errors=errors,
-                warnings=warnings,
-            )
+    # Check if file exists
+    if not space_yaml_path.is_file():
+        errors.append(f"File not found: {space_yaml_path}")
+        return ValidationResult(
+            success=False,
+            instance_path=instance_path,
+            errors=errors,
+            warnings=warnings,
+        )
 
+    space_config = None
+    try:
         # Load and parse YAML
         space_config_dict = yaml.safe_load(space_yaml_path.read_text())
 
         # Validate using DiscoverySpaceConfiguration
         space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
-
-        # Check for optional but common sections using the validated model
-        if not space_config.experiments:
-            warnings.append("No 'experiments' section found in space.yaml")
-        elif len(space_config.experiments) == 0:
-            warnings.append("'experiments' list is empty")
-
-        if not space_config.entitySpace:
-            warnings.append("No 'entitySpace' section found in space.yaml")
 
     except yaml.YAMLError as e:
         errors.append(f"Invalid YAML syntax: {e}")
@@ -80,6 +72,15 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
             errors.append(f"Validation error at {loc}: {msg}")
     except Exception as e:
         errors.append(f"Unexpected error reading space.yaml: {e}")
+
+    # Check for optional but common sections using the validated model
+    if space_config:
+        space_config = space_config.convert_experiments_to_reference_list()
+        if not space_config.experiments or len(space_config.experiments) == 0:
+            warnings.append("No 'experiments' section found in space.yaml")
+
+        if not space_config.entitySpace:
+            warnings.append("No 'entitySpace' section found in space.yaml")
 
     return ValidationResult(
         success=len(errors) == 0,
@@ -104,22 +105,16 @@ def validate_with_ado(
     Returns:
         ValidationResult with ADO validation results
     """
-    errors = []
-    warnings = []
-
     # First validate syntax
     syntax_result = validate_space_yaml_syntax(base_path, instance_path)
-    errors.extend(syntax_result.errors)
-    warnings.extend(syntax_result.warnings)
 
     if syntax_result.errors:
         # Don't proceed with ADO validation if syntax is invalid
-        return ValidationResult(
-            success=False,
-            instance_path=instance_path,
-            errors=errors,
-            warnings=warnings,
-        )
+        return syntax_result
+
+    # Start with syntax warnings for ADO validation
+    errors = []
+    warnings = syntax_result.warnings.copy()
 
     # Check if ADO binary is available in the venv
     ado_binary = venv_path / "bin" / "ado"

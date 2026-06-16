@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 try:
     import typer
@@ -366,7 +366,7 @@ def _print_validation_table(
         issues_str = "\n".join(issues) if issues else "-"
 
         table.add_row(
-            result["instance"],
+            result["instance_path"],
             status_style,
             issues_str,
         )
@@ -412,7 +412,7 @@ def validate_benchmarks(
         ),
     ] = False,
     output_format: Annotated[
-        str | None,
+        Literal["json", "yaml", "table"] | None,
         typer.Option(
             "-o",
             "--output-format",
