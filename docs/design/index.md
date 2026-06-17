@@ -9,4 +9,6 @@ Below is a list of the design documents available:
 - [Nexus Metadata Package Structure](./nexus_package.md)
 - [Nexus Dependency Resolution Process](./dependency-resolution.md)
 - [Benchmarking System](./benchmark_system.md)
+- [Benchmark Integration Design](./benchmark_integration_design.md)
+- [Benchmark Metadata Convention](./benchmark_metadata_convention.md)
 - [Project Release](./project_release.md)
