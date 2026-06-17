@@ -151,10 +151,10 @@ A benchmark binding serves two purposes:
 | ---------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `experimentIdentifier` | string | **Yes**  | The `ado` experiment identifier.                                                                                                                                                                  |
 | `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                        |
-| `targetNapping`        | string | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
+| `targetMapping`        | string | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
 | `staticFilters`        | list   | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
 | `propertyMapping`      | list   | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
-| `metricNapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
+| `metricMapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
 
 <!-- markdownlint-enable line-length -->
 
