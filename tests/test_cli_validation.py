@@ -207,7 +207,7 @@ class TestMissingPackageConfig:
         result = runner.invoke(app, ["validate", "package", str(temp_package_dir)])
 
         assert result.exit_code == 1
-        assert "nexus.yaml" in result.stdout
+        assert "nexus.yaml" in result.stdout.replace("\n", "")
 
     def test_empty_nexus_yaml(self, temp_package_dir: Path) -> None:
         """Test that empty nexus.yaml is detected."""

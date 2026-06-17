@@ -24,15 +24,6 @@ except ImportError:
 console = Console()
 
 
-def has_uv() -> bool:
-    """Check if uv is available in the system.
-
-    Returns:
-        True if uv command is available, False otherwise
-    """
-    return shutil.which("uv") is not None
-
-
 def create_temp_venv(system_site_packages: bool = True) -> Path:
     """Create a temporary virtual environment using uv.
 
@@ -46,8 +37,6 @@ def create_temp_venv(system_site_packages: bool = True) -> Path:
         subprocess.CalledProcessError: If venv creation fails
         RuntimeError: If uv is not available
     """
-    if not has_uv():
-        raise RuntimeError("uv is required but not found in PATH")
 
     # Create temporary directory
     temp_dir = tempfile.mkdtemp(prefix="nexus-validate-")
@@ -95,8 +84,6 @@ def install_packages(
     if not requirements:
         return True
 
-    if not has_uv():
-        raise RuntimeError("uv is required but not found in PATH")
     python_path = venv_path / "bin" / "python"
 
     try:

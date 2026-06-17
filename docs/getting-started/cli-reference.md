@@ -160,8 +160,6 @@ nexus validate benchmarks -o yaml
 **Requirements:**
 
 - For PR mode: GitHub CLI (`gh`) must be installed and authenticated
-- `uv` is recommended for faster package installation (optional, falls back to
-  `pip`)
 - ADO must be included as a dependency in benchmark packages
 
 ## nexus list

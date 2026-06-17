@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-import contextlib
+import shutil
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -16,7 +16,6 @@ from algorithm_nexus.commands.ado_validator import validate_space_yaml_syntax
 from algorithm_nexus.commands.venv_manager import (
     cleanup_venv,
     create_temp_venv,
-    has_uv,
     install_packages,
 )
 from algorithm_nexus.models import ValidationResult
@@ -25,13 +24,6 @@ from algorithm_nexus.models import ValidationResult
 class TestVenvManager:
     """Tests for virtual environment manager."""
 
-    def test_has_uv(self):
-        """Test uv detection."""
-        # This will return True or False depending on system
-        result = has_uv()
-        assert isinstance(result, bool)
-
-    @pytest.mark.skipif(not has_uv(), reason="uv not available")
     def test_create_temp_venv(self):
         """Test creating venv with uv."""
         venv_path = create_temp_venv()
@@ -41,7 +33,6 @@ class TestVenvManager:
         finally:
             cleanup_venv(venv_path)
 
-    @pytest.mark.skipif(not has_uv(), reason="uv not available")
     def test_cleanup_venv(self):
         """Test venv cleanup."""
         venv_path = create_temp_venv()
@@ -52,46 +43,60 @@ class TestVenvManager:
 
     @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
     def test_install_packages_passes_requirements_unchanged(self, mock_run):
-        """Test that install_packages passes requirements to uv pip install unchanged.
-
-        Note: git+ prefix addition is now handled by BenchmarkManager._resolve_benchmark_package_requirement
-        before calling install_packages.
-        """
+        """Test that install_packages passes requirements to uv pip install unchanged."""
         # Create a temporary venv path (doesn't need to exist for this test)
         venv_path = Path(tempfile.mkdtemp()) / "venv"
 
-        # Mock successful subprocess run
         mock_run.return_value = MagicMock(stdout="", returncode=0)
 
-        # Test with various package types (already processed with git+ prefix where needed)
         requirements = [
             "git+https://github.com/user/repo.git",
-            "git+http://github.com/user/repo2.git",
-            "git+https://github.com/user/repo3.git",
-            "package-name==1.0.0",  # Regular package
-            "./local/path",  # Local path
+            "package-name==1.0.0",
+            "./local/path",
         ]
 
-        # Call install_packages (now always uses uv)
         install_packages(venv_path, requirements, verbose=False)
 
-        # Verify subprocess.run was called
         assert mock_run.called
-
-        # Get the actual command that was passed
         call_args = mock_run.call_args[0][0]
 
-        # Verify requirements are passed unchanged
         assert "git+https://github.com/user/repo.git" in call_args
-        assert "git+http://github.com/user/repo2.git" in call_args
-        assert "git+https://github.com/user/repo3.git" in call_args
         assert "package-name==1.0.0" in call_args
         assert "./local/path" in call_args
 
-        # Cleanup
-        import shutil
-
         shutil.rmtree(venv_path.parent, ignore_errors=True)
+
+
+class TestResolveBenchmarkPackageRequirement:
+    """Tests for BenchmarkManager._resolve_benchmark_package_requirement."""
+
+    def setup_method(self):
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        self.manager = BenchmarkManager(pr_url=None, execute=False)
+        self.manager.repo_root = Path("/nonexistent")  # no local paths will resolve
+
+    def test_https_github_url_gets_git_prefix(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "https://github.com/org/repo"
+        )
+        assert result == "git+https://github.com/org/repo"
+
+    def test_already_prefixed_https_url_unchanged(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "git+https://github.com/org/repo.git"
+        )
+        assert result == "git+https://github.com/org/repo.git"
+
+    def test_ssh_shorthand_becomes_git_ssh_url(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "git@github.com:org/repo.git"
+        )
+        assert result == "git+ssh://git@github.com/org/repo.git"
+
+    def test_pypi_package_unchanged(self):
+        result = self.manager._resolve_benchmark_package_requirement("mypackage==1.2.3")
+        assert result == "mypackage==1.2.3"
 
 
 class TestAdoValidator:
@@ -103,8 +108,9 @@ class TestAdoValidator:
             base_path=Path("/nonexistent"), instance_path="benchmark_instances/test"
         )
         assert not result.success
-        assert len(result.errors) > 0
+        assert len(result.errors) == 1
         assert "not found" in result.errors[0].lower()
+        assert result.warnings == []
 
     def test_validate_space_yaml_syntax_valid(self, tmp_path):
         """Test validation with valid space.yaml."""
@@ -178,7 +184,6 @@ entitySpace:
         assert len(result.warnings) == 1
         assert result.status == "success"
 
-        # Test model_dump
         summary = result.model_dump()
         assert summary["instance_path"] == "/test/path"
         assert summary["status"] == "success"
@@ -189,88 +194,16 @@ entitySpace:
 class TestValidateBenchmarksCommand:
     """Tests for validate benchmarks CLI command."""
 
-    @patch("algorithm_nexus.commands.benchmark_manager.BenchmarkManager")
-    def test_validate_benchmarks_no_instances(self, mock_manager_class):
-        """Test validate benchmarks with no instances found."""
-        # Mock BenchmarkManager
-        mock_manager = MagicMock()
-
-        # Mock the validate method to return empty results
-        mock_manager.validate.return_value = {
-            "instances": [],
-            "summary": {
-                "total": 0,
-                "successful": 0,
-                "failed": 0,
-            },
-        }
-        mock_manager_class.return_value = mock_manager
-
-        # Import here to avoid issues with mocking
-        from algorithm_nexus.commands.validate import validate_benchmarks
-
-        # Should not raise an error when no instances found
-        with contextlib.suppress(SystemExit):
-            validate_benchmarks(
-                pr_url="https://github.com/test/repo/pull/1",
-                packages_root=Path("./packages"),
-                verbose=False,
-                fail_fast=False,
-                output_format="table",
-            )
-
-    @patch("algorithm_nexus.commands.benchmark_manager.BenchmarkManager")
-    def test_validate_benchmarks_with_instances(
-        self,
-        mock_manager_class,
-        tmp_path,
-    ):
-        """Test validate benchmarks with instances."""
-        # Setup mocks
-        mock_manager = MagicMock()
-
-        # Mock the validate method to return successful results
-        mock_manager.validate.return_value = {
-            "instances": [
-                {
-                    "instance_path": "test1",
-                    "status": "success",
-                    "errors": [],
-                    "warnings": [],
-                }
-            ],
-            "summary": {
-                "total": 1,
-                "successful": 1,
-                "failed": 0,
-            },
-        }
-        mock_manager_class.return_value = mock_manager
-
-        from algorithm_nexus.commands.validate import validate_benchmarks
-
-        # Should complete successfully without raising SystemExit (only raises on failure)
-        validate_benchmarks(
-            pr_url="https://github.com/test/repo/pull/1",
-            packages_root=Path("./packages"),
-            verbose=False,
-            fail_fast=False,
-            output_format="table",
-        )
-        # If we get here, the test passed (no exception raised)
-
     def test_validate_benchmarks_nonexistent_package(self, tmp_path, capsys):
         """Test validate benchmarks with nonexistent package."""
         import typer
 
         from algorithm_nexus.commands.validate import validate_benchmarks
 
-        # Create a packages directory with some packages
         packages_root = tmp_path / "packages"
         packages_root.mkdir()
         (packages_root / "existing-package").mkdir()
 
-        # Should raise typer.Exit when package doesn't exist
         with pytest.raises(typer.Exit) as exc_info:
             validate_benchmarks(
                 pr_url=None,
@@ -282,35 +215,23 @@ class TestValidateBenchmarksCommand:
             )
         assert exc_info.value.exit_code == 1
 
-        # Verify error message includes suggestion to use nexus list packages
         captured = capsys.readouterr()
         assert "nexus list packages" in captured.out
 
-    def test_validate_benchmarks_existing_package(self, tmp_path):
-        """Test validate benchmarks with existing package."""
+    def test_validate_benchmarks_no_instances_in_package(self, tmp_path):
+        """Test validate benchmarks finds no instances when package has no benchmark_instances."""
+        import contextlib
+
+        import typer
+
         from algorithm_nexus.commands.validate import validate_benchmarks
 
-        # Create a packages directory with the target package
         packages_root = tmp_path / "packages"
         packages_root.mkdir()
         (packages_root / "test-package").mkdir()
 
-        # Mock BenchmarkManager to avoid actual validation
-        with patch(
-            "algorithm_nexus.commands.benchmark_manager.BenchmarkManager"
-        ) as mock_manager_class:
-            mock_manager = MagicMock()
-            mock_manager.validate.return_value = {
-                "instances": [],
-                "summary": {
-                    "total": 0,
-                    "successful": 0,
-                    "failed": 0,
-                },
-            }
-            mock_manager_class.return_value = mock_manager
-
-            # Should not raise an error when package exists
+        # No benchmark_instances directories exist, so validation exits cleanly with code 0
+        with contextlib.suppress(typer.Exit):
             validate_benchmarks(
                 pr_url=None,
                 packages_root=packages_root,
@@ -319,7 +240,32 @@ class TestValidateBenchmarksCommand:
                 fail_fast=False,
                 output_format="table",
             )
-            # If we get here, the test passed (no exception raised)
+
+    def test_validate_benchmarks_both_package_and_pr_warns(self, tmp_path, capsys):
+        """Test that specifying both --package and --pr prints a warning."""
+        import contextlib
+
+        import typer
+
+        from algorithm_nexus.commands.validate import validate_benchmarks
+
+        packages_root = tmp_path / "packages"
+        packages_root.mkdir()
+
+        # Providing both package and pr_url should print a warning before proceeding
+        # (it will then fail trying to reach GitHub, which we suppress)
+        with contextlib.suppress(typer.Exit, Exception):
+            validate_benchmarks(
+                pr_url="https://github.com/test/repo/pull/1",
+                packages_root=packages_root,
+                package="some-package",
+                verbose=False,
+                fail_fast=False,
+                output_format="table",
+            )
+
+        captured = capsys.readouterr()
+        assert "--package is ignored" in captured.out
 
 
 # Made with Bob

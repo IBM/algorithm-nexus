@@ -38,21 +38,21 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
     Returns:
         ValidationResult with syntax validation results
     """
-    errors = []
-    warnings = []
 
     # Construct full path to space.yaml
     space_yaml_path = base_path / instance_path / "space.yaml"
 
     # Check if file exists
     if not space_yaml_path.is_file():
-        errors.append(f"File not found: {space_yaml_path}")
         return ValidationResult(
             success=False,
             instance_path=instance_path,
-            errors=errors,
-            warnings=warnings,
+            errors=[f"File not found: {space_yaml_path}"],
+            warnings=[],
         )
+
+    errors = []
+    warnings = []
 
     space_config = None
     try:

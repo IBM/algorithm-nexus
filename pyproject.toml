@@ -27,6 +27,7 @@ cli = [
   "pyyaml>=6.0.3",
   "rich>=15.0.0",
   "typer>=0.25.0",
+  "uv>=0.11.21",
 ]
 ecosystem = [
   "bmfm-targets",

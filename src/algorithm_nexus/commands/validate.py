@@ -440,7 +440,14 @@ def validate_benchmarks(
             output_format, allow_yaml=True, allow_csv=False, allow_table=True
         )
 
-    # Validate package exists if package filter is specified
+    # Warn if both package filter and PR URL are provided (package is ignored in PR mode)
+    if package and pr_url:
+        console.print(
+            "[yellow]Warning:[/yellow] --package is ignored when --pr is specified. "
+            "In PR mode, only instances changed in the PR are validated."
+        )
+
+    # Validate package exists if package filter is specified (non-PR mode only)
     if package and not pr_url:
         package_path = packages_root / package
         if not package_path.is_dir():
@@ -465,8 +472,7 @@ def validate_benchmarks(
             )
         else:
             # All or package mode
-            # Create a dummy manager for validation (no PR URL needed)
-            manager = BenchmarkManager(pr_url="", execute=False)
+            manager = BenchmarkManager(pr_url=None, execute=False)
             results = manager.validate(
                 packages_root=packages_root,
                 package_filter=package,
@@ -475,11 +481,10 @@ def validate_benchmarks(
             )
 
         # Extract results
-        all_results = results.get("instances", [])
-        summary = results.get("summary", {})
-        total_success = summary.get("successful", 0)
-        total_failed = summary.get("failed", 0)
-        total = summary.get("total", len(all_results))
+        all_results = results.instances
+        total_success = results.successful
+        total_failed = results.failed
+        total = results.total
 
         # Determine output format (default to table for human-readable)
         fmt = output_format or "table"
@@ -489,11 +494,6 @@ def validate_benchmarks(
             # Structured output (JSON or YAML)
             output_data = {
                 "pr_url": pr_url,
-                "summary": {
-                    "total": total,
-                    "successful": total_success,
-                    "failed": total_failed,
-                },
                 "instances": all_results,
             }
             print_structured_results(output_data, fmt)

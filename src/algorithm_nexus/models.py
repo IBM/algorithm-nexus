@@ -224,3 +224,19 @@ class BenchmarkExecutionResult(BaseModel):
     ray_job_id: Annotated[
         str | None, Field(description="Ray job ID for remote execution")
     ] = None
+
+
+class ValidationReport(BaseModel):
+    """Aggregated result of validating all benchmark instances."""
+
+    instances: Annotated[
+        list[dict], Field(description="Per-instance validation result dicts")
+    ]
+    successful: Annotated[int, Field(description="Number of instances that passed")]
+    failed: Annotated[int, Field(description="Number of instances that failed")]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def total(self) -> int:
+        """Total number of instances validated."""
+        return self.successful + self.failed

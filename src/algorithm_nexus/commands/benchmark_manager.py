@@ -45,6 +45,7 @@ from algorithm_nexus.commands.utils import strip_ansi_codes
 from algorithm_nexus.models import (
     AlgorithmNexusPackageConfig,
     BenchmarkExecutionResult,
+    ValidationReport,
 )
 
 console = Console()
@@ -107,7 +108,7 @@ class BenchmarkManager:
 
     def __init__(
         self,
-        pr_url: str,
+        pr_url: str | None,
         execute: bool = True,
         remote_context_file: Path | None = None,
         context_file: Path | None = None,
@@ -115,7 +116,7 @@ class BenchmarkManager:
         """Initialize the benchmark manager.
 
         Args:
-            pr_url: GitHub Pull Request URL
+            pr_url: GitHub Pull Request URL, or None for non-PR mode
             execute: Whether to execute benchmarks with ADO CLI
             remote_context_file: Path to remote execution context YAML file
             context_file: Path to ADO context YAML file (samplestore context)
@@ -297,8 +298,6 @@ class BenchmarkManager:
         # Parse instance path using regex:
         # - Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
         # - Package-level: packages/<package>/benchmark_instances/<instance>
-        import re
-
         path_str = str(instance_path)
 
         # Try model-level pattern first
@@ -446,23 +445,26 @@ class BenchmarkManager:
             requirement: The requirement specifier from nexus.yaml
 
         Returns:
-            Resolved requirement string (local path, git URL, or PyPI package)
+            Resolved requirement string (local path or package specifier)
         """
         # Check if it's a local path
         resolved_path = self.repo_root / requirement.lstrip("./")
         if resolved_path.exists():
             return str(resolved_path)
 
-        # Check if it's a GitHub URL that needs git+ prefix
-        if requirement.startswith(
-            ("https://github.com/", "http://github.com/", "git@github.com:")
-        ):
-            # Add git+ prefix if not already present
+        # uv requires git+ prefix for GitHub HTTPS URLs
+        if requirement.startswith(("https://github.com/", "http://github.com/")):
             return (
-                requirement if requirement.startswith("git+") else f"git+{requirement}"
+                f"git+{requirement}"
+                if not requirement.startswith("git+")
+                else requirement
             )
 
-        # Otherwise assume it's a URL or PyPI package
+        # SSH shorthand (git@github.com:org/repo) must become git+ssh://git@github.com/org/repo
+        if requirement.startswith("git@github.com:"):
+            ssh_url = requirement.replace("git@github.com:", "ssh://git@github.com/", 1)
+            return f"git+{ssh_url}"
+
         return requirement
 
     def get_benchmark_packages_for_instance(self, instance_path: Path) -> set[str]:
@@ -536,7 +538,6 @@ class BenchmarkManager:
                     )
                     packages.add(resolved_req)
 
-            # No benchmark packages defined in nexus.yaml
             return packages
 
         except Exception as e:
@@ -544,8 +545,6 @@ class BenchmarkManager:
                 f"[yellow]Warning:[/yellow] Could not determine benchmark packages for {instance_path}: {e}"
             )
             return set()
-
-        return packages
 
     def execute_benchmark(self, instance_path: Path) -> BenchmarkExecutionResult:
         """Execute a benchmark instance using ADO CLI.
@@ -625,9 +624,8 @@ class BenchmarkManager:
                     prefix="remote_config_space_",
                 ) as tmp_file:
                     remote_config_for_space = Path(tmp_file.name)
-                    remote_config_for_space.write_text(
-                        pydantic_model_as_yaml(space_remote_context)
-                    )
+                    tmp_file.write(pydantic_model_as_yaml(space_remote_context))
+                    tmp_file.flush()
                     temp_remote_configs.append(remote_config_for_space)
 
             console.print(f"  Creating ADO discoveryspace for: {instance_path}")
@@ -739,8 +737,9 @@ class BenchmarkManager:
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
+            tmp_file.write(pydantic_model_as_yaml(space_config))
+            tmp_file.flush()
             temp_space_path = tmp_file.name
-            Path(temp_space_path).write_text(pydantic_model_as_yaml(space_config))
 
             cmd = ["ado"]
 
@@ -843,7 +842,8 @@ class BenchmarkManager:
             mode="w", suffix=".yaml", delete=False, prefix="remote_config_"
         ) as tmp_file:
             temp_path = Path(tmp_file.name)
-            temp_path.write_text(pydantic_model_as_yaml(remote_config))
+            tmp_file.write(pydantic_model_as_yaml(remote_config))
+            tmp_file.flush()
             return temp_path
 
     def _create_operation(
@@ -862,46 +862,47 @@ class BenchmarkManager:
         Returns:
             Dictionary with operation_id and ray_job_id (if remote execution)
         """
+        # Generate descriptive name and description from instance path
+        if instance_path:
+            # Extract PR number from URL
+            pr_number = self.pr_url.rstrip("/").split("/")[-1]
+
+            # Parse instance path to get package, model, and instance names
+            package_name, model_name, instance_name = self._parse_instance_path(
+                instance_path
+            )
+
+            # Create descriptive name: randomwalk-pr123-package-model-instance
+            operation_name = (
+                f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
+            )
+            operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+        else:
+            operation_name = "randomwalk-all"
+            operation_description = "Perform a random walk on all points in a space"
+
+        # Create custom metadata with algorithm-nexus fields
+        custom_metadata = {
+            "algorithm-nexus.pr_url": self.pr_url or "",
+            "algorithm-nexus.instance_path": str(instance_path)
+            if instance_path
+            else "",
+        }
+
+        # Create operation config using the factory function
+        operation_config = create_random_walk_operation_config(
+            space_id=space_id,
+            metadata_name=operation_name,
+            metadata_description=operation_description,
+            custom_metadata=custom_metadata,
+        )
+
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".yaml", delete=True
         ) as tmp_file:
-            # Generate descriptive name and description from instance path
-            if instance_path:
-                # Extract PR number from URL
-                pr_number = self.pr_url.rstrip("/").split("/")[-1]
-
-                # Parse instance path to get package, model, and instance names
-                package_name, model_name, instance_name = self._parse_instance_path(
-                    instance_path
-                )
-
-                # Create descriptive name: randomwalk-pr123-package-model-instance
-                operation_name = f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
-                operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
-            else:
-                operation_name = "randomwalk-all"
-                operation_description = "Perform a random walk on all points in a space"
-
-            # Create custom metadata with algorithm-nexus fields
-            custom_metadata = {
-                "algorithm-nexus.pr_url": self.pr_url,
-                "algorithm-nexus.instance_path": str(instance_path)
-                if instance_path
-                else "",
-            }
-
-            # Create operation config using the factory function
-            operation_config = create_random_walk_operation_config(
-                space_id=space_id,
-                metadata_name=operation_name,
-                metadata_description=operation_description,
-                custom_metadata=custom_metadata,
-            )
-
+            tmp_file.write(pydantic_model_as_yaml(operation_config))
+            tmp_file.flush()
             operation_config_path = tmp_file.name
-            Path(operation_config_path).write_text(
-                pydantic_model_as_yaml(operation_config)
-            )
 
             cmd = ["ado"]
 
@@ -929,37 +930,39 @@ class BenchmarkManager:
                 check=True,
             )
 
-            # Extract Ray job ID and operation identifier
-            # For remote execution: Ray job ID (raysubmit_*) is available immediately
-            # Operation ID is only available after execution completes
+        # Extract Ray job ID and operation identifier
+        # For remote execution: Ray job ID (raysubmit_*) is available immediately
+        # Operation ID is only available after execution completes
 
-            combined_output = result.stdout + "\n" + result.stderr
+        combined_output = result.stdout + "\n" + result.stderr
 
-            # Extract Ray job ID (starts with raysubmit_) for remote execution
-            ray_job_id = None
-            if remote_config:
-                ray_match = re.search(r"(raysubmit_\w+)", combined_output)
-                if ray_match:
-                    ray_job_id = strip_ansi_codes(ray_match.group(1))
+        # Extract Ray job ID (starts with raysubmit_) for remote execution
+        ray_job_id = None
+        if remote_config:
+            ray_match = re.search(r"(raysubmit_\w+)", combined_output)
+            if ray_match:
+                ray_job_id = strip_ansi_codes(ray_match.group(1))
 
-            # For local execution or completed remote execution, extract operation ID
-            # Operation ID is available after "identifier" keyword
-            operation_id = None
-            op_match = re.search(r"identifier\s+(\S+)", combined_output)
-            if op_match:
-                candidate = strip_ansi_codes(op_match.group(1))
-                # Only use as operation_id if it's not a raysubmit ID
-                if not candidate.startswith("raysubmit_"):
-                    operation_id = candidate
+        # For local execution or completed remote execution, extract operation ID
+        # Operation ID is available after "identifier" keyword
+        operation_id = None
+        op_match = re.search(r"identifier\s+(\S+)", combined_output)
+        if op_match:
+            candidate = strip_ansi_codes(op_match.group(1))
+            # Only use as operation_id if it's not a raysubmit ID
+            if not candidate.startswith("raysubmit_"):
+                operation_id = candidate
 
-            # Fallback for local execution: use last word if no operation_id found
-            if not operation_id and not ray_job_id:
-                operation_id = strip_ansi_codes(result.stdout.strip().split()[-1])
+        # Fallback for local execution: use last word if no operation_id found
+        if not operation_id and not ray_job_id:
+            words = result.stdout.strip().split()
+            if words:
+                operation_id = strip_ansi_codes(words[-1])
 
-            return {
-                "operation_id": operation_id,
-                "ray_job_id": ray_job_id,
-            }
+        return {
+            "operation_id": operation_id,
+            "ray_job_id": ray_job_id,
+        }
 
     def run(self) -> dict[str, Any]:
         """Main execution method.
@@ -1093,7 +1096,7 @@ class BenchmarkManager:
         package_filter: str | None = None,
         verbose: bool = False,
         fail_fast: bool = False,
-    ) -> dict[str, Any]:
+    ) -> ValidationReport:
         """Validate benchmark instances with ADO dry-run in isolated venvs.
 
         Args:
@@ -1126,7 +1129,7 @@ class BenchmarkManager:
             self._print_instances_found(benchmark_instances, package_filter)
 
             if not benchmark_instances:
-                return {"instances": [], "summary": {"successful": 0, "failed": 0}}
+                return ValidationReport(instances=[], successful=0, failed=0)
 
             # Resolve dependencies for all instances
             instance_dependencies = self._resolve_all_dependencies(
@@ -1198,33 +1201,29 @@ class BenchmarkManager:
                         console.print("  [red]✗[/red] Validation failed")
                         total_failed += 1
 
-                    if verbose or not result.success:
-                        if result.errors:
-                            for error in result.errors:
-                                console.print(f"    [red]Error:[/red] {error}")
-                        if result.warnings:
-                            for warning in result.warnings:
-                                console.print(
-                                    f"    [yellow]Warning:[/yellow] {warning}"
-                                )
+                    if not result.success:
+                        for error in result.errors:
+                            console.print(f"    [red]Error:[/red] {error}")
 
-                    if fail_fast and not result.success:
-                        console.print(
-                            "\n[yellow]Stopping validation (--fail-fast)[/yellow]"
-                        )
-                        break
+                        for warning in result.warnings:
+                            console.print(f"    [yellow]Warning:[/yellow] {warning}")
 
                 finally:
                     if venv_path:
                         cleanup_venv(venv_path)
 
                 if fail_fast and total_failed > 0:
+                    console.print(
+                        "\n[yellow]Stopping validation (--fail-fast)[/yellow]"
+                    )
                     break
 
             # Return results
-            return {
-                "instances": all_results,
-            }
+            return ValidationReport(
+                instances=all_results,
+                successful=total_success,
+                failed=total_failed,
+            )
 
         finally:
             self.cleanup_temp_dir()
