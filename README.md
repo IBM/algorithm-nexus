@@ -156,7 +156,7 @@ Algorithm Nexus provides the `nexus` CLI for working with Nexus packages.
 To validate the structure and configuration of a Nexus package run:
 
 ```bash
-nexus validate /path/to/package
+nexus validate package /path/to/package
 ```
 
 This will examine the following:

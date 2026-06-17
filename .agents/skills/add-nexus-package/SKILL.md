@@ -38,10 +38,10 @@ model to be included, the following information is required:
 - `requires_vllm` (boolean, required): Whether the model uses vLLM for serving
 - `vllm_plugins` (string, required): If the model uses vLLM it might also
   require a set of vlLM plugins.
-  - `general` (string, optional): name of the general plugin required for
-    loading the model with vLLM
-  - `io_processors` (list of strings, optional): list of io processor plugins
-    that the model supports for pre/post processing with vLLM
+    - `general` (string, optional): name of the general plugin required for
+      loading the model with vLLM
+    - `io_processors` (list of strings, optional): list of io processor plugins
+      that the model supports for pre/post processing with vLLM
 
 If a model has been specified to be added and the above information is not
 available, stop.
@@ -56,7 +56,7 @@ Follow the below steps to create the Nexus Package:
    python package be added to.
 3. **Create Nexus Package Structure**: Create the necessary Nexus package folder
    structure and populate config files.
-4. **Validate the Nexus Package**: Run `nexus validate` to check structure.
+4. **Validate the Nexus Package**: Run `nexus validate package` to check structure.
 5. **Add Algorithm Stack Package as an Algorithm Nexus Dependency**: Use
    `uv add` with correct variant classification.
 6. **Write Report**: Write a report of the changes made and any errors
@@ -70,16 +70,16 @@ repository to a temporary location.
 Inspect the source code to identify:
 
 - Available models and their Hugging Face ID.
-  - No two models can have the same Hugging Face ID. If that's the case, stop.
-  - Extract the model name from the Hugging Face ID, i.e. model-name in
-    "org/model-name".
+    - No two models can have the same Hugging Face ID. If that's the case, stop.
+    - Extract the model name from the Hugging Face ID, i.e. model-name in
+      "org/model-name".
 - Whether the package requires vLLM or not, and if it does whether vLLM is a
   mandatory or optional requirement.
 - The GitHub release version of the python package to be installed.
-  - If no specific GitHub release version is provided by the user, inspect the
-    repository to identify the latest GitHub release.
-  - If no GitHub release is available, stop and inform the user that a GitHub
-    release is required.
+    - If no specific GitHub release version is provided by the user, inspect the
+      repository to identify the latest GitHub release.
+    - If no GitHub release is available, stop and inform the user that a GitHub
+      release is required.
 
 ## 2. Identify the Nexus Variant
 
@@ -103,7 +103,7 @@ of the _Contributing a python algorithm package to Algorithm Nexus_ documentat.
 ## 4. Validate the Nexus Package
 
 ```bash
-uv run nexus validate packages/<package-name>
+uv run nexus validate package packages/<package-name>
 ```
 
 If the validation is successful, the tool will print a success message

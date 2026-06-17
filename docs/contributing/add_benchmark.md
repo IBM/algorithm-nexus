@@ -111,7 +111,7 @@ Each `requirement_specifier` must resolve to a Python package that contains an
 Validate the updated package configuration:
 
 ```bash
-uv run nexus validate packages/<package-name>
+uv run nexus validate package packages/<package-name>
 ```
 
 Fix any validation errors before proceeding.
@@ -158,7 +158,7 @@ For full details on `space.yaml` syntax, see the
 Validate the package again to confirm the instance is well-formed:
 
 ```bash
-uv run nexus validate packages/<package-name>
+uv run nexus validate package packages/<package-name>
 ```
 
 ## Step 4: Run the benchmark
@@ -199,7 +199,7 @@ execution options including parameter sweeps and remote execution.
 Add and commit your changes:
 
 ```bash
-git add packages/<package-name> 
+git add packages/<package-name>
 git add benchmark_packages #required when also adding a benchmark package during Step 1
 git commit -s -m "feat(benchmark): Add <instance-name> benchmark for <model-name>"
 git push origin <your-branch>

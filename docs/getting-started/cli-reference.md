@@ -436,7 +436,7 @@ When creating a new Nexus package, validate its structure:
 cd packages/my-new-package
 
 # Validate the package
-nexus validate .
+nexus validate package .
 ```
 
 ### Listing Available Resources

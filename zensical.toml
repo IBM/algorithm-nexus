@@ -17,12 +17,14 @@ nav = [
     { "Dependency Resolution" = "design/dependency-resolution.md" },
     { "Benchmarking System" = "design/benchmark_system.md" },
     { "Benchmark Integration Design" = "design/benchmark_integration_design.md" },
+    { "Benchmark Metadata" = "design/benchmark_metadata_convention.md" },
     { "Project Release" = "design/project_release.md" },
   ] },
   { "Contributing" = [
     { "Overview" = "contributing/index.md" },
     { "Contributing Guidelines" = "contributing/guidelines.md" },
     { "Add New Nexus Package" = "contributing/add_new_nexus_package.md" },
+    { "Contributing a Benchmark for a Model" = "contributing/add_benchmark.md" },
     { "Owner Responsibilities" = "contributing/owner_responsibilities.md" },
   ] },
   { "Requirements" = [
