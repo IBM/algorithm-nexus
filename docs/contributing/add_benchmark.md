@@ -74,7 +74,7 @@ Place the package under your Nexus package directory:
 ```text
 packages/<package-name>/
 └── benchmark_packages/
-    └── <experiment-package-name>/
+    └── <benchmark-package-name>/
         ├── pyproject.toml
         └── src/
 ```
@@ -199,7 +199,8 @@ execution options including parameter sweeps and remote execution.
 Add and commit your changes:
 
 ```bash
-git add packages/<package-name>
+git add packages/<package-name> 
+git add benchmark_packages #required when also adding a benchmark package during Step 1
 git commit -s -m "feat(benchmark): Add <instance-name> benchmark for <model-name>"
 git push origin <your-branch>
 ```
