@@ -12,10 +12,8 @@ from orchestrator.core.operation.config import (
 )
 
 from algorithm_nexus.commands.benchmark_manager import (
-    create_random_walk_operation_config,
-)
-from algorithm_nexus.commands.run import (
     BenchmarkManager,
+    create_random_walk_operation_config,
 )
 from algorithm_nexus.models import BenchmarkExecutionResult
 

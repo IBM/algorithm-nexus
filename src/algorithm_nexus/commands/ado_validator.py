@@ -76,7 +76,7 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
     # Check for optional but common sections using the validated model
     if space_config:
         space_config = space_config.convert_experiments_to_reference_list()
-        if not space_config.experiments or len(space_config.experiments) == 0:
+        if not space_config.experiments:
             warnings.append("No 'experiments' section found in space.yaml")
 
         if not space_config.entitySpace:

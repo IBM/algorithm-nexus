@@ -462,8 +462,9 @@ class BenchmarkManager:
 
         # SSH shorthand (git@github.com:org/repo) must become git+ssh://git@github.com/org/repo
         if requirement.startswith("git@github.com:"):
-            ssh_url = requirement.replace("git@github.com:", "ssh://git@github.com/", 1)
-            return f"git+{ssh_url}"
+            return requirement.replace(
+                "git@github.com:", "git+ssh://git@github.com/", 1
+            )
 
         return requirement
 
@@ -710,8 +711,8 @@ class BenchmarkManager:
         space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
 
         # Generate descriptive name and description from instance path
-        # Extract PR number from URL
-        pr_number = self.pr_url.rstrip("/").split("/")[-1]
+        # Extract PR number from URL (pr_url may be None in non-PR mode)
+        pr_number = self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
 
         # Parse instance path to get package, model, and instance names
         package_name, model_name, instance_name = self._parse_instance_path(
@@ -864,8 +865,10 @@ class BenchmarkManager:
         """
         # Generate descriptive name and description from instance path
         if instance_path:
-            # Extract PR number from URL
-            pr_number = self.pr_url.rstrip("/").split("/")[-1]
+            # Extract PR number from URL (pr_url may be None in non-PR mode)
+            pr_number = (
+                self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
+            )
 
             # Parse instance path to get package, model, and instance names
             package_name, model_name, instance_name = self._parse_instance_path(
@@ -1044,15 +1047,17 @@ class BenchmarkManager:
         """
         benchmark_instances = []
 
-        # Resolve packages_root to absolute path and update repo_root
+        # Resolve packages_root to absolute path
         packages_root_abs = packages_root.resolve()
-        self.repo_root = packages_root_abs.parent  # Parent of packages directory
 
         if not packages_root_abs.exists():
             console.print(
                 f"[red]Error:[/red] Packages directory not found: {packages_root_abs}"
             )
             raise typer.Exit(code=1)
+
+        # Only update repo_root after confirming the path exists
+        self.repo_root = packages_root_abs.parent  # Parent of packages directory
 
         # Walk through packages directory
         for pkg_dir in packages_root_abs.iterdir():
@@ -1129,7 +1134,7 @@ class BenchmarkManager:
             self._print_instances_found(benchmark_instances, package_filter)
 
             if not benchmark_instances:
-                return ValidationReport(instances=[], successful=0, failed=0)
+                return ValidationReport(instances=[], successful=0, failed=0, total=0)
 
             # Resolve dependencies for all instances
             instance_dependencies = self._resolve_all_dependencies(
@@ -1223,6 +1228,7 @@ class BenchmarkManager:
                 instances=all_results,
                 successful=total_success,
                 failed=total_failed,
+                total=len(benchmark_instances),
             )
 
         finally:

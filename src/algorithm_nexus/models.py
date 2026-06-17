@@ -234,9 +234,9 @@ class ValidationReport(BaseModel):
     ]
     successful: Annotated[int, Field(description="Number of instances that passed")]
     failed: Annotated[int, Field(description="Number of instances that failed")]
-
-    @computed_field  # type: ignore[prop-decorator]
-    @property
-    def total(self) -> int:
-        """Total number of instances validated."""
-        return self.successful + self.failed
+    total: Annotated[
+        int,
+        Field(
+            description="Total number of instances discovered (may exceed successful + failed under --fail-fast)"
+        ),
+    ]

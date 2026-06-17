@@ -269,7 +269,6 @@ cli = [
     { name = "pyyaml" },
     { name = "rich" },
     { name = "typer" },
-    { name = "uv" },
 ]
 ecosystem = [
     { name = "bmfm-targets" },
@@ -306,7 +305,6 @@ requires-dist = [
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'product'", specifier = "==1.2.5" },
     { name = "tokamind", marker = "extra == 'ecosystem'", git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?tag=OS_v2.0" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.25.0" },
-    { name = "uv", marker = "extra == 'cli'", specifier = ">=0.11.21" },
     { name = "vllm", marker = "extra == 'candidate'", specifier = "==0.19.1" },
     { name = "vllm", marker = "extra == 'product'", specifier = "==0.18.0" },
 ]
