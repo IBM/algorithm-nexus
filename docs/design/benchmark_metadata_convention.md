@@ -18,7 +18,7 @@ The design rests on two complementary artifacts:
    properties can take. This is the shared contract that all experiments
    targeting the same problem must conform to.
 
-2. **Experiment Manifest** — metadata that maps an `ado` experiment's internal
+2. **Benchmark Binding** — metadata that maps an `ado` experiment's internal
    properties and metrics to the properties and metric names of a logical
    benchmark. This tells the system how to extract and label the relevant
    results from that experiment's data.
@@ -64,15 +64,6 @@ benchmark problem. It defines:
   `workload`) and the valid values each property may take
 - the canonical **metric names** that results should be reported under
 
-For an experiment to target a logical benchmark it must provide a mapping of its
-property names and values to the logical benchmark's. This is what allows the
-benchmarking system to aggregate results from different experiments without any
-domain-specific logic of its own.
-
-Logical benchmark definitions are stored at the top level of the Algorithm Nexus
-repository, above individual packages, so they are available as a project-wide
-reference.
-
 ### 2.2 Schema
 
 **Top-level fields:**
@@ -81,10 +72,11 @@ reference.
 
 | Field                 | Type            | Required | Description                                                                                                                                                                       |
 | --------------------- | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `benchmarkIdentifier` | string          | Yes      | The canonical identifier referenced in experiment manifests.                                                                                                                      |
+| `benchmarkIdentifier` | string          | Yes      | The canonical identifier.                                                                                                                                                         |
 | `description`         | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                               |
+| `target`              | string          | Yes      | The property that identifiers the quantity being benchmarked                                                                                                                      |
 | `properties`          | list            | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
-| `metrics`             | list of strings | No       | Canonical metric names for this benchmark. Experiment manifests use these names as the targets of their `metric_mapping`.                                                         |
+| `metrics`             | list of strings | No       | Canonical metric names for this benchmark.                                                                                                                                        |
 | `owner`               | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
 
 **Property fields:**
@@ -104,12 +96,15 @@ benchmarkIdentifier: inference_serving
 description: >
     Evaluation of AI model inference serving throughput and latency under
     controlled traffic conditions.
+target:
+    - identifier: model
+      metadata:
+          description: "The id of the AI model being benchmarked"
 properties:
     - identifier: dataset
       metadata:
           description: "Dataset used for inference requests."
-          # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
-
+      # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
     - identifier: workload
       metadata:
           description: "Traffic pattern or workload profile."
@@ -129,8 +124,9 @@ for more information about the types of domains that can be specified.
 
 ### 3.1 Concept
 
-The ability of an experiment to run a logical benchmark is declared by a
-**benchmark binding**.
+For an experiment to target a logical benchmark it must provide a mapping of its
+property names and values to the logical benchmark's. This is called a
+**benchmark binding**. .
 
 A benchmark binding serves two purposes:
 
@@ -158,10 +154,13 @@ A benchmark binding serves two purposes:
 
 <!-- markdownlint-enable line-length -->
 
-**Property Mapping:**
+#### Property Mapping
 
 Each entry in `propertyMapping` specifies how one or more experiment properties
-map to canonical benchmark properties. Two types of mapping are possible:
+map to canonical benchmark properties. Benchmark properties not listed
+are assumed to have a 1:1 mapping with a experiment property of same name.
+
+Two types of mapping are possible:
 
 - _field mapping_: A 1-to-1 mapping for logical benchmark properties
     - Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"
@@ -210,7 +209,7 @@ staticFilters:
       value: "<experiment-property-value>"
 ```
 
-**Metric mapping:**
+#### Metric mapping
 
 ```yaml
 metricMapping:
@@ -295,8 +294,8 @@ filters to it.
 
 ### 4.2 Routing Key
 
-A deterministic routing key can be constructed from a result and its
-experiment's manifest:
+A deterministic routing key can be constructed from a result and the benchmark
+binding:
 
 ```text
 {experimentIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
@@ -319,11 +318,11 @@ database of raw results needs to be maintained.
 
 The leaderboard population process for a given query:
 
-1. Identify all experiments whose manifest declares the queried
+1. Identify all experiments with a benchmark binding to the queried
    `logicalBenchmark`.
-2. For each experiment, use the benchmark binding for the logical benchmark to
-   construct a query against the result store (using the experiment's own
-   internal property names as the filter criteria).
+2. For each experiment, use its benchmark binding to construct a query against
+   the result store (ado `samplestore`) (using the experiment's own internal
+   property names as the filter criteria).
 3. Rename result dataframe columns using `propertyMapping` and `metricMapping`
    (metric names).
 4. Merge the resulting dataframes. All share the same canonical column names.
@@ -400,16 +399,31 @@ will:
 
 ## 5. Governance
 
-### 5.2 Formal Registry
+### 5.2 Logical Benchmark Location & Ownership
 
 Logical benchmark definition files are stored at the top level of the Algorithm
-Nexus repository, enabling CI to validate that any manifest declaring a
-`logical_benchmark` references a known definition, and that its property names
-and profile `logical_name` values conform to that definition's schema.
+Nexus repository. Its suggested to create a top-level dir `benchmarks` which
+contains one YAML file per logical benchmark.
 
-### 5.3 Benchmark Binding Ownership
+A logical benchmark owner is given by the value of the "owner" field. If this is
+ambiguous the author of the PR adding the benchmark will be treated as the
+owner.
 
-The benchmark binding is owned by the relevant experiment author.
+### 7.1 Benchmark Binding Location
+
+Benchmark bindings are stored in the YAML file with the logical benchmarks they
+target e.g. the structure of this file could be
+
+```yaml
+logicalBenchmark: ... #logical benchmark fields
+bindings:
+    -  #List of benchmark bindings
+```
+
+This simplifies validating the field ands values in the bindings, and
+discovering bindings.
+
+The benchmark binding is owned by the author of the PR that added it.
 
 ---
 
@@ -438,18 +452,6 @@ A benchmark binding only can change if:
 ---
 
 ## 7. Relationship to Existing Benchmark Design
-
-### 7.1 Benchmark Binding Location
-
-Benchmark bindings are stored along with logical benchmarks in top level of
-Nexus package. For example, each logical benchmark can be a YAML file in a
-top-level directory of Nexus. The structure of this YAML can be
-
-```yaml
-logicalBenchmark:
-   ... #logical benchmark fields
-- #List of benchmark bindings
-```
 
 ### 7.2 `target_mapping` and the Implicit Benchmark Target
 

@@ -38,9 +38,9 @@ uv sync --group dev --extra cli
 
 ## Step 1: Find or create a benchmark experiment
 
-A benchmark experiment is a Python package that defines how to evaluate an algorithm.
-First check whether a suitable experiment already exists in Algorithm Nexus
-before creating a new one.
+A benchmark experiment is a Python package that defines how to evaluate an
+algorithm. First check whether a suitable experiment already exists in Algorithm
+Nexus before creating a new one.
 
 ### Find an existing experiment
 
@@ -50,12 +50,12 @@ List all benchmark experiments registered across Algorithm Nexus:
 uv run nexus list benchmark-experiments
 ```
 
-If an experiment covers the evaluation you need, note its experiment ID and
-the benchmark package that provides it — you will reference both in the next
-step. Skip ahead to [Step 2](#step-2-register-the-experiment-with-your-nexus-package).
+If an experiment covers the evaluation you need, note its experiment ID and the
+benchmark package that provides it — you will reference both in the next step.
+Skip ahead to [Step 2](#step-2-register-the-experiment-with-your-nexus-package).
 
-To inspect the inputs, outputs, and parameters of a specific experiment,
-install the benchmark package it belongs to and use the `ado` CLI:
+To inspect the inputs, outputs, and parameters of a specific experiment, install
+the benchmark package it belongs to and use the `ado` CLI:
 
 ```bash
 uv pip install <benchmark-package>
@@ -81,8 +81,8 @@ packages/<package-name>/
 
 ## Step 2: Register the experiment with your Nexus package
 
-Edit `packages/<package-name>/nexus.yaml` to declare that it
-uses a the experiment from the given package
+Edit `packages/<package-name>/nexus.yaml` to declare that it uses a the
+experiment from the given package
 
 ```yaml
 package:
@@ -105,7 +105,8 @@ package:
               - "<experiment-id>"
 ```
 
-Each `requirement_specifier` must resolve to a Python package that contains an `ado` custom experiment.
+Each `requirement_specifier` must resolve to a Python package that contains an
+`ado` custom experiment.
 
 Validate the updated package configuration:
 
@@ -117,9 +118,10 @@ Fix any validation errors before proceeding.
 
 ## Step 3: Define a benchmark instance for your model
 
-A benchmark instance specifies executing a registered experiment on your model/algorithm
-with a specific set of parameter values (workload). Each benchmark instance is a folder under
-your model's `benchmark_instances/` directory, that contains a `ado` `space.yaml`
+A benchmark instance specifies executing a registered experiment on your
+model/algorithm with a specific set of parameter values (workload). Each
+benchmark instance is a folder under your model's `benchmark_instances/`
+directory, that contains a `ado` `space.yaml`
 
 Create the directory,
 
@@ -127,7 +129,8 @@ Create the directory,
 mkdir -p packages/<package-name>/models/<model-name>/benchmark_instances/<instance-name>
 ```
 
-Create `packages/<package-name>/models/<model-name>/benchmark_instances/<instance-name>/space.yaml`:
+Create
+`packages/<package-name>/models/<model-name>/benchmark_instances/<instance-name>/space.yaml`:
 
 Example:
 
@@ -160,24 +163,24 @@ uv run nexus validate packages/<package-name>
 
 ## Step 4: Run the benchmark
 
-Install the benchmark package and run the benchmark instance locally using
-the `ado` CLI. First save the following operation configuration to a file `op.yaml`.
+Install the benchmark package and run the benchmark instance locally using the
+`ado` CLI. First save the following operation configuration to a file `op.yaml`.
 It will execute the experiment on all points in your space.
 
 ```yaml
 metadata:
-  name: randomwalk-all
+    name: randomwalk-all
 spaces:
-  - dynamically_inserted
+    - dynamically_inserted
 operation:
-  module:
-    operatorName: random_walk
-    operationType: search
-  parameters:
-    numberEntities: all
-    samplerConfig:
-      samplerType: generator
-      mode: random
+    module:
+        operatorName: random_walk
+        operationType: search
+    parameters:
+        numberEntities: all
+        samplerConfig:
+            samplerType: generator
+            mode: random
 ```
 
 Then,
@@ -188,9 +191,8 @@ ado create space -f <space-yaml-path>
 ado create operation -f op.yaml --use-latest space
 ```
 
-See the
-[ADO documentation](https://ibm.github.io/ado) for the full set of execution
-options including parameter sweeps and remote execution.
+See the [ADO documentation](https://ibm.github.io/ado) for the full set of
+execution options including parameter sweeps and remote execution.
 
 ## Step 5: Commit Changes and Open a Pull Request
 
@@ -208,112 +210,141 @@ Open a pull request from your fork to the Algorithm Nexus main branch.
 
 ## Optional: Mapping to logical benchmarks
 
-Once your benchmark is running, you can connect it to a logical benchmark
-so the results can be compared with results from other experiments targeting the same
-type of problem. This requires adding metadata to your experiment that maps its
-internal parameters and metrics to a shared, canonical vocabulary.
+Once your benchmark is running, you can connect it to a logical benchmark so the
+results can be compared with results from other experiments targeting the same
+type of problem. This requires creating a _benchmark biding_ that maps the
+experiments internal parameters and metrics to a shared, canonical vocabulary.
 
-This is done in two parts: adding a manifest to your experiment, and (if no
-definition exists for your domain yet) creating a logical benchmark definition.
+This is done in two parts:
+
+1. Creating the logical benchmark definition (if it does not exist)
+2. Adding the benchmark binding for your experiment to the logical benchmark
 
 ### Check for an existing logical benchmark definition
 
-Logical benchmark definitions live in the `logical_benchmarks/` directory at
-the root of the Algorithm Nexus repository. Browse that directory to see
-whether a definition already exists for your domain (e.g.
-`inference_serving.yaml`, `max_cut_solver.yaml`).
+Logical benchmark definitions live in the `benchmarks/` directory at the root of
+the Algorithm Nexus repository. Browse that directory to see whether a
+definition already exists for your domain (e.g. `inference_serving.yaml`,
+`max_cut_solver.yaml`).
 
-- **If a definition exists** — your experiment just needs a manifest that
-  maps to it. Continue to
-  [Add a manifest to your experiment](#add-a-manifest-to-your-experiment).
+- **If a definition exists** — you add a binding for experiment to it. Continue
+  to
+  [Add a benchmark binding for your experiment](#add-a-benchmark-binding-for-your-experiment).
 - **If no definition exists** — you will create one first. Continue to
   [Create a logical benchmark definition](#create-a-logical-benchmark-definition).
 
-### Add a manifest to your experiment
-
-The manifest is added to the `metadata` field of your `ado` experiment
-definition. See the
-[ADO custom experiment documentation](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
-for where this field lives in the experiment schema.
-
-A minimal manifest declares the logical benchmark your experiment targets,
-the parameter that identifies the benchmark target, and how the experiment's
-internal parameters map to the canonical dimensions:
-
-```yaml
-logical_benchmark: <logical-benchmark-id>
-target_mapping: <experiment-parameter-that-holds-the-model-id>
-
-dimensions:
-    - dimension_name: dataset
-      mapped_from_arg: <your-internal-dataset-parameter-name>
-
-    - dimension_name: workload
-      profile_mapping:
-          - logical_name: steady_state_heavy
-            requires_params:
-                traffic_shape:
-                    values: ["constant"]
-                concurrency:
-                    domainRange: [100, 99999]
-                    variableType: CONTINUOUS_VARIABLE_TYPE
-
-metric_mapping:
-    <your-metric-name>: <canonical-metric-name>
-```
-
-The `dimension_name` values and any `logical_name` values in `profile_mapping`
-must match exactly the dimension names and domain values defined in the logical
-benchmark definition. The `metric_mapping` translates your experiment's output
-metric names to the canonical names defined by the logical benchmark.
-
-For the full manifest schema and worked examples, see the
-[Benchmark Metadata Convention](../design/benchmark_metadata_convention.md).
-
 ### Create a logical benchmark definition
 
-If no definition exists for your domain, create a YAML file in
-`logical_benchmarks/<logical-benchmark-id>.yaml`. This file establishes the
-canonical vocabulary for your benchmark domain — dimension names, valid values,
-and metric names — that all future experiments in this domain will follow.
+If no definition exists, create a YAML file in
+`benchmarks/<logical-benchmark-id>.yaml`. This file establishes the canonical
+vocabulary for your benchmark — property names, valid values, and metric names.
 
-A minimal definition:
+A minimal example:
 
 ```yaml
-id: <logical-benchmark-id>
-description: >
-    <Human-readable description of the abstract problem being evaluated.>
-
-dimensions:
-    - name: dataset
-      description: "Dataset used for evaluation."
-      # No domain: any dataset name is accepted.
-
-    - name: workload
-      description: "Workload profile."
-      domain:
-          values: ["<profile-name-1>", "<profile-name-2>"]
-      value_descriptions:
-          <profile-name-1>: >
-              <Description of what this profile means and what experiment
-              parameter values it corresponds to.>
-          <profile-name-2>: >
-              <Description of what this profile means.>
-
-metrics:
-    - <canonical-metric-name-1>
-    - <canonical-metric-name-2>
-
-owner: "@<your-github-username>"
+logicalBenchmark:
+  benchmarkIdentifier: inference_serving
+  description: >
+      Evaluation of AI model inference serving throughput and latency under
+      controlled traffic conditions.
+  target:
+      - identifier: model
+        metadata:
+            description: "The id of the AI model being benchmarked"
+  properties:
+      - identifier: dataset
+        metadata:
+            description: "Dataset used for inference requests."
+            # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
+      - identifier: workload
+        metadata:
+            description: "Traffic pattern or workload profile."
+        domain:
+            values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+  metrics:
+      - throughput_tokens_per_second
+      - time_to_first_token_ms
+  owner: "@vllm-team"
+bindings: [] # List of bindings to this benchmark
 ```
-
-The dimension names and workload profile names you define here become the
-shared vocabulary for your domain. Other teams adding experiments for the same
-problem will adopt these names and map their own internal parameter names to
-them.
 
 For the full schema and a complete worked example, see
 [Section 2 of the Benchmark Metadata Convention](../design/benchmark_metadata_convention.md#2-logical-benchmark-definition).
+
+### Add a benchmark binding for your experiment
+
+The binding is added to the list of bindings in the logical benchmark yaml.
+
+```yaml
+logicalBenchmark: ... #logical benchmark fields
+bindings:
+    - experiment:
+          experimentIdentifer: myexperiment
+          experimentVersion: 1.2
+          actuatorIdentifier: customexperiments
+      targetMapping: ...
+    -  #next binding
+```
+
+A binding contains the following mapping sections: `
+
+- `targetMapping`: Maps the target property of the benchmark to an experiment input property
+- `propertyMappings`: Maps the other inputs of the logical benchmark to inputs of the
+  experiment
+- `metricMappings`: Maps outputs of the logical benchmark to the outputs of the
+  experiment
+
+An example binding is
+
+```yaml
+benchmarkIdentifier: inference_serving
+experiment:
+    actuatorIdentifier: vllm_performance
+    experimentIdentifier: guide_llm_runner
+    experimentVersion: 2.0.0 # The binding only uses the major version
+targetMapping: model_name #The property model_name maps to the target property defined in the benchmark
+propertyMappings:
+    - benchmark:
+          identifier: dataset
+      experiment:
+          identifier: input_data_path # guide-llm's internal param name
+    - categoricalValue:
+          property:
+              identifier: workload
+          value: steady_state_heavy
+      predicate:
+          - identifier: traffic_shape
+            domain:
+                values: ["constant"]
+          - identifier: concurrency
+            domain:
+                domainRange: [100, 1000]
+                variableType: CONTINUOUS_VARIABLE_TYPE
+    - categoricalValue:
+          property:
+              identifier: workload
+          value: steady_state_heavy
+      predicate:
+          - identifier: traffic_shape
+            domain:
+                values: ["poisson"]
+          - identifier: concurrency
+            domain:
+                domainRange: [1, 100]
+                variableType: CONTINUOUS_VARIABLE_TYPE
+metricMapping:
+    - benchmark:
+          identifier: throughput_tokens_per_second
+      experiment:
+          identifier: throughput_rps # guide-llm's internal param name
+    - benchmark:
+          identifier: time_to_first_token_ms
+      experiment:
+          identifier: ttft_ms
+```
+
+For the full benchmark binding schema and worked examples, see the
+[Benchmark Metadata Convention](../design/benchmark_metadata_convention.md).
 
 ---
 
@@ -321,8 +352,10 @@ For the full schema and a complete worked example, see
 
 If you encounter issues:
 
-1. Check the [Benchmark Integration Design](../design/benchmark_integration_design.md)
-2. Check the [Benchmark Metadata Convention](../design/benchmark_metadata_convention.md)
+1. Check the
+   [Benchmark Integration Design](../design/benchmark_integration_design.md)
+2. Check the
+   [Benchmark Metadata Convention](../design/benchmark_metadata_convention.md)
 3. Refer to the [ADO documentation](https://ibm.github.io/ado)
 4. Search existing issues on GitHub
 5. Open a new issue with details about your problem
