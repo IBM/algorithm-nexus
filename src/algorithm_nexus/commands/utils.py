@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,19 @@ except ImportError:
 from algorithm_nexus.models import AlgorithmNexusPackageConfig
 
 console = Console()
+
+
+def strip_ansi_codes(text: str) -> str:
+    """Remove ANSI escape sequences from text.
+
+    Args:
+        text: Text potentially containing ANSI codes
+
+    Returns:
+        Text with ANSI codes removed
+    """
+    ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+    return ansi_escape.sub("", text)
 
 
 class ValidationErrorCollector:
@@ -108,19 +122,27 @@ def load_yaml_file(
 def validate_output_format(
     output_format: str | None,
     allow_txt: bool = False,
+    allow_yaml: bool = False,
+    allow_csv: bool = True,
 ) -> None:
     """Validate the output format parameter.
 
     Args:
         output_format: The output format to validate
         allow_txt: Whether to allow 'txt' format (for requirements files)
+        allow_yaml: Whether to allow 'yaml' format
+        allow_csv: Whether to allow 'csv' format (default: True)
 
     Raises:
         typer.Exit: If the format is invalid
     """
-    valid_formats = ["csv", "json"]
+    valid_formats = ["json"]
+    if allow_csv:
+        valid_formats.append("csv")
     if allow_txt:
         valid_formats.append("txt")
+    if allow_yaml:
+        valid_formats.append("yaml")
 
     if output_format is not None and output_format not in valid_formats:
         formats_str = "', '".join(valid_formats)
@@ -159,7 +181,7 @@ def output_data(
     Args:
         data: List of dictionaries containing the data rows
         headers: List of column headers
-        output_format: Output format ('csv', 'json', or None for table)
+        output_format: Output format ('csv', 'json', 'yaml', or None for table)
         output_file: Optional file path to write output to
         table_title: Title for the table output
     """
@@ -170,6 +192,13 @@ def output_data(
             console.print(f"[green]Output written to {output_file}[/green]")
         else:
             console.print(json_output)
+    elif output_format == "yaml":
+        yaml_output = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        if output_file:
+            output_file.write_text(yaml_output)
+            console.print(f"[green]Output written to {output_file}[/green]")
+        else:
+            console.print(yaml_output)
     elif output_format == "csv":
         # Write CSV to string first
         csv_buffer = io.StringIO()

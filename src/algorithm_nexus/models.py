@@ -187,3 +187,25 @@ class AlgorithmNexusPackageConfig(BaseModel):
     package: Annotated[
         NexusPackageInfo, Field(description="Package-level configuration")
     ]
+
+
+class BenchmarkExecutionResult(BaseModel):
+    """Result of executing a benchmark instance."""
+
+    instance_path: Annotated[str, Field(description="Path to the benchmark instance")]
+    status: Annotated[
+        Literal["success", "failed", "started", "unknown"],
+        Field(description="Execution status"),
+    ] = "unknown"
+    message: Annotated[
+        str, Field(description="Status message or error description")
+    ] = ""
+    space_id: Annotated[str | None, Field(description="Created discovery space ID")] = (
+        None
+    )
+    operation_id: Annotated[str | None, Field(description="Created operation ID")] = (
+        None
+    )
+    ray_job_id: Annotated[
+        str | None, Field(description="Ray job ID for remote execution")
+    ] = None

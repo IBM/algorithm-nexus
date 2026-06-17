@@ -1,0 +1,5 @@
+{
+  "model": "prithvi",
+  "dataset": "sen1floods11",
+  "batch_size": 32
+}

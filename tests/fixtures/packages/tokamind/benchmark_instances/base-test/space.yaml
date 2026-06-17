@@ -1,0 +1,13 @@
+entitySpace:
+  - identifier: dataset
+    propertyDomain:
+      values: ["tokamak_data"]
+  - identifier: split
+    propertyDomain:
+      values: ["test"]
+
+experiments:
+  - actuatorIdentifier: custom_experiments
+    experimentIdentifier: local-baseline-eval
+
+# Made with Bob
