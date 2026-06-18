@@ -24,7 +24,8 @@ from algorithm_nexus.commands.list import (
     list_benchmark_packages,
     list_packages,
 )
-from algorithm_nexus.commands.validate import validate
+from algorithm_nexus.commands.run import run_benchmarks
+from algorithm_nexus.commands.validate import validate_benchmarks, validate_package
 
 console = Console()
 
@@ -48,14 +49,25 @@ get_app = typer.Typer(
 )
 app.add_typer(get_app, name="get")
 
+# Create subcommand group for 'run'
+run_app = typer.Typer(
+    help="Execute benchmarks and operations.",
+    no_args_is_help=True,
+)
+app.add_typer(run_app, name="run")
+
+# Create subcommand group for 'validate'
+validate_app = typer.Typer(
+    help="Validate various aspects of Nexus packages.",
+    no_args_is_help=True,
+)
+app.add_typer(validate_app, name="validate")
+
 
 @app.callback(invoke_without_command=True)
 def main_callback(ctx: typer.Context) -> None:
     pass
 
-
-# Register validate command
-app.command(name="validate")(validate)
 
 # Register list commands
 list_app.command(name="packages")(list_packages)
@@ -64,6 +76,13 @@ list_app.command(name="benchmark-experiments")(list_benchmark_experiments)
 
 # Register get commands
 get_app.command(name="benchmark-requirements")(get_benchmark_requirements)
+
+# Register run commands
+run_app.command(name="benchmarks")(run_benchmarks)
+
+# Register validate commands
+validate_app.command(name="package")(validate_package)
+validate_app.command(name="benchmarks")(validate_benchmarks)
 
 
 def main() -> None:

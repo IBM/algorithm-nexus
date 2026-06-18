@@ -5,7 +5,7 @@
 This document describes the dependency declaration and dependency resolution
 process for **Algorithm Nexus** in the context of the three distribution package
 variants defined in
-[Requirements for Package Variants and Dependency Management](docs/requirements/packaging_and_dependency_reqs.md#req-1-multiple-build-targets`).
+[Requirements for Package Variants and Dependency Management](../requirements/packaging_and_dependency_reqs.md#req1-multiple-build-targets).
 
 It explains how distribution package variants are implemented using the
 packaging system, how dependencies are added, and how correctness is enforced
@@ -24,24 +24,24 @@ The mapping between **distribution package variants** and **optional
 dependencies** is defined as follows:
 
 - **Ecosystem Variant**
-  - Installation target: `algorithm-nexus[ecosystem]`
-  - The dependency graph **must not include** the `vllm` library.
-  - Only Algorithm Stack packages associated with the _Ecosystem Algorithm
-    Stack_ are included.
+    - Installation target: `algorithm-nexus[ecosystem]`
+    - The dependency graph **must not include** the `vllm` library.
+    - Only Algorithm Stack packages associated with the _Ecosystem Algorithm
+      Stack_ are included.
 
 - **Candidate Variant**
-  - Installation target: `algorithm-nexus[candidate]`
-  - The dependency graph **must include** the `vllm` library.
-  - A **specific version of `vllm` must always be required**.
-  - Only Algorithm Stack packages associated with the _Candidate Algorithm
-    Stack_ are included.
+    - Installation target: `algorithm-nexus[candidate]`
+    - The dependency graph **must include** the `vllm` library.
+    - A **specific version of `vllm` must always be required**.
+    - Only Algorithm Stack packages associated with the _Candidate Algorithm
+      Stack_ are included.
 
 - **Product Variant**
-  - Installation target: `algorithm-nexus[product]`
-  - The dependency graph **must include** the `vllm` library.
-  - A **specific, pinned version of `vllm` must always be required**.
-  - Only Algorithm Stack packages associated with the _Product Algorithm Stack_
-    are included.
+    - Installation target: `algorithm-nexus[product]`
+    - The dependency graph **must include** the `vllm` library.
+    - A **specific, pinned version of `vllm` must always be required**.
+    - Only Algorithm Stack packages associated with the _Product Algorithm
+      Stack_ are included.
 
 Because different variants may result in mutually incompatible dependency
 graphs, uv is relied upon to isolate and resolve dependencies per variant.
@@ -144,11 +144,11 @@ All packages are added using the following pattern:
 uv add <package-spec> --optional <variant-extra>
 ```
 
-> [!NOTE]
->
-> We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
-> command, to avoid errors with `uv` not being able to sync the dependencies
-> with the local python environment.
+!!! note
+
+    We recommend MacOS users to add the `--no-sync` argument to the the `uv add`
+    command, to avoid errors with `uv` not being able to sync the dependencies
+    with the local python environment.
 
 Where `<variant-extra>` is one of:
 
@@ -171,11 +171,11 @@ uv add <package-name> --optional ecosystem
 
 ### 5.3 vllm‑Dependent Packages
 
-> [!NOTE]
->
-> Algorithm Stack package developers **must not** add packages to the `product`
-> variant. Algorithm Nexus owners will add them once product requirements have
-> been met, and will coordinate with the developers in case of need.
+!!! note
+
+    Algorithm Stack package developers **must not** add packages to the `product`
+    variant. Algorithm Nexus owners will add them once product requirements have
+    been met, and will coordinate with the developers in case of need.
 
 Add the package to the vllm‑enabled variants:
 
@@ -203,11 +203,11 @@ uv add <package-name>[<non-vllm-extra>] --optional ecosystem
 
 #### Candidate and Product Variants (vllm included)
 
-> [!NOTE]
->
-> Algorithm Stack package developers **must not** add packages to the `product`
-> variant. Algorithm Nexus owners will add them once product requirements have
-> been met, and will coordinate with the developers in case of need.
+!!! note
+
+    Algorithm Stack package developers **must not** add packages to the `product`
+    variant. Algorithm Nexus owners will add them once product requirements have
+    been met, and will coordinate with the developers in case of need.
 
 Add the package **with extras enabled** such that `vllm` is included in the
 dependency graph:
@@ -224,10 +224,10 @@ uv add <package-name>[<vllm-extra>,<non-vllm-extra>] --optional candidate
 
 ### 5.5 Git‑Based Packages
 
-> [!IMPORTANT]
->
-> SSH-based cloning is not supported. All Git dependencies **must** be publicly
-> accessible and clonable via HTTPS.
+!!! warning
+
+    SSH-based cloning is not supported. All Git dependencies **must** be publicly
+    accessible and clonable via HTTPS.
 
 For packages hosted in a public Git repository, the same rules apply.
 

@@ -38,43 +38,43 @@ Based on the [benchmark requirements](../requirements/benchmark.md), the system
 has five core concepts that must be linked together by package metadata:
 
 - **Benchmark experiment**
-  - a script, harness, or workflow that executes a benchmark target on a
-    workload and collects measurements
-  - in this design, benchmark experiments are registered at package level in
-    `nexus.yaml`
-  - All benchmark experiments follow the
-    [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
+    - a script, harness, or workflow that executes a benchmark target on a
+      workload and collects measurements
+    - in this design, benchmark experiments are registered at package level in
+      `nexus.yaml`
+    - All benchmark experiments follow the
+      [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
 
 - **Workload**
-  - the inputs, data, and execution pattern exercised by a benchmark driver
-  - in this design, workload or experiment parameter values are specified in
-    per-instance `space.yaml` files under model-level or package-level
-    `benchmark_instances/`
+    - the inputs, data, and execution pattern exercised by a benchmark driver
+    - in this design, workload or experiment parameter values are specified in
+      per-instance `space.yaml` files under model-level or package-level
+      `benchmark_instances/`
 
 - **Benchmark target**
-  - the model or algorithm being evaluated
-  - in this design, the benchmark target is implicit from the enclosing model
-    definition in `model.yaml` for model-level benchmark instances
-  - for package-level baseline benchmark instances, the benchmark target is
-    defined directly by the benchmark instance itself
+    - the model or algorithm being evaluated
+    - in this design, the benchmark target is implicit from the enclosing model
+      definition in `model.yaml` for model-level benchmark instances
+    - for package-level baseline benchmark instances, the benchmark target is
+      defined directly by the benchmark instance itself
 
 - **Benchmark**
-  - either a fixed benchmark experiment or a workload plus a parameterizable
-    benchmark experiment
-  - in this design, a benchmark instance references a registered benchmark
-    experiment and provides parameter values where needed
+    - either a fixed benchmark experiment or a workload plus a parameterizable
+      benchmark experiment
+    - in this design, a benchmark instance references a registered benchmark
+      experiment and provides parameter values where needed
 
 - **Benchmark instance**
-  - a concrete benchmark definition for a specific use case
-  - in this design, each benchmark instance is represented by one folder under a
-    model-level or package-level `benchmark_instances/` directory, containing a
-    `space.yaml` file with the full ADO discoveryspace definition
-  - for model-level benchmark instances, the benchmark target is the enclosing
-    model
-  - package-level benchmark instances support baseline experiments that live at
-    the top level of the Nexus package
-  - the benchmark instance binds together the selected experiment and the
-    workload-specific parameter values used for execution
+    - a concrete benchmark definition for a specific use case
+    - in this design, each benchmark instance is represented by one folder under
+      a model-level or package-level `benchmark_instances/` directory,
+      containing a `space.yaml` file with the full ADO discoveryspace definition
+    - for model-level benchmark instances, the benchmark target is the enclosing
+      model
+    - package-level benchmark instances support baseline experiments that live
+      at the top level of the Nexus package
+    - the benchmark instance binds together the selected experiment and the
+      workload-specific parameter values used for execution
 
 This follows the requirements terminology that a benchmark instance is formed
 from a benchmark target together with a benchmark, where the benchmark is
@@ -142,18 +142,20 @@ packages/
 The canonical benchmark metadata is split across three locations:
 
 - [`nexus.yaml`](../../packages/terratorch/nexus.yaml)
-  - registers the benchmark packages a package makes available
-  - records the `requirement_specifier` for each registered benchmark package
-  - records the experiment identifiers exposed by each registered benchmark
-    package
+    - registers the benchmark packages a package makes available
+    - records the `requirement_specifier` for each registered benchmark package
+    - records the experiment identifiers exposed by each registered benchmark
+      package
+
 - package-level `benchmark_instances/`
-  - records which baseline benchmark instances the package makes available
-  - stores one folder per package-level benchmark instance
-  - carries a `space.yaml` ADO discoveryspace definition for each instance
+    - records which baseline benchmark instances the package makes available
+    - stores one folder per package-level benchmark instance
+    - carries a `space.yaml` ADO discoveryspace definition for each instance
+
 - model-level `benchmark_instances/`
-  - records which benchmark instances a model should use
-  - stores one folder per model-specific benchmark instance
-  - carries a `space.yaml` ADO discoveryspace definition for each instance
+    - records which benchmark instances a model should use
+    - stores one folder per model-specific benchmark instance
+    - carries a `space.yaml` ADO discoveryspace definition for each instance
 
 The package-level [`benchmark_packages/`](../../packages/terratorch/) directory
 stores local benchmark packages that live with the Nexus package. Each local
@@ -188,21 +190,21 @@ packaging protocol.
 
 ```yaml
 package:
-  name: "terratorch"
+    name: "terratorch"
 
-  benchmark_packages:
-    - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
-      experiments:
-        - "local-segmentation-eval"
-        - "local-boundary-eval"
+    benchmark_packages:
+        - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
+          experiments:
+              - "local-segmentation-eval"
+              - "local-boundary-eval"
 
-    - requirement_specifier: "https://github.com/example-org/example-benchmarks"
-      experiments:
-        - "leaderboard-baseline"
+        - requirement_specifier: "https://github.com/example-org/example-benchmarks"
+          experiments:
+              - "leaderboard-baseline"
 
-    - requirement_specifier: "example-benchmark-package"
-      experiments:
-        - "packaged-baseline"
+        - requirement_specifier: "example-benchmark-package"
+          experiments:
+              - "packaged-baseline"
 ```
 
 **Fields:**
@@ -256,16 +258,16 @@ Example `space.yaml`:
 
 ```yaml
 entitySpace:
-  - identifier: dataset
-    propertyDomain:
-      values: ["sen1floods11"]
-  - identifier: split
-    propertyDomain:
-      values: ["test"]
+    - identifier: dataset
+      propertyDomain:
+          values: ["sen1floods11"]
+    - identifier: split
+      propertyDomain:
+          values: ["test"]
 
 experiments:
-  - actuatorIdentifier: custom_experiments
-    experimentIdentifier: local-segmentation-eval
+    - actuatorIdentifier: custom_experiments
+      experimentIdentifier: local-segmentation-eval
 ```
 
 **Fields and expectations:**

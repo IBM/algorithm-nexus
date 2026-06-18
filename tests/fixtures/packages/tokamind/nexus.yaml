@@ -1,0 +1,7 @@
+name: tokamind
+version: 1.0.0
+description: Test fixture for tokamind package
+models:
+  - tokamind-base
+
+# Made with Bob

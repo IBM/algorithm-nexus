@@ -46,7 +46,7 @@ git checkout -b add-<package-name>-package
 ## Step 2: Add your algorithm package to the Algorithm Nexus dependencies
 
 1. Determine which variants your package should be added to, by reading
-[`Identify The Algorithm Nexus variant for your Package`](#identify-the-algorithm-nexus-variant-for-your-package).
+   [`Identify The Algorithm Nexus variant for your Package`](#identify-the-algorithm-nexus-variant-for-your-package).
 2. Add it to each of these variants using `uv`.
 3. Export requirements
 
@@ -85,13 +85,13 @@ Then, create the Nexus package configuration file in
 
 ```yaml
 package:
-  name: <package-name>
+    name: <package-name>
 ```
 
 Finally, validate the package structure with
 
 ```bash
-uv run nexus validate packages/<package-name>
+uv run nexus validate package packages/<package-name>
 ```
 
 In case of validation errors, the nexus validate tool will list all the errors.
@@ -119,20 +119,50 @@ case of failures in _Step 2_, the PR template contains a dedicated section
 (`I Need Help`) where you can log the errors recorded while adding your python
 package to the Algorithm Nexus dependencies.
 
-## Next Steps
+## Optional Steps
 
 After completing above you can flesh out your contribution with more
 information:
 
 1. [Describe the models your algorithm package contains](#describe-the-models-in-your-algorithm-package)
-   - This is required to access testing and benchmarking of your model in future
+    - This is required to access testing and benchmarking of your model in future
 2. [Add documentation on how to use your models](#model-usage-documentation) for
    inference and fine-tuning
 3. [Add agent skills for your package](#agent-skills-for-nexus-packages)
 
-## Additional Material
+### Describe the Models in Your Algorithm Package
 
-### Identify The Algorithm Nexus Variant for your Package
+If your algorithm package contains one or more models, you can add their
+description to the Nexus package metadata by following the steps below.
+
+For each model (`<model-name>`) that your package supports:
+
+1. Create a directory under `packages/<package-name>/models/<model-name>/`
+2. Create a `model.yaml` file with the model configuration:
+
+    ```yaml
+    model:
+        id: organization/model-name # Hugging Face model repository identifier
+        owner: github-username # Optional: defaults to package owner if omitted
+    ```
+
+Full details on the model configuration file are available in the
+[Nexus Package Structure Guide](../design/nexus_package.md).
+
+### Model Usage Documentation
+
+Optionally, each model in a Nexus package can provide usage documentation in a
+`usage.md` file in the model subfolder. This should be populated with usage
+examples, description of useful parameters, and any other relevant information.
+
+### Agent Skills for Nexus Packages
+
+Optionally, each Nexus package can provide agent skills for helping the user
+with using the package and its models. Example agent skills would aid the users
+with models deployment on different target infrastructure (e.g., bare metal,
+Kubernetes, etc.) and with building scripts for evaluating the models.
+
+## Identify The Algorithm Nexus Variant for your Package
 
 If your Python package:
 
@@ -155,52 +185,12 @@ It belongs both to the `ecosystem` and `candidate` variant only. In this case,
 when adding to the `candidate` variant, users must ensure their package is added
 with the optional `vllm` dependency (`package-name[vllm-dependency]`).
 
-### Describe the Models in Your Algorithm Package
-
-If your algorithm package contains one or more models, you can add their
-description to the Nexus package metadata by following the steps below.
-
-For each model (`<model-name>`) that your package supports:
-
-1. Create a directory under `packages/<package-name>/models/<model-name>/`
-2. Create a `model.yaml` file with the model configuration:
-
-   ```yaml
-   model:
-     id: organization/model-name # Hugging Face model repository identifier
-     owner: github-username # Optional: defaults to package owner if omitted
-   ```
-
-Full details on the model configuration file are available in the
-[Nexus Package Structure Guide](../design/nexus_package.md).
-
-### Model Usage Documentation
-
-Optionally, each model in a Nexus package can provide usage documentation in a
-`usage.md` file in the model subfolder. This should be populated with usage
-examples, description of useful parameters, and any other relevant information.
-
-### Agent Skills for Nexus Packages
-
-Optionally, each Nexus package can provide agent skills for helping the user
-with using the package and its models. Example agent skills would aid the users
-with models deployment on different target infrastructure (e.g., bare metal,
-Kubernetes, etc.) and with building scripts for evaluating the models.
-
 ## Getting Help
 
 If you encounter issues:
 
-1. Check the [Nexus Package Structure Guide](nexus_package.md)
+1. Check the [Nexus Package Structure Guide](../design/nexus_package.md)
 2. Review the
    [Dependency Resolution Design Document](../design/dependency-resolution.md)
 3. Search existing issues on GitHub
 4. Open a new issue with details about your problem
-
-## References
-
-- [Nexus Package Structure Guide](../design/nexus_package.md)
-- [Nexus Package Requirements](../requirements/nexus_package.md)
-- [Packaging and Dependency Requirements](../requirements/packaging_and_dependency_reqs.md)
-- [Contributing Guidelines](../../CONTRIBUTING.md)
-- [Maintainers](../../MAINTAINERS.md)

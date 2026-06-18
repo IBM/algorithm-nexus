@@ -9,6 +9,14 @@ config:
   # MD001/heading-increment - Heading levels should only increment by one level at a time
   MD001: false
 
+  # MD024/no-duplicate-heading - Multiple headings with the same content
+  MD024:
+    siblings_only: true
+
+  # MD007/ul-indent - Unordered list indentation
+  MD007:
+    indent: 4
+
   # MD013/line-length - Line length
   MD013:
     line_length: 120
@@ -34,5 +42,4 @@ config:
   MD041: false
 
   # MD046/code-block-style - Code block style
-  MD046:
-    style: fenced
+  MD046: false

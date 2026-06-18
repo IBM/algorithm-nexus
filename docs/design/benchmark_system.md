@@ -118,15 +118,15 @@ utilizes `ado`'s native search space semantics.
 
 <!-- markdownlint-disable line-length -->
 
-| Requirement | Name                                 | Fulfillment Strategy | Component           | Proposed Solution                                                                                                                                                                                                                                                                                                                                    |
-| ----------- | ------------------------------------ | -------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **REQ 2.1** | Benchmark Experiment Package Registration    | Technology + Process | nexus               | Registering a benchmark experiments package involves adding metadata describing the package and the experiments it contains to a Nexus package, as well as validating that all referenced packages can be installed together. Packages provided via any mechanism outlined in REQ 3.2 can be registered. [PENDING: Nexus Test Dependencies Handling] |
-| **REQ 2.3** | Benchmark Registration               | Technology + Process | nexus + `ado`       | Registering a benchmark (see REQ 3.1 for specification) involves adding the relevant files and metadata to a nexus package model directory AND those files passing ado+nexus validation. [PENDING: Nexus Model Benchmark Specification Decision].                                                                                                    |
-| **REQ 4.3** | Resource Limits                      | Technology + Process | Ray Cluster         | Admins configure Ray clusters to set hard quotas per instance.                                                                                                                                                                                                                                                                                       |
-| **REQ 4.6** | Logging                              | Technology + Process | Ray Cluster         | Admins configure infrastructure to persist logs without indefinite retention.                                                                                                                                                                                                                                                                        |
-| **REQ 6.2** | Isolated Execution                   | Technology + Process | `ado` + Ray Runtime | Users can describe the benchmark experiment dependencies in the benchmark experiment package using `ado` + Ray semantics. Ray will dynamically create isolated virtual environments per worker.                                                                                                                                                      |
-| **REQ 6.3** | Persistent Filesystem                | Technology + Process | Ray / K8s           | Admins configure the cluster to mount a shared PVC for dataset caching.                                                                                                                                                                                                                                                                              |
-| **REQ 7.2** | Admin-Triggered Evaluation Execution | Technology + Process | GitHub              | Triggered via automated GitHub events or on-demand via GitHub ChatOps.                                                                                                                                                                                                                                                                               |
+| Requirement | Name                                      | Fulfillment Strategy | Component           | Proposed Solution                                                                                                                                                                                                                                                                                                                                      |
+| ----------- | ----------------------------------------- | -------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **REQ 2.1** | Benchmark Experiment Package Registration | Technology + Process | nexus               | Registering a benchmark experiments package involves adding metadata describing the package and the experiments it contains to a Nexus package, as well as validating that all referenced packages can be installed together. Packages provided via any mechanism outlined in REQ 3.2 can be registered. \[PENDING: Nexus Test Dependencies Handling\] |
+| **REQ 2.3** | Benchmark Registration                    | Technology + Process | nexus + `ado`       | Registering a benchmark (see REQ 3.1 for specification) involves adding the relevant files and metadata to a nexus package model directory AND those files passing ado+nexus validation. \[PENDING: Nexus Model Benchmark Specification Decision\].                                                                                                    |
+| **REQ 4.3** | Resource Limits                           | Technology + Process | Ray Cluster         | Admins configure Ray clusters to set hard quotas per instance.                                                                                                                                                                                                                                                                                         |
+| **REQ 4.6** | Logging                                   | Technology + Process | Ray Cluster         | Admins configure infrastructure to persist logs without indefinite retention.                                                                                                                                                                                                                                                                          |
+| **REQ 6.2** | Isolated Execution                        | Technology + Process | `ado` + Ray Runtime | Users can describe the benchmark experiment dependencies in the benchmark experiment package using `ado` + Ray semantics. Ray will dynamically create isolated virtual environments per worker.                                                                                                                                                        |
+| **REQ 6.3** | Persistent Filesystem                     | Technology + Process | Ray / K8s           | Admins configure the cluster to mount a shared PVC for dataset caching.                                                                                                                                                                                                                                                                                |
+| **REQ 7.2** | Admin-Triggered Evaluation Execution      | Technology + Process | GitHub              | Triggered via automated GitHub events or on-demand via GitHub ChatOps.                                                                                                                                                                                                                                                                                 |
 
 <!-- markdownlint-enable line-length -->
 
@@ -174,14 +174,14 @@ submitted to the Ray cluster for execution.
 
 | Requirement | Name                            | Fulfillment Strategy    | Component     | Proposed Solution                                                                                                                                                         |
 | ----------- | ------------------------------- | ----------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. [PENDING: Versioning Semantics Decision]                               |
+| **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. \[PENDING: Versioning Semantics Decision\]                             |
 | **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`'s convention that a given experiment name encodes a unique, repeatable experiment.                                                              |
 | **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads it dynamically.                                                                     |
 | **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As REQ 1.7                                                                                                                                                                |
 | **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a workload.                                                                              |
 | **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Benchmark experiment packages (following Standardized Benchmarking Packaging Protocol) can be provided in a Nexus package in the Algorithm Nexus repo, on PyPI or GitHub. |
 | **REQ 6.1** | Admin Security                  | Process                 | CI            | Secured via trusted code submissions and mandatory CVE scans.                                                                                                             |
-| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. [PENDING: Nexus Repo Layout Decision]                  |
+| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. \[PENDING: Nexus Repo Layout Decision\]                |
 | **REQ 7.3** | Sweep Review and Approval       | Process                 | GitHub PRs    | Admins retain review oversight of sweep configurations via GitHub PR workflows.                                                                                           |
 
 <!-- markdownlint-enable line-length -->
@@ -194,16 +194,16 @@ The following questions/decisions are open and can be resolved in subsequent
 issues.
 
 - Versioning Semantics for REQ 1.3
-  - Rules and conventions for versioning benchmark experiments
+    - Rules and conventions for versioning benchmark experiments
 - Nexus Test Dependencies Handling for REQ 2.2
-  - The process for validating that the benchmark packages referenced by a nexus
-    package can be installed together
+    - The process for validating that the benchmark packages referenced by a
+      nexus package can be installed together
 - Nexus Model Benchmark Specification Decision for REQ 2.3
-  - Exact YAML metadata and directory structure used to add a Nexus Model
-    benchmark specification
+    - Exact YAML metadata and directory structure used to add a Nexus Model
+      benchmark specification
 - Nexus Repo Layout for REQ 7.1
-  - Exact YAML metadata and directory structure used to add a Nexus benchmark
-    specification
+    - Exact YAML metadata and directory structure used to add a Nexus benchmark
+      specification
 
 ## How Nexus package developers will use the system
 
@@ -233,5 +233,7 @@ They then define their benchmark using an ado configuration (REQ 3.1) adding
 this to the model directory of the relevant nexus package (REQ 2.3). The
 benchmark configuration can reference any benchmark experiment registered by the
 Nexus package. If the benchmark experiment they need is not registered by the
-nexus package [they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package). The
-benchmark configuration can also be based on one discovered via the Nexus CLI.
+nexus package
+[they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package).
+The benchmark configuration can also be based on one discovered via the Nexus
+CLI.
