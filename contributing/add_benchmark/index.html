@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../add_new_nexus_package/">
+      
+      
+        <link rel="next" href="../owner_responsibilities/">
       
       
         
@@ -236,6 +240,8 @@
       
         
       
+        
+      
     
     
     
@@ -256,6 +262,8 @@
   
   
   
+    
+  
   
     
       
@@ -270,11 +278,13 @@
       
         
       
+        
+      
     
     
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../" class="md-tabs__link">
           
   
@@ -515,6 +525,8 @@
       
         
       
+        
+      
     
     
     
@@ -680,6 +692,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/benchmark_metadata_convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Benchmark Metadata
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../design/project_release/" class="md-nav__link">
         
   
@@ -711,6 +750,8 @@
       
   
   
+    
+  
   
   
     
@@ -726,18 +767,23 @@
       
         
       
-    
-    
-    
-      
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -758,13 +804,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -825,6 +871,235 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing a Benchmark for a Model
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing a Benchmark for a Model
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Prerequisites
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-find-or-create-a-benchmark-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step 1: Find or create a benchmark experiment
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Find or create a benchmark experiment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find-an-existing-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Find an existing experiment
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-new-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create a new experiment
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-register-the-experiment-with-your-nexus-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step 2: Register the experiment with your Nexus package
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-define-a-benchmark-instance-for-your-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step 3: Define a benchmark instance for your model
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-run-the-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step 4: Run the benchmark
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-commit-changes-and-open-a-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Step 5: Commit Changes and Open a Pull Request
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-mapping-to-logical-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Optional: Mapping to logical benchmarks
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional: Mapping to logical benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-for-an-existing-logical-benchmark-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Check for an existing logical benchmark definition
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-logical-benchmark-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Create a logical benchmark definition
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-a-benchmark-binding-for-your-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Add a benchmark binding for your experiment
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Getting Help
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1097,6 +1372,65 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  
+  <span class="md-ellipsis">
+    Algorithm Nexus
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -1188,7 +1522,7 @@ experiment from the given package</p>
 <p>Each <code>requirement_specifier</code> must resolve to a Python package that contains an
 <code>ado</code> custom experiment.</p>
 <p>Validate the updated package configuration:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>packages/&lt;package-name&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/&lt;package-name&gt;
 </span></code></pre></div>
 <p>Fix any validation errors before proceeding.</p>
 <h2 id="step-3-define-a-benchmark-instance-for-your-model">Step 3: Define a benchmark instance for your model<a class="headerlink" href="#step-3-define-a-benchmark-instance-for-your-model" title="Permanent link">&para;</a></h2>
@@ -1220,7 +1554,7 @@ directory, that contains a <code>ado</code> <code>space.yaml</code></p>
 <p>For full details on <code>space.yaml</code> syntax, see the
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace">ADO discoveryspace documentation</a>.</p>
 <p>Validate the package again to confirm the instance is well-formed:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>packages/&lt;package-name&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/&lt;package-name&gt;
 </span></code></pre></div>
 <h2 id="step-4-run-the-benchmark">Step 4: Run the benchmark<a class="headerlink" href="#step-4-run-the-benchmark" title="Permanent link">&para;</a></h2>
 <p>Install the benchmark package and run the benchmark instance locally using the
@@ -1249,7 +1583,7 @@ It will execute the experiment on all points in your space.</p>
 execution options including parameter sweeps and remote execution.</p>
 <h2 id="step-5-commit-changes-and-open-a-pull-request">Step 5: Commit Changes and Open a Pull Request<a class="headerlink" href="#step-5-commit-changes-and-open-a-pull-request" title="Permanent link">&para;</a></h2>
 <p>Add and commit your changes:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>add<span class="w"> </span>packages/&lt;package-name&gt;<span class="w"> </span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>add<span class="w"> </span>packages/&lt;package-name&gt;
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>git<span class="w"> </span>add<span class="w"> </span>benchmark_packages<span class="w"> </span><span class="c1">#required when also adding a benchmark package during Step 1</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-s<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat(benchmark): Add &lt;instance-name&gt; benchmark for &lt;model-name&gt;&quot;</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>&lt;your-branch&gt;
@@ -1423,6 +1757,44 @@ vocabulary for your benchmark — property names, valid values, and metric names
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../add_new_nexus_package/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Add New Nexus Package">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Add New Nexus Package
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../owner_responsibilities/" class="md-footer__link md-footer__link--next" aria-label="Next: Owner Responsibilities">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Owner Responsibilities
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

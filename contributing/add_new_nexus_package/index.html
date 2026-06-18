@@ -16,7 +16,7 @@
         <link rel="prev" href="../guidelines/">
       
       
-        <link rel="next" href="../owner_responsibilities/">
+        <link rel="next" href="../add_benchmark/">
       
       
         
@@ -240,6 +240,8 @@
       
         
       
+        
+      
     
     
     
@@ -268,6 +270,8 @@
       
         
           
+        
+      
         
       
         
@@ -521,6 +525,8 @@
       
         
       
+        
+      
     
     
     
@@ -686,6 +692,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/benchmark_metadata_convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Benchmark Metadata
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../design/project_release/" class="md-nav__link">
         
   
@@ -726,6 +759,8 @@
       
         
           
+        
+      
         
       
         
@@ -1010,6 +1045,33 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing a Benchmark for a Model
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1318,6 +1380,8 @@
       
         
       
+        
+      
     
     
     
@@ -1411,7 +1475,7 @@ repository you checked out, create a folder with your package name</p>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;package-name&gt;</span>
 </span></code></pre></div>
 <p>Finally, validate the package structure with</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>packages/&lt;package-name&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/&lt;package-name&gt;
 </span></code></pre></div>
 <p>In case of validation errors, the nexus validate tool will list all the errors.
 Fix them before moving to the next step.</p>
@@ -1550,13 +1614,13 @@ with the optional <code>vllm</code> dependency (<code>package-name[vllm-dependen
         
         
           
-          <a href="../owner_responsibilities/" class="md-footer__link md-footer__link--next" aria-label="Next: Owner Responsibilities">
+          <a href="../add_benchmark/" class="md-footer__link md-footer__link--next" aria-label="Next: Contributing a Benchmark for a Model">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Owner Responsibilities
+                Contributing a Benchmark for a Model
               </div>
             </div>
             <div class="md-footer__button md-icon">
