@@ -1526,14 +1526,14 @@ nvidia-cuda-nvcc==13.3.33 ; sys_platform == 'emscripten' or sys_platform == 'win
     #   cuda-toolkit
     #   humming-kernels
     #   nvidia-cuda-tileiras
-nvidia-cuda-nvrtc==13.0.88 ; sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' \
+nvidia-cuda-nvrtc==13.0.88 ; sys_platform != 'darwin' \
     --hash=sha256:6bcd4e7f8e205cbe644f5a98f2f799bef9556fefc89dd786e79a16312ce49872 \
     --hash=sha256:ad9b6d2ead2435f11cbb6868809d2adeeee302e9bb94bcf0539c7a40d80e8575 \
     --hash=sha256:d27f20a0ca67a4bb34268a5e951033496c5b74870b868bacd046b1b8e0c3267b
     # via
     #   cuda-toolkit
     #   humming-kernels
-nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' or sys_platform == 'emscripten' or sys_platform == 'win32' \
+nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' \
     --hash=sha256:7b05ecda494c6dabc44231a608b060a71008a730d9dfda932cc508e6d29159e0 \
     --hash=sha256:7d2af818851c0c224d5f92221e9226e51ee23c236df4b51f9194563979c888be \
     --hash=sha256:82530788b8c6164a54d3fd9ae8bcca8893d397c4aeb998861982a03bbe41e204
