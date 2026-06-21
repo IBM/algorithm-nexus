@@ -417,7 +417,7 @@ cuda-python==13.3.1 \
     # via
     #   nvidia-cutlass-dsl-libs-base
     #   nvidia-cutlass-dsl-libs-cu13
-cuda-tile==1.3.0 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
+cuda-tile==1.3.0 ; sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' \
     --hash=sha256:375316b64c51ee7cfadb2f170a30c1547bc41eb39f1e233a6556713857d2e81f \
     --hash=sha256:8a9bd4dae193cddf438f55d617b6f25b4b0b0fcf4ac4acde7d2695898e396c30 \
     --hash=sha256:93e20ed31e46e5bf704fb31d13e1c08338d2177838798876f7ee9ec4384b75ba \
@@ -425,7 +425,7 @@ cuda-tile==1.3.0 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
     --hash=sha256:e4865acbff1172aaee304bf9c550586088d8b4545a384423597a590899386709 \
     --hash=sha256:efcb93c25563fe23d6aa083c22893fd703122eaf684b0d36874982d28a6dad0b
     # via flashinfer-python
-cuda-tile==1.4.0 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
+cuda-tile==1.4.0 ; sys_platform == 'darwin' or sys_platform == 'emscripten' or sys_platform == 'win32' \
     --hash=sha256:1d9d99b6fa57366af3f8707ac4fd91411275af2ee736996a60620240fcf92070 \
     --hash=sha256:45be74f6568c440446f510bc7799b953858e64c6abf26e96f2c9598a79084860 \
     --hash=sha256:616f13cbc7af6caa7b92430b85ba0a429d1f96ca9e7e04a29d89114cfe859663 \
@@ -436,7 +436,7 @@ cuda-tile==1.4.0 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
 cuda-toolkit==13.0.2 ; sys_platform == 'linux' \
     --hash=sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb
     # via torch
-cuda-toolkit==13.3.0 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
+cuda-toolkit==13.3.0 ; sys_platform == 'darwin' or sys_platform == 'emscripten' or sys_platform == 'win32' \
     --hash=sha256:6e50798a0cc6e94f3044be58ca7b6628852c017ccec1220af88e60d266fe8f2c
     # via cuda-tile
 cycler==0.12.1 \
@@ -1537,9 +1537,7 @@ nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' \
     --hash=sha256:7b05ecda494c6dabc44231a608b060a71008a730d9dfda932cc508e6d29159e0 \
     --hash=sha256:7d2af818851c0c224d5f92221e9226e51ee23c236df4b51f9194563979c888be \
     --hash=sha256:82530788b8c6164a54d3fd9ae8bcca8893d397c4aeb998861982a03bbe41e204
-    # via
-    #   humming-kernels
-    #   nvidia-cublas
+    # via humming-kernels
 nvidia-cuda-runtime==13.0.96 ; sys_platform != 'win32' \
     --hash=sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548 \
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
@@ -1556,7 +1554,7 @@ nvidia-cuda-runtime==13.3.29 ; sys_platform == 'win32' \
     #   cuda-toolkit
     #   humming-kernels
     #   nvidia-cuda-nvcc
-nvidia-cuda-tileiras==13.2.78 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
+nvidia-cuda-tileiras==13.2.78 ; sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' \
     --hash=sha256:5ce7c140a518aa8dfe033e7176f593617ed2fece0e50331e2a14dafd236723fd \
     --hash=sha256:658299efca52a20496b425efb0b19cb1ea7d57406a18d3f5024d4df92d5b54c1 \
     --hash=sha256:f4615627b994465da4ecd43d3d1cc3f372c22db2665acbe705987f43adf3f606
@@ -3051,6 +3049,7 @@ torch==2.11.0 \
     #   torchmetrics
     #   torchvision
     #   vllm
+    #   vllm-ibm-biomed-rna-plugin
     #   xgrammar
 torch-c-dlpack-ext==0.1.5 \
     --hash=sha256:30e3eab616dbc81dfdb7492aca557be551a9163ba9b585f97394a42b336b113a \
@@ -3139,6 +3138,7 @@ transformers==4.57.6 \
     # via
     #   compressed-tensors
     #   vllm
+    #   vllm-ibm-biomed-rna-plugin
     #   xgrammar
 triton==3.6.0 \
     --hash=sha256:10c7f76c6e72d2ef08df639e3d0d30729112f47a56b0c81672edc05ee5116ac9 \
@@ -3252,6 +3252,9 @@ vllm==0.23.0 \
     # via
     #   algorithm-nexus
     #   terratorch
+    #   vllm-ibm-biomed-rna-plugin
+vllm-ibm-biomed-rna-plugin @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@c5100243477623944e49e7dda8bb8acfba5dcfef#subdirectory=vllm
+    # via algorithm-nexus
 watchfiles==1.2.0 \
     --hash=sha256:01859b11fd9fbca670f4d5da00fbac282cfea9bd67a2125d8b2833a3b5617ea9 \
     --hash=sha256:01ea8d66f0693b9b60a6541c8d10263091ca9a9060d242f3c1f3143f9aad2c98 \
