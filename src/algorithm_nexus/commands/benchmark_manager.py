@@ -711,21 +711,24 @@ class BenchmarkManager:
         space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
 
         # Generate descriptive name and description from instance path
-        # Extract PR number from URL (pr_url may be None in non-PR mode)
-        pr_number = self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
-
         # Parse instance path to get package, model, and instance names
         package_name, model_name, instance_name = self._parse_instance_path(
             instance_path
         )
 
-        # Create descriptive name: space-pr123-package-model-instance
-        space_name = f"space-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
-        space_description = f"Discovery space for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
-
-        # Build custom labels with algorithm-nexus fields
+        # Build name, description, and labels depending on whether we are in PR mode
         labels = space_config.metadata.labels or {}
-        labels["algorithm-nexus.pr_url"] = self.pr_url
+        if self.pr_url:
+            pr_number = self.pr_url.rstrip("/").split("/")[-1]
+            space_name = (
+                f"space-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
+            )
+            space_description = f"Discovery space for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+            labels["algorithm-nexus.pr_url"] = self.pr_url
+        else:
+            space_name = f"space-{package_name}-{model_name}-{instance_name}"
+            space_description = f"Discovery space for benchmark instance: {package_name}/{model_name}/{instance_name}"
+
         labels["algorithm-nexus.instance_path"] = str(instance_path)
 
         # Update metadata with descriptive name, description, and labels
@@ -863,34 +866,27 @@ class BenchmarkManager:
         Returns:
             Dictionary with operation_id and ray_job_id (if remote execution)
         """
-        # Generate descriptive name and description from instance path
+        # Generate descriptive name, description, and labels depending on mode
+        custom_metadata = {}
         if instance_path:
-            # Extract PR number from URL (pr_url may be None in non-PR mode)
-            pr_number = (
-                self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
-            )
-
-            # Parse instance path to get package, model, and instance names
             package_name, model_name, instance_name = self._parse_instance_path(
                 instance_path
             )
+            custom_metadata["algorithm-nexus.instance_path"] = str(instance_path)
 
-            # Create descriptive name: randomwalk-pr123-package-model-instance
-            operation_name = (
-                f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
-            )
-            operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+            if self.pr_url:
+                pr_number = self.pr_url.rstrip("/").split("/")[-1]
+                operation_name = f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
+                operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+                custom_metadata["algorithm-nexus.pr_url"] = self.pr_url
+            else:
+                operation_name = (
+                    f"randomwalk-{package_name}-{model_name}-{instance_name}"
+                )
+                operation_description = f"Random walk for benchmark instance: {package_name}/{model_name}/{instance_name}"
         else:
             operation_name = "randomwalk-all"
             operation_description = "Perform a random walk on all points in a space"
-
-        # Create custom metadata with algorithm-nexus fields
-        custom_metadata = {
-            "algorithm-nexus.pr_url": self.pr_url or "",
-            "algorithm-nexus.instance_path": str(instance_path)
-            if instance_path
-            else "",
-        }
 
         # Create operation config using the factory function
         operation_config = create_random_walk_operation_config(
