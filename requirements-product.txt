@@ -423,8 +423,8 @@ cuda-pathfinder==1.5.5 \
     #   cuda-bindings
     #   cuda-core
     #   cuda-python
-cuda-python==12.9.4 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
-    --hash=sha256:d2cacea882a69863f1e7d27ee71d75f0684f4c76910aff839067e4f89c902279
+cuda-python==12.9.7; sys_platform == 'emscripten' or sys_platform == 'win32' \
+    --hash=sha256:23a1fc406d491eef7a7e985095725cb7b20a04a7bd9b7a66400e5c86e082e0aa
     # via nvidia-cutlass-dsl-libs-base
 cuda-python==13.3.1 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
     --hash=sha256:280b014139ab447b6dd70a377db1596f310d6e887d9d342e6651b919ec145fb3
