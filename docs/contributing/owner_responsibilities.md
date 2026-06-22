@@ -131,8 +131,8 @@ of supported models in Algorithm Nexus\*\***.
 
 ### 3.2 Quality and Compliance
 
-- **Follow contribution guidelines** as defined in
-  [CONTRIBUTING.md](../../CONTRIBUTING.md).
+- **Follow contribution guidelines** as defined in repository root
+  `CONTRIBUTING.md`.
 
 ## 4. Contact and Support
 
@@ -146,4 +146,4 @@ For questions about owner responsibilities or to report issues:
 
 - [Requirements for a Nexus Package](../requirements/nexus_package.md)
 - [Requirements for Model Testing](../requirements/models_testing.md)
-- [Contributing Guide](../../CONTRIBUTING.md)
+- Contributing Guide: repository root `CONTRIBUTING.md`

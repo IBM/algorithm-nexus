@@ -33,7 +33,7 @@ below to customize it for your model.
 6. **Validate your package**:
 
    ```bash
-   nexus validate /path/to/your-package
+   nexus validate package /path/to/your-package
    ```
 
 ## Package Structure
@@ -62,9 +62,9 @@ your-package/
   defaults to the Nexus package owner
 - `model.vllm`: (Optional) Only include if your model requires additional vLLM
   plugins for the candidate or product variants
-  - `enabled`: Must be `true` if the vllm section is present
-  - `plugins.general`: (Optional) General vLLM plugin that loads the model class
-  - `plugins.io_processors`: (Optional) List of vLLM IO processor plugins
+    - `enabled`: Must be `true` if the vllm section is present
+    - `plugins.general`: (Optional) General vLLM plugin that loads the model class
+    - `plugins.io_processors`: (Optional) List of vLLM IO processor plugins
 
 ## Documentation
 
@@ -78,7 +78,7 @@ For detailed documentation on Nexus package requirements, see:
 Before submitting your package, ensure it passes validation:
 
 ```bash
-nexus validate /path/to/your-package
+nexus validate package /path/to/your-package
 ```
 
 The validator checks:

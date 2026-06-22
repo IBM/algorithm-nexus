@@ -340,11 +340,9 @@ def list_benchmark_experiments(
 
         # Add instructions for getting more details
         console.print("[bold]For further details on each experiment:[/bold]")
-        console.print("1. Install ado")
-        console.print("   [cyan]uv pip install ado-core[/cyan]")
-        console.print("2. Install the Benchmark package the experiment belongs to")
+        console.print("1. Install the Benchmark package the experiment belongs to")
         console.print("   [cyan]uv pip install <benchmark_package>[/cyan]")
-        console.print("3. Describe the experiment")
+        console.print("2. Describe the experiment")
         console.print("   [cyan]ado describe experiment <experiment_id>[/cyan]\n")
 
 

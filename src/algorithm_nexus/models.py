@@ -9,7 +9,7 @@ import re
 import sys
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator
+from pydantic import AfterValidator, computed_field
 
 try:
     from pydantic import BaseModel, ConfigDict, Field
@@ -186,4 +186,57 @@ class AlgorithmNexusPackageConfig(BaseModel):
 
     package: Annotated[
         NexusPackageInfo, Field(description="Package-level configuration")
+    ]
+
+
+class ValidationResult(BaseModel):
+    """Result of validating a benchmark instance."""
+
+    success: Annotated[bool, Field(description="Whether validation succeeded")]
+    instance_path: Annotated[str, Field(description="Path to the benchmark instance")]
+    errors: Annotated[list[str], Field(description="List of validation errors")]
+    warnings: Annotated[list[str], Field(description="List of validation warnings")]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def status(self) -> str:
+        """Computed status based on success field."""
+        return "success" if self.success else "failed"
+
+
+class BenchmarkExecutionResult(BaseModel):
+    """Result of executing a benchmark instance."""
+
+    instance_path: Annotated[str, Field(description="Path to the benchmark instance")]
+    status: Annotated[
+        Literal["success", "failed", "started", "unknown"],
+        Field(description="Execution status"),
+    ] = "unknown"
+    message: Annotated[
+        str, Field(description="Status message or error description")
+    ] = ""
+    space_id: Annotated[str | None, Field(description="Created discovery space ID")] = (
+        None
+    )
+    operation_id: Annotated[str | None, Field(description="Created operation ID")] = (
+        None
+    )
+    ray_job_id: Annotated[
+        str | None, Field(description="Ray job ID for remote execution")
+    ] = None
+
+
+class ValidationReport(BaseModel):
+    """Aggregated result of validating all benchmark instances."""
+
+    instances: Annotated[
+        list[dict], Field(description="Per-instance validation result dicts")
+    ]
+    successful: Annotated[int, Field(description="Number of instances that passed")]
+    failed: Annotated[int, Field(description="Number of instances that failed")]
+    total: Annotated[
+        int,
+        Field(
+            description="Total number of instances discovered (may exceed successful + failed under --fail-fast)"
+        ),
     ]

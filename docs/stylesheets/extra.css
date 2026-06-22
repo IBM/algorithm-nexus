@@ -1,0 +1,61 @@
+/**
+ * Copyright IBM Corp. 2026
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* IBM Logo switching for light/dark mode */
+[data-md-color-scheme="default"] .md-header__button.md-logo img {
+  content: url("../assets/images/logo-ibm-dark.png");
+}
+
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  content: url("../assets/images/logo-ibm.png");
+}
+
+/* Enhanced navigation hierarchy visualization */
+.md-nav__item .md-nav__item {
+  position: relative;
+  padding-left: 0.6rem;
+}
+
+.md-nav__item .md-nav__item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--md-default-fg-color--lightest);
+  opacity: 0.3;
+}
+
+.md-nav__item .md-nav__item:last-child::before {
+  bottom: 50%;
+}
+
+/* Table styling - prevent text wrapping in cells */
+.md-typeset table:not([class]) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Allow table descriptions to wrap while keeping field names on one line */
+.md-typeset table:not([class]) td:first-child,
+.md-typeset table:not([class]) th:first-child {
+    white-space: nowrap;
+}
+
+/* Underline h5 headings */
+.md-typeset h5 {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+/* Made with Bob */

@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,19 @@ except ImportError:
 from algorithm_nexus.models import AlgorithmNexusPackageConfig
 
 console = Console()
+
+
+def strip_ansi_codes(text: str) -> str:
+    """Remove ANSI escape sequences from text.
+
+    Args:
+        text: Text potentially containing ANSI codes
+
+    Returns:
+        Text with ANSI codes removed
+    """
+    ansi_escape = re.compile(r"\x1b\[[0-9;]*m")
+    return ansi_escape.sub("", text)
 
 
 class ValidationErrorCollector:
@@ -108,19 +122,31 @@ def load_yaml_file(
 def validate_output_format(
     output_format: str | None,
     allow_txt: bool = False,
+    allow_yaml: bool = False,
+    allow_csv: bool = True,
+    allow_table: bool = False,
 ) -> None:
     """Validate the output format parameter.
 
     Args:
         output_format: The output format to validate
         allow_txt: Whether to allow 'txt' format (for requirements files)
+        allow_yaml: Whether to allow 'yaml' format
+        allow_csv: Whether to allow 'csv' format (default: True)
+        allow_table: Whether to allow 'table' format (for human-readable tables)
 
     Raises:
         typer.Exit: If the format is invalid
     """
-    valid_formats = ["csv", "json"]
+    valid_formats = ["json"]
+    if allow_csv:
+        valid_formats.append("csv")
     if allow_txt:
         valid_formats.append("txt")
+    if allow_yaml:
+        valid_formats.append("yaml")
+    if allow_table:
+        valid_formats.append("table")
 
     if output_format is not None and output_format not in valid_formats:
         formats_str = "', '".join(valid_formats)
@@ -159,7 +185,7 @@ def output_data(
     Args:
         data: List of dictionaries containing the data rows
         headers: List of column headers
-        output_format: Output format ('csv', 'json', or None for table)
+        output_format: Output format ('csv', 'json', 'yaml', or None for table)
         output_file: Optional file path to write output to
         table_title: Title for the table output
     """
@@ -170,6 +196,13 @@ def output_data(
             console.print(f"[green]Output written to {output_file}[/green]")
         else:
             console.print(json_output)
+    elif output_format == "yaml":
+        yaml_output = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        if output_file:
+            output_file.write_text(yaml_output)
+            console.print(f"[green]Output written to {output_file}[/green]")
+        else:
+            console.print(yaml_output)
     elif output_format == "csv":
         # Write CSV to string first
         csv_buffer = io.StringIO()
@@ -383,6 +416,108 @@ def output_benchmark_requirements_table(
         output_file=output_file,
         table_title=f"Benchmark Requirements for Nexus Package: {nexus_package}",
     )
+
+
+def format_results(results: dict[str, Any], fmt: str) -> str:
+    """Format benchmark results as JSON or YAML string.
+
+    Args:
+        results: Dictionary containing results to format
+        fmt: Output format ('json' or 'yaml')
+
+    Returns:
+        Formatted string representation of results
+    """
+    if fmt == "json":
+        return json.dumps(results, indent=2)
+    else:  # yaml
+        return yaml.safe_dump(results, default_flow_style=False, sort_keys=False)
+
+
+def get_status_color(status: str) -> str:
+    """Get the color name for a given status.
+
+    Args:
+        status: Status string (e.g., 'success', 'failed', 'started')
+
+    Returns:
+        Color name for Rich console formatting
+    """
+    status_colors = {
+        "success": "green",
+        "started": "cyan",
+        "failed": "red",
+    }
+    return status_colors.get(status, "yellow")
+
+
+def get_status_display(status: str) -> str:
+    """Get color-coded status display string.
+
+    Args:
+        status: Status string (e.g., 'success', 'failed', 'started')
+
+    Returns:
+        Rich-formatted status string with color
+    """
+    color = get_status_color(status)
+    return f"[{color}]{status}[/{color}]"
+
+
+def write_results_to_file(results: dict[str, Any], output_file: Path, fmt: str) -> None:
+    """Write benchmark results to a file in the specified format.
+
+    Args:
+        results: Dictionary containing results to write
+        output_file: Path to the output file
+        fmt: Output format ('json' or 'yaml')
+    """
+    output_file.write_text(format_results(results, fmt))
+    console.print(f"\nResults written to: {output_file}")
+
+
+def print_structured_results(results: dict[str, Any], fmt: str) -> None:
+    """Print benchmark results in structured format (JSON or YAML).
+
+    Args:
+        results: Dictionary containing results to print
+        fmt: Output format ('json' or 'yaml')
+    """
+    console.print()  # Blank line before output
+    console.print(format_results(results, fmt))
+
+
+def print_human_readable_results(results: dict[str, Any]) -> None:
+    """Print benchmark results in human-readable format.
+
+    Args:
+        results: Dictionary containing results with 'instances' key
+    """
+    console.print("\n[bold]Benchmark Execution Results[/bold]\n")
+
+    if not results.get("instances"):
+        console.print("[yellow]No benchmark instances found[/yellow]")
+        return
+
+    for instance in results["instances"]:
+        instance_path = instance.get("instance_path", "Unknown")
+        status = instance.get("status", "unknown")
+        message = instance.get("message", "")
+
+        console.print(f"[bold]{instance_path}[/bold]")
+        console.print(f"  Status: {get_status_display(status)}")
+
+        if message:
+            console.print(f"  Message: {message}")
+
+        if instance.get("space_id"):
+            console.print(f"  Space ID: {instance['space_id']}")
+        if instance.get("operation_id"):
+            console.print(f"  Operation ID: {instance['operation_id']}")
+        if instance.get("ray_job_id"):
+            console.print(f"  Ray Job ID: {instance['ray_job_id']}")
+
+        console.print()  # Empty line between instances
 
 
 # Made with Bob

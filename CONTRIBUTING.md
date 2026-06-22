@@ -1,8 +1,9 @@
 # Contributing
 
-> **Note:** This project is currently in closed beta. We are not accepting
-> external contributions at this time. This guide is intended for IBM
-> contributors only.
+!!! note
+
+    This project is currently in closed beta. We are not accepting external
+    contributions at this time. This guide is intended for IBM contributors only.
 
 ## For IBM Contributors
 
@@ -19,7 +20,9 @@ The project maintainers use LGTM (Looks Good To Me) in comments on the code
 review to indicate acceptance. A change requires LGTMs from one of the
 maintainers.
 
-For a list of the maintainers, see the [MAINTAINERS.md](MAINTAINERS.md) page.
+For a list of the maintainers, see the
+[MAINTAINERS.md](https://github.com/IBM/algorithm-nexus/blob/main/MAINTAINERS.md)
+page.
 
 ## Legal
 
@@ -73,10 +76,10 @@ and follow the
 [Angular convention](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines).
 In a nutshell, the commit message should be structured as follows:
 
-> [!TIP]
->
-> It is highly recommended to include the scope in the PR title and in all the
-> commits
+!!! tip
+
+    It is highly recommended to include the scope in the PR title and in all the
+    commits.
 
 ```plaintext
 <type>[optional scope]: <description>
@@ -106,7 +109,6 @@ Where `type` is one of the following:
 We require code and markup to adhere to certain rules. We enforce these rules
 through the following tools:
 
-- [Black](https://black.readthedocs.io/) - Python code formatting
 - [Ruff](https://docs.astral.sh/ruff/) - Python linting
 - [uv](https://github.com/astral-sh/uv) - Dependency management
 - [Copywrite](https://github.com/hashicorp/copywrite) - License header
@@ -125,43 +127,23 @@ commit. To set up pre-commit hooks:
 
 1. Install development dependencies (includes pre-commit and all linting tools):
 
-   ```commandline
-   uv sync --group dev
-   ```
+    ```commandline
+    uv sync --group dev
+    ```
 
 2. Install the git hook scripts:
 
-   ```commandline
-   pre-commit install --install-hooks
-   pre-commit install --hook-type commit-msg
-   ```
+    ```commandline
+    pre-commit install --install-hooks
+    pre-commit install --hook-type commit-msg
+    ```
 
 3. (Optional) Run against all files:
 
-   ```commandline
-   pre-commit run --all-files
-   ```
+    ```commandline
+    pre-commit run --all-files
+    ```
 
 Once installed, the hooks will run automatically on `git commit`. If any checks
 fail, the commit will be aborted and you'll need to fix the issues before
 committing again.
-
-### Manual Verification
-
-Alternatively, you can manually verify that your code conforms to these rules by
-running the following commands:
-
-```commandline
-black --check .
-ruff check
-uv lock --check
-copywrite headers --plan
-markdownlint-cli2 "**/*.md" "#.venv" "#.tox"
-detect-secrets scan --update .secrets.baseline
-detect-secrets audit .secrets.baseline --fail-on-unaudited --fail-on-live --fail-on-audited-real
-yamlfmt -lint -exclude ".venv" -exclude ".tox" .
-```
-
-The `uv lock --check` command verifies that the `uv.lock` lockfile is up-to-date
-with the dependencies specified in `pyproject.toml`. If this check fails, run
-`uv lock` to regenerate the lockfile.

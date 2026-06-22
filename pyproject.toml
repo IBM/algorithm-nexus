@@ -18,21 +18,24 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
-  "terratorch[vllm]==1.2.7",
-  "vllm==0.19.1",
+  "terratorch[vllm]==1.2.8",
+  "vllm==0.23.0",
 ]
 cli = [
+  "ado-core>=1.8.0",
   "pydantic>=2.13.3",
   "pyyaml>=6.0.3",
   "rich>=15.0.0",
   "typer>=0.25.0",
 ]
 ecosystem = [
+  "bmfm-targets",
   "terratorch>=1.2.7",
+  "tokamind",
 ]
 product = [
-  "terratorch[vllm]==1.2.5",
-  "vllm==0.18.0",
+  "terratorch[vllm]==1.2.8",
+  "vllm==0.21.0",
 ]
 
 [dependency-groups]
@@ -42,6 +45,7 @@ dev = [
   "detect-secrets @ git+https://github.com/ibm/detect-secrets.git",
   "pre-commit>=4.2.0",
   "ruff>=0.12.0",
+  "zensical>=0.0.40",
 ]
 test = [
   "pytest>=9.0.3",
@@ -56,3 +60,7 @@ conflicts = [
     { extra = "product" },
   ],
 ]
+
+[tool.uv.sources]
+bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
+tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
