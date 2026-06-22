@@ -93,7 +93,6 @@ anndata==0.12.17 \
     # via
     #   cellxgene-census
     #   scanpy
-    #   scverse-misc
     #   somacore
     #   tiledb-cloud
     #   tiledbsoma
@@ -1964,9 +1963,9 @@ scipy==1.18.0 \
     #   tiledbsoma
     #   tokamind
     #   umap-learn
-scverse-misc==0.0.9 \
-    --hash=sha256:2a79315fad4ac6317cb1b999f4e95b5910dccafd88545c2ce55b3551363749b2 \
-    --hash=sha256:e45905e91114b73c9a1f6fd7098cdeb6e7435a9f5ebf3d24ad034ba3560c79f8
+scverse-misc==0.1.0 \
+    --hash=sha256:b292405c24172c34738d9d93afdcd72e9f0cd96d2e6e08c02400d1a8c9247982 \
+    --hash=sha256:c9cbc6dff4879b43b47affe2cb697d360acf734b680ec2b47b895dd1e6fae5d0
     # via anndata
 seaborn==0.13.2 \
     --hash=sha256:636f8336facf092165e27924f223d3c62ca560b1f2bb5dff7ab7fad265361987 \

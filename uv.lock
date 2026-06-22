@@ -5986,16 +5986,15 @@ wheels = [
 
 [[package]]
 name = "scverse-misc"
-version = "0.0.9"
+version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "anndata" },
     { name = "session-info2" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/29/37/411583c1254e8c4477e838500f322aea3dcf66aa6e1e9fe3c62c25692d45/scverse_misc-0.0.9.tar.gz", hash = "sha256:e45905e91114b73c9a1f6fd7098cdeb6e7435a9f5ebf3d24ad034ba3560c79f8", size = 41614, upload-time = "2026-06-19T14:53:33.22Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/02/efc5ce2ec35a0018896d107f79731a3f9fe700c74d7e8267f95798fb8959/scverse_misc-0.1.0.tar.gz", hash = "sha256:c9cbc6dff4879b43b47affe2cb697d360acf734b680ec2b47b895dd1e6fae5d0", size = 42055, upload-time = "2026-06-22T08:50:10.076Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/3c/94a23485c87e25fb3cf28c0ec88dd43a2934d61715212f79fa2a9e392105/scverse_misc-0.0.9-py3-none-any.whl", hash = "sha256:2a79315fad4ac6317cb1b999f4e95b5910dccafd88545c2ce55b3551363749b2", size = 22471, upload-time = "2026-06-19T14:53:32.037Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/a8/349b860a56174f93b40d50a46094d4234877ed4d90e0b8ee77235d4b925f/scverse_misc-0.1.0-py3-none-any.whl", hash = "sha256:b292405c24172c34738d9d93afdcd72e9f0cd96d2e6e08c02400d1a8c9247982", size = 22551, upload-time = "2026-06-22T08:50:08.726Z" },
 ]
 
 [[package]]
