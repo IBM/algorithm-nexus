@@ -305,4 +305,66 @@ class TestBenchmarkExecutionResult:
         assert data["operation_id"] is None
 
 
+class TestRunBenchmarksCommand:
+    """Tests for run benchmarks CLI command."""
+
+    def test_run_benchmarks_nonexistent_package(self, tmp_path, capsys) -> None:
+        """Test run benchmarks with nonexistent package."""
+        import typer
+
+        from algorithm_nexus.commands.run import run_benchmarks
+
+        packages_root = tmp_path / "packages"
+        packages_root.mkdir()
+        (packages_root / "existing-package").mkdir()
+
+        with pytest.raises(typer.Exit) as exc_info:
+            run_benchmarks(
+                pr=None,
+                packages_root=packages_root,
+                package="nonexistent-package",
+                dry_run=True,
+            )
+        assert exc_info.value.exit_code == 1
+
+        captured = capsys.readouterr()
+        assert "nexus list packages" in captured.out
+
+    def test_run_benchmarks_both_package_and_pr_warns(
+        self, tmp_path, capsys, monkeypatch
+    ) -> None:
+        """Test that specifying both --package and --pr prints a warning."""
+        from algorithm_nexus.commands.run import run_benchmarks
+
+        packages_root = tmp_path / "packages"
+        packages_root.mkdir()
+        (packages_root / "test-package").mkdir()
+
+        # Mock BenchmarkManager to avoid real operations
+        class DummyManager:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def run(self, *args, **kwargs):
+                return {"instances": []}
+
+        monkeypatch.setattr(
+            "algorithm_nexus.commands.run.BenchmarkManager", DummyManager
+        )
+
+        import contextlib
+
+        with contextlib.suppress(Exception):
+            run_benchmarks(
+                pr="https://github.com/IBM/algorithm-nexus/pull/123",
+                packages_root=packages_root,
+                package="test-package",
+                dry_run=True,
+            )
+
+        captured = capsys.readouterr()
+        assert "Warning" in captured.out
+        assert "--package is ignored when --pr is specified" in captured.out
+
+
 # Made with Bob

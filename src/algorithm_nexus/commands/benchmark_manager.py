@@ -967,37 +967,36 @@ class BenchmarkManager:
             "ray_job_id": ray_job_id,
         }
 
-    def run(self) -> dict[str, Any]:
+    def run(
+        self,
+        packages_root: Path | None = None,
+        package_filter: str | None = None,
+    ) -> dict[str, Any]:
         """Main execution method.
+
+        Args:
+            packages_root: Path to packages directory (for all/package mode)
+            package_filter: Optional package name to filter by
 
         Returns:
             Dictionary with execution results
         """
         try:
-            console.print("Analyzing PR for new or changed benchmark instances...")
-            console.print(f"PR URL: {self.pr_url}")
+            # Print mode header
+            self._print_mode_header(packages_root, package_filter, "Executing")
 
-            # Always check if we need to checkout PR code at the beginning
-            if not self.is_local_repo_on_pr_commit():
-                console.print("[yellow]Local repository is not on PR commit[/yellow]")
-                console.print("Checking out PR code to temporary directory...")
-                self.checkout_pr_to_temp()
-            else:
-                console.print(
-                    "[green]✓[/green] Using local repository (already on PR commit)"
-                )
+            # Discover benchmark instances
+            benchmark_instances = self._discover_instances(
+                packages_root, package_filter
+            )
 
-            changed_files = self.get_changed_files()
-
-            benchmark_instances = self.find_benchmark_instances(changed_files)
+            # Print found instances (show list for dry-run/non-execution mode only)
+            self._print_instances_found(
+                benchmark_instances, package_filter, show_list=not self.execute
+            )
 
             if not benchmark_instances:
-                console.print(
-                    "[yellow]No new or changed benchmark instances found in this PR.[/yellow]"
-                )
                 return {"instances": []}
-
-            console.print(f"Found {len(benchmark_instances)} benchmark instance(s):")
 
             results: dict[str, Any] = {
                 "instances": [],
@@ -1013,7 +1012,7 @@ class BenchmarkManager:
                     exec_result = self.execute_benchmark(instance_path)
                     results["instances"].append(exec_result.model_dump())
 
-                    if exec_result.status == "success":
+                    if exec_result.status in ("success", "started"):
                         successful += 1
                     else:
                         failed += 1
@@ -1024,9 +1023,13 @@ class BenchmarkManager:
                 console.print(f"  Successful: {successful}")
                 console.print(f"  Failed: {failed}")
                 console.print("=" * 60)
+
+                results["summary"] = {
+                    "successful": successful,
+                    "failed": failed,
+                }
             else:
                 for instance_path in benchmark_instances:
-                    console.print(f"  {instance_path}")
                     results["instances"].append({"instance_path": str(instance_path)})
 
             return results
