@@ -11,7 +11,7 @@ from orchestrator.core.operation.config import (
     DiscoveryOperationResourceConfiguration,
 )
 
-from algorithm_nexus.commands.run import (
+from algorithm_nexus.commands.benchmark_manager import (
     BenchmarkManager,
     create_random_walk_operation_config,
 )

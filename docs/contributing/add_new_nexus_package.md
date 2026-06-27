@@ -91,7 +91,7 @@ package:
 Finally, validate the package structure with
 
 ```bash
-uv run nexus validate packages/<package-name>
+uv run nexus validate package packages/<package-name>
 ```
 
 In case of validation errors, the nexus validate tool will list all the errors.
