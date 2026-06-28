@@ -268,7 +268,6 @@ candidate = [
     { name = "bmfm-targets", extra = ["vllm"], marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "terratorch", extra = ["vllm"], marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "vllm", version = "0.23.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "vllm-ibm-biomed-rna-plugin" },
 ]
 cli = [
     { name = "ado-core" },
@@ -315,7 +314,6 @@ requires-dist = [
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.25.0" },
     { name = "vllm", marker = "extra == 'candidate'", specifier = "==0.23.0" },
     { name = "vllm", marker = "extra == 'product'", specifier = "==0.21.0" },
-    { name = "vllm-ibm-biomed-rna-plugin", marker = "extra == 'candidate'", git = "https://github.com/BiomedSciAI/biomed-multi-omic.git?subdirectory=vllm&branch=main" },
 ]
 provides-extras = ["candidate", "cli", "ecosystem", "product"]
 
@@ -7680,16 +7678,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/26/c66d588cc14f91d020294ecddaefe4ce698abdcb140612feec36a4c0aecd/vllm-0.23.0-2-cp38-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:872aeb7c36a1ea942216af067ce870ffdf960804e829367e1b4eb36d4831c03c", size = 274070565, upload-time = "2026-06-15T05:12:54.416Z" },
     { url = "https://files.pythonhosted.org/packages/1e/5a/93830f6509aef185ddac04e9ce78fa4382d3037ec76ecd18b6455a5a4f4b/vllm-0.23.0-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:6a1a534f81f0b62f53d73faa68c73dfae540292ace7f97baf30dbac94fe90f2c", size = 265953967, upload-time = "2026-06-13T09:27:50.84Z" },
     { url = "https://files.pythonhosted.org/packages/72/bc/652f889cde1a20585a0ee0b1b6d36109cd8177bb60020dcb8ff477448440/vllm-0.23.0-cp38-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:71eae985c79ddaa999328cc56d206a1e9b785e079fc6da9e2359ec56ef1c842a", size = 274070208, upload-time = "2026-06-13T09:28:16.037Z" },
-]
-
-[[package]]
-name = "vllm-ibm-biomed-rna-plugin"
-version = "0.1.0"
-source = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git?subdirectory=vllm&branch=main#c5100243477623944e49e7dda8bb8acfba5dcfef" }
-dependencies = [
-    { name = "torch" },
-    { name = "transformers" },
-    { name = "vllm", version = "0.23.0", source = { registry = "https://pypi.org/simple" } },
 ]
 
 [[package]]

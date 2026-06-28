@@ -3511,7 +3511,6 @@ torch==2.11.0 \
     #   torchmetrics
     #   torchvision
     #   vllm
-    #   vllm-ibm-biomed-rna-plugin
     #   xgrammar
 torch-c-dlpack-ext==0.1.5 \
     --hash=sha256:30e3eab616dbc81dfdb7492aca557be551a9163ba9b585f97394a42b336b113a \
@@ -3615,7 +3614,6 @@ transformers==4.57.6 \
     #   compressed-tensors
     #   peft
     #   vllm
-    #   vllm-ibm-biomed-rna-plugin
     #   xgrammar
 triton==3.6.0 \
     --hash=sha256:10c7f76c6e72d2ef08df639e3d0d30729112f47a56b0c81672edc05ee5116ac9 \
@@ -3759,9 +3757,6 @@ vllm==0.23.0 \
     #   algorithm-nexus
     #   bmfm-targets
     #   terratorch
-    #   vllm-ibm-biomed-rna-plugin
-vllm-ibm-biomed-rna-plugin @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@c5100243477623944e49e7dda8bb8acfba5dcfef#subdirectory=vllm
-    # via algorithm-nexus
 watchfiles==1.2.0 \
     --hash=sha256:01859b11fd9fbca670f4d5da00fbac282cfea9bd67a2125d8b2833a3b5617ea9 \
     --hash=sha256:01ea8d66f0693b9b60a6541c8d10263091ca9a9060d242f3c1f3143f9aad2c98 \

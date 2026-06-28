@@ -21,7 +21,6 @@ candidate = [
   "bmfm-targets[vllm]>=0.20.0",
   "terratorch[vllm]==1.2.8",
   "vllm==0.23.0",
-  "vllm-ibm-biomed-rna-plugin",
 ]
 cli = [
   "ado-core>=1.8.0",
@@ -66,4 +65,3 @@ conflicts = [
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
 tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
-vllm-ibm-biomed-rna-plugin = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git", subdirectory = "vllm", branch = "main" }
