@@ -131,7 +131,6 @@ attrs==26.1.0 \
     --hash=sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32
     # via
     #   aiohttp
-    #   fiona
     #   jsonschema
     #   rasterio
     #   referencing
@@ -212,7 +211,6 @@ certifi==2026.5.20 \
     --hash=sha256:3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897 \
     --hash=sha256:69dea482ab64caa7b9f6aba1c6bf48bb6a5448d1c0f1b17ab42ad8c763a5344d
     # via
-    #   fiona
     #   httpcore
     #   httpx
     #   lightly
@@ -290,9 +288,7 @@ click==8.4.1 \
     --hash=sha256:482be17c6991b8c19c5429a1e995d9b0efdbb63172824c41f99965dc0ade8ec2 \
     --hash=sha256:918b5633eddf6b41c32d4f454bf0de810065c74e3f7dbf8ee5452f8be88d3e96
     # via
-    #   click-plugins
     #   cligj
-    #   fiona
     #   flashinfer-python
     #   rasterio
     #   rich-toolkit
@@ -300,9 +296,7 @@ click==8.4.1 \
 cligj==0.7.2 \
     --hash=sha256:a4bc13d623356b373c2c27c53dbd9c68cae5d526270bfa71f6c6fa69669c6b27 \
     --hash=sha256:c1ca117dbce1fe20a5809dc96f01e1c2840f6dcc939b3ddbb1111bf330ba82df
-    # via
-    #   fiona
-    #   rasterio
+    # via rasterio
 cloudpickle==3.1.2 \
     --hash=sha256:7fda9eb655c9c230dab534f1983763de5835249750e85fbcef43aaa30a9a2414 \
     --hash=sha256:9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a
@@ -1590,7 +1584,6 @@ omegaconf==2.3.1 \
     # via
     #   geobenchv2
     #   hydra-core
-    #   torchgeo
 openai==2.24.0 \
     --hash=sha256:1e5769f540dbd01cb33bc4716a23e67b9d695161a734aff9c5f925e2bf99a673 \
     --hash=sha256:fed30480d7d6c884303287bde864980a4b137b60553ffbcf9ab4a233b7a73d94
@@ -2209,7 +2202,6 @@ pytorch-lightning==2.6.5 \
     # via
     #   lightly
     #   lightning
-    #   torchgeo
 pywin32==312 ; sys_platform == 'win32' \
     --hash=sha256:59aba5d5940842075343a5ddc6b11f1cdf0d1567fe745290359dfbcc7c2eb831 \
     --hash=sha256:6017c58e12f6809fbb0555b75df144c2922a9ffd18e4b9b5afa863b6c1a9d950 \
@@ -2549,9 +2541,7 @@ scikit-learn==1.9.0 \
     --hash=sha256:8833266989d3a5110178a9fae30783675460724d0e1efb13b14901d2c660c557 \
     --hash=sha256:d77f54c017633791bc0225a43e2f8d03745fdcfe4880268fcc4df15f505dec2e \
     --hash=sha256:da76d09304a4706db7cc1e3ebaa3b6b98a67365cc11d2996c4f1e58ba47df714
-    # via
-    #   terratorch
-    #   torchgeo
+    # via terratorch
 scipy==1.17.1 \
     --hash=sha256:010f4333c96c9bb1a4516269e33cb5917b08ef2166d5556ca2fd9f082a9e6ea0 \
     --hash=sha256:02ae3b274fde71c5e92ac4d54bc06c42d80e399fec704383dcd99b301df37458 \
