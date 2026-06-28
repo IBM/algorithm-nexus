@@ -3,6 +3,6 @@ model:
   vllm:
     enabled: true
     plugins:
-      general: biomedrna
+      general: biomed_rna_model
       io_processors:
         - biomed_rna
