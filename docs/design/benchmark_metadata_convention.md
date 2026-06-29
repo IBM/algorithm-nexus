@@ -70,21 +70,21 @@ benchmark problem. It defines:
 
 <!-- markdownlint-disable line-length -->
 
-| Field                 | Type            | Required | Description                                                                                                                                                                       |
-| --------------------- | --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `benchmarkIdentifier` | string          | Yes      | The canonical identifier.                                                                                                                                                         |
-| `description`         | string          | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                               |
-| `target`              | string          | Yes      | The property that identifiers the quantity being benchmarked                                                                                                                      |
-| `properties`          | list            | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
-| `metrics`             | list of strings | No       | Canonical metric names for this benchmark.                                                                                                                                        |
-| `owner`               | string          | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
+| Field                 | Type                | Required | Description                                                                                                                                                                       |
+| --------------------- | ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkIdentifier` | string              | Yes      | The canonical identifier.                                                                                                                                                         |
+| `description`         | string              | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                               |
+| `target`              | Property            | Yes      | The property that identifies the quantity being benchmarked                                                                                                                       |
+| `properties`          | list of Property    | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
+| `metrics`             | list of strings     | No       | Canonical metric names for this benchmark.                                                                                                                                        |
+| `owner`               | string              | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
 
 **Property fields:**
 
 | Field        | Type                               | Required | Description                                                                        |
 | ------------ | ---------------------------------- | -------- | ---------------------------------------------------------------------------------- |
 | `identifier` | string                             | Yes      | Canonical property identifier.                                                     |
-| `metadata`   | string                             | No       | Metadata about what this property represents. Can include e.g. description         |
+| `metadata`   | map                                | No       | Metadata about what this property represents. Can include e.g. description         |
 | `domain`     | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
 
 <!-- markdownlint-enable line-length -->
@@ -97,9 +97,9 @@ description: >
     Evaluation of AI model inference serving throughput and latency under
     controlled traffic conditions.
 target:
-    - identifier: model
-      metadata:
-          description: "The id of the AI model being benchmarked"
+    identifier: model
+    metadata:
+        description: "The id of the AI model being benchmarked"
 properties:
     - identifier: dataset
       metadata:
@@ -126,7 +126,7 @@ for more information about the types of domains that can be specified.
 
 For an experiment to target a logical benchmark it must provide a mapping of its
 property names and values to the logical benchmark's. This is called a
-**benchmark binding**. .
+**benchmark binding**.
 
 A benchmark binding serves two purposes:
 
@@ -143,14 +143,14 @@ A benchmark binding serves two purposes:
 
 <!-- markdownlint-disable line-length -->
 
-| Field                  | Type   | Required | Description                                                                                                                                                                                       |
-| ---------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `experimentIdentifier` | string | **Yes**  | The `ado` experiment identifier.                                                                                                                                                                  |
-| `benchmarkIdentifier`  | string | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                        |
-| `targetMapping`        | string | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
-| `staticFilters`        | list   | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
-| `propertyMapping`      | list   | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
-| `metricMapping`        | map    | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
+| Field                  | Type                | Required | Description                                                                                                                                                                                       |
+| ---------------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `experiment`           | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                             |
+| `benchmarkIdentifier`  | string              | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                        |
+| `targetMapping`        | string              | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
+| `staticFilters`        | list                | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
+| `propertyMapping`      | list                | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
+| `metricMapping`        | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
 
 <!-- markdownlint-enable line-length -->
 
@@ -213,10 +213,10 @@ staticFilters:
 
 ```yaml
 metricMapping:
-   benchmark:
-      identifier: <canonical-benchmark-property-name>
-    experiment:
-      identifier: <experiment-target-property-name>
+    - benchmark:
+          identifier: <canonical-benchmark-property-name>
+      experiment:
+          identifier: <experiment-target-property-name>
 ```
 
 Metrics not listed are passed through under their original names. For two
@@ -233,7 +233,7 @@ experiment:
     experimentIdentifier: guide_llm_runner
     experimentVersion: 2.0.0 # The binding only uses the major version
 
-propertyMappings:
+propertyMapping:
     - benchmark:
           identifier: dataset
       experiment:
@@ -298,7 +298,7 @@ A deterministic routing key can be constructed from a result and the benchmark
 binding:
 
 ```text
-{experimentIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
+{benchmarkIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
 ```
 
 Properties are sorted alphabetically. For example:
@@ -339,11 +339,11 @@ experiment:
     experimentIdentifier: vllm_bench_runner
     experimentVersion: 1.0.0
 targetMapping: model_name
-propertyMappings:
+propertyMapping:
     - benchmark:
           identifier: dataset
       experiment:
-          identifier: dataset_path # guide-llm's internal param name
+          identifier: dataset_path # vllm bench serve internal param name
     - categoricalValue:
           property:
               identifier: workload
@@ -399,7 +399,7 @@ will:
 
 ## 5. Governance
 
-### 5.2 Logical Benchmark Location & Ownership
+### 5.1 Logical Benchmark Location & Ownership
 
 Logical benchmark definition files are stored at the top level of the Algorithm
 Nexus repository. Its suggested to create a top-level dir `benchmarks` which
@@ -409,7 +409,7 @@ A logical benchmark owner is given by the value of the "owner" field. If this is
 ambiguous the author of the PR adding the benchmark will be treated as the
 owner.
 
-### 7.1 Benchmark Binding Location
+### 5.2 Benchmark Binding Location
 
 Benchmark bindings are stored in the YAML file with the logical benchmarks they
 target e.g. the structure of this file could be
@@ -453,7 +453,7 @@ A benchmark binding only can change if:
 
 ## 7. Relationship to Existing Benchmark Design
 
-### 7.2 `target_mapping` and the Implicit Benchmark Target
+### 7.1 `target_mapping` and the Implicit Benchmark Target
 
 The [`benchmark_integration_design.md`](./benchmark_integration_design.md)
 establishes that the benchmark target is implicit from the enclosing model
@@ -470,7 +470,7 @@ a model-level benchmark instance is defined for `ibm/granite-3b`, the
 leaderboard system knows that `model_name=ibm/granite-3b` is the target for that
 result.
 
-### 7.3 Benchmark Package Registration and Instances
+### 7.2 Benchmark Package Registration and Instances
 
 The existing `nexus.yaml` benchmark package registrations and
 `benchmark_instances/space.yaml` remain unchanged. The benchmark binding is an

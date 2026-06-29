@@ -12,6 +12,8 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, computed_field
 
 try:
+    from orchestrator.schema.property import Property, PropertyDomain
+    from orchestrator.schema.reference import ExperimentReference
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
     print(
@@ -240,3 +242,210 @@ class ValidationReport(BaseModel):
             description="Total number of instances discovered (may exceed successful + failed under --fail-fast)"
         ),
     ]
+
+
+# ---------------------------------------------------------------------------
+# Logical Benchmark models
+# ---------------------------------------------------------------------------
+
+
+class PropertyIdentifierRef(BaseModel):
+    """A reference to a property by identifier."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    identifier: Annotated[str, Field(min_length=1, description="Property identifier.")]
+
+
+class FieldMapping(BaseModel):
+    """1-to-1 mapping of a benchmark property to an experiment property."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    benchmark: Annotated[
+        PropertyIdentifierRef, Field(description="Canonical benchmark property.")
+    ]
+    experiment: Annotated[
+        PropertyIdentifierRef, Field(description="Experiment property.")
+    ]
+
+
+class CategoricalValueRef(BaseModel):
+    """A reference to a specific value of a categorical benchmark property."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    property: Annotated[
+        PropertyIdentifierRef, Field(description="The categorical benchmark property.")
+    ]
+    value: Annotated[
+        str,
+        Field(
+            min_length=1, description="The categorical value from the benchmark domain."
+        ),
+    ]
+
+
+class PredicateEntry(BaseModel):
+    """An experiment property constrained to a domain, used in a categorical value mapping predicate."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    identifier: Annotated[
+        str, Field(min_length=1, description="Experiment property identifier.")
+    ]
+    domain: Annotated[
+        PropertyDomain,
+        Field(description="PropertyDomain constraining this experiment property."),
+    ]
+
+
+class CategoricalValueMapping(BaseModel):
+    """Maps a categorical benchmark property value to a set of experiment property predicates."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    categoricalValue: Annotated[
+        CategoricalValueRef,
+        Field(description="The benchmark categorical value being mapped."),
+    ]
+    predicate: Annotated[
+        list[PredicateEntry],
+        Field(
+            min_length=1,
+            description="Experiment property constraints that identify this categorical value.",
+        ),
+    ]
+
+
+class StaticFilter(BaseModel):
+    """Pins an experiment property to a fixed value implicit in the logical benchmark."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    property: Annotated[
+        PropertyIdentifierRef,
+        Field(description="The experiment property to filter on."),
+    ]
+    value: Annotated[
+        str,
+        Field(
+            min_length=1, description="The fixed value for this experiment property."
+        ),
+    ]
+
+
+class MetricMapping(BaseModel):
+    """Maps a canonical benchmark metric name to an experiment metric name."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    benchmark: Annotated[
+        PropertyIdentifierRef,
+        Field(description="Canonical benchmark metric identifier."),
+    ]
+
+    experiment: Annotated[
+        PropertyIdentifierRef, Field(description="Experiment metric identifier.")
+    ]
+
+
+class LogicalBenchmarkDefinition(BaseModel):
+    """Logical benchmark definition — the abstract problem description."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    benchmarkIdentifier: Annotated[
+        str,
+        Field(
+            min_length=1, description="Canonical identifier for this logical benchmark."
+        ),
+    ]
+    description: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Human-readable description of the abstract problem being evaluated.",
+        ),
+    ]
+    target: Annotated[
+        Property,
+        Field(
+            description="The property that identifies the quantity being benchmarked."
+        ),
+    ]
+    properties: Annotated[
+        list[Property],
+        Field(
+            min_length=1,
+            description="The properties on which this benchmark is evaluated.",
+        ),
+    ]
+    metrics: Annotated[
+        list[str] | None,
+        Field(description="Canonical metric names for this benchmark."),
+    ] = None
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Team or individual responsible for maintaining this definition."
+        ),
+    ] = None
+
+
+class BenchmarkBinding(BaseModel):
+    """Binding that maps an experiment's properties and metrics to a logical benchmark."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    benchmarkIdentifier: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="The id of the logical benchmark this experiment targets.",
+        ),
+    ]
+    experiment: Annotated[
+        ExperimentReference,
+        Field(description="The ado ExperimentReference object."),
+    ]
+    targetMapping: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="The experiment property name that carries the benchmark target.",
+        ),
+    ]
+    staticFilters: Annotated[
+        list[StaticFilter] | None,
+        Field(
+            description="Static experiment property filters implicit in this logical benchmark."
+        ),
+    ] = None
+    propertyMapping: Annotated[
+        list[FieldMapping | CategoricalValueMapping] | None,
+        Field(
+            description="Maps experiment internal properties to canonical benchmark properties."
+        ),
+    ] = None
+    metricMapping: Annotated[
+        list[MetricMapping] | None,
+        Field(
+            description="Translates per-experiment metric names to canonical benchmark metric names."
+        ),
+    ] = None
+
+
+class LogicalBenchmarkConfig(BaseModel):
+    """Root model for a logical benchmark YAML file (logicalBenchmark + optional bindings)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    logicalBenchmark: Annotated[
+        LogicalBenchmarkDefinition,
+        Field(description="The logical benchmark definition."),
+    ]
+    bindings: Annotated[
+        list[BenchmarkBinding] | None,
+        Field(description="Benchmark bindings declared in this file."),
+    ] = None
