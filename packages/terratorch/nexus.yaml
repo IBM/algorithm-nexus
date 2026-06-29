@@ -1,2 +1,8 @@
 package:
   name: terratorch
+
+  benchmark_packages:
+    # Local package stored in this repository
+    - requirement_specifier: "ado-vllm-performance==1.8.0"
+      experiments:
+        - "test-geospatial-deployment-custom-dataset-v1"
