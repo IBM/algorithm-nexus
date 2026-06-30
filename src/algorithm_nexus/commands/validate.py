@@ -24,8 +24,9 @@ except ImportError:
 
 from algorithm_nexus.commands.utils import (
     ValidationErrorCollector,
-    get_status_color,
+    determine_output_format,
     load_yaml_file,
+    print_results_table,
     print_structured_results,
     validate_output_format,
     write_results_to_file,
@@ -329,41 +330,21 @@ def validate_package(
 
 
 def _print_validation_table(all_results: list[dict[str, Any]]) -> None:
-    """Print validation results in human-readable table format.
-
-    Args:
-        all_results: List of validation result dictionaries
-    """
-    from rich.table import Table
-
-    table = Table(title="\nValidation Results", show_header=True)
-    table.add_column("Instance", style="cyan")
-    table.add_column("Status", style="bold")
-    table.add_column("Issues")
-
+    rows = []
     for result in all_results:
-        # Use shared status color function
-        status = result["status"]
-        color = get_status_color(status)
-        status_style = (
-            f"[{color}]✓ PASS[/{color}]"
-            if status == "success"
-            else f"[{color}]✗ FAIL[/{color}]"
-        )
         issues = []
         if result.get("errors"):
             issues.extend([f"E: {e}" for e in result["errors"]])
         if result.get("warnings"):
             issues.extend([f"W: {w}" for w in result["warnings"]])
-        issues_str = "\n".join(issues) if issues else "-"
-
-        table.add_row(
-            result["instance_path"],
-            status_style,
-            issues_str,
+        rows.append(
+            {
+                "instance_path": result["instance_path"],
+                "status": result["status"],
+                "details": "\n".join(issues) if issues else "-",
+            }
         )
-
-    console.print(table)
+    print_results_table(rows, title="Validation Results", details_column="Issues")
 
 
 def validate_benchmarks(
@@ -689,15 +670,7 @@ def validate_logical_benchmarks(
 
     output_data = {"files": all_results}
 
-    # Determine effective format (mirrors run.py pattern)
-    if output_format:
-        fmt = output_format
-    elif output_file and output_file.suffix in (".yaml", ".yml"):
-        fmt = "yaml"
-    elif output_file:
-        fmt = "json"
-    else:
-        fmt = "table"
+    fmt = determine_output_format(output_format, output_file, default="table")
 
     if output_file:
         write_results_to_file(output_data, output_file, fmt)
