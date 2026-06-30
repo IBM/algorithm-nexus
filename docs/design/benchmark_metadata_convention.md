@@ -81,11 +81,11 @@ benchmark problem. It defines:
 
 **Property fields:**
 
-| Field        | Type                               | Required | Description                                                                        |
-| ------------ | ---------------------------------- | -------- | ---------------------------------------------------------------------------------- |
-| `identifier` | string                             | Yes      | Canonical property identifier.                                                     |
-| `metadata`   | map                                | No       | Metadata about what this property represents. Can include e.g. description         |
-| `domain`     | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
+| Field            | Type                               | Required | Description                                                                        |
+| ---------------- | ---------------------------------- | -------- | ---------------------------------------------------------------------------------- |
+| `identifier`     | string                             | Yes      | Canonical property identifier.                                                     |
+| `metadata`       | map                                | No       | Metadata about what this property represents. Can include e.g. description         |
+| `propertyDomain` | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
 
 <!-- markdownlint-enable line-length -->
 
@@ -104,11 +104,11 @@ properties:
     - identifier: dataset
       metadata:
           description: "Dataset used for inference requests."
-      # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
+      # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
     - identifier: workload
       metadata:
           description: "Traffic pattern or workload profile."
-      domain:
+      propertyDomain:
           values: ["steady_state_heavy", "poisson_bursty", "light_load"]
 metrics:
     - throughput_tokens_per_second
@@ -190,7 +190,7 @@ propertyMapping:
           value: "<categorical-value-from-logical-benchmark-domain>"
       predicate:
           - identifier: "<experiment-property-name>"
-            domain: <PropertyDomain>
+            propertyDomain: <PropertyDomain>
           - ...
 ```
 
@@ -244,10 +244,10 @@ propertyMapping:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["constant"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [100, 1000]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
@@ -256,10 +256,10 @@ propertyMapping:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["poisson"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
 metricMapping:
@@ -350,10 +350,10 @@ propertyMapping:
           value: steady_state_heavy
       predicate:
           - identifier: distribution
-            domain:
+            propertyDomain:
                 values: ["fixed"]
           - identifier: num_concurrent_requests
-            domain:
+            propertyDomain:
                 domainRange: [100, 99999]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
@@ -362,10 +362,10 @@ propertyMapping:
           value: light_load
       predicate:
           - identifier: distribution
-            domain:
+            propertyDomain:
                 values: ["fixed"]
           - identifier: num_concurrent_requests
-            domain:
+            propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
 metricMapping:

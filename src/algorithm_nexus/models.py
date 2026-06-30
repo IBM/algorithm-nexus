@@ -12,7 +12,7 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, computed_field
 
 try:
-    from orchestrator.schema.property import Property, PropertyDomain
+    from orchestrator.schema.property import Property
     from orchestrator.schema.reference import ExperimentReference
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
@@ -249,24 +249,17 @@ class ValidationReport(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class PropertyIdentifierRef(BaseModel):
-    """A reference to a property by identifier."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    identifier: Annotated[str, Field(min_length=1, description="Property identifier.")]
-
-
 class FieldMapping(BaseModel):
     """1-to-1 mapping of a benchmark property to an experiment property."""
 
     model_config = ConfigDict(extra="forbid")
 
     benchmark: Annotated[
-        PropertyIdentifierRef, Field(description="Canonical benchmark property.")
+        Property,
+        Field(description="Canonical benchmark property (propertyIdentifier)."),
     ]
     experiment: Annotated[
-        PropertyIdentifierRef, Field(description="Experiment property.")
+        Property, Field(description="Experiment property (propertyIdentifier).")
     ]
 
 
@@ -276,27 +269,14 @@ class CategoricalValueRef(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     property: Annotated[
-        PropertyIdentifierRef, Field(description="The categorical benchmark property.")
+        Property,
+        Field(description="The categorical benchmark property (propertyIdentifier)."),
     ]
     value: Annotated[
         str,
         Field(
             min_length=1, description="The categorical value from the benchmark domain."
         ),
-    ]
-
-
-class PredicateEntry(BaseModel):
-    """An experiment property constrained to a domain, used in a categorical value mapping predicate."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    identifier: Annotated[
-        str, Field(min_length=1, description="Experiment property identifier.")
-    ]
-    domain: Annotated[
-        PropertyDomain,
-        Field(description="PropertyDomain constraining this experiment property."),
     ]
 
 
@@ -310,7 +290,7 @@ class CategoricalValueMapping(BaseModel):
         Field(description="The benchmark categorical value being mapped."),
     ]
     predicate: Annotated[
-        list[PredicateEntry],
+        list[Property],
         Field(
             min_length=1,
             description="Experiment property constraints that identify this categorical value.",
@@ -324,7 +304,7 @@ class StaticFilter(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     property: Annotated[
-        PropertyIdentifierRef,
+        Property,
         Field(description="The experiment property to filter on."),
     ]
     value: Annotated[
@@ -341,13 +321,11 @@ class MetricMapping(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     benchmark: Annotated[
-        PropertyIdentifierRef,
+        Property,
         Field(description="Canonical benchmark metric identifier."),
     ]
 
-    experiment: Annotated[
-        PropertyIdentifierRef, Field(description="Experiment metric identifier.")
-    ]
+    experiment: Annotated[Property, Field(description="Experiment metric identifier.")]
 
 
 class LogicalBenchmarkDefinition(BaseModel):

@@ -256,11 +256,11 @@ logicalBenchmark:
       - identifier: dataset
         metadata:
             description: "Dataset used for inference requests."
-            # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
+            # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
       - identifier: workload
         metadata:
             description: "Traffic pattern or workload profile."
-        domain:
+        propertyDomain:
             values: ["steady_state_heavy", "poisson_bursty", "light_load"]
   metrics:
       - throughput_tokens_per_second
@@ -315,10 +315,10 @@ propertyMapping:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["constant"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [100, 1000]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
@@ -327,10 +327,10 @@ propertyMapping:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["poisson"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
 metricMapping:
