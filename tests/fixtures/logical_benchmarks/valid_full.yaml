@@ -1,0 +1,50 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+
+logicalBenchmark:
+  benchmarkIdentifier: inference_serving
+  description: >
+    Evaluation of AI model inference serving throughput and latency under controlled traffic conditions.
+  target:
+    identifier: model
+    metadata:
+      description: "The id of the AI model being benchmarked"
+  properties:
+    - identifier: dataset
+      metadata:
+        description: "Dataset used for inference requests."
+    - identifier: workload
+      metadata:
+        description: "Traffic pattern or workload profile."
+      propertyDomain:
+        values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+  metrics:
+    - throughput_tokens_per_second
+    - time_to_first_token_ms
+  owner: "@vllm-team"
+
+bindings:
+  - benchmarkIdentifier: inference_serving
+    experiment:
+      actuatorIdentifier: vllm_performance
+      experimentIdentifier: guide_llm_runner
+      experimentVersion: 2.0.0
+    targetMapping: model_name
+    propertyMapping:
+      - benchmark:
+          identifier: dataset
+        experiment:
+          identifier: input_data_path
+      - categoricalValue:
+          property:
+            identifier: workload
+          value: steady_state_heavy
+        predicate:
+          - identifier: traffic_shape
+            propertyDomain:
+              values: ["constant"]
+    metricMapping:
+      - benchmark:
+          identifier: throughput_tokens_per_second
+        experiment:
+          identifier: throughput_rps
