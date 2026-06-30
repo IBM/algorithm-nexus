@@ -387,18 +387,7 @@ cryptography==49.0.0 \
     --hash=sha256:f78ff2c9ed8dc2d036b0f4d640e22522213d047c1b14e61205a7e55c80a494d4 \
     --hash=sha256:f89660a348f4f78a92366240a61404e337586ef7f5909a2fef59ca88ef505493
     # via pyjwt
-cuda-bindings==12.9.4 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
-    --hash=sha256:32bdc5a76906be4c61eb98f546a6786c5773a881f3b166486449b5d141e4a39f \
-    --hash=sha256:3adf4958dcf68ae7801a59b73fb00a8b37f8d0595060d66ceae111b1002de38d \
-    --hash=sha256:56e0043c457a99ac473ddc926fe0dc4046694d99caef633e92601ab52cbe17eb \
-    --hash=sha256:694ba35023846625ef471257e6b5a4bc8af690f961d197d77d34b1d1db393f56 \
-    --hash=sha256:696ca75d249ddf287d01b9a698b8e2d8a05046495a9c051ca15659dc52d17615 \
-    --hash=sha256:a2e82c8985948f953c2be51df45c3fe11c812a928fca525154fb9503190b3e64 \
-    --hash=sha256:b32d8b685f0e66f5658bcf4601ef034e89fc2843582886f0a58784a4302da06c \
-    --hash=sha256:cf8bfaedc238f3b115d957d1fd6562b7e8435ba57f6d0e2f87d0e7149ccb2da5 \
-    --hash=sha256:fda147a344e8eaeca0c6ff113d2851ffca8f7dfc0a6c932374ee5c47caa649c8
-    # via cuda-python
-cuda-bindings==13.3.1 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
+cuda-bindings==13.3.1 \
     --hash=sha256:18c8c167c8907b8f02531ca810534315c458dabef31f7965095619bf647b9202 \
     --hash=sha256:2732904099e0a4d4db774a5fc6d91ee95fae065b4d2ecabb4968c5fe2406c9d7 \
     --hash=sha256:9efb21c1ee64981e184b9e0ba5eb3179e5ba3d4b51665a6cb52b8ef3d01a7cbf \
@@ -409,7 +398,7 @@ cuda-bindings==13.3.1 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     #   cuda-python
     #   humming-kernels
     #   torch
-cuda-core==1.0.1 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
+cuda-core==1.0.1 \
     --hash=sha256:1a5c1aa3b738a7599ea289498d038fe625d259fd7ab795394541eee58a8e29bc \
     --hash=sha256:6816dc020aee6103d8071bc02d8e4e1d91f2b49596f666896d608d92224d79d1 \
     --hash=sha256:b392178202c652368883dbe3773cee14f3e1ed6b8bf45d1a1bcdd37c73604e06 \
@@ -423,10 +412,7 @@ cuda-pathfinder==1.5.5 \
     #   cuda-bindings
     #   cuda-core
     #   cuda-python
-cuda-python==12.9.4 ; sys_platform == 'emscripten' or sys_platform == 'win32' \
-    --hash=sha256:d2cacea882a69863f1e7d27ee71d75f0684f4c76910aff839067e4f89c902279
-    # via nvidia-cutlass-dsl-libs-base
-cuda-python==13.3.1 ; sys_platform != 'emscripten' and sys_platform != 'win32' \
+cuda-python==13.3.1 \
     --hash=sha256:280b014139ab447b6dd70a377db1596f310d6e887d9d342e6651b919ec145fb3
     # via
     #   nvidia-cutlass-dsl-libs-base

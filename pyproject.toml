@@ -30,10 +30,6 @@ cli = [
 ]
 ecosystem = [
   "bmfm-targets",
-  # gridfm-datakit pinned to 1.0.5rc1 to skip 1.0.4's broken
-  # gridfm-datakit-winblock marker. Drop once a stable >=1.0.5 ships.
-  # See https://github.com/gridfm/gridfm-graphkit/issues/81
-  "gridfm-datakit==1.0.5rc1",
   "gridfm-graphkit==0.8.0rc1",
   "terratorch>=1.2.7",
   "tokamind",
@@ -65,6 +61,14 @@ conflicts = [
     { extra = "product" },
   ],
 ]
+# gridfm-graphkit pulls in gridfm-datakit transitively. The only stable
+# release satisfying its urllib3>=2.6.0 requirement (1.0.4) ships a broken
+# gridfm-datakit-winblock marker, so constrain the transitive dependency to
+# the 1.0.5rc1 prerelease. This is a constraint, not a dedicated dependency:
+# it only applies when gridfm-datakit is already pulled in. Drop once a
+# stable >=1.0.5 ships. See https://github.com/gridfm/gridfm-graphkit/issues/81
+constraint-dependencies = ["gridfm-datakit==1.0.5rc1"]
+prerelease = "allow"
 
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }

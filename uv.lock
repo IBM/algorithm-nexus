@@ -33,6 +33,12 @@ conflicts = [[
     { package = "algorithm-nexus", extra = "product" },
 ]]
 
+[options]
+prerelease-mode = "allow"
+
+[manifest]
+constraints = [{ name = "gridfm-datakit", specifier = "==1.0.5rc1" }]
+
 [[package]]
 name = "absl-py"
 version = "2.4.0"
@@ -290,7 +296,6 @@ cli = [
 ]
 ecosystem = [
     { name = "bmfm-targets" },
-    { name = "gridfm-datakit" },
     { name = "gridfm-graphkit" },
     { name = "terratorch" },
     { name = "tokamind" },
@@ -317,7 +322,6 @@ test = [
 requires-dist = [
     { name = "ado-core", marker = "extra == 'cli'", specifier = ">=1.8.0" },
     { name = "bmfm-targets", marker = "extra == 'ecosystem'", git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" },
-    { name = "gridfm-datakit", marker = "extra == 'ecosystem'", specifier = "==1.0.5rc1" },
     { name = "gridfm-graphkit", marker = "extra == 'ecosystem'", specifier = "==0.8.0rc1" },
     { name = "pydantic", marker = "extra == 'cli'", specifier = ">=2.13.3" },
     { name = "pyyaml", marker = "extra == 'cli'", specifier = ">=6.0.3" },
@@ -3581,15 +3585,15 @@ wheels = [
 
 [[package]]
 name = "matpowercaseframes"
-version = "2.1.0"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/ee/bc2780e989bfeea8f2873e351095715c0c68235a4554ed8d496923727f8e/matpowercaseframes-2.1.0.tar.gz", hash = "sha256:f3e78ae3648aebf2cc19dff994a4ddf0581d4052e12cf97b132c7c1eee892bc8", size = 26138, upload-time = "2026-04-01T23:03:43.918Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/35/d9156d95078810a58ab518c2fb97a1dc2c90db06ebaa2f0961e6eff56da1/matpowercaseframes-2.1.1.tar.gz", hash = "sha256:bd4211c9bddad0974a3554e777f082123aea516db97126352e2da5fc479f679c", size = 26241, upload-time = "2026-06-29T08:49:10.589Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/28/91/c0b1a6a76ede1a31081784ee513a183e3f55d8b6c66abfc85e3a3a6d27b9/matpowercaseframes-2.1.0-py3-none-any.whl", hash = "sha256:80aee79d4863b54fe1c04ec75e13324ecf14df6fa3e665dc6eb9c7fc0edf520c", size = 20326, upload-time = "2026-04-01T23:03:42.802Z" },
+    { url = "https://files.pythonhosted.org/packages/15/de/157ccc9b261569c8b790b572cfa60806845e87a5fc7ed28fcb7efdca623c/matpowercaseframes-2.1.1-py3-none-any.whl", hash = "sha256:7dac79d559aabec28324fd31eac750463834dfa90842f4f80ee343bfcbfa91de", size = 20379, upload-time = "2026-06-29T08:49:09.634Z" },
 ]
 
 [[package]]
@@ -8689,11 +8693,11 @@ wheels = [
 
 [[package]]
 name = "wcwidth"
-version = "0.8.1"
+version = "0.8.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/49/b4/51fe890511f0f242d07cb1ebe6a5b6db417262b9d2568b460347c57d95cc/wcwidth-0.8.1.tar.gz", hash = "sha256:faf5b4a5366a72dc49cad48cdf21f52bdf63bdda995178e483ba247ff79089b9", size = 1466072, upload-time = "2026-06-08T05:57:23.146Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/74/c6428f875774288bec1396f5bfcbc2d925700a4dad61727fd5f2b12f249d/wcwidth-0.8.2.tar.gz", hash = "sha256:91fbef97204b96a3d4d421609b80340b760cf33e26da123ff243d76b1fda8dda", size = 1466253, upload-time = "2026-06-29T18:11:11.601Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/6e/95b0e537de1f4d4301f76f944642c6da50d1511cc7b3d64dc418a66c7509/wcwidth-0.8.1-py3-none-any.whl", hash = "sha256:f453740b1e4a4f3291faa37944c555d71056c4da08d59809b307ef4feba695c8", size = 323092, upload-time = "2026-06-08T05:57:21.413Z" },
+    { url = "https://files.pythonhosted.org/packages/96/42/3e5985a0a7e57de470b320c6d6a1a67c844f6737a587f3d44dd13d1819e7/wcwidth-0.8.2-py3-none-any.whl", hash = "sha256:d63947694a0539a1d51e01eda7caf800c291020e6cdd7e28ad7b14dd33ad4f85", size = 323166, upload-time = "2026-06-29T18:11:09.888Z" },
 ]
 
 [[package]]
