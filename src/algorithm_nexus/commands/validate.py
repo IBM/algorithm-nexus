@@ -602,6 +602,10 @@ def validate_logical_benchmarks(
         typer.Option(
             "--benchmarks-root",
             help="Path to the directory containing logical benchmark YAML files.",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
         ),
     ] = Path("./benchmarks"),
     file: Annotated[
@@ -657,11 +661,6 @@ def validate_logical_benchmarks(
     if file is not None:
         files = [file]
     else:
-        if not benchmarks_root.is_dir():
-            console.print(
-                f"[red]Error:[/red] Benchmarks directory not found: {benchmarks_root.resolve()}"
-            )
-            raise typer.Exit(code=1)
         files = sorted(benchmarks_root.glob("*.yaml"))
         if not files:
             console.print(
