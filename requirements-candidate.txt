@@ -402,7 +402,7 @@ cuda-python==13.3.1 \
     # via
     #   nvidia-cutlass-dsl-libs-base
     #   nvidia-cutlass-dsl-libs-cu13
-cuda-tile==1.3.0 ; sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' \
+cuda-tile==1.3.0 \
     --hash=sha256:375316b64c51ee7cfadb2f170a30c1547bc41eb39f1e233a6556713857d2e81f \
     --hash=sha256:8a9bd4dae193cddf438f55d617b6f25b4b0b0fcf4ac4acde7d2695898e396c30 \
     --hash=sha256:93e20ed31e46e5bf704fb31d13e1c08338d2177838798876f7ee9ec4384b75ba \
@@ -410,23 +410,9 @@ cuda-tile==1.3.0 ; sys_platform != 'darwin' and sys_platform != 'emscripten' and
     --hash=sha256:e4865acbff1172aaee304bf9c550586088d8b4545a384423597a590899386709 \
     --hash=sha256:efcb93c25563fe23d6aa083c22893fd703122eaf684b0d36874982d28a6dad0b
     # via flashinfer-python
-cuda-tile==1.4.0 ; sys_platform == 'darwin' or sys_platform == 'emscripten' or sys_platform == 'win32' \
-    --hash=sha256:1d9d99b6fa57366af3f8707ac4fd91411275af2ee736996a60620240fcf92070 \
-    --hash=sha256:45be74f6568c440446f510bc7799b953858e64c6abf26e96f2c9598a79084860 \
-    --hash=sha256:616f13cbc7af6caa7b92430b85ba0a429d1f96ca9e7e04a29d89114cfe859663 \
-    --hash=sha256:9e358a85a153820aa0a51d0e09346d884a3c14b88c0313d20d0fb9f53952abae \
-    --hash=sha256:edd1df4d7955032c7be2a26c6d7e47261415ba7c87587705e0f4f1fd0d61650a \
-    --hash=sha256:fc74185efd81f6153af0a19549d111dec6861ee9b9bc27927a2cef6e19173eb5
-    # via flashinfer-python
 cuda-toolkit==13.0.2 ; sys_platform == 'linux' \
     --hash=sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb
     # via torch
-cuda-toolkit==13.2.1 ; sys_platform == 'win32' \
-    --hash=sha256:646d0e3668ce6f78f2312bb9cc0f668b9cbfcbef187eaa6a39eb2ea6dbec2a31
-    # via cuda-tile
-cuda-toolkit==13.3.1 ; sys_platform == 'darwin' or sys_platform == 'emscripten' \
-    --hash=sha256:2ceda460a540323d52469bcfde48b48c1861f6482e4b5ea3cb5bdac00a1b11bd
-    # via cuda-tile
 cycler==0.12.1 \
     --hash=sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30 \
     --hash=sha256:88bb128f02ba341da8ef447245a9e138fae777f6a23943da4540077d3601eb1c
@@ -1484,14 +1470,7 @@ nvidia-cuda-cccl==13.3.3.4.1 \
     --hash=sha256:cc0adc188d570b09f4d606c7dc05a42aa3d8aa082e0d60f7bbfc5b6435f627c6 \
     --hash=sha256:d7c92cc03047031fa7af30866636d35ce4af409c28fc7dd8f69cb17053741399
     # via humming-kernels
-nvidia-cuda-crt==13.2.78 ; sys_platform == 'win32' \
-    --hash=sha256:2c8615ee30ed466cb6298ecb8ffe9e6ea8b252ca833206152d155750bf831608 \
-    --hash=sha256:3f5f1d7bf8a89e98f19f45a2f18bb5df99a806433bfb6f0bc487d9e8f4b3677b \
-    --hash=sha256:6a5ac267680aecbec0405884c81b12db48f9baadfa67a62f230ab2f47f6ccaf1
-    # via
-    #   cuda-toolkit
-    #   nvidia-cuda-nvcc
-nvidia-cuda-crt==13.3.73 ; sys_platform != 'win32' \
+nvidia-cuda-crt==13.3.73 \
     --hash=sha256:60aacc0b5e1e8b40c62abe4d1ab16440add91b99bd2f17f62dd091586b73d166 \
     --hash=sha256:af04e75148db1f0eea30958f33a9ec5a5a2dc2afa99ca4323f9a93b840602ca5 \
     --hash=sha256:df14a17ae1c5c3171265411212246654d780f89344ea85344466c6b955247543
@@ -1507,7 +1486,6 @@ nvidia-cuda-nvcc==13.2.78 \
     --hash=sha256:dfc76950c775cd00ce588f15192f08c9b858c0dcfa7da685acf39a3d0d8f588b
     # via
     #   cuda-tile
-    #   cuda-toolkit
     #   humming-kernels
     #   nvidia-cuda-tileiras
 nvidia-cuda-nvrtc==13.0.88 ; sys_platform != 'darwin' \
@@ -1521,8 +1499,10 @@ nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' \
     --hash=sha256:7b05ecda494c6dabc44231a608b060a71008a730d9dfda932cc508e6d29159e0 \
     --hash=sha256:7d2af818851c0c224d5f92221e9226e51ee23c236df4b51f9194563979c888be \
     --hash=sha256:82530788b8c6164a54d3fd9ae8bcca8893d397c4aeb998861982a03bbe41e204
-    # via humming-kernels
-nvidia-cuda-runtime==13.0.96 ; sys_platform != 'win32' \
+    # via
+    #   humming-kernels
+    #   nvidia-cublas
+nvidia-cuda-runtime==13.0.96 \
     --hash=sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548 \
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
     --hash=sha256:f79298c8a098cec150a597c8eba58ecdab96e3bdc4b9bc4f9983635031740492
@@ -1530,21 +1510,11 @@ nvidia-cuda-runtime==13.0.96 ; sys_platform != 'win32' \
     #   cuda-toolkit
     #   humming-kernels
     #   nvidia-cuda-nvcc
-nvidia-cuda-runtime==13.2.75 ; sys_platform == 'win32' \
-    --hash=sha256:16a2ff1b786d52c7b4d4439c7f5fc05cf9e086071f51efd5163989dee65bd4ea \
-    --hash=sha256:36e539e8deb01568025830c1454216c26ef4b4529507220b1d8ef739bf5c6439 \
-    --hash=sha256:72bf454902da594e0b833cadeddc8b7100ce1c7cf7ed9023943931be1aa913b7
-    # via
-    #   cuda-toolkit
-    #   humming-kernels
-    #   nvidia-cuda-nvcc
-nvidia-cuda-tileiras==13.2.78 ; (platform_machine == 'AMD64' and sys_platform == 'win32') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32') \
+nvidia-cuda-tileiras==13.2.78 \
     --hash=sha256:5ce7c140a518aa8dfe033e7176f593617ed2fece0e50331e2a14dafd236723fd \
     --hash=sha256:658299efca52a20496b425efb0b19cb1ea7d57406a18d3f5024d4df92d5b54c1 \
     --hash=sha256:f4615627b994465da4ecd43d3d1cc3f372c22db2665acbe705987f43adf3f606
-    # via
-    #   cuda-tile
-    #   cuda-toolkit
+    # via cuda-tile
 nvidia-cudnn-cu13==9.19.0.56 ; sys_platform == 'linux' \
     --hash=sha256:40d8c375005bcb01495f8edf375230b203a411a0c05fb6dc92a3781edcb23eac \
     --hash=sha256:6ed29ffaee1176c612daf442e4dd6cfeb6a0caa43ddcbeb59da94953030b1be4 \
@@ -1646,7 +1616,6 @@ nvidia-nvvm==13.2.78 \
     --hash=sha256:f5aa433631109bbdec81802c5b5f319bf10bc891fe2f212e4e445845211d6f77
     # via
     #   cuda-tile
-    #   cuda-toolkit
     #   nvidia-cuda-nvcc
     #   nvidia-cuda-tileiras
 omegaconf==2.3.1 \
