@@ -1124,17 +1124,11 @@ name = "cuda-tile"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.13' and sys_platform == 'darwin'",
-    "python_full_version < '3.13' and sys_platform == 'darwin'",
-    "python_full_version >= '3.13' and sys_platform == 'win32'",
-    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
     "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and sys_platform == 'emscripten'",
     "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "typing-extensions", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "typing-extensions", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/49/4592bc94ca05a07c7947ea114fd12734c8497f2daffee9faa79a03e39fb5/cuda_tile-1.3.0-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:375316b64c51ee7cfadb2f170a30c1547bc41eb39f1e233a6556713857d2e81f", size = 245744, upload-time = "2026-04-20T15:52:09.621Z" },
@@ -1147,9 +1141,9 @@ wheels = [
 
 [package.optional-dependencies]
 tileiras = [
-    { name = "nvidia-cuda-nvcc", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-cuda-tileiras", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-nvvm", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-nvcc", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-tileiras", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvvm", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 
 [[package]]
@@ -1167,7 +1161,7 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "typing-extensions", marker = "(extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "typing-extensions", marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or extra == 'extra-15-algorithm-nexus-product' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/42/93/64ef40d3982dcda7a97ebfa3e3bb9045b573d4eb3877fa5d1fa3cd2541d3/cuda_tile-1.4.0-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:9e358a85a153820aa0a51d0e09346d884a3c14b88c0313d20d0fb9f53952abae", size = 280953, upload-time = "2026-05-27T17:46:53.03Z" },
@@ -1178,47 +1172,103 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/67/41f1acdf21bf6214a3a1c3b46d39b8eb0f9eba7aecc6b57005db35d56f9a/cuda_tile-1.4.0-cp313-cp313-win_amd64.whl", hash = "sha256:edd1df4d7955032c7be2a26c6d7e47261415ba7c87587705e0f4f1fd0d61650a", size = 269783, upload-time = "2026-05-27T17:47:16.631Z" },
 ]
 
+[package.optional-dependencies]
+tileiras = [
+    { name = "cuda-toolkit", version = "13.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["nvcc", "nvvm", "tileiras"], marker = "(sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "cuda-toolkit", version = "13.3.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+]
+
 [[package]]
 name = "cuda-toolkit"
 version = "13.0.2"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/57/b2/453099f5f3b698d7d0eab38916aac44c7f76229f451709e2eb9db6615dcd/cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb", size = 2364, upload-time = "2025-12-19T23:24:07.328Z" },
 ]
 
 [package.optional-dependencies]
 cublas = [
-    { name = "nvidia-cublas", version = "13.1.0.3", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cublas", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 cudart = [
-    { name = "nvidia-cuda-runtime", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cuda-runtime", version = "13.0.96", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 cufft = [
-    { name = "nvidia-cufft", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cufft", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 cufile = [
     { name = "nvidia-cufile", marker = "sys_platform == 'linux'" },
 ]
 cupti = [
-    { name = "nvidia-cuda-cupti", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cuda-cupti", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 curand = [
-    { name = "nvidia-curand", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-curand", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 cusolver = [
-    { name = "nvidia-cusolver", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cusolver", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 cusparse = [
-    { name = "nvidia-cusparse", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cusparse", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 nvjitlink = [
-    { name = "nvidia-nvjitlink", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-nvjitlink", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 nvrtc = [
-    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 nvtx = [
-    { name = "nvidia-nvtx", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "nvidia-nvtx", marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+]
+
+[[package]]
+name = "cuda-toolkit"
+version = "13.2.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bd/6a/f79c134fa8e6d5fe028584933be063ce7961b1a85ce217f261cdda176e48/cuda_toolkit-13.2.1-py2.py3-none-any.whl", hash = "sha256:646d0e3668ce6f78f2312bb9cc0f668b9cbfcbef187eaa6a39eb2ea6dbec2a31", size = 2612, upload-time = "2026-04-14T01:10:36.163Z" },
+]
+
+[package.optional-dependencies]
+nvcc = [
+    { name = "nvidia-cuda-crt", version = "13.2.78", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-nvcc", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-runtime", version = "13.2.75", source = { registry = "https://pypi.org/simple" }, marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvvm", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+]
+nvvm = [
+    { name = "nvidia-nvvm", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+]
+tileiras = [
+    { name = "nvidia-cuda-nvcc", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-tileiras", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvvm", marker = "(platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (platform_machine != 'AMD64' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+]
+
+[[package]]
+name = "cuda-toolkit"
+version = "13.3.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'darwin'",
+    "python_full_version < '3.13' and sys_platform == 'darwin'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/a1/54c1e9498ba0df91ca15a46f41af6320cb9faed6ec2dbb30b6cbff8887c4/cuda_toolkit-13.3.1-py2.py3-none-any.whl", hash = "sha256:2ceda460a540323d52469bcfde48b48c1861f6482e4b5ea3cb5bdac00a1b11bd", size = 2656, upload-time = "2026-06-29T17:23:23.848Z" },
 ]
 
 [[package]]
@@ -1708,7 +1758,8 @@ resolution-markers = [
 dependencies = [
     { name = "apache-tvm-ffi", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "click", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "cuda-tile", version = "1.3.0", source = { registry = "https://pypi.org/simple" }, extra = ["tileiras"], marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "cuda-tile", version = "1.3.0", source = { registry = "https://pypi.org/simple" }, extra = ["tileiras"], marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "cuda-tile", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, extra = ["tileiras"], marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "einops", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "ninja", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -2235,7 +2286,8 @@ cu13 = [
     { name = "nvidia-cuda-nvcc", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "nvidia-cuda-nvrtc", version = "13.0.88", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "nvidia-cuda-nvrtc", version = "13.3.33", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-cuda-runtime", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-runtime", version = "13.0.96", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-runtime", version = "13.2.75", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 
 [[package]]
@@ -3512,31 +3564,10 @@ wheels = [
 name = "nvidia-cublas"
 version = "13.1.0.3"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
-    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
-    "python_full_version >= '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
-    "python_full_version < '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
-    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
-    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
-]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e1/a5/fce49e2ae977e0ccc084e5adafceb4f0ac0c8333cb6863501618a7277f67/nvidia_cublas-13.1.0.3-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:c86fc7f7ae36d7528288c5d88098edcb7b02c633d262e7ddbb86b0ad91be5df2", size = 542851226, upload-time = "2025-10-09T08:59:04.818Z" },
     { url = "https://files.pythonhosted.org/packages/e7/44/423ac00af4dd95a5aeb27207e2c0d9b7118702149bf4704c3ddb55bb7429/nvidia_cublas-13.1.0.3-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:ee8722c1f0145ab246bccb9e452153b5e0515fd094c3678df50b2a0888b8b171", size = 423133236, upload-time = "2025-10-09T08:59:32.536Z" },
     { url = "https://files.pythonhosted.org/packages/10/f5/f50bc3f5c2bb57ab8f5b4d78bc1146b57810d42cb8fcb28cbe2e14050376/nvidia_cublas-13.1.0.3-py3-none-win_amd64.whl", hash = "sha256:2a3b94a37def342471c59fad7856caee4926809a72dd5270155d6a31b5b277be", size = 404355960, upload-time = "2025-10-09T09:07:00.987Z" },
-]
-
-[[package]]
-name = "nvidia-cublas"
-version = "13.6.0.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "nvidia-cuda-nvrtc", version = "13.3.33", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/22/7c08d8e93f6a2e4879ac83c12696aecaf17a0fc2c9e8d204caceaa3b8426/nvidia_cublas-13.6.0.2-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:946f6a252b1cc72d8de912c75975fd6d8ba44f67d4e5044fe764ddb909f4a688", size = 518599300, upload-time = "2026-06-29T16:54:56.859Z" },
-    { url = "https://files.pythonhosted.org/packages/fd/6c/173c7a3db77a6592210f73f194f0f8ed5e51b6ec61cfed7b1eee06ac5fd3/nvidia_cublas-13.6.0.2-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:b82c80c886cea6da6e149a5c3bdba274f12b7e4ec4b00a050b916b0446fb4153", size = 410473152, upload-time = "2026-06-29T16:55:54.297Z" },
-    { url = "https://files.pythonhosted.org/packages/08/8f/890a96ea1ff615100296977cce23296052dcb8c114d4e451201ec39df9bf/nvidia_cublas-13.6.0.2-py3-none-win_amd64.whl", hash = "sha256:3b5bcd6bfb6f65010ebf195851bcb9b2aa34b9fe08479432002991c1fe84b67d", size = 394568225, upload-time = "2026-06-29T17:15:46.911Z" },
 ]
 
 [[package]]
@@ -3551,8 +3582,30 @@ wheels = [
 
 [[package]]
 name = "nvidia-cuda-crt"
+version = "13.2.78"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/85/8a/3954a429bbe1dea60c7e3fa4a0cf6a4fdb7df295b2cfb49a77a73bcd3ca4/nvidia_cuda_crt-13.2.78-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:3f5f1d7bf8a89e98f19f45a2f18bb5df99a806433bfb6f0bc487d9e8f4b3677b", size = 133298, upload-time = "2026-04-13T09:37:06.368Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/78/501eee5cce9202fba2f3476529e296a7f6d003261d80b52ab0abfa09ddd6/nvidia_cuda_crt-13.2.78-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2c8615ee30ed466cb6298ecb8ffe9e6ea8b252ca833206152d155750bf831608", size = 133301, upload-time = "2026-04-13T09:37:36.922Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/5a/2f01037f080c72ba9eed048fc5a041336e017dc49d551e7a1563b041e246/nvidia_cuda_crt-13.2.78-py3-none-win_amd64.whl", hash = "sha256:6a5ac267680aecbec0405884c81b12db48f9baadfa67a62f230ab2f47f6ccaf1", size = 134064, upload-time = "2026-04-13T10:03:45.81Z" },
+]
+
+[[package]]
+name = "nvidia-cuda-crt"
 version = "13.3.73"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'darwin'",
+    "python_full_version < '3.13' and sys_platform == 'darwin'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/41/2089e411507d66458d67208bdd1bc562d492bb6458c3d2aea4603072a219/nvidia_cuda_crt-13.3.73-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:60aacc0b5e1e8b40c62abe4d1ab16440add91b99bd2f17f62dd091586b73d166", size = 157353, upload-time = "2026-06-29T16:42:38.163Z" },
     { url = "https://files.pythonhosted.org/packages/7e/ce/16d76f4b5b3f7460f5ebd17516685495c149c66651ffdd381f90e4d4e65c/nvidia_cuda_crt-13.3.73-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:df14a17ae1c5c3171265411212246654d780f89344ea85344466c6b955247543", size = 157352, upload-time = "2026-06-29T16:43:09.209Z" },
@@ -3574,8 +3627,10 @@ name = "nvidia-cuda-nvcc"
 version = "13.2.78"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cuda-crt", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-cuda-runtime", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-crt", version = "13.2.78", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-crt", version = "13.3.73", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-runtime", version = "13.0.96", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-runtime", version = "13.2.75", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "nvidia-nvvm", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 wheels = [
@@ -3624,6 +3679,18 @@ wheels = [
 name = "nvidia-cuda-runtime"
 version = "13.0.96"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version >= '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+    "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra != 'extra-15-algorithm-nexus-product'",
+]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/4f/17d7b9b8e285199c58ce28e31b5c5bbaa4d8271af06a89b6405258245de2/nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55", size = 2261060, upload-time = "2025-10-09T08:55:15.78Z" },
     { url = "https://files.pythonhosted.org/packages/2e/24/d1558f3b68b1d26e706813b1d10aa1d785e4698c425af8db8edc3dced472/nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548", size = 2243632, upload-time = "2025-10-09T08:55:36.117Z" },
@@ -3631,12 +3698,26 @@ wheels = [
 ]
 
 [[package]]
+name = "nvidia-cuda-runtime"
+version = "13.2.75"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and sys_platform == 'win32'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/40/56a70b5a4e0a2881a1b7c172fea8025ab6b3cfb2de61c743fb7974d1ded4/nvidia_cuda_runtime-13.2.75-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:36e539e8deb01568025830c1454216c26ef4b4529507220b1d8ef739bf5c6439", size = 2339755, upload-time = "2026-04-13T09:37:53.791Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/74/f1493b0774c6eaf0234512bb650e1ab90ce8f61fecf0b4aaf1fb416f571e/nvidia_cuda_runtime-13.2.75-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:72bf454902da594e0b833cadeddc8b7100ce1c7cf7ed9023943931be1aa913b7", size = 2321965, upload-time = "2026-04-13T09:38:26.359Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/ea/efd56431c409f292739b0f69ceae9f1469599e9e228706b4f1fad45a32ba/nvidia_cuda_runtime-13.2.75-py3-none-win_amd64.whl", hash = "sha256:16a2ff1b786d52c7b4d4439c7f5fc05cf9e086071f51efd5163989dee65bd4ea", size = 3154350, upload-time = "2026-04-13T10:04:17.355Z" },
+]
+
+[[package]]
 name = "nvidia-cuda-tileiras"
 version = "13.2.78"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cuda-nvcc", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-nvvm", marker = "extra == 'extra-15-algorithm-nexus-candidate' or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cuda-nvcc", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvvm", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/04/eb26cc1d67c653f5dbe8c13fd6da9c1e844b097147051b5052ac5e6d4047/nvidia_cuda_tileiras-13.2.78-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:658299efca52a20496b425efb0b19cb1ea7d57406a18d3f5024d4df92d5b54c1", size = 36418791, upload-time = "2026-04-13T09:48:30.107Z" },
@@ -3649,8 +3730,7 @@ name = "nvidia-cudnn-cu13"
 version = "9.19.0.56"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas", version = "13.1.0.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-cublas", version = "13.6.0.2", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cublas", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/84/26025437c1e6b61a707442184fa0c03d083b661adf3a3eecfd6d21677740/nvidia_cudnn_cu13-9.19.0.56-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:6ed29ffaee1176c612daf442e4dd6cfeb6a0caa43ddcbeb59da94953030b1be4", size = 433781201, upload-time = "2026-02-03T20:40:53.805Z" },
@@ -3709,7 +3789,7 @@ name = "nvidia-cufft"
 version = "12.0.0.61"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/ae/f417a75c0259e85c1d2f83ca4e960289a5f814ed0cea74d18c353d3e989d/nvidia_cufft-12.0.0.61-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2708c852ef8cd89d1d2068bdbece0aa188813a0c934db3779b9b1faa8442e5f5", size = 214053554, upload-time = "2025-09-04T08:31:38.196Z" },
@@ -3741,9 +3821,9 @@ name = "nvidia-cusolver"
 version = "12.0.4.66"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas", version = "13.1.0.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-cusparse", marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-cublas", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
+    { name = "nvidia-cusparse", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
+    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/c3/b30c9e935fc01e3da443ec0116ed1b2a009bb867f5324d3f2d7e533e776b/nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:02c2457eaa9e39de20f880f4bd8820e6a1cfb9f9a34f820eb12a155aa5bc92d2", size = 223467760, upload-time = "2025-09-04T08:33:04.222Z" },
@@ -3756,7 +3836,7 @@ name = "nvidia-cusparse"
 version = "12.6.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "nvidia-nvjitlink", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'darwin' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'emscripten' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (sys_platform == 'win32' and extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra != 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f8/94/5c26f33738ae35276672f12615a64bd008ed5be6d1ebcb23579285d960a9/nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:80bcc4662f23f1054ee334a15c72b8940402975e0eab63178fc7e670aa59472c", size = 162155568, upload-time = "2025-09-04T08:33:42.864Z" },
@@ -6806,7 +6886,7 @@ version = "2.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cuda-bindings", marker = "sys_platform == 'linux'" },
-    { name = "cuda-toolkit", extra = ["cublas", "cudart", "cufft", "cufile", "cupti", "curand", "cusolver", "cusparse", "nvjitlink", "nvrtc", "nvtx"], marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
+    { name = "cuda-toolkit", version = "13.0.2", source = { registry = "https://pypi.org/simple" }, extra = ["cublas", "cudart", "cufft", "cufile", "cupti", "curand", "cusolver", "cusparse", "nvjitlink", "nvrtc", "nvtx"], marker = "(sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-candidate') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-ecosystem') or (sys_platform == 'linux' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "filelock" },
     { name = "fsspec" },
     { name = "jinja2" },
