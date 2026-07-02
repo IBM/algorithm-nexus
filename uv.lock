@@ -33,9 +33,6 @@ conflicts = [[
     { package = "algorithm-nexus", extra = "product" },
 ]]
 
-[options]
-exclude-newer = "2026-07-02T14:18:20Z"
-
 [[package]]
 name = "absl-py"
 version = "2.4.0"
