@@ -280,6 +280,11 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
+- `--actuatorconfiguration-ids <path>`: Path to a YAML file mapping
+  `actuatorIdentifier` to `actuatorConfigurationId`. When provided, experiments
+  in a benchmark's `space.yaml` whose `actuatorIdentifier` matches a key in this
+  file will have the corresponding `actuatorConfigurationId` added to the
+  operation's `actuatorConfigurationIdentifiers` list.
 - `--dry-run`: List benchmark instances without executing them (dry run)
 - `--output-file <path>`: Output file path for execution results. If not
   specified, results are printed to screen.
@@ -344,6 +349,14 @@ nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
   --remote path/to/remote-context.yaml \
   --context path/to/ado-context.yaml
+```
+
+Execute benchmarks with actuator configuration IDs:
+
+```bash
+nexus run benchmarks \
+  --pr https://github.com/IBM/algorithm-nexus/pull/123 \
+  --actuatorconfiguration-ids path/to/actuator-config-ids.yaml
 ```
 
 Execute benchmarks and save results to a file:
