@@ -86,6 +86,22 @@ def run_benchmarks(
             help="Output format: 'json' or 'yaml'. Only used with --output-file.",
         ),
     ] = None,
+    actuatorconfiguration_ids: Annotated[
+        Path | None,
+        typer.Option(
+            "--actuatorconfiguration-ids",
+            help=(
+                "Path to a YAML file mapping actuatorIdentifier to actuatorConfigurationId. "
+                "When provided, experiments in a benchmark's space.yaml whose actuatorIdentifier "
+                "matches a key in this file will have the corresponding actuatorConfigurationId "
+                "added to the operation's actuatorConfigurationIdentifiers list."
+            ),
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
 ) -> None:
     """Execute benchmarks from a GitHub Pull Request.
 
@@ -107,6 +123,7 @@ def run_benchmarks(
             execute=not dry_run,
             remote_context_file=remote,
             context_file=context,
+            actuator_configuration_ids_file=actuatorconfiguration_ids,
         )
         results = manager.run()
 

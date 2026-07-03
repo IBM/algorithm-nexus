@@ -58,6 +58,7 @@ def create_random_walk_operation_config(
     metadata_name: str = "randomwalk-all",
     metadata_description: str = "Perform a random walk on all points in a space",
     custom_metadata: dict[str, Any] | None = None,
+    actuator_configuration_ids: list[str] | None = None,
 ) -> DiscoveryOperationResourceConfiguration:
     """Create a random walk operation configuration.
 
@@ -66,6 +67,7 @@ def create_random_walk_operation_config(
         metadata_name: Name for the operation metadata
         metadata_description: Description for the operation metadata
         custom_metadata: Additional custom metadata fields
+        actuator_configuration_ids: Optional list of actuator configuration identifiers
 
     Returns:
         DiscoveryOperationResourceConfiguration object
@@ -99,7 +101,7 @@ def create_random_walk_operation_config(
         metadata=metadata,
         spaces=[space_id],
         operation=operation,
-        actuatorConfigurationIdentifiers=[],
+        actuatorConfigurationIdentifiers=actuator_configuration_ids or [],
     )
 
 
@@ -112,6 +114,7 @@ class BenchmarkManager:
         execute: bool = True,
         remote_context_file: Path | None = None,
         context_file: Path | None = None,
+        actuator_configuration_ids_file: Path | None = None,
     ):
         """Initialize the benchmark manager.
 
@@ -120,13 +123,42 @@ class BenchmarkManager:
             execute: Whether to execute benchmarks with ADO CLI
             remote_context_file: Path to remote execution context YAML file
             context_file: Path to ADO context YAML file (samplestore context)
+            actuator_configuration_ids_file: Optional path to a YAML file mapping
+                actuatorIdentifier to actuatorConfigurationId. When provided, the
+                actuatorIdentifier values from the benchmark's space.yaml are looked
+                up in this mapping and matching actuatorConfigurationId values are
+                set in the operation YAML as actuatorConfigurationIdentifiers.
         """
         self.pr_url = pr_url
         self.execute = execute
         self.remote_context_file = remote_context_file
         self.context_file = context_file
+        self.actuator_configuration_ids_file = actuator_configuration_ids_file
+        self._actuator_id_map: dict[str, str] = (
+            self._load_actuator_id_map(actuator_configuration_ids_file)
+            if actuator_configuration_ids_file
+            else {}
+        )
         self.repo_root = Path.cwd()
         self.temp_dir_obj = None
+
+    @staticmethod
+    def _load_actuator_id_map(path: Path) -> dict[str, str]:
+        """Load the actuatorIdentifier → actuatorConfigurationId mapping from a YAML file.
+
+        Args:
+            path: Path to a YAML file with entries of the form
+                  ``actuatorIdentifier: actuatorConfigurationId``
+
+        Returns:
+            Dictionary mapping actuator identifier strings to configuration ID strings
+        """
+        raw = yaml.safe_load(path.read_text()) or {}
+        if not isinstance(raw, dict):
+            raise ValueError(
+                f"Actuator configuration IDs file must be a YAML mapping, got: {type(raw).__name__}"
+            )
+        return {str(k): str(v) for k, v in raw.items()}
 
     def get_changed_files(self) -> list[str]:
         """Get list of changed files from the PR using gh CLI.
@@ -630,7 +662,7 @@ class BenchmarkManager:
                     temp_remote_configs.append(remote_config_for_space)
 
             console.print(f"  Creating ADO discoveryspace for: {instance_path}")
-            space_id = self._create_discoveryspace(
+            space_id, actuator_configuration_ids = self._create_discoveryspace(
                 space_yaml_path, instance_path, remote_config_for_space
             )
             result.space_id = space_id
@@ -638,7 +670,10 @@ class BenchmarkManager:
 
             console.print(f"  Creating operation for space: {space_id}")
             operation_result = self._create_operation(
-                space_id, instance_path, remote_config_for_operation
+                space_id,
+                instance_path,
+                remote_config_for_operation,
+                actuator_configuration_ids,
             )
             result.operation_id = operation_result["operation_id"]
             result.ray_job_id = operation_result.get("ray_job_id")
@@ -692,7 +727,7 @@ class BenchmarkManager:
         space_yaml_path: Path,
         instance_path: Path,
         remote_config: Path | None = None,
-    ) -> str:
+    ) -> tuple[str, list[str]]:
         """Create a discoveryspace using ado CLI.
 
         Args:
@@ -701,11 +736,21 @@ class BenchmarkManager:
             remote_config: Optional path to remote configuration file (with wait: true for space creation)
 
         Returns:
-            Created space identifier
+            Tuple of (space identifier, resolved actuator configuration IDs)
         """
 
         # Load the space configuration from YAML
         space_config_dict = yaml.safe_load(space_yaml_path.read_text())
+
+        # Resolve actuator configuration IDs while the space dict is available
+        actuator_configuration_ids: list[str] = []
+        if self._actuator_id_map:
+            for experiment in (space_config_dict or {}).get("experiments", []):
+                actuator_identifier = experiment.get("actuatorIdentifier")
+                if actuator_identifier and actuator_identifier in self._actuator_id_map:
+                    actuator_configuration_ids.append(
+                        self._actuator_id_map[actuator_identifier]
+                    )
 
         # Parse the configuration using DiscoverySpaceConfiguration
         space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
@@ -770,11 +815,13 @@ class BenchmarkManager:
             combined_output = result.stdout + "\n" + result.stderr
             match = re.search(r"identifier[:\s]+(\S+)", combined_output)
             if match:
-                return strip_ansi_codes(match.group(1))
+                return strip_ansi_codes(match.group(1)), actuator_configuration_ids
             else:
                 output_words = result.stdout.strip().split()
                 if output_words:
-                    return strip_ansi_codes(output_words[-1])
+                    return strip_ansi_codes(
+                        output_words[-1]
+                    ), actuator_configuration_ids
                 else:
                     raise ValueError(
                         f"Could not extract space identifier from ADO output.\n"
@@ -852,6 +899,7 @@ class BenchmarkManager:
         space_id: str,
         instance_path: Path | None = None,
         remote_config: Path | None = None,
+        actuator_configuration_ids: list[str] | None = None,
     ) -> dict[str, str | None]:
         """Create and execute an operation using ado CLI.
 
@@ -859,6 +907,7 @@ class BenchmarkManager:
             space_id: Discovery space identifier
             instance_path: Optional path to benchmark instance (for package resolution)
             remote_config: Optional path to remote configuration file
+            actuator_configuration_ids: Actuator configuration IDs resolved from space.yaml
 
         Returns:
             Dictionary with operation_id and ray_job_id (if remote execution)
@@ -898,6 +947,7 @@ class BenchmarkManager:
             metadata_name=operation_name,
             metadata_description=operation_description,
             custom_metadata=custom_metadata,
+            actuator_configuration_ids=actuator_configuration_ids or None,
         )
 
         with tempfile.NamedTemporaryFile(
