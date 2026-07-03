@@ -18,6 +18,12 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  # CP 02/07/2026
+  # Scanners are flagging opencv-python-headless==5.0.0.93 as
+  # potentially malicious. While we think it's a false positive,
+  # we use this qualifier to prevent installing a potentially malicious library.
+  # This dependency is added by vLLM and TerraTorch
+  "opencv-python-headless!=5.0.0.93",
   "terratorch[vllm]==1.2.8",
   "vllm==0.23.0",
 ]
@@ -34,6 +40,12 @@ ecosystem = [
   "tokamind",
 ]
 product = [
+  # CP 02/07/2026
+  # Scanners are flagging opencv-python-headless==5.0.0.93 as
+  # potentially malicious. While we think it's a false positive,
+  # we use this qualifier to prevent installing a potentially malicious library.
+  # This dependency is added by vLLM and TerraTorch
+  "opencv-python-headless!=5.0.0.93",
   "terratorch[vllm]==1.2.8",
   "vllm==0.21.0",
 ]
