@@ -84,9 +84,9 @@ annotated-types==0.7.0 \
     --hash=sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53 \
     --hash=sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89
     # via pydantic
-anthropic==0.115.1 \
-    --hash=sha256:040287319abb909acf1cc49d83c0405dc0b1121ef257034b02c2b54151cf2446 \
-    --hash=sha256:685fa94964c1b9428f6a76e42d0dbae49aa2016f5ad386a96becac04c5e80ef9
+anthropic==0.116.0 \
+    --hash=sha256:5fc248fbb9fe03ef686f8a774f81586bca31a043260aab88b387ea3660f4a396 \
+    --hash=sha256:6c0a7698e8d652455da3499978279bb2588c7264d0a35be3666009a4258c8256
     # via vllm
 antlr4-python3-runtime==4.9.3 \
     --hash=sha256:f224469b4168294902bb1efa80a8bf7855f24c99aef99cbefc1bcd3cce77881b
@@ -536,9 +536,9 @@ fastsafetensors==0.3.2 \
     --hash=sha256:9e358fce238684613a5c3ebb7800c52c5b3270c0bb5e4ed2191ee8f3d0431de1 \
     --hash=sha256:b02dd7a2332013c24cce1fb9cd037326c6b52dd25e84fa07d02d61c6301b54e8
     # via vllm
-filelock==3.29.4 \
-    --hash=sha256:10cdb3656fc44541cdf30652a93fb10ec6b05325620eb316bd26893e4201538a \
-    --hash=sha256:dac1648087d5115554850d113e7dd8c83ab2d38e3435dde2d4f163847e57b767
+filelock==3.29.5 \
+    --hash=sha256:6e6034c57a00a020e767f2614a5539863f056de7e7991d6d1473aef7ff73f156 \
+    --hash=sha256:8af830889ba3a0ffcefbd6c7d2af8a54012058103771f2e10848222f476a1693
     # via
     #   diffusers
     #   huggingface-hub

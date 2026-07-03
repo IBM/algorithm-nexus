@@ -125,7 +125,7 @@ attrs==26.1.0 \
     #   somacore
     #   tiledb-cloud
     #   tiledbsoma
-bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@7a430b264e7d1ae4600495dff4a7eb70e2ed7048
+bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@78d2ba11e39e6027fe27c950b096be33d992bcbe
     # via algorithm-nexus
 boto3==1.43.0 \
     --hash=sha256:80d44a943ef90aba7958ab31d30c155c198acc8a9581b5846b3878b2c8951086 \
@@ -298,9 +298,9 @@ fast-array-utils==1.4.1 \
     --hash=sha256:466512aa0e19ebfb2f8d7ae8736fc81b5724e9bf1a7958474206c17b8e991e9c \
     --hash=sha256:cad55a58359cac4084445d801b50904357093a94863aca7ff7118bd4bd38ce7c
     # via scanpy
-filelock==3.29.4 \
-    --hash=sha256:10cdb3656fc44541cdf30652a93fb10ec6b05325620eb316bd26893e4201538a \
-    --hash=sha256:dac1648087d5115554850d113e7dd8c83ab2d38e3435dde2d4f163847e57b767
+filelock==3.29.5 \
+    --hash=sha256:6e6034c57a00a020e767f2614a5539863f056de7e7991d6d1473aef7ff73f156 \
+    --hash=sha256:8af830889ba3a0ffcefbd6c7d2af8a54012058103771f2e10848222f476a1693
     # via
     #   diffusers
     #   huggingface-hub
