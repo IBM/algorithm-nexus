@@ -50,15 +50,7 @@ uv lock
 ```
 
 ```bash
-uv export --frozen --no-emit-project --no-default-groups --no-header --extra=candidate --output-file=requirements-candidate.txt
-```
-
-```bash
-uv export --frozen --no-emit-project --no-default-groups --no-header --extra=ecosystem --output-file=requirements-ecosystem.txt
-```
-
-```bash
-uv export --frozen --no-emit-project --no-default-groups --no-header --extra=product --output-file=requirements-product.txt
+uv run pre-commit run uv-export -a
 ```
 
 ## 3. Commit the Updated Files
