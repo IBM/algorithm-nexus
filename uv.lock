@@ -35,11 +35,11 @@ conflicts = [[
 
 [[package]]
 name = "absl-py"
-version = "2.4.0"
+version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/64/c7/8de93764ad66968d19329a7e0c147a2bb3c7054c554d4a119111b8f9440f/absl_py-2.4.0.tar.gz", hash = "sha256:8c6af82722b35cf71e0f4d1d47dcaebfff286e27110a99fc359349b247dfb5d4", size = 116543, upload-time = "2026-01-28T10:17:05.322Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/4f/d79676ab82f2e42fc3611618139f13a9c4c31d0cff4b486982047679a802/absl_py-2.5.0.tar.gz", hash = "sha256:0c996f25c0490700fadabe6351630f6111534fa0ae252cc6d2014ea3b141135f", size = 118119, upload-time = "2026-07-03T10:57:48.157Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/a6/907a406bb7d359e6a63f99c313846d9eec4f7e6f7437809e03aa00fa3074/absl_py-2.4.0-py3-none-any.whl", hash = "sha256:88476fd881ca8aab94ffa78b7b6c632a782ab3ba1cd19c9bd423abc4fb4cd28d", size = 135750, upload-time = "2026-01-28T10:17:04.19Z" },
+    { url = "https://files.pythonhosted.org/packages/58/0a/a10b45aab35b175aded078a462dc8d0c698f5b13946e7cb0869097b78bb6/absl_py-2.5.0-py3-none-any.whl", hash = "sha256:0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba", size = 137410, upload-time = "2026-07-03T10:57:46.735Z" },
 ]
 
 [[package]]
@@ -1290,13 +1290,13 @@ dependencies = [
 
 [[package]]
 name = "diffusers"
-version = "0.38.0"
+version = "0.39.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "httpx" },
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "importlib-metadata" },
     { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
@@ -1305,9 +1305,9 @@ dependencies = [
     { name = "requests" },
     { name = "safetensors" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/01/ed/255d3dfd4a2271dffc8f1895f9d2720b3bf1beaecf02148bb5604439e594/diffusers-0.38.0.tar.gz", hash = "sha256:1e094ec5c16f18c42fb89d37f07a94cf9aab3ebbe527ab059c609597b8857626", size = 4328401, upload-time = "2026-05-01T05:42:15.276Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1a/81/6095237b86a3116c4789f28c4435d5296c00c0fc74ffde99008fd6b3a36c/diffusers-0.39.0.tar.gz", hash = "sha256:14bb1d98c85a0e463d734c99aaa73b480a7bc9bad22af30fbf730ef8f09c1d67", size = 4651240, upload-time = "2026-07-03T08:48:47.904Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/42/c0/3237566ea6e3a542f3c0669a253d62fe75f27b84b3d7bd4fb3b5ee89d73c/diffusers-0.38.0-py3-none-any.whl", hash = "sha256:18e53f9e539096320470f62c6360a6fd5727ff28cffda566265316e13fcdb612", size = 5245919, upload-time = "2026-05-01T05:42:12.779Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/3f/7469c46e9d22307ea686bab687d70e6bf328722952f9d10339f5e913e608/diffusers-0.39.0-py3-none-any.whl", hash = "sha256:912aca51b5787365110806e984d5555735bf8a461073bb8459029d0bca7870ef", size = 5631176, upload-time = "2026-07-03T08:48:45.337Z" },
 ]
 
 [[package]]
@@ -2178,7 +2178,7 @@ wheels = [
 
 [[package]]
 name = "huggingface-hub"
-version = "1.21.0"
+version = "1.22.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'darwin'",
@@ -2199,12 +2199,11 @@ dependencies = [
     { name = "packaging", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "pyyaml", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "tqdm", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
-    { name = "typer", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "typing-extensions", marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8f/77/ce3331f40cb2d021fe9b24c46c41e72faf74493621138e5eddac12bf5e1c/huggingface_hub-1.21.0.tar.gz", hash = "sha256:a44f222cd8f2f7c2eade30b5e7a04cac984a3235fa61ea87a0a5a31db77d561f", size = 861572, upload-time = "2026-06-25T13:09:26.356Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/ea/dc54b4dda5841cb3a7812a178695be776e7c15c597887c2ed892f17d015a/huggingface_hub-1.22.0.tar.gz", hash = "sha256:e2dfe5fe1ec3b87ba2709aa34555b23e3f3f6ad4d7255238e13ddb8348e6bbfa", size = 914232, upload-time = "2026-07-03T09:46:44.685Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/85/b505a99a133d9f99d21af182af416e9baef70bdeef019983479651e494c2/huggingface_hub-1.21.0-py3-none-any.whl", hash = "sha256:eadaa3678c512c82aea69e8675d90a184861e68de32f1105668628b4dce0e7cd", size = 721078, upload-time = "2026-06-25T13:09:24.402Z" },
+    { url = "https://files.pythonhosted.org/packages/64/9c/a1a377265abd8b823a2c661c665028ccb6b9fba1ca9d08e52ff679c20ecd/huggingface_hub-1.22.0-py3-none-any.whl", hash = "sha256:b09e19309ae09ee0a71892701c4fe70af39ab4e00817321dc62f2289a977249b", size = 765085, upload-time = "2026-07-03T09:46:42.832Z" },
 ]
 
 [[package]]
@@ -5980,7 +5979,7 @@ version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-product') or extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "pillow" },
@@ -6476,7 +6475,7 @@ dependencies = [
     { name = "geopandas" },
     { name = "h5py" },
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "jsonargparse" },
     { name = "lightly" },
     { name = "lightning" },
@@ -6698,7 +6697,7 @@ version = "1.0.27"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "pyyaml" },
     { name = "safetensors" },
     { name = "torch" },
@@ -6727,7 +6726,7 @@ version = "0.22.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/73/6f/f80cfef4a312e1fb34baf7d85c72d4411afde10978d4657f8cdd811d3ccc/tokenizers-0.22.2.tar.gz", hash = "sha256:473b83b915e547aa366d1eee11806deaf419e17be16310ac0a14077f1e28f917", size = 372115, upload-time = "2026-01-05T10:45:15.988Z" }
 wheels = [
@@ -7014,7 +7013,7 @@ resolution-markers = [
     "python_full_version < '3.13' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "huggingface-hub", version = "1.21.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "huggingface-hub", version = "1.22.0", source = { registry = "https://pypi.org/simple" } },
     { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version < '3.13' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-candidate') or (python_full_version >= '3.13' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "packaging" },
@@ -7057,17 +7056,17 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.25.1"
+version = "0.26.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "click" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-ecosystem') or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product') or (extra == 'extra-15-algorithm-nexus-ecosystem' and extra == 'extra-15-algorithm-nexus-product')" },
     { name = "rich" },
     { name = "shellingham" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/51/9aed62104cea109b820bbd6c14245af756112017d309da813ef107d42e7e/typer-0.25.1.tar.gz", hash = "sha256:9616eb8853a09ffeabab1698952f33c6f29ffdbceb4eaeecf571880e8d7664cc", size = 122276, upload-time = "2026-04-30T19:32:16.964Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/f7/68adc395201b20b872d68e975386832e8005ffeacedd43a1d837a32815be/typer-0.26.8.tar.gz", hash = "sha256:c244a6bd558886fe3f8780efb6bdd28bb9aff005a94eedebaa5cb32926fe2f7e", size = 202097, upload-time = "2026-06-26T09:22:45.705Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3f/f9/2b3ff4e56e5fa7debfaf9eb135d0da96f3e9a1d5b27222223c7296336e5f/typer-0.25.1-py3-none-any.whl", hash = "sha256:75caa44ed46a03fb2dab8808753ffacdbfea88495e74c85a28c5eefcf5f39c89", size = 58409, upload-time = "2026-04-30T19:32:18.271Z" },
+    { url = "https://files.pythonhosted.org/packages/80/87/b9fd69c92c6102a066e1b86a35243f53e70bd4c709f2a26d9f4fee4f4dc0/typer-0.26.8-py3-none-any.whl", hash = "sha256:3512ca79ac5c11113414b36e80281b872884477722440691c89d1112e321a49c", size = 122564, upload-time = "2026-06-26T09:22:44.72Z" },
 ]
 
 [[package]]

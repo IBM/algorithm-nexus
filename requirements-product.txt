@@ -1,6 +1,6 @@
-absl-py==2.4.0 \
-    --hash=sha256:88476fd881ca8aab94ffa78b7b6c632a782ab3ba1cd19c9bd423abc4fb4cd28d \
-    --hash=sha256:8c6af82722b35cf71e0f4d1d47dcaebfff286e27110a99fc359349b247dfb5d4
+absl-py==2.5.0 \
+    --hash=sha256:0c996f25c0490700fadabe6351630f6111534fa0ae252cc6d2014ea3b141135f \
+    --hash=sha256:0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba
     # via tensorboard
 aenum==3.1.17 \
     --hash=sha256:8b883a37a04e74cc838ac442bdd28c266eae5bbf13e1342c7ef123ed25230139 \
@@ -283,7 +283,6 @@ click==8.4.2 \
     #   huggingface-hub
     #   rasterio
     #   rich-toolkit
-    #   typer
     #   uvicorn
 cligj==0.7.2 \
     --hash=sha256:a4bc13d623356b373c2c27c53dbd9c68cae5d526270bfa71f6c6fa69669c6b27 \
@@ -302,6 +301,7 @@ colorama==0.4.6 ; sys_platform == 'win32' \
     #   click
     #   loguru
     #   tqdm
+    #   typer
     #   uvicorn
 compressed-tensors==0.15.0.1 \
     --hash=sha256:a8e93054e8a5ec49c980b09ed36c4c1249b4a8ee167920a8e461c4da26e78d99 \
@@ -429,9 +429,9 @@ detect-installer==0.1.0 \
     --hash=sha256:00ad7ba0a36e3cf7d08a40d3643011746dbc112597c7d475cc91c416710ca4e7 \
     --hash=sha256:034fb20fd665c36e6ba52b8821525ea07fb4f7f938cac459df889fb33801528a
     # via fastapi-cloud-cli
-diffusers==0.38.0 \
-    --hash=sha256:18e53f9e539096320470f62c6360a6fd5727ff28cffda566265316e13fcdb612 \
-    --hash=sha256:1e094ec5c16f18c42fb89d37f07a94cf9aab3ebbe527ab059c609597b8857626
+diffusers==0.39.0 \
+    --hash=sha256:14bb1d98c85a0e463d734c99aaa73b480a7bc9bad22af30fbf730ef8f09c1d67 \
+    --hash=sha256:912aca51b5787365110806e984d5555735bf8a461073bb8459029d0bca7870ef
     # via terratorch
 dill==0.4.1 \
     --hash=sha256:1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d \
@@ -763,9 +763,9 @@ httpx-sse==0.4.3 \
     --hash=sha256:0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc \
     --hash=sha256:9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d
     # via mcp
-huggingface-hub==1.21.0 \
-    --hash=sha256:a44f222cd8f2f7c2eade30b5e7a04cac984a3235fa61ea87a0a5a31db77d561f \
-    --hash=sha256:eadaa3678c512c82aea69e8675d90a184861e68de32f1105668628b4dce0e7cd
+huggingface-hub==1.22.0 \
+    --hash=sha256:b09e19309ae09ee0a71892701c4fe70af39ab4e00817321dc62f2289a977249b \
+    --hash=sha256:e2dfe5fe1ec3b87ba2709aa34555b23e3f3f6ad4d7255238e13ddb8348e6bbfa
     # via
     #   diffusers
     #   segmentation-models-pytorch
@@ -2975,14 +2975,13 @@ triton==3.6.0 ; sys_platform == 'linux' \
     #   humming-kernels
     #   torch
     #   xgrammar
-typer==0.25.1 \
-    --hash=sha256:75caa44ed46a03fb2dab8808753ffacdbfea88495e74c85a28c5eefcf5f39c89 \
-    --hash=sha256:9616eb8853a09ffeabab1698952f33c6f29ffdbceb4eaeecf571880e8d7664cc
+typer==0.26.8 \
+    --hash=sha256:3512ca79ac5c11113414b36e80281b872884477722440691c89d1112e321a49c \
+    --hash=sha256:c244a6bd558886fe3f8780efb6bdd28bb9aff005a94eedebaa5cb32926fe2f7e
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
     #   fastsafetensors
-    #   huggingface-hub
     #   transformers
 typeshed-client==2.12.0 \
     --hash=sha256:54dcfa25fcff82cedcb1b51c03c1b3c51a614097aab8fe49e4316aff6f79d9c7 \
