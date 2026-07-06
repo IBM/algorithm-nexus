@@ -13,6 +13,7 @@ from pydantic import AfterValidator, computed_field
 
 try:
     from orchestrator.schema.property import Property
+    from orchestrator.schema.property_value import PropertyValue
     from orchestrator.schema.reference import ExperimentReference
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
@@ -256,28 +257,9 @@ class FieldMapping(BaseModel):
 
     benchmark: Annotated[
         Property,
-        Field(description="Canonical benchmark property (propertyIdentifier)."),
+        Field(description="Canonical benchmark property."),
     ]
-    experiment: Annotated[
-        Property, Field(description="Experiment property (propertyIdentifier).")
-    ]
-
-
-class CategoricalValueRef(BaseModel):
-    """A reference to a specific value of a categorical benchmark property."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    property: Annotated[
-        Property,
-        Field(description="The categorical benchmark property (propertyIdentifier)."),
-    ]
-    value: Annotated[
-        str,
-        Field(
-            min_length=1, description="The categorical value from the benchmark domain."
-        ),
-    ]
+    experiment: Annotated[Property, Field(description="Experiment property.")]
 
 
 class CategoricalValueMapping(BaseModel):
@@ -286,7 +268,7 @@ class CategoricalValueMapping(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     categoricalValue: Annotated[
-        CategoricalValueRef,
+        PropertyValue,
         Field(description="The benchmark categorical value being mapped."),
     ]
     predicate: Annotated[
@@ -298,20 +280,14 @@ class CategoricalValueMapping(BaseModel):
     ]
 
 
-class StaticFilter(BaseModel):
-    """Pins an experiment property to a fixed value implicit in the logical benchmark."""
+class MetricIdentifier(BaseModel):
+    """A reference to a canonical benchmark metric by its identifier string."""
 
     model_config = ConfigDict(extra="forbid")
 
-    property: Annotated[
-        Property,
-        Field(description="The experiment property to filter on."),
-    ]
-    value: Annotated[
+    identifier: Annotated[
         str,
-        Field(
-            min_length=1, description="The fixed value for this experiment property."
-        ),
+        Field(min_length=1, description="Metric identifier."),
     ]
 
 
@@ -321,11 +297,14 @@ class MetricMapping(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     benchmark: Annotated[
-        Property,
+        MetricIdentifier,
         Field(description="Canonical benchmark metric identifier."),
     ]
 
-    experiment: Annotated[Property, Field(description="Experiment metric identifier.")]
+    experiment: Annotated[
+        MetricIdentifier,
+        Field(description="Experiment metric identifier."),
+    ]
 
 
 class LogicalBenchmarkDefinition(BaseModel):
@@ -395,7 +374,7 @@ class BenchmarkBinding(BaseModel):
         ),
     ]
     staticFilters: Annotated[
-        list[StaticFilter] | None,
+        list[PropertyValue] | None,
         Field(
             description="Static experiment property filters implicit in this logical benchmark."
         ),
