@@ -543,6 +543,7 @@ filelock==3.29.5 \
     #   diffusers
     #   huggingface-hub
     #   torch
+    #   transformers
     #   vllm
 flashinfer-cubin==0.6.8.post1 \
     --hash=sha256:43636d4cd39e694a83d76a89f87fefcdf4cecb4c4f7dd22dac25ec368c1e901f
@@ -2335,6 +2336,7 @@ requests==2.34.2 \
     #   opentelemetry-exporter-otlp-proto-http
     #   tacoreader
     #   tiktoken
+    #   transformers
     #   vllm
 rich==15.0.0 \
     --hash=sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb \

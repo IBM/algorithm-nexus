@@ -1,0 +1,8 @@
+model:
+  id: ibm-research/biomed.rna.llama.32m.mlm.multitask.v1.vllm
+  vllm:
+    enabled: true
+    plugins:
+      general: biomed_rna_model
+      io_processors:
+        - biomed_rna
