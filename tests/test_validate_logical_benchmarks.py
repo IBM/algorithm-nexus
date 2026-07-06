@@ -101,34 +101,12 @@ class TestReferentialIntegrity:
         assert "wrong_benchmark_id" in error_text
         assert "inference_serving" in error_text
 
-    def test_metric_mapping_allowed_when_no_metrics_defined(
-        self, tmp_path: Path
-    ) -> None:
+    def test_metric_mapping_allowed_when_no_metrics_defined(self) -> None:
         """metricMapping with no metrics defined in the definition does not raise an error."""
-        yaml_file = tmp_path / "bench.yaml"
-        yaml_file.write_text(
-            "logicalBenchmark:\n"
-            "    benchmarkIdentifier: my_bench\n"
-            "    description: test\n"
-            "    target:\n"
-            "        identifier: model\n"
-            "    properties:\n"
-            "        - identifier: dataset\n"
-            "bindings:\n"
-            "    - benchmarkIdentifier: my_bench\n"
-            "      experiment:\n"
-            "          actuatorIdentifier: acme\n"
-            "          experimentIdentifier: exp_a\n"
-            "          experimentVersion: 1.0.0\n"
-            "      targetMapping: model_name\n"
-            "      metricMapping:\n"
-            "          - benchmark:\n"
-            "                identifier: any_metric\n"
-            "            experiment:\n"
-            "                identifier: internal_metric\n"
-        )
         collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(yaml_file, collector)
+        result = validate_logical_benchmark_file(
+            FIXTURES / "valid_metric_mapping_no_metrics_defined.yaml", collector
+        )
 
         # No metrics defined → metric_ids is None → no integrity check is performed
         assert result is not None
