@@ -92,10 +92,17 @@ Python package and its supported models.
 
 ##### `package.benchmark_packages[]`
 
-| Field                   | Type           | Required | Description                                                                                                                                                                                                                         |
-| ----------------------- | -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `requirement_specifier` | `string`       | Yes      | Python package requirement target for the benchmark package. It may be a Python package name, a URL to a Python package or source repository, or a local path to a Python package within `./packages` in the Nexus repository root. |
-| `experiments`           | `list[string]` | Yes      | Experiment identifiers exposed by that benchmark package and made available to models in the Nexus package.                                                                                                                         |
+| Field                   | Type                        | Required | Description                                                                                                                                                                                                                         |
+| ----------------------- | --------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `requirement_specifier` | `string`                    | Yes      | Python package requirement target for the benchmark package. It may be a Python package name, a URL to a Python package or source repository, or a local path to a Python package within `./packages` in the Nexus repository root. |
+| `experiments`           | `list[ExperimentReference]` | Yes      | List of ado ExperimentReference objects describing the experiments exposed by that benchmark package and made available to models in the Nexus package.                                                                             |
+
+##### `package.benchmark_packages[].experiments[]`
+
+| Field                   | Type      | Required | Description                                                                    |
+| ----------------------- | --------- | -------- | ------------------------------------------------------------------------------ |
+| `experimentIdentifier`  | `string`  | Yes      | The identifier of an experiment in an ado actuator experiment catalog.         |
+| `actuatorIdentifier`    | `string`  | Yes      | The identifier of the ado actuator that supplies the experiment.               |
 
 #### 3.1.2. Example
 

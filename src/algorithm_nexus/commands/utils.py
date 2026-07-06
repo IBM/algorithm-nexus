@@ -464,6 +464,32 @@ def get_status_display(status: str) -> str:
     return f"[{color}]{status}[/{color}]"
 
 
+def determine_output_format(
+    output_format: str | None,
+    output_file: Path | None,
+    default: str = "table",
+) -> str:
+    """Determine the effective output format from CLI options.
+
+    Precedence: explicit --output-format > file extension > default.
+
+    Args:
+        output_format: Explicitly requested format, or None.
+        output_file: Output file path (used to infer format from extension), or None.
+        default: Fallback format when neither of the above apply.
+
+    Returns:
+        Resolved format string (e.g. 'json', 'yaml', 'table').
+    """
+    if output_format:
+        return output_format
+    if output_file and output_file.suffix in (".yaml", ".yml"):
+        return "yaml"
+    if output_file:
+        return "json"
+    return default
+
+
 def write_results_to_file(results: dict[str, Any], output_file: Path, fmt: str) -> None:
     """Write benchmark results to a file in the specified format.
 
@@ -487,37 +513,72 @@ def print_structured_results(results: dict[str, Any], fmt: str) -> None:
     console.print(format_results(results, fmt))
 
 
+def print_results_table(
+    rows: list[dict[str, Any]],
+    title: str,
+    details_column: str,
+) -> None:
+    """Print a results table with Instance, Status, and a details column.
+
+    Each row dict may contain:
+      - ``instance_path`` (str): shown in the Instance column.
+      - ``status`` (str): coloured in the Status column.
+      - ``details`` (str): pre-formatted text for the details column.
+
+    Args:
+        rows: List of row dicts as described above.
+        title: Table title.
+        details_column: Header label for the third column.
+    """
+    table = Table(title=f"\n{title}", show_header=True)
+    table.add_column("Instance", style="cyan")
+    table.add_column("Status", style="bold")
+    table.add_column(details_column)
+
+    for row in rows:
+        status = row.get("status", "unknown")
+        color = get_status_color(status)
+        status_display = f"[{color}]{status}[/{color}]"
+        table.add_row(
+            row.get("instance_path", "Unknown"),
+            status_display,
+            row.get("details", "-"),
+        )
+
+    console.print(table)
+
+
 def print_human_readable_results(results: dict[str, Any]) -> None:
-    """Print benchmark results in human-readable format.
+    """Print benchmark execution results as a table.
 
     Args:
         results: Dictionary containing results with 'instances' key
     """
-    console.print("\n[bold]Benchmark Execution Results[/bold]\n")
-
-    if not results.get("instances"):
+    instances = results.get("instances")
+    if not instances:
         console.print("[yellow]No benchmark instances found[/yellow]")
         return
 
-    for instance in results["instances"]:
-        instance_path = instance.get("instance_path", "Unknown")
-        status = instance.get("status", "unknown")
-        message = instance.get("message", "")
-
-        console.print(f"[bold]{instance_path}[/bold]")
-        console.print(f"  Status: {get_status_display(status)}")
-
-        if message:
-            console.print(f"  Message: {message}")
-
+    rows = []
+    for instance in instances:
+        details = []
+        if instance.get("message"):
+            details.append(instance["message"])
         if instance.get("space_id"):
-            console.print(f"  Space ID: {instance['space_id']}")
+            details.append(f"Space ID: {instance['space_id']}")
         if instance.get("operation_id"):
-            console.print(f"  Operation ID: {instance['operation_id']}")
+            details.append(f"Operation ID: {instance['operation_id']}")
         if instance.get("ray_job_id"):
-            console.print(f"  Ray Job ID: {instance['ray_job_id']}")
+            details.append(f"Ray Job ID: {instance['ray_job_id']}")
+        rows.append(
+            {
+                "instance_path": instance.get("instance_path", "Unknown"),
+                "status": instance.get("status", "unknown"),
+                "details": "\n".join(details) if details else "-",
+            }
+        )
 
-        console.print()  # Empty line between instances
+    print_results_table(rows, title="Execution Results", details_column="Details")
 
 
 # Made with Bob
