@@ -727,6 +727,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#packagebenchmark_packagesexperiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>package.benchmark_packages[].experiments[]</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1594,9 +1605,34 @@ Python package and its supported models.</p>
 </tr>
 <tr>
 <td><code>experiments</code></td>
-<td><code>list[string]</code></td>
+<td><code>list[ExperimentReference]</code></td>
 <td>Yes</td>
-<td>Experiment identifiers exposed by that benchmark package and made available to models in the Nexus package.</td>
+<td>List of ado ExperimentReference objects describing the experiments exposed by that benchmark package and made available to models in the Nexus package.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="packagebenchmark_packagesexperiments"><code>package.benchmark_packages[].experiments[]</code><a class="headerlink" href="#packagebenchmark_packagesexperiments" title="Permanent link">&para;</a></h5>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>experimentIdentifier</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>The identifier of an experiment in an ado actuator experiment catalog.</td>
+</tr>
+<tr>
+<td><code>actuatorIdentifier</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>The identifier of the ado actuator that supplies the experiment.</td>
 </tr>
 </tbody>
 </table>
