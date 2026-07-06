@@ -162,6 +162,57 @@ nexus validate benchmarks -o yaml
 - For PR mode: GitHub CLI (`gh`) must be installed and authenticated
 - ADO must be included as a dependency in benchmark packages
 
+#### nexus validate logical-benchmarks
+
+Validate logical benchmark YAML files for schema correctness and referential integrity.
+
+**Usage:**
+
+```bash
+# Validate all files under ./benchmarks (default)
+nexus validate logical-benchmarks [OPTIONS]
+
+# Validate all files under a custom directory
+nexus validate logical-benchmarks --benchmarks-root <path> [OPTIONS]
+
+# Validate a single file
+nexus validate logical-benchmarks --file <path> [OPTIONS]
+```
+
+**Options:**
+
+- `--benchmarks-root PATH`: Path to the directory containing logical benchmark YAML files (default: `./benchmarks`)
+- `--file FILE`: Validate a single logical benchmark YAML file instead of the whole directory
+- `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
+- `--output-file PATH`: Write results to a file. Format is inferred from the file extension
+  (`.json`/`.yaml`) unless `--output-format` is also set
+
+**Examples:**
+
+Validate all logical benchmarks in the default directory:
+
+```bash
+nexus validate logical-benchmarks
+```
+
+Validate logical benchmarks in a custom directory:
+
+```bash
+nexus validate logical-benchmarks --benchmarks-root path/to/benchmarks
+```
+
+Validate a single file:
+
+```bash
+nexus validate logical-benchmarks --file benchmarks/inference_serving.yaml
+```
+
+Get results in JSON format:
+
+```bash
+nexus validate logical-benchmarks -o json
+```
+
 ## nexus list
 
 List various resources in Nexus packages.

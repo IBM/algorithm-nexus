@@ -256,11 +256,11 @@ logicalBenchmark:
       - identifier: dataset
         metadata:
             description: "Dataset used for inference requests."
-            # No domain: Will be OPEN_CATEGORICAL_DOMAIN by default
+            # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
       - identifier: workload
         metadata:
             description: "Traffic pattern or workload profile."
-        domain:
+        propertyDomain:
             values: ["steady_state_heavy", "poisson_bursty", "light_load"]
   metrics:
       - throughput_tokens_per_second
@@ -290,7 +290,7 @@ bindings:
 A binding contains the following mapping sections: `
 
 - `targetMapping`: Maps the target property of the benchmark to an experiment input property
-- `propertyMappings`: Maps the other inputs of the logical benchmark to inputs of the
+- `propertyMapping`: Maps the other inputs of the logical benchmark to inputs of the
   experiment
 - `metricMappings`: Maps outputs of the logical benchmark to the outputs of the
   experiment
@@ -304,7 +304,7 @@ experiment:
     experimentIdentifier: guide_llm_runner
     experimentVersion: 2.0.0 # The binding only uses the major version
 targetMapping: model_name #The property model_name maps to the target property defined in the benchmark
-propertyMappings:
+propertyMapping:
     - benchmark:
           identifier: dataset
       experiment:
@@ -315,10 +315,10 @@ propertyMappings:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["constant"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [100, 1000]
                 variableType: CONTINUOUS_VARIABLE_TYPE
     - categoricalValue:
@@ -327,10 +327,10 @@ propertyMappings:
           value: steady_state_heavy
       predicate:
           - identifier: traffic_shape
-            domain:
+            propertyDomain:
                 values: ["poisson"]
           - identifier: concurrency
-            domain:
+            propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
 metricMapping:
@@ -346,6 +346,72 @@ metricMapping:
 
 For the full benchmark binding schema and worked examples, see the
 [Benchmark Metadata Convention](../design/benchmark_metadata_convention.md).
+
+---
+
+## `benchmarks/` Directory Convention
+
+The top-level `benchmarks/` directory is the single source of truth for all
+logical benchmark definitions and their bindings.
+
+### Structure
+
+One YAML file per logical benchmark, named after the `benchmarkIdentifier`:
+
+```text
+benchmarks/
+├── inference_serving.yaml
+├── max_cut_solver.yaml
+└── ...
+```
+
+Each file uses the following top-level structure:
+
+```yaml
+logicalBenchmark:
+    # Definition fields (see Section 2 of the Benchmark Metadata Convention)
+bindings:
+    # List of benchmark bindings (see Section 3 of the Benchmark Metadata Convention)
+```
+
+### Ownership
+
+- The **logical benchmark owner** is given by the `owner` field in the
+  `logicalBenchmark` block. If omitted, the author of the PR that introduced the
+  file is treated as the owner.
+- Each **benchmark binding** is owned by the author of the PR that added it.
+- Ownership implies responsibility for keeping the definition and bindings
+  consistent with the experiments that reference them.
+
+### Versioning and When a Binding May Change
+
+A benchmark binding may only be updated when:
+
+- **Experiment property names or values change** — this should accompany a new
+  experiment major version. The binding for the previous major version can be
+  retained alongside the new one.
+- **Logical benchmark property names or values change** — if the existing
+  mappings become invalid, update the definition and all affected bindings in
+  place. If the original mappings are still valid, create a new logical benchmark
+  instead.
+- **New non-default experiment properties are added in a minor version bump** —
+  if those properties must be set to non-default values to reproduce the same
+  measurement, the binding must be updated because a different subset of
+  experiment data would be aggregated.
+
+### Validation
+
+Validate all logical benchmark files before opening a pull request:
+
+```bash
+uv run nexus validate logical-benchmarks
+```
+
+To validate a single file:
+
+```bash
+uv run nexus validate logical-benchmarks --file benchmarks/<logical-benchmark-id>.yaml
+```
 
 ---
 

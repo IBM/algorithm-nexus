@@ -11,6 +11,7 @@ from typing import Annotated
 
 from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
 from algorithm_nexus.commands.utils import (
+    determine_output_format,
     print_human_readable_results,
     print_structured_results,
     validate_output_format,
@@ -111,24 +112,9 @@ def run_benchmarks(
         results = manager.run()
 
         # Output results
-        # Determine output format
-        if output_format:
-            fmt = output_format
-        elif output_file and (
-            output_file.suffix == ".yaml" or output_file.suffix == ".yml"
-        ):
-            fmt = "yaml"
-        elif output_file:
-            fmt = "json"
-        else:
-            fmt = None  # Human-readable format for console
+        fmt = determine_output_format(output_format, output_file, default="table")
 
-        # Output results
         if output_file:
-            # fmt is guaranteed to be a string when output_file is provided
-            # (either from output_format, file extension, or defaulted to "json")
-            if fmt is None:
-                fmt = "json"  # Default fallback (should never happen based on logic above)
             write_results_to_file(results, output_file, fmt)
         elif fmt in ("json", "yaml"):
             print_structured_results(results, fmt)
