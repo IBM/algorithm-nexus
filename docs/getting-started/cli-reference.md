@@ -405,12 +405,13 @@ nexus run benchmarks \
   --context path/to/ado-context.yaml
 ```
 
-Execute benchmarks with actuator configuration IDs:
+Execute benchmarks with actuator configuration mappings:
 
 ```bash
 nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
-  --actuatorconfiguration-ids path/to/actuator-config-ids.yaml
+  --use-actuator-configuration actuator-a=cfg-1 \
+  --use-actuator-configuration actuator-b=cfg-2
 ```
 
 Execute benchmarks and save results to a file:
@@ -550,6 +551,11 @@ nexus run benchmarks \
   --remote config/remote-context.yaml \
   --context config/ado-context.yaml \
   --output-file pr123_results.json
+
+# Execute benchmarks with actuator configuration mappings
+nexus run benchmarks \
+  --pr https://github.com/IBM/algorithm-nexus/pull/123 \
+  --use-actuator-configuration actuator-a=cfg-1,actuator-b=cfg-2
 ```
 
 The command will:
