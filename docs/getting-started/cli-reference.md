@@ -331,10 +331,13 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
-- `--actuatorconfiguration-ids <path>`: Path to a YAML file mapping
-  `actuatorIdentifier` to `actuatorConfigurationId`. When provided, experiments
-  in a benchmark's `space.yaml` whose `actuatorIdentifier` matches a key in this
-  file will have the corresponding `actuatorConfigurationId` added to the
+- `--use-actuator-configuration <mapping>`: Map an `actuatorIdentifier` to an
+  `actuatorConfigurationId` using `actuator-id=config-id`. Pass multiple
+  mappings either by repeating the flag or as a comma-separated list, for
+  example `--use-actuator-configuration actuator-a=cfg-1` or
+  `--use-actuator-configuration actuator-a=cfg-1,actuator-b=cfg-2`.
+  Experiments in a benchmark's `space.yaml` whose `actuatorIdentifier` matches a
+  key will have the corresponding `actuatorConfigurationId` added to the
   operation's `actuatorConfigurationIdentifiers` list.
 - `--dry-run`: List benchmark instances without executing them (dry run)
 - `--output-file <path>`: Output file path for execution results. If not

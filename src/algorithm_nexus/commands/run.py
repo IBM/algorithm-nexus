@@ -87,7 +87,7 @@ def run_benchmarks(
             help="Output format: 'json' or 'yaml'. Only used with --output-file.",
         ),
     ] = None,
-    actuator_configurations: Annotated[
+    actuator_configuration_mappings: Annotated[
         list[str] | None,
         typer.Option(
             "--use-actuator-configuration",
@@ -117,7 +117,7 @@ def run_benchmarks(
         validate_output_format(output_format, allow_yaml=True, allow_csv=False)
 
     actuator_configuration_id_map: dict[str, str] = {}
-    for entry in actuator_configurations or []:
+    for entry in actuator_configuration_mappings or []:
         for pair in entry.split(","):
             if "=" not in pair:
                 raise typer.BadParameter(
