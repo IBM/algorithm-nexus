@@ -1,0 +1,14 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+
+logicalBenchmark:
+  benchmarkIdentifier: inference_serving
+  description: >
+    Evaluation of AI model inference serving throughput and latency under controlled traffic conditions.
+  target:
+    identifier: model
+  properties:
+    - identifier: dataset
+    - identifier: workload
+  metrics:
+    - throughput_tokens_per_second

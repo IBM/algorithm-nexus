@@ -1,0 +1,19 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+# Binding's benchmarkIdentifier does not match the definition's
+
+logicalBenchmark:
+  benchmarkIdentifier: inference_serving
+  description: "Test benchmark"
+  target:
+    identifier: model
+  properties:
+    - identifier: dataset
+
+bindings:
+  - benchmarkIdentifier: wrong_benchmark_id
+    experiment:
+      actuatorIdentifier: vllm_performance
+      experimentIdentifier: guide_llm_runner
+      experimentVersion: 1.0.0
+    targetMapping: model_name

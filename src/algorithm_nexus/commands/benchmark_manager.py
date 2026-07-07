@@ -1044,17 +1044,12 @@ class BenchmarkManager:
                     exec_result = self.execute_benchmark(instance_path)
                     results["instances"].append(exec_result.model_dump())
 
-                    if exec_result.status == "success":
+                    # When execution is local we return "success" when remote we return "started"
+                    if exec_result.status in ["started", "success"]:
                         successful += 1
                     else:
                         failed += 1
 
-                console.print("\n" + "=" * 60)
-                console.print("Execution Summary:")
-                console.print(f"  Total: {len(benchmark_instances)}")
-                console.print(f"  Successful: {successful}")
-                console.print(f"  Failed: {failed}")
-                console.print("=" * 60)
             else:
                 for instance_path in benchmark_instances:
                     console.print(f"  {instance_path}")
