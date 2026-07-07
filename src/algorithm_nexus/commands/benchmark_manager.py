@@ -114,7 +114,7 @@ class BenchmarkManager:
         execute: bool = True,
         remote_context_file: Path | None = None,
         context_file: Path | None = None,
-        actuator_configuration_ids_file: Path | None = None,
+        actuator_configuration_id_map: dict[str, str] | None = None,
     ):
         """Initialize the benchmark manager.
 
@@ -123,42 +123,20 @@ class BenchmarkManager:
             execute: Whether to execute benchmarks with ADO CLI
             remote_context_file: Path to remote execution context YAML file
             context_file: Path to ADO context YAML file (samplestore context)
-            actuator_configuration_ids_file: Optional path to a YAML file mapping
-                actuatorIdentifier to actuatorConfigurationId. When provided, the
-                actuatorIdentifier values from the benchmark's space.yaml are looked
-                up in this mapping and matching actuatorConfigurationId values are
-                set in the operation YAML as actuatorConfigurationIdentifiers.
+            actuator_configuration_id_map: Optional mapping of actuatorIdentifier to
+                actuatorConfigurationId. When provided, experiments whose actuatorIdentifier
+                matches a key will have the corresponding actuatorConfigurationId added to
+                the operation's actuatorConfigurationIdentifiers list.
         """
         self.pr_url = pr_url
         self.execute = execute
         self.remote_context_file = remote_context_file
         self.context_file = context_file
-        self.actuator_configuration_ids_file = actuator_configuration_ids_file
-        self._actuator_id_map: dict[str, str] = (
-            self._load_actuator_id_map(actuator_configuration_ids_file)
-            if actuator_configuration_ids_file
-            else {}
+        self.actuator_configuration_id_map: dict[str, str] = (
+            actuator_configuration_id_map or {}
         )
         self.repo_root = Path.cwd()
         self.temp_dir_obj = None
-
-    @staticmethod
-    def _load_actuator_id_map(path: Path) -> dict[str, str]:
-        """Load the actuatorIdentifier → actuatorConfigurationId mapping from a YAML file.
-
-        Args:
-            path: Path to a YAML file with entries of the form
-                  ``actuatorIdentifier: actuatorConfigurationId``
-
-        Returns:
-            Dictionary mapping actuator identifier strings to configuration ID strings
-        """
-        raw = yaml.safe_load(path.read_text()) or {}
-        if not isinstance(raw, dict):
-            raise ValueError(
-                f"Actuator configuration IDs file must be a YAML mapping, got: {type(raw).__name__}"
-            )
-        return {str(k): str(v) for k, v in raw.items()}
 
     def get_changed_files(self) -> list[str]:
         """Get list of changed files from the PR using gh CLI.
@@ -744,12 +722,15 @@ class BenchmarkManager:
 
         # Resolve actuator configuration IDs while the space dict is available
         actuator_configuration_ids: list[str] = []
-        if self._actuator_id_map:
+        if self.actuator_configuration_id_map:
             for experiment in (space_config_dict or {}).get("experiments", []):
                 actuator_identifier = experiment.get("actuatorIdentifier")
-                if actuator_identifier and actuator_identifier in self._actuator_id_map:
+                if (
+                    actuator_identifier
+                    and actuator_identifier in self.actuator_configuration_id_map
+                ):
                     actuator_configuration_ids.append(
-                        self._actuator_id_map[actuator_identifier]
+                        self.actuator_configuration_id_map[actuator_identifier]
                     )
 
         # Parse the configuration using DiscoverySpaceConfiguration

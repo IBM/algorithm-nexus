@@ -86,20 +86,18 @@ def run_benchmarks(
             help="Output format: 'json' or 'yaml'. Only used with --output-file.",
         ),
     ] = None,
-    actuatorconfiguration_ids: Annotated[
-        Path | None,
+    actuator_configurations: Annotated[
+        list[str] | None,
         typer.Option(
-            "--actuatorconfiguration-ids",
+            "--use-actuator-configuration",
             help=(
-                "Path to a YAML file mapping actuatorIdentifier to actuatorConfigurationId. "
-                "When provided, experiments in a benchmark's space.yaml whose actuatorIdentifier "
-                "matches a key in this file will have the corresponding actuatorConfigurationId "
-                "added to the operation's actuatorConfigurationIdentifiers list."
+                "Map an actuatorIdentifier to an actuatorConfigurationId using the format "
+                "'actuator-id=config-id'. Pass multiple mappings either by repeating the flag "
+                "or as a comma-separated list: 'id1=cfg-1,id2=cfg-2'. "
+                "Experiments whose actuatorIdentifier matches a key will have the "
+                "corresponding actuatorConfigurationId added to the operation's "
+                "actuatorConfigurationIdentifiers list."
             ),
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
         ),
     ] = None,
 ) -> None:
@@ -117,13 +115,25 @@ def run_benchmarks(
     if output_format:
         validate_output_format(output_format, allow_yaml=True, allow_csv=False)
 
+    actuator_configuration_id_map: dict[str, str] = {}
+    for entry in actuator_configurations or []:
+        for pair in entry.split(","):
+            if "=" not in pair:
+                raise typer.BadParameter(
+                    f"Invalid format '{pair}': expected 'actuator-id=config-id'",
+                    param_hint="--use-actuator-configuration",
+                )
+            key, _, value = pair.partition("=")
+
+            actuator_configuration_id_map[key] = value
+
     try:
         manager = BenchmarkManager(
             pr_url=pr,
             execute=not dry_run,
             remote_context_file=remote,
             context_file=context,
-            actuator_configuration_ids_file=actuatorconfiguration_ids,
+            actuator_configuration_id_map=actuator_configuration_id_map or None,
         )
         results = manager.run()
 
