@@ -18,6 +18,7 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  "bmfm-targets[vllm]>=0.20.0",
   # CP 02/07/2026
   # Scanners are flagging opencv-python-headless==5.0.0.93 as
   # potentially malicious. While we think it's a false positive,

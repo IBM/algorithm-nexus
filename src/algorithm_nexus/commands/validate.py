@@ -24,14 +24,20 @@ except ImportError:
 
 from algorithm_nexus.commands.utils import (
     ValidationErrorCollector,
-    get_status_color,
+    determine_output_format,
     load_yaml_file,
+    print_results_table,
     print_structured_results,
     validate_output_format,
+    write_results_to_file,
 )
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
+    BenchmarkBinding,
+    CategoricalValueMapping,
+    FieldMapping,
+    LogicalBenchmarkConfig,
 )
 
 console = Console()
@@ -323,55 +329,22 @@ def validate_package(
     )
 
 
-def _print_validation_table(
-    all_results: list[dict[str, Any]], total: int, total_success: int, total_failed: int
-) -> None:
-    """Print validation results in human-readable table format.
-
-    Args:
-        all_results: List of validation result dictionaries
-        total: Total number of instances
-        total_success: Number of successful validations
-        total_failed: Number of failed validations
-    """
-    from rich.table import Table
-
-    # Output results summary
-    console.print("\n" + "=" * 60)
-    console.print("[bold]Validation Summary:[/bold]")
-    console.print(f"  Total instances: {total}")
-    console.print(f"  Successful: {total_success}")
-    console.print(f"  Failed: {total_failed}")
-    console.print("=" * 60)
-
-    table = Table(title="\nValidation Results", show_header=True)
-    table.add_column("Instance", style="cyan")
-    table.add_column("Status", style="bold")
-    table.add_column("Issues")
-
+def _print_validation_table(all_results: list[dict[str, Any]]) -> None:
+    rows = []
     for result in all_results:
-        # Use shared status color function
-        status = result["status"]
-        color = get_status_color(status)
-        status_style = (
-            f"[{color}]✓ PASS[/{color}]"
-            if status == "success"
-            else f"[{color}]✗ FAIL[/{color}]"
-        )
         issues = []
         if result.get("errors"):
             issues.extend([f"E: {e}" for e in result["errors"]])
         if result.get("warnings"):
             issues.extend([f"W: {w}" for w in result["warnings"]])
-        issues_str = "\n".join(issues) if issues else "-"
-
-        table.add_row(
-            result["instance_path"],
-            status_style,
-            issues_str,
+        rows.append(
+            {
+                "instance_path": result["instance_path"],
+                "status": result["status"],
+                "details": "\n".join(issues) if issues else "-",
+            }
         )
-
-    console.print(table)
+    print_results_table(rows, title="Validation Results", details_column="Issues")
 
 
 def validate_benchmarks(
@@ -482,9 +455,7 @@ def validate_benchmarks(
 
         # Extract results
         all_results = results.instances
-        total_success = results.successful
         total_failed = results.failed
-        total = results.total
 
         # Determine output format (default to table for human-readable)
         fmt = output_format or "table"
@@ -499,7 +470,7 @@ def validate_benchmarks(
             print_structured_results(output_data, fmt)
         else:
             # Human-readable table output (default)
-            _print_validation_table(all_results, total, total_success, total_failed)
+            _print_validation_table(all_results)
 
         # Exit with error if any validation failed
         if total_failed > 0:
@@ -520,4 +491,193 @@ def validate_benchmarks(
         raise typer.Exit(code=1)
 
 
-# Made with Bob
+def _check_binding_integrity(
+    binding: BenchmarkBinding,
+    definition_id: str,
+    property_ids: set[str],
+    metric_ids: set[str] | None,
+    collector: ValidationErrorCollector,
+    file_path: Path,
+    binding_index: int,
+) -> None:
+    """Check referential integrity between a binding and its parent definition."""
+    prefix = f"[bold]{file_path}[/bold]\n  Binding[{binding_index}]"
+
+    # 1. benchmarkIdentifier must match the definition
+    if binding.benchmarkIdentifier != definition_id:
+        collector.add(
+            f"{prefix}: benchmarkIdentifier '{binding.benchmarkIdentifier}' "
+            f"does not match definition '{definition_id}'"
+        )
+
+    # 2. Property identifiers in propertyMapping must exist in the definition
+    if binding.propertyMapping:
+        for entry in binding.propertyMapping:
+            if isinstance(entry, FieldMapping):
+                pid = entry.benchmark.identifier
+                if pid not in property_ids:
+                    collector.add(
+                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
+                    )
+            elif isinstance(entry, CategoricalValueMapping):
+                pid = entry.categoricalValue.property.identifier
+                if pid not in property_ids:
+                    collector.add(
+                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
+                    )
+
+    # 3. Metric identifiers in metricMapping must exist in the definition
+    if binding.metricMapping and metric_ids is not None:
+        for entry in binding.metricMapping:
+            mid = entry.benchmark.identifier
+            if mid not in metric_ids:
+                collector.add(
+                    f"{prefix}: metricMapping references unknown benchmark metric '{mid}'"
+                )
+
+
+def validate_logical_benchmark_file(
+    file: Path,
+    collector: ValidationErrorCollector,
+) -> LogicalBenchmarkConfig | None:
+    """Validate a logical benchmark YAML file against the schema and referential integrity rules.
+
+    Returns the parsed LogicalBenchmarkConfig if schema validation passes, None otherwise.
+    Integrity errors are collected but do not prevent returning the parsed object.
+    """
+    data = load_yaml_file(file, collector)
+    if data is None:
+        return None
+
+    try:
+        parsed = LogicalBenchmarkConfig.model_validate(data)
+    except ValidationError as exc:
+        for error in exc.errors():
+            collector.add(format_pydantic_error(error, file))
+        return None
+
+    # Referential integrity checks
+    defn = parsed.logicalBenchmark
+    definition_id = defn.benchmarkIdentifier
+    property_ids = {p.identifier for p in defn.properties}
+    metric_ids = set(defn.metrics) if defn.metrics is not None else None
+
+    if parsed.bindings:
+        for i, binding in enumerate(parsed.bindings):
+            _check_binding_integrity(
+                binding,
+                definition_id,
+                property_ids,
+                metric_ids,
+                collector,
+                file,
+                i,
+            )
+
+    return parsed
+
+
+def validate_logical_benchmarks(
+    benchmarks_root: Annotated[
+        Path,
+        typer.Option(
+            "--benchmarks-root",
+            help="Path to the directory containing logical benchmark YAML files.",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = Path("./benchmarks"),
+    file: Annotated[
+        Path | None,
+        typer.Option(
+            "--file",
+            help="Validate a single logical benchmark YAML file instead of the whole directory.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            resolve_path=True,
+        ),
+    ] = None,
+    output_format: Annotated[
+        Literal["json", "yaml", "table"] | None,
+        typer.Option(
+            "-o",
+            "--output-format",
+            help="Output format: 'json', 'yaml', or 'table' (default: table)",
+        ),
+    ] = None,
+    output_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--output-file",
+            help="Write results to a file. Format is inferred from the file extension (.json/.yaml) unless --output-format is also set.",
+            dir_okay=False,
+            writable=True,
+        ),
+    ] = None,
+) -> None:
+    """Validate logical benchmark YAML files.
+
+    This command supports two modes:
+    1. Directory mode: validate all *.yaml files under --benchmarks-root (default: ./benchmarks)
+    2. Single-file mode: validate one file via --file
+
+    Checks performed for each file:
+    - Schema correctness (required fields, valid structure)
+    - Referential integrity (binding identifiers match the definition, property/metric
+      references exist in the definition)
+
+    Exit code is 0 on success, 1 if any file fails validation.
+    """
+    # NOTE: no verbose mode — errors are always shown in the table's Issues column
+    if output_format:
+        validate_output_format(
+            output_format, allow_yaml=True, allow_csv=False, allow_table=True
+        )
+
+    # Collect files to validate
+    if file is not None:
+        files = [file]
+    else:
+        files = sorted(benchmarks_root.glob("*.yaml"))
+        if not files:
+            console.print(
+                f"[yellow]No YAML files found in {benchmarks_root.resolve()}[/yellow]"
+            )
+            raise typer.Exit(code=0)
+
+    all_results: list[dict[str, Any]] = []
+    total_failed = 0
+
+    for yaml_file in files:
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_file(yaml_file, collector)
+
+        success = not collector.has_errors
+        if not success:
+            total_failed += 1
+
+        result: dict[str, Any] = {
+            "instance_path": str(yaml_file),
+            "status": "success" if success else "failed",
+            "errors": collector.errors,
+            "warnings": [],
+        }
+        all_results.append(result)
+
+    output_data = {"files": all_results}
+
+    fmt = determine_output_format(output_format, output_file, default="table")
+
+    if output_file:
+        write_results_to_file(output_data, output_file, fmt)
+    elif fmt in ("json", "yaml"):
+        print_structured_results(output_data, fmt)
+    else:
+        _print_validation_table(all_results)
+
+    if total_failed > 0:
+        raise typer.Exit(code=1)

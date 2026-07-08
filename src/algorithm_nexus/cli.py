@@ -25,7 +25,11 @@ from algorithm_nexus.commands.list import (
     list_packages,
 )
 from algorithm_nexus.commands.run import run_benchmarks
-from algorithm_nexus.commands.validate import validate_benchmarks, validate_package
+from algorithm_nexus.commands.validate import (
+    validate_benchmarks,
+    validate_logical_benchmarks,
+    validate_package,
+)
 
 console = Console()
 
@@ -83,6 +87,7 @@ run_app.command(name="benchmarks")(run_benchmarks)
 # Register validate commands
 validate_app.command(name="package")(validate_package)
 validate_app.command(name="benchmarks")(validate_benchmarks)
+validate_app.command(name="logical-benchmarks")(validate_logical_benchmarks)
 
 
 def main() -> None:
