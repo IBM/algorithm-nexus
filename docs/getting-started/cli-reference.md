@@ -331,6 +331,14 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
   [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
+- `--use-actuator-configuration <mapping>`: Map an `actuatorIdentifier` to an
+  `actuatorConfigurationId` using `actuator-id=config-id`. Pass multiple
+  mappings either by repeating the flag or as a comma-separated list, for
+  example `--use-actuator-configuration actuator-a=cfg-1` or
+  `--use-actuator-configuration actuator-a=cfg-1,actuator-b=cfg-2`.
+  Experiments in a benchmark's `space.yaml` whose `actuatorIdentifier` matches a
+  key will have the corresponding `actuatorConfigurationId` added to the
+  operation's `actuatorConfigurationIdentifiers` list.
 - `--dry-run`: List benchmark instances without executing them (dry run)
 - `--output-file <path>`: Output file path for execution results. If not
   specified, results are printed to screen.
@@ -395,6 +403,15 @@ nexus run benchmarks \
   --pr https://github.com/IBM/algorithm-nexus/pull/123 \
   --remote path/to/remote-context.yaml \
   --context path/to/ado-context.yaml
+```
+
+Execute benchmarks with actuator configuration mappings:
+
+```bash
+nexus run benchmarks \
+  --pr https://github.com/IBM/algorithm-nexus/pull/123 \
+  --use-actuator-configuration actuator-a=cfg-1 \
+  --use-actuator-configuration actuator-b=cfg-2
 ```
 
 Execute benchmarks and save results to a file:
@@ -534,6 +551,11 @@ nexus run benchmarks \
   --remote config/remote-context.yaml \
   --context config/ado-context.yaml \
   --output-file pr123_results.json
+
+# Execute benchmarks with actuator configuration mappings
+nexus run benchmarks \
+  --pr https://github.com/IBM/algorithm-nexus/pull/123 \
+  --use-actuator-configuration actuator-a=cfg-1,actuator-b=cfg-2
 ```
 
 The command will:
