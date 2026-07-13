@@ -1,3 +1,103 @@
+
+## [0.2.0](https://github.com/IBM/algorithm-nexus/compare/356391fa2a70beab9797b96df3f7c6b8bbf7f1d6..0.2.0) - 2026-07-13
+
+#### Features
+
+- (**cli**) Upgraded cli requirement to ado-core>=2.0 (#179) -
+  ([1b1f658](https://github.com/IBM/algorithm-nexus/commit/1b1f6586e635be8c4b5d21618eaeb14dcd81685f)) -
+  Christian Pinto
+- (**cli**) Added logic to load actuatorconfiguration ids via config file (#166) -
+  ([4153f39](https://github.com/IBM/algorithm-nexus/commit/4153f3961993ca8e13a8b406f1b44e1a8a5f2c61)) -
+  Christian Pinto
+- (**cli**) Added logical-benchmark validation logic (#156) -
+  ([b8bee5f](https://github.com/IBM/algorithm-nexus/commit/b8bee5f79d896bb86e9cc7464da2724d60d1de91)) -
+  Christian Pinto
+- (**cli**) Add nexus validate benchmarks command (#136) -
+  ([51c247c](https://github.com/IBM/algorithm-nexus/commit/51c247cf604fb74eb40fe6371bea30b0237f8929)) -
+  Christian Pinto
+- (**cli**) added run benchmarks command to execute benchmark instances on PR (#131) -
+  ([868f661](https://github.com/IBM/algorithm-nexus/commit/868f661b317525ffaf1556809b790d85b9f0e9be)) -
+  Christian Pinto
+- (**cli**) Added support for benchmarking metadata in nexus package and nexus cli (#114) -
+  ([3ad1d4a](https://github.com/IBM/algorithm-nexus/commit/3ad1d4adf0042b02822e1be7f879e6a11b7a65cb)) -
+  Christian Pinto
+- (**dependencies**) Pin ado installation to ado-core<2.0 (#172) -
+  ([b42b9af](https://github.com/IBM/algorithm-nexus/commit/b42b9afe715ce66900cfb963acd9246744db0b55)) -
+  Christian Pinto
+- (**deps**) add bmfm-targets vllm plugin to candidate variant (#145) -
+  ([71d87a3](https://github.com/IBM/algorithm-nexus/commit/71d87a38ac1efd61797dd6f8571f047aaa05f033)) -
+  Sivan Ravid
+- (**package**) tokamind package integration (#134) -
+  ([c10ed43](https://github.com/IBM/algorithm-nexus/commit/c10ed43b07565f203ec894104cedb512987f54ea)) -
+  Tobia Boschi
+- (**package**) Add bmfm-targets Nexus Package (#124) -
+  ([2aec83e](https://github.com/IBM/algorithm-nexus/commit/2aec83e1c7e550d1b0c3e1da500d2761106b9830)) -
+  Sivan Ravid
+- (**packages**) Added terrakit nexus package to ecosystem, candidate and product targets (#180) -
+  ([0e51a75](https://github.com/IBM/algorithm-nexus/commit/0e51a754167ef96205d6cb80a283340b819e0ea5)) -
+  Christian Pinto
+- (**skills**) Added skill to perform lock-file update (#164) -
+  ([6c5f242](https://github.com/IBM/algorithm-nexus/commit/6c5f242654a49cad959900f1871397a65af86251)) -
+  Christian Pinto
+
+#### Documentation
+
+- (**benchmark**) benchmark metadata definition and contribution guidelines (#135) -
+  ([8100378](https://github.com/IBM/algorithm-nexus/commit/8100378ff6fa12687c3cddd2881b5e51ad813f38)) -
+  Michael Johnston, Christian Pinto
+- (**benchmarks**) Added design guidelines and extended nexus package structure for baseline
+  benchmark instances (#115) -
+  ([c58be09](https://github.com/IBM/algorithm-nexus/commit/c58be091eaf8622ad5c46134c3db2b39bd2b9eaa)) -
+  Christian Pinto
+- (**benchmarks**) Extend Nexus package metadata to support benchmarking (#110) -
+  ([356391f](https://github.com/IBM/algorithm-nexus/commit/356391fa2a70beab9797b96df3f7c6b8bbf7f1d6)) -
+  Christian Pinto
+- (**website**) add website for documentation with zensical (#105) -
+  ([8d35f44](https://github.com/IBM/algorithm-nexus/commit/8d35f44ea0e33529860ddad1801d20ddbc592264)) -
+  Christian Pinto, Alessandro Pomponio
+
+#### Build System
+
+- (**deps**) update dependencies (#177) -
+  ([b55adae](https://github.com/IBM/algorithm-nexus/commit/b55adaef57edadb7d085ce4aed115c38ac44881f)) -
+  DRL-NextGen
+- (**deps**) updated vllm and terratorch in product target (#175) -
+  ([10a8ad2](https://github.com/IBM/algorithm-nexus/commit/10a8ad21fe4c66ca9b871e7f2aa580e12a5e4254)) -
+  Christian Pinto
+- (**deps**) update dependencies (#171) -
+  ([7f0917a](https://github.com/IBM/algorithm-nexus/commit/7f0917ae20c314edea5159e97419c2ebdd4f9774)) -
+  DRL-NextGen
+- (**deps**) update dependencies (#161) -
+  ([a30f3a1](https://github.com/IBM/algorithm-nexus/commit/a30f3a17fa4c9f1d45c770411b303d5f6bee031a)) -
+  DRL-NextGen, Christian Pinto, Alessandro Pomponio
+- (**deps**) update vLLM to 0.23.0 in candidate and 0.21.0 in product -
+  ([19dac64](https://github.com/IBM/algorithm-nexus/commit/19dac644f80174b9d8eda46ed5518b82051e7086)) -
+  Christian Pinto
+- (**deps**) update dependencies (#137) -
+  ([4e26338](https://github.com/IBM/algorithm-nexus/commit/4e263380231ced4100dce2b74a4cd999e0ba1921)) -
+  DRL-NextGen
+- (**deps**) update dependencies (#132) -
+  ([5ae32d8](https://github.com/IBM/algorithm-nexus/commit/5ae32d81eb962ed0bea35171126e7d483a29b490)) -
+  DRL-NextGen
+- (**deps**) update dependencies (#118) -
+  ([bc18d1d](https://github.com/IBM/algorithm-nexus/commit/bc18d1de88883a3746b974fa8c14cbd6cf90a947)) -
+  DRL-NextGen
+- (**hooks**) update pre-commit hooks (#169) -
+  ([f1dcae9](https://github.com/IBM/algorithm-nexus/commit/f1dcae9a04f41796ad2b4bad3d0634fe32f32352)) -
+  DRL-NextGen
+- (**hooks**) update pre-commit hooks (#147) -
+  ([8977da0](https://github.com/IBM/algorithm-nexus/commit/8977da0be33ad06fce1ce174d1f0b61d378a027c)) -
+  DRL-NextGen
+- (**hooks**) update pre-commit hooks (#138) -
+  ([fb1f905](https://github.com/IBM/algorithm-nexus/commit/fb1f905187f1fde50a104ea6f53fd53f881155e1)) -
+  DRL-NextGen
+- (**hooks**) update pre-commit hooks (#133) -
+  ([a27752f](https://github.com/IBM/algorithm-nexus/commit/a27752f96216a8fc4d90ba2a1b218793eaa7ee3b)) -
+  DRL-NextGen
+- (**hooks**) update pre-commit hooks (#119) -
+  ([9f4c816](https://github.com/IBM/algorithm-nexus/commit/9f4c816840e855d61025a15108c77468630e32f9)) -
+  DRL-NextGen
+
 ## [0.1.0](https://github.com/ibm/algorithm-nexus/compare/664c05b74685efd78a9358c1cac47513af0c4702..0.1.0) - 2026-05-19
 
 #### Features
