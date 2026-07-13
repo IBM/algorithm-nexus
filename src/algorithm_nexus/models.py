@@ -12,9 +12,9 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, computed_field
 
 try:
-    from orchestrator.schema.property import Property
-    from orchestrator.schema.property_value import PropertyValue
-    from orchestrator.schema.reference import ExperimentReference
+    from ado.schema.property import Property
+    from ado.schema.property_value import PropertyValue
+    from ado.schema.reference import ExperimentReference
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
     print(

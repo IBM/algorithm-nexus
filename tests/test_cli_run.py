@@ -6,7 +6,7 @@
 from pathlib import Path
 
 import pytest
-from orchestrator.core.operation.config import (
+from ado.core.operation.config import (
     DiscoveryOperationEnum,
     DiscoveryOperationResourceConfiguration,
 )
@@ -211,7 +211,7 @@ class TestCreateRandomWalkOperationConfig:
             == "Perform a random walk on all points in a space"
         )
         assert config.operation.module.operatorName == "random_walk"
-        assert config.operation.module.operationType == DiscoveryOperationEnum.SEARCH
+        assert config.operation.module.operationType == DiscoveryOperationEnum.EXPLORE
         assert config.operation.parameters.numberEntities == "all"
         assert config.operation.parameters.singleMeasurement is True
 

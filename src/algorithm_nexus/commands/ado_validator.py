@@ -12,7 +12,7 @@ from pathlib import Path
 import yaml
 
 try:
-    from orchestrator.core.discoveryspace.config import DiscoverySpaceConfiguration
+    from ado.core.discoveryspace.config import DiscoverySpaceConfiguration
     from pydantic import ValidationError
     from rich.console import Console
 except ImportError:
