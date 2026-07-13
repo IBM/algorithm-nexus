@@ -38,7 +38,7 @@ cli = [
 ]
 ecosystem = [
   "bmfm-targets",
-  "gridfm-graphkit==0.8.0",
+  "gridfm-graphkit==0.8.1",
   "terrakit>=0.2.0",
   "terratorch>=1.2.7",
   "tokamind",
@@ -84,15 +84,6 @@ conflicts = [
     { extra = "product" },
   ],
 ]
-# gridfm-graphkit==0.8.0 depends on gridfm-datakit==1.0.5rc1 (a prerelease).
-# Under uv's default prerelease mode (if-necessary-or-explicit),
-# gridfm-datakit's rc pin lives inside graphkit (transitive), so it isn't
-# treated as explicit. Surface it as a first-party constraint to make the
-# prerelease explicit - without declaring it as a dedicated dependency.
-# Drop once a stable gridfm-datakit ships.
-# See https://github.com/gridfm/gridfm-graphkit/issues/81
-constraint-dependencies = ["gridfm-datakit==1.0.5rc1"]
-
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
 tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
