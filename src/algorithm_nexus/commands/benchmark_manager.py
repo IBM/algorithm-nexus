@@ -15,23 +15,23 @@ from typing import Any
 try:
     import typer
     import yaml
-    from orchestrator.core.discoveryspace.config import DiscoverySpaceConfiguration
-    from orchestrator.core.operation.config import (
+    from ado.core.discoveryspace.config import DiscoverySpaceConfiguration
+    from ado.core.operation.config import (
         ConfigurationMetadata,
         DiscoveryOperationConfiguration,
         DiscoveryOperationEnum,
         DiscoveryOperationResourceConfiguration,
         OperatorReference,
     )
-    from orchestrator.core.remotecontext.config import (
+    from ado.core.remotecontext.config import (
         PackageConfiguration,
         RemoteExecutionContext,
     )
-    from orchestrator.modules.operators.randomwalk import (
+    from ado.modules.operators.randomwalk import (
         BaseSamplerConfiguration,
         RandomWalkParameters,
     )
-    from orchestrator.utilities.output import pydantic_model_as_yaml
+    from ado.utilities.output import pydantic_model_as_yaml
     from rich.console import Console
 except ImportError:
     print(
@@ -85,7 +85,7 @@ def create_random_walk_operation_config(
     operation = DiscoveryOperationConfiguration(
         module=OperatorReference(
             operatorName="random_walk",
-            operationType=DiscoveryOperationEnum.SEARCH,
+            operationType=DiscoveryOperationEnum.EXPLORE,
         ),
         parameters=RandomWalkParameters(
             numberEntities="all",
