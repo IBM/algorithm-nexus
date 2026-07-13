@@ -2056,9 +2056,9 @@ termcolor==3.3.0 \
     --hash=sha256:348871ca648ec6a9a983a13ab626c0acce02f515b9e1983332b17af7979521c5 \
     --hash=sha256:cf642efadaf0a8ebbbf4bc7a31cec2f9b5f21a9f726f4ccbb08192c9c26f43a5
     # via terratorch
-terratorch==1.2.8 \
-    --hash=sha256:2fb8b5607ac75594dc3619736a9ffcbb338030d15915c5a9da3c7e8434730d7d \
-    --hash=sha256:cbfa5d27bb9c0fda2975409eab0ffaf003d69ba58d32e12ba0487aff9fd9c285
+terratorch==1.2.9 \
+    --hash=sha256:6bcd8989dd25c17a1def2ddf31fdc8d3df43237d6f1625c20e04fd8a7b106414 \
+    --hash=sha256:9d331e415b3108bc2452340bd0097ed0ed7cfba7e6240a1385db641a2bdc9c7e
     # via algorithm-nexus
 threadpoolctl==3.6.0 \
     --hash=sha256:43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb \

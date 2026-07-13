@@ -289,9 +289,7 @@ cffi==2.0.0 ; implementation_name == 'pypy' \
     --hash=sha256:da902562c3e9c550df360bfa53c035b2f241fed6d9aef119048073680ace4a18 \
     --hash=sha256:dd4f05f54a52fb558f1ba9f528228066954fee3ebe629fc1660d874d040ae5a3 \
     --hash=sha256:f93fd8e5c8c0a4aa1f424d6173f14a892044054871c771f8566e4008eaa359d2
-    # via
-    #   cryptography
-    #   pyzmq
+    # via pyzmq
 charset-normalizer==3.4.7 \
     --hash=sha256:0ea948db76d31190bf08bd371623927ee1339d5f2a0b4b1b4a4439a65298703c \
     --hash=sha256:0f7eb884681e3938906ed0434f20c63046eacd0111c4ba96f27b76084cd679f5 \
@@ -1674,6 +1672,7 @@ nvidia-cuda-nvcc==13.2.78 \
     --hash=sha256:dfc76950c775cd00ce588f15192f08c9b858c0dcfa7da685acf39a3d0d8f588b
     # via
     #   cuda-tile
+    #   cuda-toolkit
     #   humming-kernels
     #   nvidia-cuda-tileiras
 nvidia-cuda-nvrtc==13.0.88 ; sys_platform != 'darwin' \
@@ -1700,7 +1699,9 @@ nvidia-cuda-tileiras==13.2.78 ; sys_platform != 'darwin' \
     --hash=sha256:5ce7c140a518aa8dfe033e7176f593617ed2fece0e50331e2a14dafd236723fd \
     --hash=sha256:658299efca52a20496b425efb0b19cb1ea7d57406a18d3f5024d4df92d5b54c1 \
     --hash=sha256:f4615627b994465da4ecd43d3d1cc3f372c22db2665acbe705987f43adf3f606
-    # via cuda-tile
+    # via
+    #   cuda-tile
+    #   cuda-toolkit
 nvidia-cudnn-cu13==9.19.0.56 ; sys_platform == 'linux' \
     --hash=sha256:40d8c375005bcb01495f8edf375230b203a411a0c05fb6dc92a3781edcb23eac \
     --hash=sha256:6ed29ffaee1176c612daf442e4dd6cfeb6a0caa43ddcbeb59da94953030b1be4 \
@@ -1802,6 +1803,7 @@ nvidia-nvvm==13.2.78 \
     --hash=sha256:f5aa433631109bbdec81802c5b5f319bf10bc891fe2f212e4e445845211d6f77
     # via
     #   cuda-tile
+    #   cuda-toolkit
     #   nvidia-cuda-nvcc
     #   nvidia-cuda-tileiras
 obstore==0.11.0 \
@@ -3538,7 +3540,6 @@ typing-extensions==4.16.0 \
     #   huggingface-hub
     #   lightning
     #   lightning-utilities
-    #   mcp
     #   mistral-common
     #   nvidia-cutlass-dsl-libs-base
     #   nvidia-cutlass-dsl-libs-cu13
@@ -3583,7 +3584,6 @@ typing-inspection==0.4.2 \
     --hash=sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464
     # via
     #   fastapi
-    #   mcp
     #   pydantic
     #   pydantic-settings
 tzdata==2026.2 \
