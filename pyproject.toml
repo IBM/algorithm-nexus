@@ -47,8 +47,8 @@ product = [
   # we use this qualifier to prevent installing a potentially malicious library.
   # This dependency is added by vLLM and TerraTorch
   "opencv-python-headless!=5.0.0.93",
-  "terratorch[vllm]==1.2.8",
-  "vllm==0.21.0",
+  "terratorch[vllm]==1.2.9",
+  "vllm==0.24.0",
 ]
 
 [dependency-groups]
