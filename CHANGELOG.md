@@ -1,3 +1,9 @@
+## Unreleased ([34eb864..34eb864](https://github.com/ibm/algorithm-nexus/compare/34eb864..34eb864))
+#### Features
+- (**algorithm-nexus**) testing a change - ([34eb864](https://github.com/ibm/algorithm-nexus/commit/34eb864b99e06143cce9e7bd0a833678f49a9752)) - Christian Pinto
+
+- - -
+
 
 ## [0.2.0](https://github.com/IBM/algorithm-nexus/compare/356391fa2a70beab9797b96df3f7c6b8bbf7f1d6..0.2.0) - 2026-07-13
 
