@@ -1,3 +1,11 @@
+## [0.2.1](https://github.com/ibm/algorithm-nexus/compare/8ecb12699614fbe444ee9c03a49e42951a6a5563..0.2.1) - 2026-07-14
+#### Documentation
+- (**changelog**) Added release notes for 0.2.0 (#181) - ([8ecb126](https://github.com/ibm/algorithm-nexus/commit/8ecb12699614fbe444ee9c03a49e42951a6a5563)) - Christian Pinto
+#### Build system
+- Update version tag to 0.2.1 (#183) - ([4084137](https://github.com/ibm/algorithm-nexus/commit/4084137baddd690b373de76fc6cc5f3e574ed653)) - Christian Pinto
+
+- - -
+
 
 ## [0.2.0](https://github.com/IBM/algorithm-nexus/compare/356391fa2a70beab9797b96df3f7c6b8bbf7f1d6..0.2.0) - 2026-07-13
 
