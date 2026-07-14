@@ -1,12 +1,12 @@
 [project]
 name = "algorithm-nexus"
-version = "0.2.1"
 description = "A comprehensive library for AI model delivery, testing, and benchmarking"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 license-files = ["LICENSE"]
 authors = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
 maintainers = [{ name = "Christian Pinto", email = "christian.pinto@ibm.com" }]
+dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/IBM/algorithm-nexus"
@@ -67,6 +67,13 @@ test = [
   "pytest>=9.0.3",
 ]
 
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
 [tool.uv]
 package = true
 conflicts = [
@@ -80,3 +87,9 @@ conflicts = [
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
 tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
+
+[tool.uv-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+pattern = "default-unprefixed"
