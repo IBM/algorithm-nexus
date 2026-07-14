@@ -262,7 +262,6 @@ wheels = [
 
 [[package]]
 name = "algorithm-nexus"
-version = "0.2.1"
 source = { editable = "." }
 
 [package.optional-dependencies]
