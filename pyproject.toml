@@ -38,6 +38,7 @@ cli = [
 ]
 ecosystem = [
   "bmfm-targets",
+  "gridfm-graphkit==0.8.1",
   "terrakit>=0.2.0",
   "terratorch>=1.2.7",
   "tokamind",

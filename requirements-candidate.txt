@@ -1773,9 +1773,7 @@ nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' \
     --hash=sha256:7b05ecda494c6dabc44231a608b060a71008a730d9dfda932cc508e6d29159e0 \
     --hash=sha256:7d2af818851c0c224d5f92221e9226e51ee23c236df4b51f9194563979c888be \
     --hash=sha256:82530788b8c6164a54d3fd9ae8bcca8893d397c4aeb998861982a03bbe41e204
-    # via
-    #   humming-kernels
-    #   nvidia-cublas
+    # via humming-kernels
 nvidia-cuda-runtime==13.0.96 ; sys_platform != 'darwin' \
     --hash=sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548 \
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
