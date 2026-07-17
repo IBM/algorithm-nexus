@@ -343,9 +343,9 @@ colorama==0.4.6 ; sys_platform == 'win32' \
     #   loguru
     #   tqdm
     #   typer
-compressed-tensors==0.17.0 \
-    --hash=sha256:15c20d06bdbcf35b51fc99fd125e7b9be1e1855567c33b7a46dfac26ad6fb126 \
-    --hash=sha256:4a1b89b508f7efb8ffb4eee8a6e69e0452d9b080cae130146025c64fbe9fa9aa
+compressed-tensors==0.17.1 \
+    --hash=sha256:a651b9f3d1e77d1f7d7c2887141e316fdc5a2994660a8291baa064d28baf04a7 \
+    --hash=sha256:c6a9e96361564d1b66bde9ae236a7176c139675a8f863d8f26274cbda4932db7
     # via vllm
 contextily==1.7.1 \
     --hash=sha256:82ca36a4a51cf49e43700ad1113b50531b3637e4f12b407b54e0a1fd8950a49c \
