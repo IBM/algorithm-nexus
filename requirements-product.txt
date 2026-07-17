@@ -1082,9 +1082,9 @@ lazy-loader==0.5 \
     --hash=sha256:717f9179a0dbed357012ddad50a5ad3d5e4d9a0b8712680d4e687f5e6e6ed9b3 \
     --hash=sha256:ab0ea149e9c554d4ffeeb21105ac60bed7f3b4fd69b1d2360a4add51b170b005
     # via scikit-image
-lightly==1.5.22 \
-    --hash=sha256:58694433dd85ec371cb532dba3fea9465009d36e4afac67e53dbf464dba69e2a \
-    --hash=sha256:7bb8939976ea5e8fabb20d049812700d51e44f6461f15510a784afd1252a3dbd
+lightly==1.5.25 \
+    --hash=sha256:8504fee639eb51b0baf44b18fc22c9e8c6956b64be60a531059380d089672c08 \
+    --hash=sha256:f3fa9c2bf67ac81947bbfee0082a2b355c68f15242ad8b52549ecb4c95d71805
     # via
     #   terratorch
     #   torchgeo
