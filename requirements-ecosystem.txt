@@ -1042,9 +1042,9 @@ legacy-api-wrap==1.5 \
     # via
     #   anndata
     #   scanpy
-lightly==1.5.22 \
-    --hash=sha256:58694433dd85ec371cb532dba3fea9465009d36e4afac67e53dbf464dba69e2a \
-    --hash=sha256:7bb8939976ea5e8fabb20d049812700d51e44f6461f15510a784afd1252a3dbd
+lightly==1.5.25 \
+    --hash=sha256:8504fee639eb51b0baf44b18fc22c9e8c6956b64be60a531059380d089672c08 \
+    --hash=sha256:f3fa9c2bf67ac81947bbfee0082a2b355c68f15242ad8b52549ecb4c95d71805
     # via
     #   terratorch
     #   torchgeo
