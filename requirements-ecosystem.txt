@@ -167,9 +167,9 @@ boto3==1.43.0 \
     # via
     #   litdata
     #   terrakit
-botocore==1.43.0 \
-    --hash=sha256:cc5b15eaec3c6eac05d8012cb5ef17ebe891beb88a16ca13c374bfaece1241e6 \
-    --hash=sha256:e933b31a2d644253e1d029d7d39e99ba41b87e29300534f189744cc438cdf928
+botocore==1.43.51 \
+    --hash=sha256:7c2c538c932bddc95834e177ce6f91dcc388c6a7934b4f8d0db13caa30e3e543 \
+    --hash=sha256:e0e5e88585fdb01dcb6b533ac2dd3f18d5d45092a14ccbfd330e3576a4152128
     # via
     #   aiobotocore
     #   boto3
