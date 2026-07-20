@@ -17,7 +17,7 @@ repos:
 
   # Ruff - Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.20
+    rev: v0.15.22
     hooks:
       - id: ruff
         args: [--fix]
@@ -35,7 +35,7 @@ repos:
 
   # Codespell - Check for common misspellings
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
         additional_dependencies: ["tomli"]
@@ -43,7 +43,7 @@ repos:
 
   # UV lock check
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.26
+    rev: 0.11.29
     hooks:
       - id: uv-lock
       - id: uv-export
@@ -64,7 +64,7 @@ repos:
 
   # Markdownlint - Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.23.0
+    rev: v0.23.1
     hooks:
       - id: markdownlint-cli2
 
@@ -76,7 +76,7 @@ repos:
 
   # Tombi - TOML formatting
   - repo: https://github.com/tombi-toml/tombi-pre-commit
-    rev: v1.2.0
+    rev: v1.2.4
     hooks:
       - id: tombi-format
         args: ["--offline"]
