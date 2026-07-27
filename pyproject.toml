@@ -27,7 +27,7 @@ candidate = [
   "opencv-python-headless!=5.0.0.93",
   "terrakit==0.2.0",
   "terratorch[vllm]==1.2.10",
-  "vllm==0.24.0",
+  "vllm==0.26.0",
 ]
 cli = [
   "ado-core>=2.0",

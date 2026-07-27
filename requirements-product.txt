@@ -1610,10 +1610,7 @@ nvidia-cuda-nvcc==13.2.86 \
     --hash=sha256:4171face482ef8ca35b5b2d59cfd25d2d0e2a2e2534fe34d2ce20695437868d9 \
     --hash=sha256:7d3f56c8d705bad35bbba69eb0470d90856fd5d4dc48c6a6173aaf1e9f887cf5 \
     --hash=sha256:909140a1f942b943982b2eff120e618c94e29d75d9e33f5cd074f0e64eb411e8
-    # via
-    #   cuda-tile
-    #   humming-kernels
-    #   nvidia-cuda-tileiras
+    # via humming-kernels
 nvidia-cuda-nvdisasm==13.3.73 \
     --hash=sha256:da2fab133c3d095d83f13587eb87149beabd199b34a3cc270d0aa99449a628c3 \
     --hash=sha256:dd4751884f9016b9b6dbf007abdeb5681d0a2edc731dd3d2fda9d6d878e88f73 \
@@ -1743,7 +1740,6 @@ nvidia-nvjitlink==13.0.88 ; sys_platform == 'linux' \
     --hash=sha256:e931536ccc7d467a98ba1d8b89ff7fa7f1fa3b13f2b0069118cd7f47bff07d0c
     # via
     #   cuda-toolkit
-    #   nvidia-cuda-tileiras
     #   nvidia-cufft
     #   nvidia-cusolver
     #   nvidia-cusparse
@@ -1760,10 +1756,7 @@ nvidia-nvvm==13.2.86 \
     --hash=sha256:7d140c2dd2d177af71240a31bbca20f40b4aee9a4e331156083e387855222b49 \
     --hash=sha256:a502dcc2859f17a925adba495c222d44a221b9eb10e7d111a7046dc2cc883b69 \
     --hash=sha256:a9244f3209922d655612c11ebb4117ea1f80983cb2b215c9cccded127282cebc
-    # via
-    #   cuda-tile
-    #   nvidia-cuda-nvcc
-    #   nvidia-cuda-tileiras
+    # via nvidia-cuda-nvcc
 nvtx==0.2.15 \
     --hash=sha256:10749686633f880ad53dcdbb2179fad41b45dcf5b7631d4a1070a577577bd386 \
     --hash=sha256:2287d3be05b85661deb386f878d1f536c2e532774aa9ec7a50c434942ed81ae5 \
