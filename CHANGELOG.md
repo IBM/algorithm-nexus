@@ -1,3 +1,15 @@
+## [0.2.2](https://github.com/ibm/algorithm-nexus/compare/240d5223c75c60c20cfaa45f18352ae59c5a7563..0.2.2) - 2026-07-27
+#### Features
+- (**package**) Add gridfm-graphkit Nexus package (#157) - ([b8e8b4a](https://github.com/ibm/algorithm-nexus/commit/b8e8b4a1218c60f1d2f34a47cfa6916150f788c4)) - Romeo Kienzler
+#### Documentation
+- (**changelog**) Added release notes for 0.2.1 (#187) - ([240d522](https://github.com/ibm/algorithm-nexus/commit/240d5223c75c60c20cfaa45f18352ae59c5a7563)) - Christian Pinto
+#### Build system
+- (**deps**) upgrade vllm to v0.26.0 in candidate and product (#196) - ([9bfc388](https://github.com/ibm/algorithm-nexus/commit/9bfc388c1f8a1e7155c297beb89a11442894a9cb)) - Christian Pinto
+- (**deps**) update dependencies (#189) - ([0e3815d](https://github.com/ibm/algorithm-nexus/commit/0e3815d353b1ce98888a065df95e8bf0007af732)) - DRL-NextGen
+- Migrate to uv-dynamic-versioning (#188) - ([7cf1ffb](https://github.com/ibm/algorithm-nexus/commit/7cf1ffbab6007eebbb6a9b5b3def0e19e52d62d9)) - Christian Pinto
+
+- - -
+
 ## [0.2.1](https://github.com/IBM/algorithm-nexus/compare/8ecb12699614fbe444ee9c03a49e42951a6a5563..0.2.1) - 2026-07-14
 
 #### Documentation
