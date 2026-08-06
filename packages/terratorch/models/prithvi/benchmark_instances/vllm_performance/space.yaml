@@ -93,4 +93,4 @@ entitySpace:
 
 experiments:
   - actuatorIdentifier: "vllm_performance"
-    experimentIdentifier: "test-geospatial-deployment-custom-dataset-v1"
+    experimentIdentifier: "geospatial-vllm-bench-deployment-custom-dataset"
