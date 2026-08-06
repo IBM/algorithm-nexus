@@ -3,6 +3,6 @@ package:
 
   benchmark_packages:
     # Local package stored in this repository
-    - requirement_specifier: "ado-vllm-performance>=1.9.6"
+    - requirement_specifier: "ado-vllm-performance>=1.13.2"
       experiments:
-        - "test-geospatial-deployment-custom-dataset-v1"
+        - "geospatial-vllm-bench-deployment-custom-dataset"
