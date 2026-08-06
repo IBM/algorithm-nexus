@@ -244,7 +244,7 @@ bcrypt==5.0.0 \
     --hash=sha256:f8429e1c410b4073944f03bd778a9e066e7fad723564a52ff91841d278dfc822 \
     --hash=sha256:fc746432b951e92b58317af8e0ca746efe93e66555f1b40888865ef5bf56446b
     # via paramiko
-biomed-multi-alignment @ git+https://github.com/BiomedSciAI/biomed-multi-alignment@1ae611fa40a3afb2695705e5abb4855d504ceef1
+biomed-multi-alignment @ git+https://github.com/BiomedSciAI/biomed-multi-alignment@8cc56e9494b489ca86a63b76fa4cd2921f8af7f7
     # via algorithm-nexus
 blake3==1.0.9 \
     --hash=sha256:0cdfeff65488089ef86f7587c76055ff72b28d28d10e427b547f5711477c376d \

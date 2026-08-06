@@ -21,8 +21,8 @@ small molecules, and single-cell gene expression data.
   with the HuggingFace model ID (`ibm-research/biomed.omics.bl.sm.ma-ted-458m`)
   and vLLM plugin configuration (general plugin: `mammal`).
 - Added `biomed-multi-alignment` as a dependency to both the `ecosystem` and
-  `candidate` variants in `pyproject.toml`, pointing at the `main` branch of
-  the GitHub repository (`git+https://github.com/BiomedSciAI/biomed-multi-alignment`).
+  `candidate` variants in `pyproject.toml`, pinned to release `0.2.5`
+  (`git+https://github.com/BiomedSciAI/biomed-multi-alignment@0.2.5`).
   The package is **vllm-agnostic** (vLLM is an optional dependency via the
   `[vllm]` extra), so it is added without extras for `ecosystem` and with
   `[vllm]` for `candidate`.
@@ -34,13 +34,6 @@ small molecules, and single-cell gene expression data.
 The package declares `vllm` as an **optional** dependency (via the `[vllm]`
 extra in its `pyproject.toml`). It therefore belongs to both the **ecosystem**
 and **candidate** variants per the Variant Association Rules.
-
-### Notes
-
-- The latest GitHub release (`0.2.4`) has a `transformers<5.0.0` constraint
-  that conflicts with `bmfm-targets` (which requires `transformers>=5`). The
-  `main` branch already fixes this to `transformers>=5.0.0,<6.0.0`. The
-  dependency therefore points at `main` until a new release is tagged.
 
 ## Additional Information
 
