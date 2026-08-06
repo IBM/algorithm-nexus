@@ -1,0 +1,6 @@
+model:
+  id: ibm-research/biomed.omics.bl.sm.ma-ted-458m
+  vllm:
+    enabled: true
+    plugins:
+      general: mammal

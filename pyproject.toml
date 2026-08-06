@@ -18,6 +18,7 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
+  "biomed-multi-alignment[vllm]",
   "bmfm-targets[vllm]>=0.20.0",
   # CP 02/07/2026
   # Scanners are flagging opencv-python-headless==5.0.0.93 as
@@ -37,6 +38,7 @@ cli = [
   "typer>=0.25.0",
 ]
 ecosystem = [
+  "biomed-multi-alignment",
   "bmfm-targets",
   "gridfm-graphkit==0.8.1",
   "terrakit>=0.2.0",
@@ -88,6 +90,7 @@ conflicts = [
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
 tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
+biomed-multi-alignment = { git = "https://github.com/BiomedSciAI/biomed-multi-alignment" }
 
 [tool.uv-dynamic-versioning]
 enable = true
