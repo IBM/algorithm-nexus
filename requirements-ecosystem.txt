@@ -227,19 +227,15 @@ blinker==1.9.0 \
     --hash=sha256:b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf \
     --hash=sha256:ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc
     # via flask
-blosc2==4.10.1 \
-    --hash=sha256:77f2191c0be24c82d88cdcf7f45634602c996bd082ef9ff73a4d2a20b1340391 \
-    --hash=sha256:7b4b1dcc4da3198c4747bb88a62fc1664e3dc8fb727d505c85e283302ce7b8d4 \
-    --hash=sha256:7c66bd1f69683a63d4b9e5f8285ff951e1a0057bac5d2f68dee1564abaa8c277 \
-    --hash=sha256:acae1bc45fa0ba927270822b0f05d2f135309eebdcb1ea89383198996bc7702b \
-    --hash=sha256:b81e31335127eca1a6bfad235e45723c1b25fe0e8a99d5f830ea791d3da17839 \
-    --hash=sha256:b86f45f236ef2a812778ae2af7b530477db36693df4e464c29a75b6246b4dbaa \
-    --hash=sha256:c1196f12ccc19181743b7f66edceccf1981cf1b885c78a3a4f27b1a41e6541d4 \
-    --hash=sha256:d412cdf216e8fe4cffbe76a926c98c37a2419b14ba5c4be7f771f73e7d7b1840 \
-    --hash=sha256:d8dbaa028160992b03e3668578ef9668e09cdd11c2534646831a6a36d321cc8a \
-    --hash=sha256:e6649b94c28eb90a4c7dc5703cb67a5eb5121e891139c5ded2b75a172291d011 \
-    --hash=sha256:ee7f4b39a045fc77ec7d67381a95399d30885c208e71278c38f59b5ae29e8028 \
-    --hash=sha256:f37bb784c56b4fe11a0e23a011c609d08ebab0fe19fb2e75cea5e9ab13f9cbf2
+blosc2==4.11.0 \
+    --hash=sha256:255568f149b74686a5de615eb91176b204c1efc0f66ddbb7d6621c2ef451e225 \
+    --hash=sha256:3beaa151b91b15fa516acef69f55d74bb7dd13b3dfeacfdaf032278091c2264f \
+    --hash=sha256:3c610b076ad0422d861ff10732013c7c3461135968c3c442630542e71249a4a2 \
+    --hash=sha256:571876df978732371c2b53e015483a812d161d8b6939a1393d59318df9df75b3 \
+    --hash=sha256:67fdd3e7e66004ba25adec0ade5916c8a312b9c9de72d024a63d6476051f0b75 \
+    --hash=sha256:a232274ac0813037ba2fb60317bc03dfb459fa469f330aa08ba8d03124aa6d1d \
+    --hash=sha256:caab9e379c5b1d41a721e30403885434c2ded9067265aa2ba3cef9576cd9fb12 \
+    --hash=sha256:d17cb079973e0843e669cbd553be7e7e33ce815efb6a3f1f9f2167e41f1bf1ac
     # via tables
 bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@8b5694a922be7ccb1d3ee5c280c4dcef2eb95df9
     # via algorithm-nexus
@@ -3597,9 +3593,9 @@ torch==2.11.0 \
     #   torchvision
     #   vit-pytorch
     #   x-transformers
-torch-einops-utils==0.1.12 \
-    --hash=sha256:9cbfe7e365d985c629a22830eea2541dcd990230a3e49a1916038938386b0bbe \
-    --hash=sha256:ab2b46a235a5ce6af0b29bff93ee83aecf4cacdb31cadc05de74eaf369708cd6
+torch-einops-utils==0.1.20 \
+    --hash=sha256:37bd448476284df31503c7c5ff73956cd19cba8d949c1434d0e3b21d2084edb2 \
+    --hash=sha256:ac70ada21b36315d61d18825b96b4cc9f35250a149973550a3da65f6185a4c19
     # via x-transformers
 torch-geometric==2.8.0.post1 \
     --hash=sha256:2c0c81666ec10f2132f6b4e0b6c57fc813f2c9f6b57599d7b7a799c614c22fbd \
@@ -3858,9 +3854,9 @@ werkzeug==3.1.8 \
 wget==3.2 \
     --hash=sha256:35e630eca2aa50ce998b9b1a127bb26b30dfee573702782aa982f875e3f16061
     # via fuse-med-ml
-wheel==0.47.0 \
-    --hash=sha256:212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced \
-    --hash=sha256:cc72bd1009ba0cf63922e28f94d9d83b920aa2bb28f798a31d0691b02fa3c9b3
+wheel==0.48.0 \
+    --hash=sha256:3217dcc807155e45db462d7ef2431f5ddda0d7273b700d05a67b271ceb1287ab \
+    --hash=sha256:94800765601e9171bf5d58d066e640662842bcedcbab982b2c90787a2c987322
     # via astunparse
 widgetsnbextension==4.0.15 \
     --hash=sha256:8156704e4346a571d9ce73b84bee86a29906c9abfd7223b7228a28899ccf3366 \
@@ -3911,9 +3907,9 @@ wrapt==2.3.0 \
     #   deprecated
     #   formulaic
     #   tensorflow
-x-transformers==2.25.4 \
-    --hash=sha256:550872f0fbe089d83f45b1eb9b9d5304102369c77ce04a07559d88dd9b1b2832 \
-    --hash=sha256:d4e71a9938369851d88e22fa462d5c3545a0dee9f606fa330017e0836c3d0eb7
+x-transformers==2.25.5 \
+    --hash=sha256:59ec7f0ed2a4b583725bbddde6f1423327a5fac813d68b817fd13bbfcbf4bed8 \
+    --hash=sha256:94fc9868eb9dbfe23d5762eb5cc93dfb9fae6bd97e0113b0d964012437da2a32
     # via fuse-med-ml
 xarray==2026.7.0 \
     --hash=sha256:361b495928fdbf5b58d0969bb6775339019da5e93ca74d61ddf4eb5edd6ce604 \
