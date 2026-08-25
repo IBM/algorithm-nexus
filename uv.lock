@@ -335,7 +335,7 @@ requires-dist = [
     { name = "tokamind", marker = "extra == 'ecosystem'", git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind?tag=OS_v2.0" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.25.0" },
     { name = "vllm", marker = "extra == 'candidate'", specifier = "==0.26.0" },
-    { name = "vllm", marker = "extra == 'product'", specifier = "==0.26.0" },
+    { name = "vllm", marker = "extra == 'product'", specifier = ">=0.26.0,<27" },
 ]
 provides-extras = ["candidate", "cli", "ecosystem", "product"]
 
