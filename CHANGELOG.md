@@ -1,3 +1,14 @@
+## [0.2.3](https://github.com/ibm/algorithm-nexus/compare/36f3d99129ddf64de7f5098e4f1c290b991efa18..0.2.3) - 2026-08-25
+#### Features
+- (**dependencies**) Relaxed vllm dependency in product target (#214) - ([5926fdf](https://github.com/ibm/algorithm-nexus/commit/5926fdf6e38d8def91ab5ceed2a2b01b258d24c9)) - Christian Pinto
+- (**package**) Add biomed-multi-alignment (mammal) Nexus Package (#204) - ([d037a46](https://github.com/ibm/algorithm-nexus/commit/d037a460b9e6b610f86ef0cad59275ad4251337f)) - simona-rc
+#### Documentation
+- (**changelog**) add release notes for 0.2.2 (#197) - ([36f3d99](https://github.com/ibm/algorithm-nexus/commit/36f3d99129ddf64de7f5098e4f1c290b991efa18)) - DRL-NextGen
+#### Build system
+- (**deps**) update dependencies (#201) - ([1691af9](https://github.com/ibm/algorithm-nexus/commit/1691af97ea99bd1d0b22cf31578e4ebacae706aa)) - DRL-NextGen
+
+- - -
+
 ## [0.2.2](https://github.com/ibm/algorithm-nexus/compare/240d5223c75c60c20cfaa45f18352ae59c5a7563..0.2.2) - 2026-07-27
 #### Features
 - (**package**) Add gridfm-graphkit Nexus package (#157) - ([b8e8b4a](https://github.com/ibm/algorithm-nexus/commit/b8e8b4a1218c60f1d2f34a47cfa6916150f788c4)) - Romeo Kienzler
