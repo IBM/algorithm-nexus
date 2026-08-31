@@ -128,7 +128,6 @@ anyio==4.14.2 \
     # via
     #   anthropic
     #   httpx
-    #   httpx2
     #   mcp
     #   openai
     #   sse-starlette
@@ -601,9 +600,7 @@ cryptography==50.0.0 \
     --hash=sha256:eeac2acb5a20ed25e0ad6d1df9891a520b78b404266b6d11778f25d5d691a6c9 \
     --hash=sha256:f89831ef99dd7dd169ab06d63a831adb9e20a87aac6d380266bbda5823349169 \
     --hash=sha256:fd9192b7b70c573d7f214eb1ae35e00d359f6f5e4b27c7e21e30de1fc6204645
-    # via
-    #   paramiko
-    #   pyjwt
+    # via paramiko
 cuda-bindings==13.3.1 \
     --hash=sha256:18c8c167c8907b8f02531ca810534315c458dabef31f7965095619bf647b9202 \
     --hash=sha256:2732904099e0a4d4db774a5fc6d91ee95fae065b4d2ecabb4968c5fe2406c9d7 \
@@ -1015,7 +1012,6 @@ h11==0.16.0 \
     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
     # via
     #   httpcore
-    #   httpcore2
     #   uvicorn
 h2==4.4.1 \
     --hash=sha256:0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6 \
@@ -1106,9 +1102,9 @@ httpx-sse==0.4.3 \
     --hash=sha256:0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc \
     --hash=sha256:9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d
     # via mcp
-huggingface-hub==1.26.0 \
-    --hash=sha256:c8cd4e2df1ba9402f77fce9b509ec1d52debb502551789473f34016acc14e361 \
-    --hash=sha256:e8cca670caa5d8dfa7e45bf45e86b466698198cd8150c021bcdb4a86b9252364
+huggingface-hub==1.29.0 \
+    --hash=sha256:6ebb385a581435325cf6d5c5b233d5d4bc91175834d99fd65dae14379b36e9ad \
+    --hash=sha256:b00f7782afc14db4bc6572763810a635bdfbab8623d957bfb553bd18e03852cd
     # via
     #   accelerate
     #   bmfm-targets
@@ -1144,7 +1140,6 @@ idna==3.18 \
     #   anyio
     #   email-validator
     #   httpx
-    #   httpx2
     #   requests
     #   terrakit
     #   yarl
@@ -2175,6 +2170,7 @@ nvidia-cuda-nvrtc==13.0.88 ; sys_platform != 'darwin' \
     # via
     #   cuda-toolkit
     #   humming-kernels
+    #   nvidia-cublas
 nvidia-cuda-nvrtc==13.3.33 ; sys_platform == 'darwin' \
     --hash=sha256:7b05ecda494c6dabc44231a608b060a71008a730d9dfda932cc508e6d29159e0 \
     --hash=sha256:7d2af818851c0c224d5f92221e9226e51ee23c236df4b51f9194563979c888be \
@@ -2387,7 +2383,6 @@ opentelemetry-api==1.44.0 \
     --hash=sha256:67647e5e9566edcf421166fdf022b3537f818635daa852b289e34604dc6fb33a \
     --hash=sha256:94b98c893a91b88657eaac1e3ba89618cdb85be6918196705354f34728b2cdef
     # via
-    #   mcp
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-sdk
@@ -2956,7 +2951,6 @@ pydantic==2.13.4 \
     #   lightly
     #   lm-format-enforcer
     #   mcp
-    #   mcp-types
     #   mistral-common
     #   model-hosting-container-standards
     #   openai
@@ -4475,13 +4469,22 @@ transformers==5.14.1 \
     #   peft
     #   vllm
     #   xgrammar
-triton==3.6.0 \
+triton==3.6.0 ; sys_platform != 'darwin' \
     --hash=sha256:10c7f76c6e72d2ef08df639e3d0d30729112f47a56b0c81672edc05ee5116ac9 \
     --hash=sha256:1722e172d34e32abc3eb7711d0025bb69d7959ebea84e3b7f7a341cd7ed694d6 \
     --hash=sha256:374f52c11a711fd062b4bfbb201fd9ac0a5febd28a96fb41b4a0f51dde3157f4 \
     --hash=sha256:448e02fe6dc898e9e5aa89cf0ee5c371e99df5aa5e8ad976a80b93334f3494fd \
     --hash=sha256:74caf5e34b66d9f3a429af689c1c7128daba1d8208df60e81106b115c00d6fca \
     --hash=sha256:d002e07d7180fd65e622134fbd980c9a3d4211fb85224b56a0a0efbd422ab72f
+    # via
+    #   humming-kernels
+    #   torch
+    #   xgrammar
+triton==3.7.1 ; sys_platform == 'darwin' \
+    --hash=sha256:58c0e131da05134a2a4788ccbcc0c1105cf0f54c8e98f19e34cd465396dc15eb \
+    --hash=sha256:7e40869937a68206ec70d7f25bb7ec6433cb083f9135e1f36dbd318dc449a728 \
+    --hash=sha256:9497f2e696ee368862a181a90b2dcc03ca978cc4f602abd67c7d81022a6988e1 \
+    --hash=sha256:cdbfc09d9ec58bc5e68321525653220de7515c199e7a8097a97c85e62b52cd0a
     # via
     #   humming-kernels
     #   torch
@@ -4518,13 +4521,10 @@ typing-extensions==4.16.0 \
     #   fastapi
     #   formulaic
     #   grpcio
-    #   httpx2
     #   huggingface-hub
     #   jupyter-client
     #   lightning
     #   lightning-utilities
-    #   mcp
-    #   mcp-types
     #   mistral-common
     #   nibabel
     #   nvidia-cutlass-dsl-libs-base
@@ -4577,7 +4577,6 @@ typing-inspection==0.4.2 \
     --hash=sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464
     # via
     #   fastapi
-    #   mcp
     #   pydantic
     #   pydantic-settings
 tzdata==2026.3 \
