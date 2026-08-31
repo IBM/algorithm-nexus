@@ -3449,7 +3449,7 @@ transformers==5.14.1 \
     #   compressed-tensors
     #   vllm
     #   xgrammar
-triton==3.6.0 ; platform_machine == 'ARM64' and sys_platform == 'win32' \
+triton==3.6.0 ; (platform_machine == 'ARM64' and sys_platform == 'win32') or sys_platform == 'darwin' \
     --hash=sha256:10c7f76c6e72d2ef08df639e3d0d30729112f47a56b0c81672edc05ee5116ac9 \
     --hash=sha256:1722e172d34e32abc3eb7711d0025bb69d7959ebea84e3b7f7a341cd7ed694d6 \
     --hash=sha256:374f52c11a711fd062b4bfbb201fd9ac0a5febd28a96fb41b4a0f51dde3157f4 \
@@ -3460,7 +3460,7 @@ triton==3.6.0 ; platform_machine == 'ARM64' and sys_platform == 'win32' \
     #   humming-kernels
     #   torch
     #   xgrammar
-triton==3.7.1 ; platform_machine != 'ARM64' or sys_platform != 'win32' \
+triton==3.7.1 ; (platform_machine != 'ARM64' and sys_platform == 'win32') or (sys_platform != 'darwin' and sys_platform != 'win32') \
     --hash=sha256:58c0e131da05134a2a4788ccbcc0c1105cf0f54c8e98f19e34cd465396dc15eb \
     --hash=sha256:7e40869937a68206ec70d7f25bb7ec6433cb083f9135e1f36dbd318dc449a728 \
     --hash=sha256:9497f2e696ee368862a181a90b2dcc03ca978cc4f602abd67c7d81022a6988e1 \
