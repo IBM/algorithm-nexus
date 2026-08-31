@@ -1420,9 +1420,9 @@ lifelines==0.30.3 \
     --hash=sha256:44802480a28d6cb836c7fea4a54ec0ba220eb31c6d7444589637a8bd66066e8c \
     --hash=sha256:acd1e0ecada4280c7bb2948f39c760a0f9158a57d752c8ca29f984a86c698b7f
     # via fuse-med-ml
-lightly==1.5.22 \
-    --hash=sha256:58694433dd85ec371cb532dba3fea9465009d36e4afac67e53dbf464dba69e2a \
-    --hash=sha256:7bb8939976ea5e8fabb20d049812700d51e44f6461f15510a784afd1252a3dbd
+lightly==1.5.26 \
+    --hash=sha256:0c3daa74bda643f4212de1dea6d8e39cd78b6a47bf154bc6b3e9e2baad59eb09 \
+    --hash=sha256:6ffc121af5b73093579941d44234523babea1046725c1826f8675ba57ecc58f7
     # via
     #   terratorch
     #   torchgeo
