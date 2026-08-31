@@ -1,3 +1,11 @@
+## [0.3.0](https://github.com/ibm/algorithm-nexus/compare/f6eeb79b27485ed30089ec3b8e216d8756b1971a..0.3.0) - 2026-08-31
+#### Features
+- (**dependencies**) Updated vllm to 0.28.x and terratorch to 1.2.13 (#218) - ([7bdaea9](https://github.com/ibm/algorithm-nexus/commit/7bdaea9a97534de8376c1826c424b35e65b0bf1b)) - Christian Pinto
+#### Documentation
+- (**changelog**) add release notes for 0.2.3 (#215) - ([f6eeb79](https://github.com/ibm/algorithm-nexus/commit/f6eeb79b27485ed30089ec3b8e216d8756b1971a)) - DRL-NextGen
+
+- - -
+
 ## [0.2.3](https://github.com/ibm/algorithm-nexus/compare/36f3d99129ddf64de7f5098e4f1c290b991efa18..0.2.3) - 2026-08-25
 #### Features
 - (**dependencies**) Relaxed vllm dependency in product target (#214) - ([5926fdf](https://github.com/ibm/algorithm-nexus/commit/5926fdf6e38d8def91ab5ceed2a2b01b258d24c9)) - Christian Pinto
