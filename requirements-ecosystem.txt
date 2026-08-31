@@ -416,8 +416,8 @@ choix==0.4.1 \
     --hash=sha256:15fe145ffc194dc6b4ba5a44ef24667fa0107578fb5b36723ab0b5e87eeae29f \
     --hash=sha256:7c85d13845400932508c45a6a6a3e7a44f637969ffd506e1c7f5db07de1560b4
     # via fuse-med-ml
-clearml==1.18.0 \
-    --hash=sha256:fe53ffcfdb0799150ad5ae1ca95bdbd568e570cbde2e35a65474e36606a899d0
+clearml==2.0.2 \
+    --hash=sha256:6d17724eb297a71ff66fdcd157d0cfa7978c857bdce6b339ef1b3927a959c79a
     # via
     #   biomed-multi-alignment
     #   bmfm-targets
