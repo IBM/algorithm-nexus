@@ -1,0 +1,15 @@
+model:
+  # Trained GridFM PowerFlow checkpoint (case14_ieee, GNS_heterogeneous),
+  # exported via gridfm_graphkit.vllm.export.export_model and published to the Hub.
+  id: gridfm/gridfm-pf-reconstruction
+
+  vllm:
+    enabled: true
+    plugins:
+      # Registers the custom pooling-model class (architecture "GridFMGNS").
+      # Installed by gridfm-graphkit[vllm] via the vllm.general_plugins entry point.
+      general: gridfm_gns
+      io_processors:
+        # Builds a normalized HeteroData graph from a power-grid case, serves the
+        # PowerFlow reconstruction, and returns per-node embeddings + Vm/Va/Pg.
+        - gridfm_pf_reconstruction
