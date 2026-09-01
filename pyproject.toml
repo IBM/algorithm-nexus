@@ -20,6 +20,12 @@ nexus = "algorithm_nexus.cli:main"
 candidate = [
   "biomed-multi-alignment[vllm]",
   "bmfm-targets[vllm]>=0.20.0",
+  # NOTE: pending the gridfm-graphkit release that ships the vLLM serving
+  # subpackage + `vllm` extra + entry points (see PR description). 0.9.0 on PyPI
+  # does NOT contain it; 0.9.1 is the intended servable release. Its `vllm` extra
+  # targets vllm>=0.26,<0.27, matching this candidate variant (vllm==0.26.0);
+  # it is intentionally NOT added to `product` (vllm>=0.28) until validated there.
+  "gridfm-graphkit[vllm]==0.9.1",
   # CP 02/07/2026
   # Scanners are flagging opencv-python-headless==5.0.0.93 as
   # potentially malicious. While we think it's a false positive,
@@ -40,7 +46,7 @@ cli = [
 ecosystem = [
   "biomed-multi-alignment",
   "bmfm-targets",
-  "gridfm-graphkit==0.8.1",
+  "gridfm-graphkit==0.9.1",
   "terrakit>=0.2.0",
   "terratorch>=1.2.7",
   "tokamind",
@@ -86,6 +92,13 @@ conflicts = [
     { extra = "product" },
   ],
 ]
+
+# gridfm-graphkit (>=0.9) depends on torch-scatter, whose sdist imports torch at
+# build time without declaring it as a build dependency. Inject torch into its
+# build environment so `uv lock` can generate its metadata. (Must sit after all
+# flat [tool.uv] keys above, or it orphans them.)
+[tool.uv.extra-build-dependencies]
+torch-scatter = ["torch"]
 
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
