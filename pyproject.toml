@@ -90,7 +90,7 @@ conflicts = [
 [tool.uv.sources]
 bmfm-targets = { git = "https://github.com/BiomedSciAI/biomed-multi-omic.git" }
 tokamind = { git = "https://github.com/UKAEA-IBM-STFC-Fusion-FMs/tokamind", tag = "OS_v2.0" }
-biomed-multi-alignment = { git = "https://github.com/BiomedSciAI/biomed-multi-alignment", rev = "0.2.5" }
+biomed-multi-alignment = { git = "https://github.com/BiomedSciAI/biomed-multi-alignment", rev = "8cc56e9494b489ca86a63b76fa4cd2921f8af7f7" }
 
 [tool.uv-dynamic-versioning]
 enable = true
