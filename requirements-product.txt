@@ -622,9 +622,9 @@ filelock==3.32.2 \
     #   huggingface-hub
     #   torch
     #   vllm
-flashinfer-python==0.6.16.post3 \
-    --hash=sha256:9b146cfcc1454c80f3f99444db48013b3eadaeb32f2a399bd76c9471ecb72f04 \
-    --hash=sha256:caf686b9b079abe1c9d65ab505698bd325e8072de40afd822f2c74f2ac3bc601
+flashinfer-python==0.6.18.post1 \
+    --hash=sha256:1ebfb8ff3fa3a896e5abbd0dec123a5f3e3734029871349dad6968b252b82097 \
+    --hash=sha256:adb6d2952b47131138e108bd2999b1fe18b71f1a4c0b2684f168753db9563991
     # via vllm
 folium==0.20.0 \
     --hash=sha256:a0d78b9d5a36ba7589ca9aedbd433e84e9fcab79cd6ac213adbcff922e454cb9 \
