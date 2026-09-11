@@ -95,9 +95,9 @@ albumentations==2.0.8 \
     --hash=sha256:4da95e658e490de3c34af8fcdffed09e36aa8a4edd06ca9f9e7e3ea0b0b16856 \
     --hash=sha256:c4c4259aaf04a7386ad85c7fdcb73c6c7146ca3057446b745cc035805acb1017
     # via terratorch
-alembic==1.19.0 \
-    --hash=sha256:6487c612fc719dcfa22b17d2dd5b2b458929641e6aa2f0b65b135727f5e6d501 \
-    --hash=sha256:cf839d3849116aab3cc047e09c6968b9bd6b2fde61b6bb7c1e97352fe5503580
+alembic==1.19.2 \
+    --hash=sha256:297950a8a91f6770eb82bfbce9bea55c728b90a5386c6e81430191a319d138b0 \
+    --hash=sha256:32d553dcd577e6fe5c3c63e91468526d35e4dcecafe865d7db4e9b328fa93cb2
     # via mlflow
 anndata==0.13.2 \
     --hash=sha256:1930305dc3a32ab5433dee2bc441cd264f9eeed22cc5a224b9f9d69e74d4fdf0 \
