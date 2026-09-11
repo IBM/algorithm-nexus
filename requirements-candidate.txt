@@ -4588,10 +4588,10 @@ vit-pytorch==1.26.6 \
     --hash=sha256:0b14ca7e873bb76578c3a7e368dcf37f20064d63bbeae0e1f1183b3e315eba4a \
     --hash=sha256:3dfdbf0ec9d2fa6b7f623d0739d4428bde95d55b6763760617f6def9d6c25edf
     # via fuse-med-ml
-vllm==0.26.0 \
-    --hash=sha256:23e9fa19d7e20ce7dcc1c074d41503e2116d23f19e688f5d5ea91b741f958502 \
-    --hash=sha256:52a4c3e55c2c80cc8793e52ccc244457ceade25b0ad7caa1c15e5002a95a1b2c \
-    --hash=sha256:adb1e4c9b46d0dfdb094121ae5aad670a42412dd813ed4e5db069ed6a15006de
+vllm==0.27.0 \
+    --hash=sha256:02d8265e71bab1cf50f93026211c9a75562a7f0a72b3a32ec5e0e8bcdd62ec75 \
+    --hash=sha256:862671641625d6cfb7aaab98a5386126738b59ca50e5d01ca539a4e32f63ffcb \
+    --hash=sha256:d38f7f738a6c340fa86abaa56287ab126d0c841f9d129fb6eb21056c3a83e40b
     # via
     #   algorithm-nexus
     #   biomed-multi-alignment
