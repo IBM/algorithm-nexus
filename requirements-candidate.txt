@@ -128,6 +128,7 @@ anyio==4.14.2 \
     # via
     #   anthropic
     #   httpx
+    #   httpx2
     #   mcp
     #   openai
     #   sse-starlette
@@ -600,7 +601,9 @@ cryptography==50.0.0 \
     --hash=sha256:eeac2acb5a20ed25e0ad6d1df9891a520b78b404266b6d11778f25d5d691a6c9 \
     --hash=sha256:f89831ef99dd7dd169ab06d63a831adb9e20a87aac6d380266bbda5823349169 \
     --hash=sha256:fd9192b7b70c573d7f214eb1ae35e00d359f6f5e4b27c7e21e30de1fc6204645
-    # via paramiko
+    # via
+    #   paramiko
+    #   pyjwt
 cuda-bindings==13.3.1 \
     --hash=sha256:18c8c167c8907b8f02531ca810534315c458dabef31f7965095619bf647b9202 \
     --hash=sha256:2732904099e0a4d4db774a5fc6d91ee95fae065b4d2ecabb4968c5fe2406c9d7 \
@@ -1016,6 +1019,7 @@ h11==0.16.0 \
     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
     # via
     #   httpcore
+    #   httpcore2
     #   uvicorn
 h2==4.4.1 \
     --hash=sha256:0e25f1462b23c9cb82d9eb02e28bc706dac2a68cb457c6a0d74d63c8a2a5d0e6 \
@@ -1146,6 +1150,7 @@ idna==3.18 \
     #   anyio
     #   email-validator
     #   httpx
+    #   httpx2
     #   requests
     #   terrakit
     #   yarl
@@ -2402,6 +2407,7 @@ opentelemetry-api==1.44.0 \
     --hash=sha256:67647e5e9566edcf421166fdf022b3537f818635daa852b289e34604dc6fb33a \
     --hash=sha256:94b98c893a91b88657eaac1e3ba89618cdb85be6918196705354f34728b2cdef
     # via
+    #   mcp
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-sdk
@@ -2971,6 +2977,7 @@ pydantic==2.13.4 \
     #   lightly
     #   lm-format-enforcer
     #   mcp
+    #   mcp-types
     #   mistral-common
     #   model-hosting-container-standards
     #   openai
@@ -4131,9 +4138,9 @@ terrakit==0.2.0 \
     --hash=sha256:683587a1f630ccbab5e345fdb2c8c0ee393aa450f0523b30ab1004aba1ca26a7 \
     --hash=sha256:e72951ceb6f4745554c47a633373de702caafde13690c440fbf8a16301b3508d
     # via algorithm-nexus
-terratorch==1.2.10 \
-    --hash=sha256:0da8855c7a743c9d09666a3955767c9e476a7c79f817cf9f823f9967d286f4fc \
-    --hash=sha256:6a47d6ecec1992e2f030b6f8d0b87482ddc54766abd2e6e103f9991ee54517f4
+terratorch==1.2.13 \
+    --hash=sha256:b2e7ed551639fcfe7a7d849cb6acc5d348b66707c500a1bee35953847daff148 \
+    --hash=sha256:e1826ccdf8cdef8ddcd417375473ae6eacea2f56949df4c7f9ae476e4823d437
     # via
     #   algorithm-nexus
     #   impactmesh
@@ -4528,10 +4535,13 @@ typing-extensions==4.16.0 \
     #   fastapi
     #   formulaic
     #   grpcio
+    #   httpx2
     #   huggingface-hub
     #   jupyter-client
     #   lightning
     #   lightning-utilities
+    #   mcp
+    #   mcp-types
     #   mistral-common
     #   nibabel
     #   nvidia-cutlass-dsl-libs-base
@@ -4584,6 +4594,7 @@ typing-inspection==0.4.2 \
     --hash=sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464
     # via
     #   fastapi
+    #   mcp
     #   pydantic
     #   pydantic-settings
 tzdata==2026.3 \
