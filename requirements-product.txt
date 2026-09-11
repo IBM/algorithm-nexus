@@ -859,6 +859,7 @@ httpx==0.28.1 \
     #   fastapi
     #   fastapi-cloud-cli
     #   huggingface-hub
+    #   mcp
     #   model-hosting-container-standards
 httpx2==2.12.0 \
     --hash=sha256:7631fe9887a8a2275f4a2540e053aa670fcc50742864a9ae7c66e609fdcf12cf \
@@ -1651,9 +1652,7 @@ nvidia-cuda-nvrtc==13.4.59 ; sys_platform == 'darwin' \
     --hash=sha256:da5e1ba65f402b2fdf1c4bfcb16e27df47e8ade27f7936b1524cb10cdd61a1c8 \
     --hash=sha256:ec27241be8b65e88d37a25d5e4ec0f4fdb0499439a7d5122cfdc74457752ae81 \
     --hash=sha256:f6cb36996797989976bd021d89e263be379668be7a4249cc95a3d11590bda652
-    # via
-    #   humming-kernels
-    #   nvidia-cublas
+    # via humming-kernels
 nvidia-cuda-runtime==13.0.96 ; sys_platform != 'darwin' \
     --hash=sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548 \
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
@@ -2227,10 +2226,6 @@ pycocotools==2.0.11 \
     --hash=sha256:fd72b9734e6084b217c1fc3945bfd4ec05bdc75a44e4f0c461a91442bb804973 \
     --hash=sha256:ffe806ce535f5996445188f9a35643791dc54beabc61bd81e2b03367356d604f
     # via terratorch
-pycountry==26.2.16 \
-    --hash=sha256:115c4baf7cceaa30f59a4694d79483c9167dbce7a9de4d3d571c5f3ea77c305a \
-    --hash=sha256:5b6027d453fcd6060112b951dd010f01f168b51b4bf8a1f1fc8c95c8d94a0801
-    # via pydantic-extra-types
 pycparser==3.0 ; (implementation_name != 'PyPy' and platform_python_implementation != 'PyPy') or (implementation_name == 'pypy' and platform_python_implementation == 'PyPy') \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
@@ -2305,7 +2300,9 @@ pydantic-extra-types==2.11.1 \
 pydantic-settings==2.15.0 \
     --hash=sha256:0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42 \
     --hash=sha256:694b793e84f766ba76a90ebdefc01d0a9a045dab0382bee70393da93712ad117
-    # via fastapi
+    # via
+    #   fastapi
+    #   mcp
 pygments==2.21.0 \
     --hash=sha256:2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9 \
     --hash=sha256:610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c
@@ -3285,6 +3282,7 @@ torch==2.13.0 \
     #   compressed-tensors
     #   flashinfer-python
     #   humming-kernels
+    #   instanttensor
     #   kornia
     #   lightly
     #   lightning
