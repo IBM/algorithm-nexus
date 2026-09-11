@@ -27,8 +27,8 @@ candidate = [
   # This dependency is added by vLLM and TerraTorch
   "opencv-python-headless!=5.0.0.93",
   "terrakit==0.2.0",
-  "terratorch[vllm]==1.2.10",
-  "vllm==0.26.0",
+  "terratorch[vllm]==1.2.13",
+  "vllm==0.29.0",
 ]
 cli = [
   "ado-core>=2.0",
