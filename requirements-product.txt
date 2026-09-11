@@ -837,9 +837,9 @@ httpx==0.28.1 \
     #   huggingface-hub
     #   model-hosting-container-standards
     #   openai
-httpx2==2.9.1 \
-    --hash=sha256:1820fe14a9ab1107bfeff39259987429450b070ec0ff38cc87eb0d8c97fdc71a \
-    --hash=sha256:1932a768737e3666291582833da748cc4e563c337cf96706fccc04fa6e58764a
+httpx2==2.12.0 \
+    --hash=sha256:7631fe9887a8a2275f4a2540e053aa670fcc50742864a9ae7c66e609fdcf12cf \
+    --hash=sha256:cc8b6eecb8661c146b8f89a60e97456ee086e91a784ed31ac450c3a9e613dd36
     # via mcp
 huggingface-hub==1.29.0 \
     --hash=sha256:6ebb385a581435325cf6d5c5b233d5d4bc91175834d99fd65dae14379b36e9ad \
