@@ -98,9 +98,9 @@ albumentations==2.0.8 \
     --hash=sha256:4da95e658e490de3c34af8fcdffed09e36aa8a4edd06ca9f9e7e3ea0b0b16856 \
     --hash=sha256:c4c4259aaf04a7386ad85c7fdcb73c6c7146ca3057446b745cc035805acb1017
     # via terratorch
-anndata==0.11.4 \
-    --hash=sha256:4ce08d09d2ccb5f37d32790363bbcc7fc1b79863842296ae4badfaf48c736e24 \
-    --hash=sha256:fefebb1480316dfa5a23924aa9f74781d447484421bb0c788b0b2ca5e3b339d2
+anndata==0.13.3.post0 \
+    --hash=sha256:9c564b4f04af7f84e45f28de9c4ee3455e989cb05ba1d800054033420f24e8b0 \
+    --hash=sha256:9e5eab0abadff2e97e9ea913d7f234c50bb6bea14e27acf7a5ecf14373e7e18b
     # via
     #   cellxgene-census
     #   scanpy
