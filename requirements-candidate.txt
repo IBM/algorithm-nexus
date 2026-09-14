@@ -293,9 +293,9 @@ blosc2==4.13.0 \
     # via tables
 bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@1d403afba44bdee371bf4113c16c893b28da91c7
     # via algorithm-nexus
-boto3==1.43.75 \
-    --hash=sha256:08a79edb68e6a0d65d305eb90188639313650e155aed015e86eef59d8475dde0 \
-    --hash=sha256:86da93d3d5b46a58b03fa51b598ffa4aeaff485a3000affacf78491c105e44f0
+boto3==1.43.93 \
+    --hash=sha256:196bfc8b4c9cd5505f9f7b963e30956db3a00fd47e20dd0ee3574a243c1fb212 \
+    --hash=sha256:3c948fe231490d446bf90bf3322d1452632107329d3683b37d88b7399bf481a0
     # via
     #   litdata
     #   terrakit
