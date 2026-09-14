@@ -1152,10 +1152,10 @@ huggingface-hub==1.31.0 \
     #   tokenizers
     #   transformers
     #   vllm
-humming-kernels==0.1.12 \
-    --hash=sha256:988e8b9da41e3679ae2816bdfb51acab53c05cc56254b5ca98e847f4efcf24fd \
-    --hash=sha256:c96c37c95f74379067d2d2d0c5154d12ee9a8cfa29a7c3370a7f3e34f207ca72 \
-    --hash=sha256:cd3ef712a93f3a9075ea99de2c72bcd3ec89dab3759b3a248d869f5507b60331
+humming-kernels==0.1.14 \
+    --hash=sha256:3872b1d3af69e1a5e7ae96e43beafa65c691b09be8fed3692ea164b51130e19c \
+    --hash=sha256:826f75e625ecad81e7e2867823e85cee4d500056086128da2d3e907ad4d89589 \
+    --hash=sha256:a5084c20ca0ddc97cd2316532a4f361b90bf8a4963eabc742c792e717d15ccc8
     # via vllm
 hydra-core==1.3.6 \
     --hash=sha256:55951f49c7e19c29f4281cce2eeaa6e73ef6c5620093a4efb402a7e4b839fc38 \
