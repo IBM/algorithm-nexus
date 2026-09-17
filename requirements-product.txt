@@ -850,6 +850,7 @@ httpx==0.28.1 \
     #   fastapi
     #   fastapi-cloud-cli
     #   huggingface-hub
+    #   mcp
     #   model-hosting-container-standards
 httpx2==2.13.0 \
     --hash=sha256:81bd07dc67a3701729ef1f777a3c00c915d4539604fdb5afd327f8682f6b7b44 \
@@ -1637,7 +1638,9 @@ nvidia-cuda-nvrtc==13.4.92 ; sys_platform == 'darwin' \
     --hash=sha256:24b9f5eccc6a5a19779038cf468aecb7cecfa8716269beaef5640bd989d21c28 \
     --hash=sha256:5ce8c97b00b232c4f50c8c4b5a3b68cafee08bdb82ea86f2052ff01d03194f4a \
     --hash=sha256:6af7ac5372920f6a7a560d0699348560fe44cb52c1d722d6afd3119f8af948c4
-    # via humming-kernels
+    # via
+    #   humming-kernels
+    #   nvidia-cublas
 nvidia-cuda-runtime==13.0.96 ; sys_platform != 'darwin' \
     --hash=sha256:7f82250d7782aa23b6cfe765ecc7db554bd3c2870c43f3d1821f1d18aebf0548 \
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
