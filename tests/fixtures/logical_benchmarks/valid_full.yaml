@@ -3,12 +3,9 @@
 
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
+  title: "Inference Serving Performance"
   description: >
     Evaluation of AI model inference serving throughput and latency under controlled traffic conditions.
-  target:
-    identifier: model
-    metadata:
-      description: "The id of the AI model being benchmarked"
   properties:
     - identifier: dataset
       metadata:

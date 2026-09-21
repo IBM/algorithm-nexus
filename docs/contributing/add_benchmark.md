@@ -14,7 +14,7 @@ There are four steps to add a benchmark for your algorithm:
 
 1. **Find or create a benchmark experiment**
 2. **Register the experiment with your Nexus package**
-3. **Define a benchmark instance for your algorithm**
+3. **Define a benchmark submission for your algorithm**
 4. **Run the benchmark**
 
 ## Prerequisites
@@ -116,21 +116,21 @@ uv run nexus validate package packages/<package-name>
 
 Fix any validation errors before proceeding.
 
-## Step 3: Define a benchmark instance for your model
+## Step 3: Define a benchmark submission for your model
 
-A benchmark instance specifies executing a registered experiment on your
-model/algorithm with a specific set of parameter values (workload). Each
-benchmark instance is a folder under your model's `benchmark_instances/`
-directory, that contains a `ado` `space.yaml`
+A benchmark submission specifies executing a registered experiment on your
+model/algorithm with a specific set of parameter values (benchmark instance).
+Each benchmark submission is a folder under your model's
+`benchmark_submissions/` directory, that contains an `ado` `space.yaml`
 
 Create the directory,
 
 ```bash
-mkdir -p packages/<package-name>/models/<model-name>/benchmark_instances/<instance-name>
+mkdir -p packages/<package-name>/models/<model-name>/benchmark_submissions/<submission-name>
 ```
 
 Create
-`packages/<package-name>/models/<model-name>/benchmark_instances/<instance-name>/space.yaml`:
+`packages/<package-name>/models/<model-name>/benchmark_submissions/<submission-name>/space.yaml`:
 
 Example:
 
@@ -148,9 +148,9 @@ experiments:
       experimentIdentifier: <experiment-id>
 ```
 
-The `entitySpace` defines the workload parameters for this instance. The
-`experimentIdentifier` must match one of the experiment IDs you registered in
-`nexus.yaml` in the previous step.
+The `entitySpace` defines the benchmark instance and any other parameters for
+this submission. The `experimentIdentifier` must match one of the experiment IDs
+you registered in `nexus.yaml` in the previous step.
 
 For full details on `space.yaml` syntax, see the
 [ADO discoveryspace documentation](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace).
@@ -163,7 +163,7 @@ uv run nexus validate package packages/<package-name>
 
 ## Step 4: Run the benchmark
 
-Install the benchmark package and run the benchmark instance locally using the
+Install the benchmark package and run the benchmark submission locally using the
 `ado` CLI. First save the following operation configuration to a file `op.yaml`.
 It will execute the experiment on all points in your space.
 
@@ -201,7 +201,7 @@ Add and commit your changes:
 ```bash
 git add packages/<package-name>
 git add benchmark_packages #required when also adding a benchmark package during Step 1
-git commit -s -m "feat(benchmark): Add <instance-name> benchmark for <model-name>"
+git commit -s -m "feat(benchmark): Add <submission-name> benchmark for <model-name>"
 git push origin <your-branch>
 ```
 
@@ -225,8 +225,8 @@ This is done in two parts:
 
 Logical benchmark definitions live in the `benchmarks/` directory at the root of
 the Algorithm Nexus repository. Browse that directory to see whether a
-definition already exists for your domain (e.g. `inference_serving.yaml`,
-`max_cut_solver.yaml`).
+definition already exists for your domain (e.g.
+`benchmarks/llm-inference/problem.yaml`, `benchmarks/max-cut/problem.yaml`).
 
 - **If a definition exists** — you add a binding for experiment to it. Continue
   to
@@ -236,41 +236,62 @@ definition already exists for your domain (e.g. `inference_serving.yaml`,
 
 ### Create a logical benchmark definition
 
-If no definition exists, create a YAML file in
-`benchmarks/<logical-benchmark-id>.yaml`. This file establishes the canonical
-vocabulary for your benchmark — property names, valid values, and metric names.
+If no definition exists, create a directory in
+`benchmarks/<logical-benchmark-id>/` with a `problem.yaml` file. This file
+establishes the canonical vocabulary for your benchmark — property names, valid
+values, and metric names.
 
 A minimal example:
 
 ```yaml
 logicalBenchmark:
-  benchmarkIdentifier: inference_serving
-  description: >
-      Evaluation of AI model inference serving throughput and latency under
-      controlled traffic conditions.
-  target:
-      - identifier: model
-        metadata:
-            description: "The id of the AI model being benchmarked"
-  properties:
-      - identifier: dataset
-        metadata:
-            description: "Dataset used for inference requests."
-            # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
-      - identifier: workload
-        metadata:
-            description: "Traffic pattern or workload profile."
-        propertyDomain:
-            values: ["steady_state_heavy", "poisson_bursty", "light_load"]
-  metrics:
-      - throughput_tokens_per_second
-      - time_to_first_token_ms
-  owner: "@vllm-team"
+    benchmarkIdentifier: inference_serving
+    description: >
+        Evaluation of AI model inference serving throughput and latency under
+        controlled traffic conditions.
+    properties:
+        - identifier: dataset
+          metadata:
+              description: "Dataset used for inference requests."
+              # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
+        - identifier: workload
+          metadata:
+              description: "Traffic pattern or workload profile."
+          propertyDomain:
+              values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+    instance:
+        - dataset # properties that together identify a benchmark instance
+    metrics:
+        - throughput_tokens_per_second
+        - time_to_first_token_ms
+    owner: "@vllm-team"
 bindings: [] # List of bindings to this benchmark
 ```
 
 For the full schema and a complete worked example, see
 [Section 2 of the Benchmark Metadata Convention](../design/benchmark_metadata_convention.md#2-logical-benchmark-definition).
+
+### Add logical benchmark instances
+
+To define specific benchmark problem instances (e.g., individual graphs, routing
+problem instances, or datasets), add a subfolder per instance in
+`benchmarks/<logical-benchmark-id>/instances/<instance-name>/` containing an
+`instance.yaml` file and an optional `artifacts/` folder for instance data files
+(which allows having multiple formats for the same instance).
+
+Example instance YAML
+(`benchmarks/<logical-benchmark-id>/instances/graph_01/instance.yaml`):
+
+```yaml
+identifier: graph_01
+description: 50-node random graph
+artifacts:
+    dimacs: graph_01.dimacs
+    json: graph_01.json
+parameters:
+    num_vertices: 50
+    edge_density: 0.2
+```
 
 ### Add a benchmark binding for your experiment
 
@@ -287,12 +308,15 @@ bindings:
     -  #next binding
 ```
 
-A binding contains the following mapping sections: `
+A binding contains the following mapping sections:
 
-- `targetMapping`: Maps the target property of the benchmark to an experiment input property
-- `propertyMapping`: Maps the other inputs of the logical benchmark to inputs of the
-  experiment
-- `metricMappings`: Maps outputs of the logical benchmark to the outputs of the
+- `targetMapping`: Names the experiment property that carries the benchmark
+  target (e.g. the algorithm or model identifier)
+- `propertyMapping`: Maps non-instance experiment parameters and canonical
+  properties
+- `instanceMapping`: Maps instance artifact inputs (`artifactMapping`), instance
+  parameters/properties (`propertyMapping`), and static filters
+- `metricMapping`: Maps outputs of the logical benchmark to the outputs of the
   experiment
 
 An example binding is
@@ -303,7 +327,7 @@ experiment:
     actuatorIdentifier: vllm_performance
     experimentIdentifier: guide_llm_runner
     experimentVersion: 2.0.0 # The binding only uses the major version
-targetMapping: model_name #The property model_name maps to the target property defined in the benchmark
+targetMapping: model_name # The experiment property that carries the benchmark target identifier
 propertyMapping:
     - benchmark:
           identifier: dataset
@@ -333,6 +357,15 @@ propertyMapping:
             propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
+instanceMapping:
+    artifactMapping:
+        - benchmark: json
+          experiment: input_dataset_file
+    propertyMapping:
+        - benchmark:
+              identifier: prompt_len
+          experiment:
+              identifier: input_len
 metricMapping:
     - benchmark:
           identifier: throughput_tokens_per_second
@@ -356,16 +389,24 @@ logical benchmark definitions and their bindings.
 
 ### Structure
 
-One YAML file per logical benchmark, named after the `benchmarkIdentifier`:
+Each logical benchmark has its own directory containing `problem.yaml` and an
+`instances/` directory with per-instance subfolders:
 
 ```text
 benchmarks/
-├── inference_serving.yaml
-├── max_cut_solver.yaml
+├── <benchmark-id>/
+│   ├── problem.yaml
+│   └── instances/
+│       ├── <instance-1-id>/
+│       │   ├── instance.yaml
+│       │   └── artifacts/
+│       │       ├── graph.dimacs
+│       │       └── graph.json
+│       └── ...
 └── ...
 ```
 
-Each file uses the following top-level structure:
+Each `problem.yaml` uses the following top-level structure:
 
 ```yaml
 logicalBenchmark:
@@ -392,8 +433,8 @@ A benchmark binding may only be updated when:
   retained alongside the new one.
 - **Logical benchmark property names or values change** — if the existing
   mappings become invalid, update the definition and all affected bindings in
-  place. If the original mappings are still valid, create a new logical benchmark
-  instead.
+  place. If the original mappings are still valid, create a new logical
+  benchmark instead.
 - **New non-default experiment properties are added in a minor version bump** —
   if those properties must be set to non-default values to reproduce the same
   measurement, the binding must be updated because a different subset of
@@ -407,10 +448,10 @@ Validate all logical benchmark files before opening a pull request:
 uv run nexus validate logical-benchmarks
 ```
 
-To validate a single file:
+To validate a single file or benchmark folder:
 
 ```bash
-uv run nexus validate logical-benchmarks --file benchmarks/<logical-benchmark-id>.yaml
+uv run nexus validate logical-benchmarks --file benchmarks/<logical-benchmark-id>
 ```
 
 ---

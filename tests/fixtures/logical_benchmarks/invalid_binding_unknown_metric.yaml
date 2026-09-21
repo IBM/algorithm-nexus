@@ -5,8 +5,6 @@
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
   description: "Test benchmark"
-  target:
-    identifier: model
   properties:
     - identifier: dataset
   metrics:

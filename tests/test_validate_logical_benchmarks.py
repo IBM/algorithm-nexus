@@ -6,7 +6,10 @@
 from pathlib import Path
 
 from algorithm_nexus.commands.utils import ValidationErrorCollector
-from algorithm_nexus.commands.validate import validate_logical_benchmark_file
+from algorithm_nexus.commands.validate import (
+    validate_logical_benchmark_directory,
+    validate_logical_benchmark_file,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures" / "logical_benchmarks"
 
@@ -22,6 +25,7 @@ class TestValidFiles:
         assert result is not None
         assert not collector.has_errors
         assert result.logicalBenchmark.benchmarkIdentifier == "inference_serving"
+        assert result.logicalBenchmark.title == "Inference Serving Performance"
         assert result.bindings is not None
         assert len(result.bindings) == 1
 
@@ -39,7 +43,7 @@ class TestValidFiles:
 
 class TestSchemaValidation:
     def test_missing_required_field_fails(self) -> None:
-        """A file missing required fields (description, target) returns None with errors."""
+        """A file missing required fields (description) returns None with errors."""
         collector = ValidationErrorCollector()
         result = validate_logical_benchmark_file(
             FIXTURES / "invalid_missing_required_field.yaml", collector
@@ -47,10 +51,8 @@ class TestSchemaValidation:
 
         assert result is None
         assert collector.has_errors
-        # Both missing fields should be reported
         error_text = " ".join(collector.errors)
         assert "description" in error_text
-        assert "target" in error_text
 
     def test_missing_file_fails(self, tmp_path: Path) -> None:
         """A non-existent file path collects an error and returns None."""
@@ -111,3 +113,232 @@ class TestReferentialIntegrity:
         # No metrics defined → metric_ids is None → no integrity check is performed
         assert result is not None
         assert not collector.has_errors
+
+
+class TestBenchmarkDirectoryAndInstances:
+    def test_valid_benchmark_directory(self, tmp_path: Path) -> None:
+        """A complete benchmark folder with problem.yaml and instances folder with per-instance folder layout passes validation."""
+        bench_dir = tmp_path / "test_benchmark"
+        instances_dir = bench_dir / "instances"
+        inst1_dir = instances_dir / "inst_1"
+        inst1_artifacts = inst1_dir / "artifacts"
+        inst1_artifacts.mkdir(parents=True)
+
+        # Create problem.yaml
+        problem_yaml = FIXTURES / "valid_full.yaml"
+        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+
+        # Create an artifact file
+        (inst1_artifacts / "data.json").write_text("{}")
+        (inst1_artifacts / "data.csv").write_text("a,b\n1,2")
+
+        # Create a valid instance YAML inside instances/inst_1/instance.yaml
+        instance_content = """
+identifier: test_inst_1
+description: A test instance
+artifacts:
+  json_format: data.json
+  csv_format: data.csv
+parameters:
+  dataset: "cifar10"
+  workload: "steady_state_heavy"
+"""
+        (inst1_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        config = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert config is not None
+        assert not collector.has_errors
+
+    def test_instance_with_unknown_parameter_fails(self, tmp_path: Path) -> None:
+        """An instance specifying a parameter not in problem properties fails."""
+        bench_dir = tmp_path / "test_benchmark"
+        inst1_dir = bench_dir / "instances" / "inst_1"
+        inst1_dir.mkdir(parents=True)
+
+        problem_yaml = FIXTURES / "valid_full.yaml"
+        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+
+        instance_content = """
+identifier: test_inst_1
+parameters:
+  nonexistent_param: "value"
+"""
+        (inst1_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "nonexistent_param" in " ".join(collector.errors)
+
+    def test_instance_with_missing_artifact_fails(self, tmp_path: Path) -> None:
+        """An instance specifying an artifact that does not exist in its artifacts/ fails."""
+        bench_dir = tmp_path / "test_benchmark"
+        inst1_dir = bench_dir / "instances" / "inst_1"
+        inst1_artifacts = inst1_dir / "artifacts"
+        inst1_artifacts.mkdir(parents=True)
+
+        problem_yaml = FIXTURES / "valid_full.yaml"
+        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+
+        instance_content = """
+identifier: test_inst_1
+artifacts:
+  - missing_graph.txt
+"""
+        (inst1_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "missing_graph.txt" in " ".join(collector.errors)
+
+    def test_binding_with_valid_instance_mapping_passes(self, tmp_path: Path) -> None:
+        """A binding with instanceMapping referencing valid instance passes."""
+        bench_dir = tmp_path / "test_benchmark"
+        instances_dir = bench_dir / "instances"
+        bench_dir.mkdir(parents=True)
+        instances_dir.mkdir(parents=True)
+
+        problem_content = """
+logicalBenchmark:
+  benchmarkIdentifier: test_bench
+  description: Test description
+  properties:
+    - identifier: size
+
+bindings:
+  - benchmarkIdentifier: test_bench
+    experiment:
+      actuatorIdentifier: custom
+      experimentIdentifier: exp1
+      experimentVersion: 1.0.0
+    targetMapping: solver
+    instanceMapping:
+      artifactMapping:
+        - benchmark: dimacs
+          experiment: input_graph_path
+      propertyMapping:
+        - benchmark:
+            identifier: size
+          experiment:
+            identifier: n_nodes
+      staticFilters:
+        - property:
+            identifier: graph_type
+          value: erdos_renyi
+"""
+        (bench_dir / "problem.yaml").write_text(problem_content)
+
+        inst_dir = instances_dir / "graph_01"
+        inst_dir.mkdir(parents=True)
+        instance_content = """
+identifier: graph_01
+parameters:
+  size: 10
+"""
+        (inst_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        config = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert config is not None
+        assert not collector.has_errors
+        assert config.bindings is not None
+        assert config.bindings[0].instanceMapping is not None
+        assert config.bindings[0].instanceMapping.artifactMapping is not None
+        assert config.bindings[0].instanceMapping.propertyMapping is not None
+        assert config.bindings[0].instanceMapping.staticFilters is not None
+
+    def test_binding_with_invalid_instance_property_mapping_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """A binding with propertyMapping inside instanceMapping referencing unknown property fails."""
+        bench_dir = tmp_path / "test_benchmark"
+        instances_dir = bench_dir / "instances"
+        bench_dir.mkdir(parents=True)
+        instances_dir.mkdir(parents=True)
+
+        problem_content = """
+logicalBenchmark:
+  benchmarkIdentifier: test_bench
+  description: Test description
+  properties:
+    - identifier: num_vertices
+
+bindings:
+  - benchmarkIdentifier: test_bench
+    experiment:
+      actuatorIdentifier: custom
+      experimentIdentifier: exp1
+      experimentVersion: 1.0.0
+    targetMapping: solver
+    instanceMapping:
+      propertyMapping:
+        - benchmark:
+            identifier: unknown_property
+          experiment:
+            identifier: n_nodes
+"""
+        (bench_dir / "problem.yaml").write_text(problem_content)
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "unknown_property" in " ".join(collector.errors)
+
+
+class TestRankingValidation:
+    def test_valid_ranking_asc_passes(self) -> None:
+        """A ranking config referencing a known metric with asc order is valid."""
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_file(
+            FIXTURES / "valid_ranking_field.yaml", collector
+        )
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.logicalBenchmark.ranking is not None
+        assert result.logicalBenchmark.ranking.metric == "elapsed_ms"
+        assert result.logicalBenchmark.ranking.order == "asc"
+
+    def test_valid_ranking_desc_passes(self) -> None:
+        """A ranking config with desc order is valid."""
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_file(
+            FIXTURES / "valid_ranking_desc.yaml", collector
+        )
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.logicalBenchmark.ranking is not None
+        assert result.logicalBenchmark.ranking.order == "desc"
+
+    def test_ranking_unknown_metric_fails(self) -> None:
+        """A ranking.metric that is not in the defined metrics list is an integrity error."""
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_file(
+            FIXTURES / "invalid_ranking_unknown_metric.yaml", collector
+        )
+
+        assert (
+            result is not None
+        )  # schema is valid; integrity error is collected separately
+        assert collector.has_errors
+        assert "nonexistent_metric" in " ".join(collector.errors)
+
+    def test_ranking_without_metrics_no_error(self) -> None:
+        """When metrics is not defined, a ranking integrity check is skipped."""
+        collector = ValidationErrorCollector()
+        # valid_no_bindings.yaml has no ranking — verify no ranking field means None
+        result = validate_logical_benchmark_file(
+            FIXTURES / "valid_no_bindings.yaml", collector
+        )
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.logicalBenchmark.ranking is None

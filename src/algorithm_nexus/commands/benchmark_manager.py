@@ -1,7 +1,7 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
 
-"""Benchmark manager for discovering and managing benchmark instances from GitHub PRs."""
+"""Benchmark manager for discovering and managing benchmark submissions from GitHub PRs."""
 
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ def create_random_walk_operation_config(
 
 
 class BenchmarkManager:
-    """Manages discovery and execution of benchmark instances from a GitHub PR."""
+    """Manages discovery and execution of benchmark submissions from a GitHub PR."""
 
     def __init__(
         self,
@@ -166,7 +166,7 @@ class BenchmarkManager:
         packages_root: Path | None = None,
         package_filter: str | None = None,
     ) -> list[Path]:
-        """Discover benchmark instances based on mode (PR or all/package).
+        """Discover benchmark submissions based on mode (PR or all/package).
 
         Args:
             packages_root: Path to packages directory (for all/package mode)
@@ -187,12 +187,12 @@ class BenchmarkManager:
                 )
 
             changed_files = self.get_changed_files()
-            return self.find_benchmark_instances(changed_files)
+            return self.find_benchmark_submissions(changed_files)
 
         elif packages_root:
             # All or package mode
-            console.print("Discovering benchmark instances...")
-            return self.find_all_benchmark_instances(packages_root, package_filter)
+            console.print("Discovering benchmark submissions...")
+            return self.find_all_benchmark_submissions(packages_root, package_filter)
 
         else:
             console.print(
@@ -221,7 +221,7 @@ class BenchmarkManager:
                 f"\n[bold]Mode:[/bold] {mode_name} package '{package_filter}'"
             )
         else:
-            console.print(f"\n[bold]Mode:[/bold] {mode_name} all benchmark instances")
+            console.print(f"\n[bold]Mode:[/bold] {mode_name} all benchmark submissions")
 
         # Print packages root when not in PR mode
         if not self.pr_url and packages_root:
@@ -231,44 +231,44 @@ class BenchmarkManager:
 
     def _print_instances_found(
         self,
-        benchmark_instances: list[Path],
+        benchmark_submissions: list[Path],
         package_filter: str | None = None,
         show_list: bool = True,
     ) -> None:
         """Print found instances or empty message.
 
         Args:
-            benchmark_instances: List of found benchmark instances
+            benchmark_submissions: List of found benchmark submissions
             package_filter: Optional package name (for empty message)
             show_list: Whether to show the list of instances
         """
-        if not benchmark_instances:
+        if not benchmark_submissions:
             if self.pr_url:
                 console.print(
-                    "\n[yellow]No benchmark instances found in this PR.[/yellow]"
+                    "\n[yellow]No benchmark submissions found in this PR.[/yellow]"
                 )
             elif package_filter:
                 console.print(
-                    f"\n[yellow]No benchmark instances found in package '{package_filter}'.[/yellow]"
+                    f"\n[yellow]No benchmark submissions found in package '{package_filter}'.[/yellow]"
                 )
             else:
-                console.print("\n[yellow]No benchmark instances found.[/yellow]")
+                console.print("\n[yellow]No benchmark submissions found.[/yellow]")
             return
 
         console.print(
-            f"\n[bold]Found {len(benchmark_instances)} benchmark instance(s):[/bold]"
+            f"\n[bold]Found {len(benchmark_submissions)} benchmark submission(s):[/bold]"
         )
         if show_list:
-            for instance in benchmark_instances:
+            for instance in benchmark_submissions:
                 console.print(f"  • {instance}")
 
     def _resolve_all_dependencies(
-        self, benchmark_instances: list[Path], verbose: bool = False
+        self, benchmark_submissions: list[Path], verbose: bool = False
     ) -> dict[Path, list[str]]:
-        """Resolve dependencies for all benchmark instances.
+        """Resolve dependencies for all benchmark submissions.
 
         Args:
-            benchmark_instances: List of benchmark instance paths
+            benchmark_submissions: List of benchmark instance paths
             verbose: Whether to show verbose output
 
         Returns:
@@ -277,8 +277,8 @@ class BenchmarkManager:
         console.print("\n[bold]Resolving dependencies...[/bold]")
         instance_dependencies: dict[Path, list[str]] = {}
 
-        for instance in benchmark_instances:
-            packages = self.get_benchmark_packages_for_instance(instance)
+        for instance in benchmark_submissions:
+            packages = self.get_benchmark_packages_for_submission(instance)
             if verbose:
                 console.print(
                     f"  {instance}: {', '.join(packages) if packages else 'no dependencies'}"
@@ -287,16 +287,16 @@ class BenchmarkManager:
             instance_dependencies[instance] = list(packages)
 
         console.print(
-            f"[green]✓[/green] Resolved dependencies for {len(benchmark_instances)} instance(s)"
+            f"[green]✓[/green] Resolved dependencies for {len(benchmark_submissions)} instance(s)"
         )
 
         return instance_dependencies
 
-    def _parse_instance_path(self, instance_path: Path) -> tuple[str, str, str]:
+    def _parse_submission_path(self, submission_path: Path) -> tuple[str, str, str]:
         """Parse benchmark instance path to extract package, model, and instance names.
 
         Args:
-            instance_path: Path to benchmark instance directory
+            submission_path: Path to benchmark instance directory
 
         Returns:
             Tuple of (package_name, model_name, instance_name)
@@ -305,20 +305,22 @@ class BenchmarkManager:
         Raises:
             ValueError: If the instance path format is invalid
         """
-        # Parse instance path using regex:
-        # - Model-level: packages/<package>/models/<model>/benchmark_instances/<instance>
-        # - Package-level: packages/<package>/benchmark_instances/<instance>
-        path_str = str(instance_path)
+        # Parse submission path using regex:
+        # - Model-level: packages/<package>/models/<model>/benchmark_submissions/<submission>
+        # - Package-level: packages/<package>/benchmark_submissions/<submission>
+        path_str = str(submission_path)
 
         # Try model-level pattern first
-        model_pattern = r"^packages/([^/]+)/models/([^/]+)/benchmark_instances/([^/]+)$"
+        model_pattern = (
+            r"^packages/([^/]+)/models/([^/]+)/benchmark_submissions/([^/]+)$"
+        )
         match = re.match(model_pattern, path_str)
         if match:
             package_name, model_name, instance_name = match.groups()
             return package_name, model_name, instance_name
 
         # Try package-level pattern
-        package_pattern = r"^packages/([^/]+)/benchmark_instances/([^/]+)$"
+        package_pattern = r"^packages/([^/]+)/benchmark_submissions/([^/]+)$"
         match = re.match(package_pattern, path_str)
         if match:
             package_name, instance_name = match.groups()
@@ -327,12 +329,12 @@ class BenchmarkManager:
 
         # If neither pattern matches, raise an error
         raise ValueError(
-            f"Invalid benchmark instance path format: {instance_path}. "
-            "Expected: packages/<package>/benchmark_instances/<instance> or "
-            "packages/<package>/models/<model>/benchmark_instances/<instance>"
+            f"Invalid benchmark submission path format: {submission_path}. "
+            "Expected: packages/<package>/benchmark_submissions/<submission> or "
+            "packages/<package>/models/<model>/benchmark_submissions/<submission>"
         )
 
-    def find_benchmark_instances(self, changed_files: list[str]) -> list[Path]:
+    def find_benchmark_submissions(self, changed_files: list[str]) -> list[Path]:
         """Find benchmark instance directories from changed files.
 
         Args:
@@ -345,12 +347,12 @@ class BenchmarkManager:
 
         for file_path in changed_files:
             path = Path(file_path)
-            if "benchmark_instances" in path.parts:
-                # Find the index of 'benchmark_instances' in the path parts
-                bench_idx = path.parts.index("benchmark_instances")
-                # Ensure there's at least one part after 'benchmark_instances'
+            if "benchmark_submissions" in path.parts:
+                # Find the index of 'benchmark_submissions' in the path parts
+                bench_idx = path.parts.index("benchmark_submissions")
+                # Ensure there's at least one part after 'benchmark_submissions'
                 if bench_idx + 1 < len(path.parts):
-                    # Reconstruct path up to and including the first directory after 'benchmark_instances'
+                    # Reconstruct path up to and including the first directory after 'benchmark_submissions'
                     instance_dir = Path(*path.parts[: bench_idx + 2])
                     benchmark_dirs.add(instance_dir)
 
@@ -478,11 +480,11 @@ class BenchmarkManager:
 
         return requirement
 
-    def get_benchmark_packages_for_instance(self, instance_path: Path) -> set[str]:
+    def get_benchmark_packages_for_submission(self, submission_path: Path) -> set[str]:
         """Get the benchmark packages required for a specific benchmark instance.
 
         Args:
-            instance_path: Path to benchmark instance directory
+            submission_path: Path to benchmark instance directory
 
         Returns:
             Set of requirement specifiers for benchmark packages
@@ -492,7 +494,7 @@ class BenchmarkManager:
         try:
             repo_root = self.repo_root
 
-            space_yaml_path = repo_root / instance_path / "space.yaml"
+            space_yaml_path = repo_root / submission_path / "space.yaml"
             if not space_yaml_path.is_file():
                 return set()
 
@@ -515,7 +517,7 @@ class BenchmarkManager:
                 for exp_ref in space_config_with_refs.experiments  # type: ignore[union-attr]
             }
 
-            current_path = repo_root / instance_path
+            current_path = repo_root / submission_path
             nexus_yaml_path = None
 
             # Find the deepest nexus.yaml file up to repo_root
@@ -528,7 +530,7 @@ class BenchmarkManager:
                     break
 
             if not nexus_yaml_path:
-                parts = instance_path.parts
+                parts = submission_path.parts
                 if len(parts) > 0 and parts[0] == "packages" and len(parts) > 1:
                     potential_nexus = repo_root / "packages" / parts[1] / "nexus.yaml"
                     if potential_nexus.exists():
@@ -553,37 +555,37 @@ class BenchmarkManager:
 
         except Exception as e:
             console_err.print(
-                f"[yellow]Warning:[/yellow] Could not determine benchmark packages for {instance_path}: {e}"
+                f"[yellow]Warning:[/yellow] Could not determine benchmark packages for {submission_path}: {e}"
             )
             return set()
 
-    def execute_benchmark(self, instance_path: Path) -> BenchmarkExecutionResult:
+    def execute_benchmark(self, submission_path: Path) -> BenchmarkExecutionResult:
         """Execute a benchmark instance using ADO CLI.
 
         Args:
-            instance_path: Path to benchmark instance directory
+            submission_path: Path to benchmark instance directory
 
         Returns:
             Execution result
         """
-        result = BenchmarkExecutionResult(instance_path=str(instance_path))
+        result = BenchmarkExecutionResult(submission_path=str(submission_path))
 
-        # Prepare remote config once for this benchmark instance
+        # Prepare remote config once for this benchmark submission
         remote_config_for_space = None
         remote_config_for_operation = None
         temp_remote_configs = []
 
         try:
             # Use repo_root which is set to either local or checked out directory
-            space_yaml_path = self.repo_root / instance_path / "space.yaml"
+            space_yaml_path = self.repo_root / submission_path / "space.yaml"
 
             if not space_yaml_path.is_file():
-                raise FileNotFoundError(f"space.yaml not found in {instance_path}")
+                raise FileNotFoundError(f"space.yaml not found in {submission_path}")
 
             # If in remote mode, create remote configs with benchmark packages
             if self.remote_context_file:
-                benchmark_packages = self.get_benchmark_packages_for_instance(
-                    instance_path
+                benchmark_packages = self.get_benchmark_packages_for_submission(
+                    submission_path
                 )
 
                 if benchmark_packages:
@@ -639,9 +641,9 @@ class BenchmarkManager:
                     tmp_file.flush()
                     temp_remote_configs.append(remote_config_for_space)
 
-            console.print(f"  Creating ADO discoveryspace for: {instance_path}")
+            console.print(f"  Creating ADO discoveryspace for: {submission_path}")
             space_id, actuator_configuration_ids = self._create_discoveryspace(
-                space_yaml_path, instance_path, remote_config_for_space
+                space_yaml_path, submission_path, remote_config_for_space
             )
             result.space_id = space_id
             console.print(f"  [green]✓[/green] Successfully created space: {space_id}")
@@ -649,7 +651,7 @@ class BenchmarkManager:
             console.print(f"  Creating operation for space: {space_id}")
             operation_result = self._create_operation(
                 space_id,
-                instance_path,
+                submission_path,
                 remote_config_for_operation,
                 actuator_configuration_ids,
             )
@@ -703,14 +705,14 @@ class BenchmarkManager:
     def _create_discoveryspace(
         self,
         space_yaml_path: Path,
-        instance_path: Path,
+        submission_path: Path,
         remote_config: Path | None = None,
     ) -> tuple[str, list[str]]:
         """Create a discoveryspace using ado CLI.
 
         Args:
             space_yaml_path: Path to space.yaml file
-            instance_path: Path to benchmark instance directory
+            submission_path: Path to benchmark instance directory
             remote_config: Optional path to remote configuration file (with wait: true for space creation)
 
         Returns:
@@ -740,19 +742,19 @@ class BenchmarkManager:
         # Extract PR number from URL (pr_url may be None in non-PR mode)
         pr_number = self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
 
-        # Parse instance path to get package, model, and instance names
-        package_name, model_name, instance_name = self._parse_instance_path(
-            instance_path
+        # Parse submission path to get package, model, and submission names
+        package_name, model_name, instance_name = self._parse_submission_path(
+            submission_path
         )
 
-        # Create descriptive name: space-pr123-package-model-instance
+        # Create descriptive name: space-pr123-package-model-submission
         space_name = f"space-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
-        space_description = f"Discovery space for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+        space_description = f"Discovery space for benchmark submission from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
 
         # Build custom labels with algorithm-nexus fields
         labels = space_config.metadata.labels or {}
         labels["algorithm-nexus.pr_url"] = self.pr_url
-        labels["algorithm-nexus.instance_path"] = str(instance_path)
+        labels["algorithm-nexus.submission_path"] = str(submission_path)
 
         # Update metadata with descriptive name, description, and labels
         space_config.metadata = ConfigurationMetadata(
@@ -878,7 +880,7 @@ class BenchmarkManager:
     def _create_operation(
         self,
         space_id: str,
-        instance_path: Path | None = None,
+        submission_path: Path | None = None,
         remote_config: Path | None = None,
         actuator_configuration_ids: list[str] | None = None,
     ) -> dict[str, str | None]:
@@ -886,30 +888,30 @@ class BenchmarkManager:
 
         Args:
             space_id: Discovery space identifier
-            instance_path: Optional path to benchmark instance (for package resolution)
+            submission_path: Optional path to benchmark submission (for package resolution)
             remote_config: Optional path to remote configuration file
             actuator_configuration_ids: Actuator configuration IDs resolved from space.yaml
 
         Returns:
             Dictionary with operation_id and ray_job_id (if remote execution)
         """
-        # Generate descriptive name and description from instance path
-        if instance_path:
+        # Generate descriptive name and description from submission path
+        if submission_path:
             # Extract PR number from URL (pr_url may be None in non-PR mode)
             pr_number = (
                 self.pr_url.rstrip("/").split("/")[-1] if self.pr_url else "unknown"
             )
 
-            # Parse instance path to get package, model, and instance names
-            package_name, model_name, instance_name = self._parse_instance_path(
-                instance_path
+            # Parse submission path to get package, model, and submission names
+            package_name, model_name, instance_name = self._parse_submission_path(
+                submission_path
             )
 
-            # Create descriptive name: randomwalk-pr123-package-model-instance
+            # Create descriptive name: randomwalk-pr123-package-model-submission
             operation_name = (
                 f"randomwalk-pr{pr_number}-{package_name}-{model_name}-{instance_name}"
             )
-            operation_description = f"Random walk for benchmark instance from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
+            operation_description = f"Random walk for benchmark submission from PR #{pr_number}: {package_name}/{model_name}/{instance_name}"
         else:
             operation_name = "randomwalk-all"
             operation_description = "Perform a random walk on all points in a space"
@@ -917,8 +919,8 @@ class BenchmarkManager:
         # Create custom metadata with algorithm-nexus fields
         custom_metadata = {
             "algorithm-nexus.pr_url": self.pr_url or "",
-            "algorithm-nexus.instance_path": str(instance_path)
-            if instance_path
+            "algorithm-nexus.submission_path": str(submission_path)
+            if submission_path
             else "",
         }
 
@@ -1005,7 +1007,7 @@ class BenchmarkManager:
             Dictionary with execution results
         """
         try:
-            console.print("Analyzing PR for new or changed benchmark instances...")
+            console.print("Analyzing PR for new or changed benchmark submissions...")
             console.print(f"PR URL: {self.pr_url}")
 
             # Always check if we need to checkout PR code at the beginning
@@ -1020,18 +1022,20 @@ class BenchmarkManager:
 
             changed_files = self.get_changed_files()
 
-            benchmark_instances = self.find_benchmark_instances(changed_files)
+            benchmark_submissions = self.find_benchmark_submissions(changed_files)
 
-            if not benchmark_instances:
+            if not benchmark_submissions:
                 console.print(
-                    "[yellow]No new or changed benchmark instances found in this PR.[/yellow]"
+                    "[yellow]No new or changed benchmark submissions found in this PR.[/yellow]"
                 )
-                return {"instances": []}
+                return {"submissions": []}
 
-            console.print(f"Found {len(benchmark_instances)} benchmark instance(s):")
+            console.print(
+                f"Found {len(benchmark_submissions)} benchmark submission(s):"
+            )
 
             results: dict[str, Any] = {
-                "instances": [],
+                "submissions": [],
             }
 
             if self.execute:
@@ -1039,10 +1043,10 @@ class BenchmarkManager:
                 successful = 0
                 failed = 0
 
-                for instance_path in benchmark_instances:
-                    console.print(f"\nProcessing: {instance_path}")
-                    exec_result = self.execute_benchmark(instance_path)
-                    results["instances"].append(exec_result.model_dump())
+                for submission_path in benchmark_submissions:
+                    console.print(f"\nProcessing: {submission_path}")
+                    exec_result = self.execute_benchmark(submission_path)
+                    results["submissions"].append(exec_result.model_dump())
 
                     # When execution is local we return "success" when remote we return "started"
                     if exec_result.status in ["started", "success"]:
@@ -1051,18 +1055,20 @@ class BenchmarkManager:
                         failed += 1
 
             else:
-                for instance_path in benchmark_instances:
-                    console.print(f"  {instance_path}")
-                    results["instances"].append({"instance_path": str(instance_path)})
+                for submission_path in benchmark_submissions:
+                    console.print(f"  {submission_path}")
+                    results["submissions"].append(
+                        {"submission_path": str(submission_path)}
+                    )
 
             return results
         finally:
             self.cleanup_temp_dir()
 
-    def find_all_benchmark_instances(
+    def find_all_benchmark_submissions(
         self, packages_root: Path, package_filter: str | None = None
     ) -> list[Path]:
-        """Find all benchmark instances in the packages directory.
+        """Find all benchmark submissions in the packages directory.
 
         Args:
             packages_root: Path to packages directory
@@ -1071,7 +1077,7 @@ class BenchmarkManager:
         Returns:
             List of benchmark instance directory paths (relative to repo_root)
         """
-        benchmark_instances = []
+        benchmark_submissions = []
 
         # Resolve packages_root to absolute path
         packages_root_abs = packages_root.resolve()
@@ -1094,32 +1100,32 @@ class BenchmarkManager:
             if package_filter and pkg_dir.name != package_filter:
                 continue
 
-            # Find benchmark_instances directories
-            # Check package-level benchmark_instances
-            pkg_benchmark_dir = pkg_dir / "benchmark_instances"
+            # Find benchmark_submissions directories
+            # Check package-level benchmark_submissions
+            pkg_benchmark_dir = pkg_dir / "benchmark_submissions"
             if pkg_benchmark_dir.exists() and pkg_benchmark_dir.is_dir():
-                benchmark_instances.extend(
+                benchmark_submissions.extend(
                     instance_dir.relative_to(self.repo_root)
                     for instance_dir in pkg_benchmark_dir.iterdir()
                     if instance_dir.is_dir() and (instance_dir / "space.yaml").exists()
                 )
 
-            # Check model-level benchmark_instances
+            # Check model-level benchmark_submissions
             models_dir = pkg_dir / "models"
             if models_dir.exists() and models_dir.is_dir():
                 for model_dir in models_dir.iterdir():
                     if not model_dir.is_dir():
                         continue
-                    model_benchmark_dir = model_dir / "benchmark_instances"
+                    model_benchmark_dir = model_dir / "benchmark_submissions"
                     if model_benchmark_dir.exists() and model_benchmark_dir.is_dir():
-                        benchmark_instances.extend(
+                        benchmark_submissions.extend(
                             instance_dir.relative_to(self.repo_root)
                             for instance_dir in model_benchmark_dir.iterdir()
                             if instance_dir.is_dir()
                             and (instance_dir / "space.yaml").exists()
                         )
 
-        return sorted(benchmark_instances)
+        return sorted(benchmark_submissions)
 
     def validate(
         self,
@@ -1128,7 +1134,7 @@ class BenchmarkManager:
         verbose: bool = False,
         fail_fast: bool = False,
     ) -> ValidationReport:
-        """Validate benchmark instances with ADO dry-run in isolated venvs.
+        """Validate benchmark submissions with ADO dry-run in isolated venvs.
 
         Args:
             packages_root: Path to packages directory (for all/package mode)
@@ -1151,31 +1157,31 @@ class BenchmarkManager:
             # Print mode header
             self._print_mode_header(packages_root, package_filter, "Validating")
 
-            # Discover benchmark instances
-            benchmark_instances = self._discover_instances(
+            # Discover benchmark submissions
+            benchmark_submissions = self._discover_instances(
                 packages_root, package_filter
             )
 
             # Print found instances
-            self._print_instances_found(benchmark_instances, package_filter)
+            self._print_instances_found(benchmark_submissions, package_filter)
 
-            if not benchmark_instances:
+            if not benchmark_submissions:
                 return ValidationReport(instances=[], successful=0, failed=0, total=0)
 
             # Resolve dependencies for all instances
             instance_dependencies = self._resolve_all_dependencies(
-                benchmark_instances, verbose
+                benchmark_submissions, verbose
             )
 
             # Validate each instance with its own venv
-            console.print("\n[bold]Validating benchmark instances...[/bold]")
+            console.print("\n[bold]Validating benchmark submissions...[/bold]")
             console.print("=" * 60)
 
             all_results = []
             total_success = 0
             total_failed = 0
 
-            for instance in benchmark_instances:
+            for instance in benchmark_submissions:
                 resolved_req_list = instance_dependencies[instance]
 
                 console.print(f"\n[cyan]Validating:[/cyan] {instance}")
@@ -1203,7 +1209,7 @@ class BenchmarkManager:
                             # Create ValidationResult for failed dependency installation
                             failed_result = ValidationResult(
                                 success=False,
-                                instance_path=str(instance),
+                                submission_path=str(instance),
                                 errors=["Failed to install dependencies"],
                                 warnings=[],
                             )
@@ -1218,7 +1224,7 @@ class BenchmarkManager:
 
                     result = validate_with_ado(
                         base_path=self.repo_root,
-                        instance_path=str(instance),
+                        submission_path=str(instance),
                         venv_path=venv_path,
                     )
 
@@ -1254,7 +1260,7 @@ class BenchmarkManager:
                 instances=all_results,
                 successful=total_success,
                 failed=total_failed,
-                total=len(benchmark_instances),
+                total=len(benchmark_submissions),
             )
 
         finally:

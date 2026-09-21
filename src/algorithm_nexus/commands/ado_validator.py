@@ -1,7 +1,7 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
 
-"""ADO validation for benchmark instances."""
+"""ADO validation for benchmark submissions."""
 
 from __future__ import annotations
 
@@ -28,25 +28,27 @@ from algorithm_nexus.models import ValidationResult
 console = Console()
 
 
-def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> ValidationResult:
+def validate_space_yaml_syntax(
+    base_path: Path, submission_path: str
+) -> ValidationResult:
     """Validate space.yaml YAML syntax and basic structure using DiscoverySpaceConfiguration.
 
     Args:
         base_path: Base path (e.g., repo root or temp directory)
-        instance_path: Relative path to the benchmark instance from base_path
+        submission_path: Relative path to the benchmark submission from base_path
 
     Returns:
         ValidationResult with syntax validation results
     """
 
     # Construct full path to space.yaml
-    space_yaml_path = base_path / instance_path / "space.yaml"
+    space_yaml_path = base_path / submission_path / "space.yaml"
 
     # Check if file exists
     if not space_yaml_path.is_file():
         return ValidationResult(
             success=False,
-            instance_path=instance_path,
+            submission_path=submission_path,
             errors=[f"File not found: {space_yaml_path}"],
             warnings=[],
         )
@@ -84,7 +86,7 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
 
     return ValidationResult(
         success=len(errors) == 0,
-        instance_path=instance_path,
+        submission_path=submission_path,
         errors=errors,
         warnings=warnings,
     )
@@ -92,21 +94,21 @@ def validate_space_yaml_syntax(base_path: Path, instance_path: str) -> Validatio
 
 def validate_with_ado(
     base_path: Path,
-    instance_path: str,
+    submission_path: str,
     venv_path: Path,
 ) -> ValidationResult:
     """Run ADO validation in isolated virtual environment.
 
     Args:
         base_path: Base path (e.g., repo root or temp directory)
-        instance_path: Relative path to the benchmark instance from base_path
+        submission_path: Relative path to the benchmark submission from base_path
         venv_path: Path to virtual environment with ADO installed
 
     Returns:
         ValidationResult with ADO validation results
     """
     # First validate syntax
-    syntax_result = validate_space_yaml_syntax(base_path, instance_path)
+    syntax_result = validate_space_yaml_syntax(base_path, submission_path)
 
     if syntax_result.errors:
         # Don't proceed with ADO validation if syntax is invalid
@@ -125,7 +127,7 @@ def validate_with_ado(
         )
         return ValidationResult(
             success=False,
-            instance_path=instance_path,
+            submission_path=submission_path,
             errors=errors,
             warnings=warnings,
         )
@@ -133,10 +135,10 @@ def validate_with_ado(
     # Validate with ADO using dry-run mode
     try:
         # Construct full path to space.yaml
-        space_yaml_path = base_path / instance_path / "space.yaml"
+        space_yaml_path = base_path / submission_path / "space.yaml"
 
         # Use ado create space with --dry-run flag
-        # Run from the benchmark instance directory to support relative paths in space.yaml
+        # Run from the benchmark submission directory to support relative paths in space.yaml
         result = subprocess.run(  # noqa: S603
             [
                 str(ado_binary),
@@ -150,7 +152,7 @@ def validate_with_ado(
             text=True,
             check=False,
             timeout=30,  # 30 second timeout
-            cwd=space_yaml_path.parent,  # Run from benchmark instance directory
+            cwd=space_yaml_path.parent,  # Run from benchmark submission directory
         )
 
         if result.returncode != 0:
@@ -167,7 +169,7 @@ def validate_with_ado(
 
     return ValidationResult(
         success=len(errors) == 0,
-        instance_path=instance_path,
+        submission_path=submission_path,
         errors=errors,
         warnings=warnings,
     )

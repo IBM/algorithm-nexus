@@ -19,7 +19,7 @@ from algorithm_nexus.models import BenchmarkExecutionResult
 
 
 class TestParseInstancePath:
-    """Tests for _parse_instance_path method."""
+    """Tests for _parse_submission_path method."""
 
     def test_parse_model_level_instance(self) -> None:
         """Test parsing model-level benchmark instance path."""
@@ -27,8 +27,8 @@ class TestParseInstancePath:
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
 
-        package, model, instance = manager._parse_instance_path(
-            Path("packages/terratorch/models/prithvi/benchmark_instances/flood-test")
+        package, model, instance = manager._parse_submission_path(
+            Path("packages/terratorch/models/prithvi/benchmark_submissions/flood-test")
         )
 
         assert package == "terratorch"
@@ -41,8 +41,8 @@ class TestParseInstancePath:
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
 
-        package, model, instance = manager._parse_instance_path(
-            Path("packages/terratorch/benchmark_instances/base-test")
+        package, model, instance = manager._parse_submission_path(
+            Path("packages/terratorch/benchmark_submissions/base-test")
         )
 
         assert package == "terratorch"
@@ -57,9 +57,9 @@ class TestParseInstancePath:
 
         with pytest.raises(
             ValueError,
-            match="Invalid benchmark instance path format",
+            match="Invalid benchmark submission path format",
         ):
-            manager._parse_instance_path(Path("packages"))
+            manager._parse_submission_path(Path("packages"))
 
     def test_parse_invalid_model_level_path(self) -> None:
         """Test parsing fails for incomplete model-level path."""
@@ -69,10 +69,10 @@ class TestParseInstancePath:
 
         with pytest.raises(
             ValueError,
-            match="Invalid benchmark instance path format",
+            match="Invalid benchmark submission path format",
         ):
-            manager._parse_instance_path(
-                Path("packages/terratorch/models/prithvi/benchmark_instances")
+            manager._parse_submission_path(
+                Path("packages/terratorch/models/prithvi/benchmark_submissions")
             )
 
     def test_parse_invalid_package_level_path(self) -> None:
@@ -83,15 +83,15 @@ class TestParseInstancePath:
 
         with pytest.raises(
             ValueError,
-            match="Invalid benchmark instance path format",
+            match="Invalid benchmark submission path format",
         ):
-            manager._parse_instance_path(
-                Path("packages/terratorch/benchmark_instances")
+            manager._parse_submission_path(
+                Path("packages/terratorch/benchmark_submissions")
             )
 
 
 class TestFindBenchmarkInstances:
-    """Tests for find_benchmark_instances method."""
+    """Tests for find_benchmark_submissions method."""
 
     def test_find_model_level_instances(self) -> None:
         """Test finding model-level benchmark instances from changed files."""
@@ -100,16 +100,16 @@ class TestFindBenchmarkInstances:
         )
 
         changed_files = [
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/flood-test/space.yaml",
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/flood-test/config.json",
+            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
+            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/config.json",
             "tests/fixtures/packages/terratorch/models/prithvi/model.yaml",
         ]
 
-        instances = manager.find_benchmark_instances(changed_files)
+        instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 1
         assert instances[0] == Path(
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/flood-test"
+            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test"
         )
 
     def test_find_package_level_instances(self) -> None:
@@ -119,15 +119,15 @@ class TestFindBenchmarkInstances:
         )
 
         changed_files = [
-            "tests/fixtures/packages/terratorch/benchmark_instances/base-test/space.yaml",
+            "tests/fixtures/packages/terratorch/benchmark_submissions/base-test/space.yaml",
             "tests/fixtures/packages/terratorch/nexus.yaml",
         ]
 
-        instances = manager.find_benchmark_instances(changed_files)
+        instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 1
         assert instances[0] == Path(
-            "tests/fixtures/packages/terratorch/benchmark_instances/base-test"
+            "tests/fixtures/packages/terratorch/benchmark_submissions/base-test"
         )
 
     def test_find_multiple_instances(self) -> None:
@@ -137,28 +137,28 @@ class TestFindBenchmarkInstances:
         )
 
         changed_files = [
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/flood-test/space.yaml",
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/fire-test/space.yaml",
-            "tests/fixtures/packages/tokamind/benchmark_instances/base-test/space.yaml",
+            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
+            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/fire-test/space.yaml",
+            "tests/fixtures/packages/tokamind/benchmark_submissions/base-test/space.yaml",
         ]
 
-        instances = manager.find_benchmark_instances(changed_files)
+        instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 3
         assert (
             Path(
-                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/flood-test"
+                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test"
             )
             in instances
         )
         assert (
             Path(
-                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_instances/fire-test"
+                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/fire-test"
             )
             in instances
         )
         assert (
-            Path("tests/fixtures/packages/tokamind/benchmark_instances/base-test")
+            Path("tests/fixtures/packages/tokamind/benchmark_submissions/base-test")
             in instances
         )
 
@@ -174,7 +174,7 @@ class TestFindBenchmarkInstances:
             "README.md",
         ]
 
-        instances = manager.find_benchmark_instances(changed_files)
+        instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 0
 
@@ -185,12 +185,12 @@ class TestFindBenchmarkInstances:
         )
 
         changed_files = [
-            "packages/terratorch/models/prithvi/benchmark_instances/flood-test/space.yaml",
-            "packages/terratorch/models/prithvi/benchmark_instances/flood-test/config.json",
-            "packages/terratorch/models/prithvi/benchmark_instances/flood-test/data.csv",
+            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
+            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/config.json",
+            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/data.csv",
         ]
 
-        instances = manager.find_benchmark_instances(changed_files)
+        instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 1
 
@@ -219,7 +219,7 @@ class TestCreateRandomWalkOperationConfig:
         """Test creating config with custom metadata."""
         custom_meta = {
             "algorithm-nexus.pr_url": "https://github.com/test/repo/pull/123",
-            "algorithm-nexus.instance_path": "packages/test/benchmark_instances/test",
+            "algorithm-nexus.submission_path": "packages/test/benchmark_submissions/test",
         }
 
         config: DiscoveryOperationResourceConfiguration = (
@@ -240,8 +240,8 @@ class TestCreateRandomWalkOperationConfig:
             == "https://github.com/test/repo/pull/123"
         )
         assert (
-            config.metadata.labels["algorithm-nexus.instance_path"]
-            == "packages/test/benchmark_instances/test"
+            config.metadata.labels["algorithm-nexus.submission_path"]
+            == "packages/test/benchmark_submissions/test"
         )
 
 
@@ -251,10 +251,10 @@ class TestBenchmarkExecutionResult:
     def test_create_with_defaults(self) -> None:
         """Test creating result with default values."""
         result = BenchmarkExecutionResult(
-            instance_path="packages/test/benchmark_instances/test"
+            submission_path="packages/test/benchmark_submissions/test"
         )
 
-        assert result.instance_path == "packages/test/benchmark_instances/test"
+        assert result.submission_path == "packages/test/benchmark_submissions/test"
         assert result.status == "unknown"
         assert result.message == ""
         assert result.space_id is None
@@ -264,7 +264,7 @@ class TestBenchmarkExecutionResult:
     def test_create_with_all_fields(self) -> None:
         """Test creating result with all fields."""
         result = BenchmarkExecutionResult(
-            instance_path="packages/test/benchmark_instances/test",
+            submission_path="packages/test/benchmark_submissions/test",
             status="success",
             message="Successfully executed",
             space_id="space-123",
@@ -283,7 +283,7 @@ class TestBenchmarkExecutionResult:
         # Valid statuses
         for status in ["success", "failed", "started", "unknown"]:
             result = BenchmarkExecutionResult(
-                instance_path="test",
+                submission_path="test",
                 status=status,  # type: ignore[arg-type]
             )
             assert result.status == status
@@ -291,7 +291,7 @@ class TestBenchmarkExecutionResult:
     def test_model_dump(self) -> None:
         """Test converting model to dictionary."""
         result = BenchmarkExecutionResult(
-            instance_path="packages/test/benchmark_instances/test",
+            submission_path="packages/test/benchmark_submissions/test",
             status="success",
             space_id="space-123",
         )
@@ -299,7 +299,7 @@ class TestBenchmarkExecutionResult:
         data = result.model_dump()
 
         assert isinstance(data, dict)
-        assert data["instance_path"] == "packages/test/benchmark_instances/test"
+        assert data["submission_path"] == "packages/test/benchmark_submissions/test"
         assert data["status"] == "success"
         assert data["space_id"] == "space-123"
         assert data["operation_id"] is None
