@@ -859,9 +859,9 @@ filelock==3.32.7 \
     #   litdata
     #   torch
     #   vllm
-flashinfer-python==0.6.18 \
-    --hash=sha256:70a2074d78cb17ed39c98e5ed47f626c6e8bb29015cf028c49cbf8f2629405a1 \
-    --hash=sha256:d5d26edb48f8def0bf28b2c94415aef7f0754e2cd9e3cb3d6e7081262d068aad
+flashinfer-python==0.7.0 \
+    --hash=sha256:11e564820cde80ec13d351b68fc44cb54a537268bca135204abafc5fadd50240 \
+    --hash=sha256:ff3684b5ab30228992687cc091dca97e5a8904865b5d54380456d52efd20db12
     # via vllm
 flatbuffers==25.12.19 \
     --hash=sha256:7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4
