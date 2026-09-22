@@ -78,6 +78,7 @@ benchmark problem. It defines:
 | `properties`          | list of Property | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
 | `instance`            | list of strings  | No       | Names of the properties (from `properties`) that together identify a benchmark instance. Entries must reference declared property identifiers.                                    |
 | `metrics`             | list of strings  | No       | Canonical metric names for this benchmark.                                                                                                                                        |
+| `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                                                                             |
 | `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
 
 **Property fields:**
@@ -88,32 +89,50 @@ benchmark problem. It defines:
 | `metadata`       | map                                | No       | Metadata about what this property represents. Can include e.g. description         |
 | `propertyDomain` | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
 
+**Ranking fields:**
+
+| Field    | Type                   | Required | Description                                                                 |
+| -------- | ---------------------- | -------- | --------------------------------------------------------------------------- |
+| `metric` | string                 | Yes      | Identifier of the metric used for ranking. Must be in the `metrics` list.   |
+| `order`  | "asc" or "desc"        | Yes      | Sort order: "asc" for lower-is-better, "desc" for higher-is-better.         |
+
 <!-- markdownlint-enable line-length -->
 
 ### 2.3 Example: Inference Serving
 
+The logical benchmark definition lives under the `logicalBenchmark` key inside
+`benchmarks/<benchmark-id>/problem.yaml`. Bindings are placed in the sibling
+`bindings` list in the same file (see [Section 3](#3-benchmark-binding)).
+
 ```yaml
-benchmarkIdentifier: inference_serving
-title: "Inference Serving Performance"
-description: >
-    Evaluation of AI model inference serving throughput and latency under
-    controlled traffic conditions.
-properties:
-    - identifier: dataset
-      metadata:
-          description: "Dataset used for inference requests."
-      # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
-    - identifier: workload
-      metadata:
-          description: "Traffic pattern or workload profile."
-      propertyDomain:
-          values: ["steady_state_heavy", "poisson_bursty", "light_load"]
-instance:
-    - dataset
-metrics:
-    - throughput_tokens_per_second
-    - time_to_first_token_ms
-owner: "@vllm-team"
+logicalBenchmark:
+    benchmarkIdentifier: inference_serving
+    title: "Inference Serving Performance"
+    description: >
+        Evaluation of AI model inference serving throughput and latency under
+        controlled traffic conditions.
+    properties:
+        - identifier: dataset
+          metadata:
+              description: "Dataset used for inference requests."
+          # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
+        - identifier: workload
+          metadata:
+              description: "Traffic pattern or workload profile."
+          propertyDomain:
+              values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+    instance:
+        - dataset
+    metrics:
+        - throughput_tokens_per_second
+        - time_to_first_token_ms
+    ranking:
+        metric: throughput_tokens_per_second
+        order: desc
+    owner: "@vllm-team"
+
+bindings:
+    - ...
 ```
 
 See
@@ -302,52 +321,55 @@ instanceMapping:
 
 ### 3.3 Example: `guide_llm_runner`
 
-```yaml
-benchmarkIdentifier: inference_serving
-targetMapping: model_name
-experiment:
-    actuatorIdentifier: vllm_performance
-    experimentIdentifier: guide_llm_runner
-    experimentVersion: 2.0.0 # The binding only uses the major version
+Bindings are placed in the `bindings` list inside `problem.yaml`, alongside the
+`logicalBenchmark` definition (see [Section 2.3](#23-example-inference-serving)):
 
-propertyMapping:
-    - benchmark:
-          identifier: dataset
+```yaml
+bindings:
+    - benchmarkIdentifier: inference_serving
+      targetMapping: model_name
       experiment:
-          identifier: input_data_path # guide-llm's internal param name
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: steady_state_heavy
-      predicate:
-          - identifier: traffic_shape
-            propertyDomain:
-                values: ["constant"]
-          - identifier: concurrency
-            propertyDomain:
-                domainRange: [100, 1000]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: steady_state_heavy
-      predicate:
-          - identifier: traffic_shape
-            propertyDomain:
-                values: ["poisson"]
-          - identifier: concurrency
-            propertyDomain:
-                domainRange: [1, 100]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-metricMapping:
-    - benchmark:
-          identifier: throughput_tokens_per_second
-      experiment:
-          identifier: throughput_rps # guide-llm's internal param name
-    - benchmark:
-          identifier: time_to_first_token_ms
-      experiment:
-          identifier: ttft_ms
+          actuatorIdentifier: vllm_performance
+          experimentIdentifier: guide_llm_runner
+          experimentVersion: 2.0.0 # The binding only uses the major version
+      propertyMapping:
+          - benchmark:
+                identifier: dataset
+            experiment:
+                identifier: input_data_path # guide-llm's internal param name
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: steady_state_heavy
+            predicate:
+                - identifier: traffic_shape
+                  propertyDomain:
+                      values: ["constant"]
+                - identifier: concurrency
+                  propertyDomain:
+                      domainRange: [100, 1000]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: poisson_bursty
+            predicate:
+                - identifier: traffic_shape
+                  propertyDomain:
+                      values: ["poisson"]
+                - identifier: concurrency
+                  propertyDomain:
+                      domainRange: [1, 100]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
+      metricMapping:
+          - benchmark:
+                identifier: throughput_tokens_per_second
+            experiment:
+                identifier: throughput_rps # guide-llm's internal param name
+          - benchmark:
+                identifier: time_to_first_token_ms
+            experiment:
+                identifier: ttft_ms
 ```
 
 ---
@@ -410,50 +432,51 @@ A second experiment, `vllm_bench_runner`, targets the same logical benchmark
 with entirely different internal property and metric names:
 
 ```yaml
-benchmarkIdentifier: inference_serving
-experiment:
-    actuatorIdentifier: vllm_performance
-    experimentIdentifier: vllm_bench_runner
-    experimentVersion: 1.0.0
-targetMapping: model_name
-propertyMapping:
-    - benchmark:
-          identifier: dataset
+bindings:
+    - benchmarkIdentifier: inference_serving
       experiment:
-          identifier: dataset_path # vllm bench serve internal param name
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: steady_state_heavy
-      predicate:
-          - identifier: distribution
-            propertyDomain:
-                values: ["fixed"]
-          - identifier: num_concurrent_requests
-            propertyDomain:
-                domainRange: [100, 99999]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: light_load
-      predicate:
-          - identifier: distribution
-            propertyDomain:
-                values: ["fixed"]
-          - identifier: num_concurrent_requests
-            propertyDomain:
-                domainRange: [1, 100]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-metricMapping:
-    - benchmark:
-          identifier: throughput_tokens_per_second
-      experiment:
-          identifier: req_per_sec
-    - benchmark:
-          identifier: time_to_first_token_ms
-      experiment:
-          identifier: time_to_first_token
+          actuatorIdentifier: vllm_performance
+          experimentIdentifier: vllm_bench_runner
+          experimentVersion: 1.0.0
+      targetMapping: model_name
+      propertyMapping:
+          - benchmark:
+                identifier: dataset
+            experiment:
+                identifier: dataset_path # vllm bench serve internal param name
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: steady_state_heavy
+            predicate:
+                - identifier: distribution
+                  propertyDomain:
+                      values: ["fixed"]
+                - identifier: num_concurrent_requests
+                  propertyDomain:
+                      domainRange: [100, 99999]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: light_load
+            predicate:
+                - identifier: distribution
+                  propertyDomain:
+                      values: ["fixed"]
+                - identifier: num_concurrent_requests
+                  propertyDomain:
+                      domainRange: [1, 100]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
+      metricMapping:
+          - benchmark:
+                identifier: throughput_tokens_per_second
+            experiment:
+                identifier: req_per_sec
+          - benchmark:
+                identifier: time_to_first_token_ms
+            experiment:
+                identifier: time_to_first_token
 ```
 
 A leaderboard query for
@@ -478,9 +501,21 @@ will:
 
 ### 5.1 Logical Benchmark Location & Ownership
 
-Logical benchmark definition files are stored at the top level of the Algorithm
-Nexus repository. Its suggested to create a top-level dir `benchmarks` which
-contains one YAML file per logical benchmark.
+Logical benchmark definition files are stored under the `benchmarks/` directory
+at the top level of the Algorithm Nexus repository. Each logical benchmark has
+its own subdirectory named after its `benchmarkIdentifier`, containing a
+`problem.yaml` file that holds both the `logicalBenchmark` definition and its
+`bindings`:
+
+```text
+benchmarks/
+└── <benchmark-id>/
+    ├── problem.yaml        # logicalBenchmark definition + bindings
+    └── instances/          # optional concrete problem instances
+        └── <instance-name>/
+            ├── instance.yaml
+            └── artifacts/
+```
 
 A logical benchmark owner is given by the value of the "owner" field. If this is
 ambiguous the author of the PR adding the benchmark will be treated as the
