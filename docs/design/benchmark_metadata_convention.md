@@ -91,10 +91,10 @@ benchmark problem. It defines:
 
 **Ranking fields:**
 
-| Field    | Type                   | Required | Description                                                                 |
-| -------- | ---------------------- | -------- | --------------------------------------------------------------------------- |
-| `metric` | string                 | Yes      | Identifier of the metric used for ranking. Must be in the `metrics` list.   |
-| `order`  | "asc" or "desc"        | Yes      | Sort order: "asc" for lower-is-better, "desc" for higher-is-better.         |
+| Field    | Type            | Required | Description                                                               |
+| -------- | --------------- | -------- | ------------------------------------------------------------------------- |
+| `metric` | string          | Yes      | Identifier of the metric used for ranking. Must be in the `metrics` list. |
+| `order`  | "asc" or "desc" | Yes      | Sort order: "asc" for lower-is-better, "desc" for higher-is-better.       |
 
 <!-- markdownlint-enable line-length -->
 
@@ -161,12 +161,12 @@ benchmarks/<benchmark-id>/instances/<instance-name>/
 
 Each `instance.yaml` has the following schema:
 
-| Field         | Type         | Required | Description                                                                            |
-| ------------- | ------------ | -------- | -------------------------------------------------------------------------------------- |
-| `identifier`  | string       | **Yes**  | Unique identifier for this benchmark instance.                                         |
-| `description` | string       | No       | Human-readable description of this specific instance.                                  |
-| `artifacts`   | list or dict | No       | Filename(s) or format mapping of instance files in the instance's `artifacts/` folder. |
-| `parameters`  | map          | No       | Parameter values matching the properties defined in `problem.yaml`.                    |
+| Field         | Type            | Required | Description                                                         |
+| ------------- | --------------- | -------- | ------------------------------------------------------------------- |
+| `identifier`  | string          | **Yes**  | Unique identifier for this benchmark instance.                      |
+| `description` | string          | No       | Human-readable description of this specific instance.               |
+| `artifacts`   | list od strings | No       | Filename(s) instance files in the instance's `artifacts/` folder.   |
+| `parameters`  | map             | No       | Parameter values matching the properties defined in `problem.yaml`. |
 
 #### Example Instance (`benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`)
 
@@ -174,8 +174,8 @@ Each `instance.yaml` has the following schema:
 identifier: erdos_renyi_50_02
 description: 50-node Erdos-Renyi graph with edge density 0.2
 artifacts:
-    dimacs: graph.dimacs
-    json: graph.json
+    - graph.dimacs
+    - graph.json
 parameters:
     graph_family: erdos_renyi
     num_vertices: 50
@@ -208,7 +208,6 @@ A benchmark binding serves two purposes:
 | Field                 | Type                | Required | Description                                                                                                                                                                                       |
 | --------------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `experiment`          | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                             |
-| `benchmarkIdentifier` | string              | **Yes**  | The `id` of the logical benchmark this experiment targets.                                                                                                                                        |
 | `targetMapping`       | string              | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
 | `staticFilters`       | list                | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
 | `propertyMapping`     | list                | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
@@ -322,12 +321,12 @@ instanceMapping:
 ### 3.3 Example: `guide_llm_runner`
 
 Bindings are placed in the `bindings` list inside `problem.yaml`, alongside the
-`logicalBenchmark` definition (see [Section 2.3](#23-example-inference-serving)):
+`logicalBenchmark` definition (see
+[Section 2.3](#23-example-inference-serving)):
 
 ```yaml
 bindings:
-    - benchmarkIdentifier: inference_serving
-      targetMapping: model_name
+    - targetMapping: model_name
       experiment:
           actuatorIdentifier: vllm_performance
           experimentIdentifier: guide_llm_runner
@@ -433,8 +432,7 @@ with entirely different internal property and metric names:
 
 ```yaml
 bindings:
-    - benchmarkIdentifier: inference_serving
-      experiment:
+    - experiment:
           actuatorIdentifier: vllm_performance
           experimentIdentifier: vllm_bench_runner
           experimentVersion: 1.0.0

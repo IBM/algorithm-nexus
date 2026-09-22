@@ -246,6 +246,7 @@ A minimal example:
 ```yaml
 logicalBenchmark:
     benchmarkIdentifier: inference_serving
+    title: Inference Serving
     description: >
         Evaluation of AI model inference serving throughput and latency under
         controlled traffic conditions.
@@ -286,8 +287,8 @@ Example instance YAML
 identifier: graph_01
 description: 50-node random graph
 artifacts:
-    dimacs: graph_01.dimacs
-    json: graph_01.json
+    - graph_01.dimacs
+    - graph_01.json
 parameters:
     num_vertices: 50
     edge_density: 0.2
@@ -322,7 +323,6 @@ A binding contains the following mapping sections:
 An example binding is
 
 ```yaml
-benchmarkIdentifier: inference_serving
 experiment:
     actuatorIdentifier: vllm_performance
     experimentIdentifier: guide_llm_runner
