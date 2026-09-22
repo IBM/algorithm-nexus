@@ -374,75 +374,11 @@ class BenchmarkRanking(BaseModel):
     ]
 
 
-class LogicalBenchmarkDefinition(BaseModel):
-    """Logical benchmark definition — the abstract problem description."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    benchmarkIdentifier: Annotated[
-        str,
-        Field(
-            min_length=1, description="Canonical identifier for this logical benchmark."
-        ),
-    ]
-    title: Annotated[
-        str | None,
-        Field(
-            min_length=1,
-            description="Short human-readable display name for this benchmark.",
-        ),
-    ] = None
-    description: Annotated[
-        str,
-        Field(
-            min_length=1,
-            description="Human-readable description of the abstract problem being evaluated.",
-        ),
-    ]
-    properties: Annotated[
-        list[Property],
-        Field(
-            min_length=1,
-            description="The properties on which this benchmark is evaluated.",
-        ),
-    ]
-    instance: Annotated[
-        list[str] | None,
-        Field(
-            description=(
-                "Names of the properties that define a benchmark instance. "
-                "Each entry must reference a property declared in `properties`."
-            )
-        ),
-    ] = None
-    metrics: Annotated[
-        list[str] | None,
-        Field(description="Canonical metric names for this benchmark."),
-    ] = None
-    owner: Annotated[
-        str | None,
-        Field(
-            description="Team or individual responsible for maintaining this definition."
-        ),
-    ] = None
-    ranking: Annotated[
-        BenchmarkRanking | None,
-        Field(description="Optional ranking configuration for this benchmark."),
-    ] = None
-
-
 class BenchmarkBinding(BaseModel):
     """Binding that maps an experiment's properties and metrics to a logical benchmark."""
 
     model_config = ConfigDict(extra="forbid")
 
-    benchmarkIdentifier: Annotated[
-        str,
-        Field(
-            min_length=1,
-            description="The id of the logical benchmark this experiment targets.",
-        ),
-    ]
     experiment: Annotated[
         ExperimentReference,
         Field(description="The ado ExperimentReference object."),
@@ -505,8 +441,65 @@ class BenchmarkInstance(BaseModel):
     ] = None
 
 
+class LogicalBenchmarkDefinition(BaseModel):
+    """Logical benchmark definition — the abstract problem description."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    benchmarkIdentifier: Annotated[
+        str,
+        Field(
+            min_length=1, description="Canonical identifier for this logical benchmark."
+        ),
+    ]
+    title: Annotated[
+        str | None,
+        Field(
+            min_length=1,
+            description="Short human-readable display name for this benchmark.",
+        ),
+    ] = None
+    description: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Human-readable description of the abstract problem being evaluated.",
+        ),
+    ]
+    properties: Annotated[
+        list[Property],
+        Field(
+            min_length=1,
+            description="The properties on which this benchmark is evaluated.",
+        ),
+    ]
+    instance: Annotated[
+        list[str] | None,
+        Field(
+            description=(
+                "Names of the properties that define a benchmark instance. "
+                "Each entry must reference a property declared in `properties`."
+            )
+        ),
+    ] = None
+    metrics: Annotated[
+        list[str] | None,
+        Field(description="Canonical metric names for this benchmark."),
+    ] = None
+    owner: Annotated[
+        str | None,
+        Field(
+            description="Team or individual responsible for maintaining this definition."
+        ),
+    ] = None
+    ranking: Annotated[
+        BenchmarkRanking | None,
+        Field(description="Optional ranking configuration for this benchmark."),
+    ] = None
+
+
 class LogicalBenchmarkConfig(BaseModel):
-    """Root model for a logical benchmark YAML file (problem.yaml: logicalBenchmark + optional bindings)."""
+    """Root model for a logical benchmark YAML file (problem.yaml)."""
 
     model_config = ConfigDict(extra="forbid")
 

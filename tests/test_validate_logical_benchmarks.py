@@ -90,19 +90,6 @@ class TestReferentialIntegrity:
         assert collector.has_errors
         assert "nonexistent_metric" in " ".join(collector.errors)
 
-    def test_binding_identifier_mismatch_fails(self) -> None:
-        """A binding whose benchmarkIdentifier differs from the definition is an integrity error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "invalid_binding_id_mismatch.yaml", collector
-        )
-
-        assert result is not None
-        assert collector.has_errors
-        error_text = " ".join(collector.errors)
-        assert "wrong_benchmark_id" in error_text
-        assert "inference_serving" in error_text
-
     def test_metric_mapping_allowed_when_no_metrics_defined(self) -> None:
         """metricMapping with no metrics defined in the definition does not raise an error."""
         collector = ValidationErrorCollector()
@@ -211,8 +198,7 @@ logicalBenchmark:
     - identifier: size
 
 bindings:
-  - benchmarkIdentifier: test_bench
-    experiment:
+  - experiment:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0
@@ -270,8 +256,7 @@ logicalBenchmark:
     - identifier: num_vertices
 
 bindings:
-  - benchmarkIdentifier: test_bench
-    experiment:
+  - experiment:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0

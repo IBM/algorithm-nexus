@@ -494,7 +494,6 @@ def validate_benchmarks(
 
 def _check_binding_integrity(
     binding: BenchmarkBinding,
-    definition_id: str,
     property_ids: set[str],
     metric_ids: set[str] | None,
     instance_ids: set[str] | None,
@@ -505,14 +504,7 @@ def _check_binding_integrity(
     """Check referential integrity between a binding and its parent definition."""
     prefix = f"[bold]{file_path}[/bold]\n  Binding[{binding_index}]"
 
-    # 1. benchmarkIdentifier must match the definition
-    if binding.benchmarkIdentifier != definition_id:
-        collector.add(
-            f"{prefix}: benchmarkIdentifier '{binding.benchmarkIdentifier}' "
-            f"does not match definition '{definition_id}'"
-        )
-
-    # 2. Property identifiers in propertyMapping must exist in the definition
+    # 1. Property identifiers in propertyMapping must exist in the definition
     if binding.propertyMapping:
         for entry in binding.propertyMapping:
             if isinstance(entry, FieldMapping):
@@ -643,7 +635,6 @@ def validate_logical_benchmark_file(
 
     # Referential integrity checks
     defn = parsed.logicalBenchmark
-    definition_id = defn.benchmarkIdentifier
     property_ids = {p.identifier for p in defn.properties}
     metric_ids = set(defn.metrics) if defn.metrics is not None else None
 
@@ -670,7 +661,6 @@ def validate_logical_benchmark_file(
         for i, binding in enumerate(parsed.bindings):
             _check_binding_integrity(
                 binding,
-                definition_id,
                 property_ids,
                 metric_ids,
                 instance_ids,

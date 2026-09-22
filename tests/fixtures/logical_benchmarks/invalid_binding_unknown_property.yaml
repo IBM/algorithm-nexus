@@ -9,8 +9,7 @@ logicalBenchmark:
     - identifier: dataset
 
 bindings:
-  - benchmarkIdentifier: inference_serving
-    experiment:
+  - experiment:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 1.0.0
