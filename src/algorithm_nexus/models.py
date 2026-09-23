@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, computed_field
 
@@ -254,6 +254,18 @@ class ValidationReport(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class BenchmarkInstanceProperty(Property):
+    """A benchmark instance property definition, with optional artifact indicator."""
+
+    is_artifact: Annotated[
+        bool,
+        Field(
+            default=False,
+            description="Whether this instance property is provided via artifact files rather than scalar values.",
+        ),
+    ] = False
+
+
 class FieldMapping(BaseModel):
     """1-to-1 mapping of a benchmark property to an experiment property."""
 
@@ -311,36 +323,10 @@ class MetricMapping(BaseModel):
     ]
 
 
-class ArtifactMapping(BaseModel):
-    """Maps a benchmark instance artifact property/format or specific artifact file to an experiment input property."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    benchmark: Annotated[
-        str | None,
-        Field(description="Benchmark artifact format/key name in artifacts/."),
-    ] = None
-
-    experiment: Annotated[
-        str,
-        Field(
-            min_length=1,
-            description="Experiment property name that receives the artifact file path.",
-        ),
-    ]
-
-
 class InstanceMapping(BaseModel):
-    """Maps benchmark instances to an experiment: maps artifact properties and instance parameters/properties without remapping the instance identifier."""
+    """Maps benchmark instances to an experiment: maps instance parameters/properties and sets static filters."""
 
     model_config = ConfigDict(extra="forbid")
-
-    artifactMapping: Annotated[
-        list[ArtifactMapping] | None,
-        Field(
-            description="Remaps benchmark instance artifact files/formats to experiment artifact input properties.",
-        ),
-    ] = None
 
     propertyMapping: Annotated[
         list[FieldMapping | CategoricalValueMapping] | None,
@@ -383,25 +369,6 @@ class BenchmarkBinding(BaseModel):
         ExperimentReference,
         Field(description="The ado ExperimentReference object."),
     ]
-    targetMapping: Annotated[
-        str | None,
-        Field(
-            min_length=1,
-            description="The experiment property name that carries the benchmark target.",
-        ),
-    ] = None
-    staticFilters: Annotated[
-        list[PropertyValue] | None,
-        Field(
-            description="Static experiment property filters implicit in this logical benchmark."
-        ),
-    ] = None
-    propertyMapping: Annotated[
-        list[FieldMapping | CategoricalValueMapping] | None,
-        Field(
-            description="Maps experiment internal properties to canonical benchmark properties."
-        ),
-    ] = None
     metricMapping: Annotated[
         list[MetricMapping] | None,
         Field(
@@ -411,7 +378,7 @@ class BenchmarkBinding(BaseModel):
     instanceMapping: Annotated[
         InstanceMapping | None,
         Field(
-            description="Maps benchmark instance artifacts and instance parameters/properties to experiment inputs."
+            description="Maps benchmark instance properties/parameters and static filters to experiment inputs."
         ),
     ] = None
 
@@ -419,7 +386,7 @@ class BenchmarkBinding(BaseModel):
 class BenchmarkInstance(BaseModel):
     """Benchmark instance configuration."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
     identifier: Annotated[
         str,
@@ -428,16 +395,6 @@ class BenchmarkInstance(BaseModel):
     description: Annotated[
         str | None,
         Field(description="Description of this specific instance."),
-    ] = None
-    artifacts: Annotated[
-        list[str] | dict[str, str] | None,
-        Field(
-            description="Artifact filenames (or format-to-filename mapping) located in the instance's artifacts/ folder."
-        ),
-    ] = None
-    parameters: Annotated[
-        dict[str, Any] | None,
-        Field(description="Parameters and property values defining this instance."),
     ] = None
 
 
@@ -466,22 +423,13 @@ class LogicalBenchmarkDefinition(BaseModel):
             description="Human-readable description of the abstract problem being evaluated.",
         ),
     ]
-    properties: Annotated[
-        list[Property],
+    instance: Annotated[
+        list[BenchmarkInstanceProperty],
         Field(
             min_length=1,
-            description="The properties on which this benchmark is evaluated.",
+            description="Properties defining a benchmark instance for this benchmark.",
         ),
     ]
-    instance: Annotated[
-        list[str] | None,
-        Field(
-            description=(
-                "Names of the properties that define a benchmark instance. "
-                "Each entry must reference a property declared in `properties`."
-            )
-        ),
-    ] = None
     metrics: Annotated[
         list[str] | None,
         Field(description="Canonical metric names for this benchmark."),

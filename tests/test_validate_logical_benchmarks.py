@@ -42,6 +42,18 @@ class TestValidFiles:
 
 
 class TestSchemaValidation:
+    def test_empty_instance_fails(self) -> None:
+        """A file with empty instance list returns None with errors."""
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_file(
+            FIXTURES / "invalid_instance_unknown_property.yaml", collector
+        )
+
+        assert result is None
+        assert collector.has_errors
+        error_text = " ".join(collector.errors)
+        assert "instance" in error_text
+
     def test_missing_required_field_fails(self) -> None:
         """A file missing required fields (description) returns None with errors."""
         collector = ValidationErrorCollector()
@@ -111,9 +123,17 @@ class TestBenchmarkDirectoryAndInstances:
         inst1_artifacts = inst1_dir / "artifacts"
         inst1_artifacts.mkdir(parents=True)
 
-        # Create problem.yaml
-        problem_yaml = FIXTURES / "valid_full.yaml"
-        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+        # Create problem.yaml with artifact and scalar properties
+        problem_content = """
+logicalBenchmark:
+  benchmarkIdentifier: inference_serving
+  description: Test description
+  instance:
+    - identifier: dataset
+      is_artifact: true
+    - identifier: workload
+"""
+        (bench_dir / "problem.yaml").write_text(problem_content)
 
         # Create an artifact file
         (inst1_artifacts / "data.json").write_text("{}")
@@ -123,12 +143,10 @@ class TestBenchmarkDirectoryAndInstances:
         instance_content = """
 identifier: test_inst_1
 description: A test instance
-artifacts:
+dataset:
   json_format: data.json
   csv_format: data.csv
-parameters:
-  dataset: "cifar10"
-  workload: "steady_state_heavy"
+workload: "steady_state_heavy"
 """
         (inst1_dir / "instance.yaml").write_text(instance_content)
 
@@ -139,7 +157,7 @@ parameters:
         assert not collector.has_errors
 
     def test_instance_with_unknown_parameter_fails(self, tmp_path: Path) -> None:
-        """An instance specifying a parameter not in problem properties fails."""
+        """An instance specifying a property not in problem instance properties fails."""
         bench_dir = tmp_path / "test_benchmark"
         inst1_dir = bench_dir / "instances" / "inst_1"
         inst1_dir.mkdir(parents=True)
@@ -149,8 +167,7 @@ parameters:
 
         instance_content = """
 identifier: test_inst_1
-parameters:
-  nonexistent_param: "value"
+nonexistent_param: "value"
 """
         (inst1_dir / "instance.yaml").write_text(instance_content)
 
@@ -167,12 +184,19 @@ parameters:
         inst1_artifacts = inst1_dir / "artifacts"
         inst1_artifacts.mkdir(parents=True)
 
-        problem_yaml = FIXTURES / "valid_full.yaml"
-        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+        problem_content = """
+logicalBenchmark:
+  benchmarkIdentifier: test_bench
+  description: Test description
+  instance:
+    - identifier: graph
+      is_artifact: true
+"""
+        (bench_dir / "problem.yaml").write_text(problem_content)
 
         instance_content = """
 identifier: test_inst_1
-artifacts:
+graph:
   - missing_graph.txt
 """
         (inst1_dir / "instance.yaml").write_text(instance_content)
@@ -194,7 +218,7 @@ artifacts:
 logicalBenchmark:
   benchmarkIdentifier: test_bench
   description: Test description
-  properties:
+  instance:
     - identifier: size
 
 bindings:
@@ -202,11 +226,7 @@ bindings:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0
-    targetMapping: solver
     instanceMapping:
-      artifactMapping:
-        - benchmark: dimacs
-          experiment: input_graph_path
       propertyMapping:
         - benchmark:
             identifier: size
@@ -223,8 +243,7 @@ bindings:
         inst_dir.mkdir(parents=True)
         instance_content = """
 identifier: graph_01
-parameters:
-  size: 10
+size: 10
 """
         (inst_dir / "instance.yaml").write_text(instance_content)
 
@@ -235,7 +254,6 @@ parameters:
         assert not collector.has_errors
         assert config.bindings is not None
         assert config.bindings[0].instanceMapping is not None
-        assert config.bindings[0].instanceMapping.artifactMapping is not None
         assert config.bindings[0].instanceMapping.propertyMapping is not None
         assert config.bindings[0].instanceMapping.staticFilters is not None
 
@@ -252,7 +270,7 @@ parameters:
 logicalBenchmark:
   benchmarkIdentifier: test_bench
   description: Test description
-  properties:
+  instance:
     - identifier: num_vertices
 
 bindings:
@@ -260,7 +278,6 @@ bindings:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0
-    targetMapping: solver
     instanceMapping:
       propertyMapping:
         - benchmark:

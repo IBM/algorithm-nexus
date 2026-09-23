@@ -245,27 +245,42 @@ A minimal example:
 
 ```yaml
 logicalBenchmark:
-    benchmarkIdentifier: inference_serving
-    title: Inference Serving
+    benchmarkIdentifier: graph_coloring
+    title: Graph Coloring
     description: >
-        Evaluation of AI model inference serving throughput and latency under
-        controlled traffic conditions.
-    properties:
-        - identifier: dataset
-          metadata:
-              description: "Dataset used for inference requests."
-              # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
-        - identifier: workload
-          metadata:
-              description: "Traffic pattern or workload profile."
-          propertyDomain:
-              values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+        Evaluates graph-coloring algorithms on their ability to produce valid
+        k-colorings with a small chromatic number. Instances span random
+        Erdős–Rényi graphs and structured benchmark graphs at varying densities.
     instance:
-        - dataset # properties that together identify a benchmark instance
+        - identifier: graph_family
+          metadata:
+              description: Graph family (erdos_renyi, planar, random_regular).
+          propertyDomain:
+              variableType: CATEGORICAL_VARIABLE_TYPE
+              values: [erdos_renyi, planar, random_regular]
+        - identifier: num_vertices
+          metadata:
+              description: Number of vertices in the graph.
+          propertyDomain:
+              variableType: DISCRETE_VARIABLE_TYPE
+              values: [50, 100, 250, 500]
+        - identifier: edge_density
+          metadata:
+              description: Edge probability / density parameter.
+          propertyDomain:
+              variableType: CONTINUOUS_VARIABLE_TYPE
+        - identifier: graph
+          is_artifact: true
+          metadata:
+              description: Graph input files in various formats.
     metrics:
-        - throughput_tokens_per_second
-        - time_to_first_token_ms
-    owner: "@vllm-team"
+        - num_colors_used
+        - is_valid_coloring
+        - elapsed_ms
+    ranking:
+        metric: num_colors_used
+        order: asc
+    owner: "@graph-team"
 bindings: [] # List of bindings to this benchmark
 ```
 
@@ -286,12 +301,12 @@ Example instance YAML
 ```yaml
 identifier: graph_01
 description: 50-node random graph
-artifacts:
+graph_family: random_regular
+num_vertices: 50
+edge_density: 0.2
+graph:
     - graph_01.dimacs
     - graph_01.json
-parameters:
-    num_vertices: 50
-    edge_density: 0.2
 ```
 
 ### Add a benchmark binding for your experiment

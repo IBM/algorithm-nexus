@@ -4,5 +4,5 @@
 
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
-  properties:
+  instance:
     - identifier: dataset

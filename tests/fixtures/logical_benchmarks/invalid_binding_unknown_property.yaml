@@ -5,7 +5,7 @@
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
   description: "Test benchmark"
-  properties:
+  instance:
     - identifier: dataset
 
 bindings:
@@ -13,9 +13,9 @@ bindings:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 1.0.0
-    targetMapping: model_name
-    propertyMapping:
-      - benchmark:
-          identifier: nonexistent_property
-        experiment:
-          identifier: input_data_path
+    instanceMapping:
+      propertyMapping:
+        - benchmark:
+            identifier: nonexistent_property
+          experiment:
+            identifier: input_data_path

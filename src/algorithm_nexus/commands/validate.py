@@ -504,23 +504,7 @@ def _check_binding_integrity(
     """Check referential integrity between a binding and its parent definition."""
     prefix = f"[bold]{file_path}[/bold]\n  Binding[{binding_index}]"
 
-    # 1. Property identifiers in propertyMapping must exist in the definition
-    if binding.propertyMapping:
-        for entry in binding.propertyMapping:
-            if isinstance(entry, FieldMapping):
-                pid = entry.benchmark.identifier
-                if pid not in property_ids:
-                    collector.add(
-                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
-                    )
-            elif isinstance(entry, CategoricalValueMapping):
-                pid = entry.categoricalValue.property.identifier
-                if pid not in property_ids:
-                    collector.add(
-                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
-                    )
-
-    # 3. Metric identifiers in metricMapping must exist in the definition
+    # 1. Metric identifiers in metricMapping must exist in the definition
     if binding.metricMapping and metric_ids is not None:
         for entry in binding.metricMapping:
             mid = entry.benchmark.identifier
@@ -529,28 +513,26 @@ def _check_binding_integrity(
                     f"{prefix}: metricMapping references unknown benchmark metric '{mid}'"
                 )
 
-    # 4. Instance mappings (artifact remapping and instance property remapping)
-    if binding.instanceMapping:
-        im = binding.instanceMapping
-        if im.propertyMapping:
-            for pm_entry in im.propertyMapping:
-                if isinstance(pm_entry, FieldMapping):
-                    pid = pm_entry.benchmark.identifier
-                    if pid not in property_ids:
-                        collector.add(
-                            f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
-                        )
-                elif isinstance(pm_entry, CategoricalValueMapping):
-                    pid = pm_entry.categoricalValue.property.identifier
-                    if pid not in property_ids:
-                        collector.add(
-                            f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
-                        )
+    # 2. Property identifiers in instanceMapping.propertyMapping must exist in the definition
+    if binding.instanceMapping and binding.instanceMapping.propertyMapping:
+        for pm_entry in binding.instanceMapping.propertyMapping:
+            if isinstance(pm_entry, FieldMapping):
+                pid = pm_entry.benchmark.identifier
+                if pid not in property_ids:
+                    collector.add(
+                        f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
+                    )
+            elif isinstance(pm_entry, CategoricalValueMapping):
+                pid = pm_entry.categoricalValue.property.identifier
+                if pid not in property_ids:
+                    collector.add(
+                        f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
+                    )
 
 
 def validate_instance(
     instance_target: Path,
-    property_ids: set[str],
+    instance_props: dict[str, bool],
     collector: ValidationErrorCollector,
 ) -> BenchmarkInstance | None:
     """Validate a benchmark instance (either an instance directory containing instance.yaml or a standalone instance YAML)."""
@@ -586,28 +568,36 @@ def validate_instance(
             collector.add(format_pydantic_error(error, instance_file))
         return None
 
-    # Validate parameters against benchmark properties
-    if instance.parameters:
-        for param_name in instance.parameters:
-            if param_name not in property_ids:
-                collector.add(
-                    f"{instance_file}: parameter '{param_name}' is not declared as a property in the logical benchmark"
-                )
+    # Validate top-level instance properties against benchmark instance definitions
+    standard_fields = {"identifier", "description"}
+    extra_fields = instance.model_extra if instance.model_extra is not None else {}
 
-    # Validate artifact file existence if specified
-    if instance.artifacts:
-        artifact_files: list[str] = []
-        if isinstance(instance.artifacts, list):
-            artifact_files = instance.artifacts
-        elif isinstance(instance.artifacts, dict):
-            artifact_files = list(instance.artifacts.values())
+    for field_name, field_val in extra_fields.items():
+        if field_name in standard_fields:
+            continue
+        if field_name not in instance_props:
+            collector.add(
+                f"{instance_file}: property '{field_name}' is not declared as an instance property in the logical benchmark"
+            )
+            continue
 
-        for art in artifact_files:
-            art_path = artifacts_dir / art
-            if not art_path.is_file():
-                collector.add(
-                    f"{instance_file}: artifact file '{art}' does not exist in {artifacts_dir}"
-                )
+        is_artifact_prop = instance_props[field_name]
+        if is_artifact_prop and field_val is not None:
+            # Check artifact files exist
+            artifact_files: list[str] = []
+            if isinstance(field_val, list):
+                artifact_files = [str(x) for x in field_val]
+            elif isinstance(field_val, dict):
+                artifact_files = [str(x) for x in field_val.values()]
+            elif isinstance(field_val, str):
+                artifact_files = [field_val]
+
+            for art in artifact_files:
+                art_path = artifacts_dir / art
+                if not art_path.is_file():
+                    collector.add(
+                        f"{instance_file}: artifact file '{art}' for property '{field_name}' does not exist in {artifacts_dir}"
+                    )
 
     return instance
 
@@ -635,7 +625,7 @@ def validate_logical_benchmark_file(
 
     # Referential integrity checks
     defn = parsed.logicalBenchmark
-    property_ids = {p.identifier for p in defn.properties}
+    property_ids = {p.identifier for p in defn.instance}
     metric_ids = set(defn.metrics) if defn.metrics is not None else None
 
     # Ranking integrity: ranking.metric must exist in the defined metrics
@@ -648,14 +638,6 @@ def validate_logical_benchmark_file(
             f"[bold]{file}[/bold]\n  ranking.metric '{defn.ranking.metric}' "
             f"is not defined in metrics"
         )
-
-    # Instance integrity: every entry in instance must reference a declared property
-    if defn.instance is not None:
-        for prop_name in defn.instance:
-            if prop_name not in property_ids:
-                collector.add(
-                    f"[bold]{file}[/bold]\n  instance references unknown property '{prop_name}'"
-                )
 
     if parsed.bindings:
         for i, binding in enumerate(parsed.bindings):
@@ -699,7 +681,9 @@ def validate_logical_benchmark_directory(
             collector.add(format_pydantic_error(error, problem_file))
         return None
 
-    property_ids = {p.identifier for p in config.logicalBenchmark.properties}
+    instance_props = {
+        p.identifier: p.is_artifact for p in config.logicalBenchmark.instance
+    }
 
     # Validate instances folder if present and collect instance identifiers
     instances_dir = benchmark_dir / "instances"
@@ -716,7 +700,7 @@ def validate_logical_benchmark_directory(
                 if item.is_dir() or (
                     item.is_file() and item.suffix in (".yaml", ".yml")
                 ):
-                    inst = validate_instance(item, property_ids, collector)
+                    inst = validate_instance(item, instance_props, collector)
                     if inst is not None:
                         discovered_instance_ids.add(inst.identifier)
 

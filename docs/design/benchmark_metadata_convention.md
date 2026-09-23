@@ -60,8 +60,7 @@ A **logical benchmark** is an abstract, domain-specific definition of a
 benchmark problem. It defines:
 
 - a unique identifier
-- the **properties** on which the benchmark is evaluated (e.g. `dataset`,
-  `benchmark_instance`) and the valid values each property may take
+- the **instance** properties defining the benchmark problem instances and the valid values each property may take
 - the canonical **metric names** that results should be reported under
 
 ### 2.2 Schema
@@ -75,17 +74,17 @@ benchmark problem. It defines:
 | `benchmarkIdentifier` | string           | Yes      | The canonical identifier.                                                                                                                                                         |
 | `title`               | string           | No       | Short human-readable display name for this benchmark.                                                                                                                             |
 | `description`         | string           | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                               |
-| `properties`          | list of Property | Yes      | The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values. |
-| `instance`            | list of strings  | No       | Names of the properties (from `properties`) that together identify a benchmark instance. Entries must reference declared property identifiers.                                    |
+| `instance`            | list of Property | Yes      | The properties defining a benchmark instance. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions.                        |
 | `metrics`             | list of strings  | No       | Canonical metric names for this benchmark.                                                                                                                                        |
 | `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                                                                             |
 | `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                                                                   |
 
-**Property fields:**
+**Instance Property fields:**
 
 | Field            | Type                               | Required | Description                                                                        |
 | ---------------- | ---------------------------------- | -------- | ---------------------------------------------------------------------------------- |
 | `identifier`     | string                             | Yes      | Canonical property identifier.                                                     |
+| `is_artifact`    | boolean                            | No       | Uses artifact files rather than a scalar value. Default: `false`.                  |
 | `metadata`       | map                                | No       | Metadata about what this property represents. Can include e.g. description         |
 | `propertyDomain` | orchestrator.schema.PropertyDomain | No       | Valid values for this property. If omitted, an open categorical domain is assumed. |
 
@@ -111,7 +110,7 @@ logicalBenchmark:
     description: >
         Evaluation of AI model inference serving throughput and latency under
         controlled traffic conditions.
-    properties:
+    instance:
         - identifier: dataset
           metadata:
               description: "Dataset used for inference requests."
@@ -121,8 +120,6 @@ logicalBenchmark:
               description: "Traffic pattern or workload profile."
           propertyDomain:
               values: ["steady_state_heavy", "poisson_bursty", "light_load"]
-    instance:
-        - dataset
     metrics:
         - throughput_tokens_per_second
         - time_to_first_token_ms
@@ -159,27 +156,34 @@ benchmarks/<benchmark-id>/instances/<instance-name>/
 
 #### Instance Schema
 
-Each `instance.yaml` has the following schema:
+Each `instance.yaml` defines a concrete problem instance. Instance properties match the property
+identifiers defined under `instance:` in `problem.yaml`:
 
-| Field         | Type            | Required | Description                                                         |
-| ------------- | --------------- | -------- | ------------------------------------------------------------------- |
-| `identifier`  | string          | **Yes**  | Unique identifier for this benchmark instance.                      |
-| `description` | string          | No       | Human-readable description of this specific instance.               |
-| `artifacts`   | list od strings | No       | Filename(s) instance files in the instance's `artifacts/` folder.   |
-| `parameters`  | map             | No       | Parameter values matching the properties defined in `problem.yaml`. |
+- **Scalar properties** (`is_artifact: false`, the default) are specified directly as scalar/primitive values.
+- **Artifact properties** (`is_artifact: true`) are specified as a list of filenames or a map of format
+  names to filenames located in the instance's `artifacts/` folder.
+
+| Field          | Type                           | Required | Description                                                         |
+| -------------- | ------------------------------ | -------- | ------------------------------------------------------------------- |
+| `identifier`   | string                         | **Yes**  | Unique identifier for this benchmark instance.                      |
+| `description`  | string                         | No       | Human-readable description of this specific instance.               |
+| `<property_id>`| scalar / list / map of strings | No       | Values matching property identifiers defined in `problem.yaml`.     |
 
 #### Example Instance (`benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`)
 
 ```yaml
 identifier: erdos_renyi_50_02
 description: 50-node Erdos-Renyi graph with edge density 0.2
-artifacts:
+
+# Scalar instance properties
+graph_family: erdos_renyi
+num_vertices: 50
+edge_density: 0.2
+
+# Artifact instance property (files in artifacts/ directory)
+graph:
     - graph.dimacs
     - graph.json
-parameters:
-    graph_family: erdos_renyi
-    num_vertices: 50
-    edge_density: 0.2
 ```
 
 ## 3. Benchmark Binding
@@ -205,55 +209,74 @@ A benchmark binding serves two purposes:
 
 <!-- markdownlint-disable line-length -->
 
-| Field                 | Type                | Required | Description                                                                                                                                                                                       |
-| --------------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `experiment`          | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                             |
-| `targetMapping`       | string              | **Yes**  | The name of the experiment property that carries the benchmark target (model or algorithm identifier).                                                                                            |
-| `staticFilters`       | list                | No       | Sets values of experiment internal properties to those implicitly required by the logical benchmark                                                                                               |
-| `propertyMapping`     | list                | No       | Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.                                                                                           |
-| `metricMapping`       | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
-| `instanceMapping`     | list                | No       | Maps canonical benchmark instances to experiment instance identifiers or property predicates.                                                                                                     |
+| Field             | Type                | Required | Description                                                                                                                                                                                       |
+| ----------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `experiment`      | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                             |
+| `metricMapping`   | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
+| `instanceMapping` | object              | No       | Maps benchmark instance properties/parameters to experiment inputs and sets static experiment filters.                                                                                            |
 
 <!-- markdownlint-enable line-length -->
 
-#### Property Mapping
+#### Metric mapping
 
-Each entry in `propertyMapping` specifies how one or more experiment properties
-map to canonical benchmark properties. Benchmark properties not listed are
-assumed to have a 1:1 mapping with a experiment property of same name.
+```yaml
+metricMapping:
+    - benchmark:
+          identifier: <canonical-benchmark-metric-name>
+      experiment:
+          identifier: <experiment-metric-name>
+```
 
-Two types of mapping are possible:
+Metrics not listed are passed through under their original names. For two
+experiments to produce a merged metric column, both must map their respective
+metric names to the same canonical name defined by the logical benchmark.
 
-- _field mapping_: A 1-to-1 mapping for logical benchmark properties
+#### Instance mapping
+
+The `instanceMapping` section maps benchmark instance properties/parameters to
+experiment inputs. The artifact mapping is implicit — the experiment property
+being bound against determines which artifact is used. It supports:
+
+- **`propertyMapping`**: Remapping benchmark instance properties/parameters to
+  experiment properties.
+- **`staticFilters`**: Setting static experiment properties or parameters for
+  the instance.
+
+Two types of entry are possible in `propertyMapping`:
+
+- _field mapping_: A 1-to-1 mapping for a benchmark instance property.
     - Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"
 - _categorical value mapping_: 1-to-many mapping for the values of a categorical
-  logical benchmark properties
+  benchmark instance property.
     - Allows translating "WHERE logical_dim = CategoryA" to e.g. "WHERE
       exp_param_1 > X and exp_param_2 = y"
 
-**Field mapping** — maps an experiment property to a benchmark property.
+**Field mapping** — maps an experiment property to a benchmark instance property.
 
 ```yaml
-propertyMapping:
-    - benchmark:
-          identifier: "<logical-benchmark-property-name>"
-      experiment:
-          identifier: "<experiment-property-name>"
+instanceMapping:
+    propertyMapping:
+        - benchmark:
+              identifier: "<benchmark-instance-property-name>"
+          experiment:
+              identifier: "<experiment-property-name>"
 ```
 
 **Categorical value mapping** — maps one or more values of a categorical
-benchmark property to a set of (experiment property:allowed value set) pairs.
+benchmark instance property to a set of (experiment property:allowed value set)
+pairs.
 
 ```yaml
-propertyMapping:
-    - categoricalValue:
-          property:
-              identifier: "<logical-benchmark-property-name>"
-          value: "<categorical-value-from-logical-benchmark-domain>"
-      predicate:
-          - identifier: "<experiment-property-name>"
-            propertyDomain: <PropertyDomain>
-          - ...
+instanceMapping:
+    propertyMapping:
+        - categoricalValue:
+              property:
+                  identifier: "<benchmark-instance-property-name>"
+              value: "<categorical-value-from-benchmark-domain>"
+          predicate:
+              - identifier: "<experiment-property-name>"
+                propertyDomain: <PropertyDomain>
+              - ...
 ```
 
 **Static Filters:**
@@ -265,44 +288,17 @@ particular logical benchmark, essentially adding "AND production == True" to all
 queries.
 
 ```yaml
-staticFilters:
-    - property:
-          identifier: "<experiment-property-name>"
-      value: "<experiment-property-value>"
+instanceMapping:
+    staticFilters:
+        - property:
+              identifier: "<experiment-property-name>"
+          value: "<experiment-property-value>"
 ```
 
-#### Metric mapping
-
-```yaml
-metricMapping:
-    - benchmark:
-          identifier: <canonical-benchmark-property-name>
-      experiment:
-          identifier: <experiment-target-property-name>
-```
-
-Metrics not listed are passed through under their original names. For two
-experiments to produce a merged metric column, both must map their respective
-metric names to the same canonical name defined by the logical benchmark.
-
-#### Instance mapping
-
-The `instanceMapping` section maps benchmark instances to experiment inputs
-without remapping instance identifiers. It supports:
-
-- **`artifactMapping`**: Remapping benchmark instance artifact files/formats to
-  experiment artifact input properties.
-- **`propertyMapping`**: Remapping benchmark instance properties/parameters to
-  experiment properties (kept separate from non-instance experiment properties
-  in the top-level `propertyMapping`).
-- **`staticFilters`**: Setting static experiment properties or parameters for
-  the instance.
+**Full example:**
 
 ```yaml
 instanceMapping:
-    artifactMapping:
-        - benchmark: dimacs # format key in instance.yaml or filename
-          experiment: input_graph_path # experiment property name
     propertyMapping:
         - benchmark:
               identifier: num_vertices
@@ -326,40 +322,40 @@ Bindings are placed in the `bindings` list inside `problem.yaml`, alongside the
 
 ```yaml
 bindings:
-    - targetMapping: model_name
-      experiment:
+    - experiment:
           actuatorIdentifier: vllm_performance
           experimentIdentifier: guide_llm_runner
           experimentVersion: 2.0.0 # The binding only uses the major version
-      propertyMapping:
-          - benchmark:
-                identifier: dataset
-            experiment:
-                identifier: input_data_path # guide-llm's internal param name
-          - categoricalValue:
-                property:
-                    identifier: workload
-                value: steady_state_heavy
-            predicate:
-                - identifier: traffic_shape
-                  propertyDomain:
-                      values: ["constant"]
-                - identifier: concurrency
-                  propertyDomain:
-                      domainRange: [100, 1000]
-                      variableType: CONTINUOUS_VARIABLE_TYPE
-          - categoricalValue:
-                property:
-                    identifier: workload
-                value: poisson_bursty
-            predicate:
-                - identifier: traffic_shape
-                  propertyDomain:
-                      values: ["poisson"]
-                - identifier: concurrency
-                  propertyDomain:
-                      domainRange: [1, 100]
-                      variableType: CONTINUOUS_VARIABLE_TYPE
+      instanceMapping:
+          propertyMapping:
+              - benchmark:
+                    identifier: dataset
+                experiment:
+                    identifier: input_data_path # guide-llm's internal param name
+              - categoricalValue:
+                    property:
+                        identifier: workload
+                    value: steady_state_heavy
+                predicate:
+                    - identifier: traffic_shape
+                      propertyDomain:
+                          values: ["constant"]
+                    - identifier: concurrency
+                      propertyDomain:
+                          domainRange: [100, 1000]
+                          variableType: CONTINUOUS_VARIABLE_TYPE
+              - categoricalValue:
+                    property:
+                        identifier: workload
+                    value: poisson_bursty
+                predicate:
+                    - identifier: traffic_shape
+                      propertyDomain:
+                          values: ["poisson"]
+                    - identifier: concurrency
+                      propertyDomain:
+                          domainRange: [1, 100]
+                          variableType: CONTINUOUS_VARIABLE_TYPE
       metricMapping:
           - benchmark:
                 identifier: throughput_tokens_per_second
@@ -563,22 +559,13 @@ A benchmark binding only can change if:
 
 ## 7. Relationship to Existing Benchmark Design
 
-### 7.1 `target_mapping` and the Implicit Benchmark Target
+### 7.1 Implicit Benchmark Target
 
 The [`benchmark_integration_design.md`](./benchmark_integration_design.md)
 establishes that the benchmark target is implicit from the enclosing model
-definition for model-level benchmark submissions. The `target_mapping` field is
-complementary, not conflicting:
-
-- `target_mapping` in the benchmark binding names the **experiment property**
-  that carries the target identifier (e.g. `model_name`).
-- The **value** of that property for a specific benchmark submission is
-  determined by the enclosing model definition.
-
-For example, if the benchmark binding declares `target_mapping: model_name`, and
-a model-level benchmark submission is defined for `ibm/granite-3b`, the
-leaderboard system knows that `model_name=ibm/granite-3b` is the target for that
-result.
+definition for model-level benchmark submissions. The binding does not need to
+name the target property explicitly — the target identity is determined by the
+enclosing model or algorithm definition that owns the benchmark submission.
 
 ### 7.2 Benchmark Package Registration and Submissions
 

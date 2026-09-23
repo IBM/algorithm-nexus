@@ -5,7 +5,7 @@ logicalBenchmark:
   benchmarkIdentifier: inference_serving
   description: >
     Evaluation of AI model inference serving throughput and latency under controlled traffic conditions.
-  properties:
+  instance:
     - identifier: dataset
     - identifier: workload
   metrics:
