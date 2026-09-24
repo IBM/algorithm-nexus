@@ -226,16 +226,15 @@ bindings:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0
-    instanceMapping:
-      propertyMapping:
-        - benchmark:
-            identifier: size
-          experiment:
-            identifier: n_nodes
-      staticFilters:
-        - property:
-            identifier: graph_type
-          value: erdos_renyi
+    propertyMapping:
+      - benchmark:
+          identifier: size
+        experiment:
+          identifier: n_nodes
+    staticFilters:
+      - property:
+          identifier: graph_type
+        value: erdos_renyi
 """
         (bench_dir / "problem.yaml").write_text(problem_content)
 
@@ -253,14 +252,13 @@ size: 10
         assert config is not None
         assert not collector.has_errors
         assert config.bindings is not None
-        assert config.bindings[0].instanceMapping is not None
-        assert config.bindings[0].instanceMapping.propertyMapping is not None
-        assert config.bindings[0].instanceMapping.staticFilters is not None
+        assert config.bindings[0].propertyMapping is not None
+        assert config.bindings[0].staticFilters is not None
 
     def test_binding_with_invalid_instance_property_mapping_fails(
         self, tmp_path: Path
     ) -> None:
-        """A binding with propertyMapping inside instanceMapping referencing unknown property fails."""
+        """A binding with propertyMapping referencing an unknown property fails."""
         bench_dir = tmp_path / "test_benchmark"
         instances_dir = bench_dir / "instances"
         bench_dir.mkdir(parents=True)
@@ -278,12 +276,11 @@ bindings:
       actuatorIdentifier: custom
       experimentIdentifier: exp1
       experimentVersion: 1.0.0
-    instanceMapping:
-      propertyMapping:
-        - benchmark:
-            identifier: unknown_property
-          experiment:
-            identifier: n_nodes
+    propertyMapping:
+      - benchmark:
+          identifier: unknown_property
+        experiment:
+          identifier: n_nodes
 """
         (bench_dir / "problem.yaml").write_text(problem_content)
 

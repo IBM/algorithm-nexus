@@ -328,10 +328,9 @@ A binding contains the following mapping sections:
 
 - `targetMapping`: Names the experiment property that carries the benchmark
   target (e.g. the algorithm or model identifier)
-- `propertyMapping`: Maps non-instance experiment parameters and canonical
-  properties
-- `instanceMapping`: Maps instance artifact inputs (`artifactMapping`), instance
-  parameters/properties (`propertyMapping`), and static filters
+- `propertyMapping`: Maps benchmark instance properties to experiment inputs
+- `staticFilters`: Sets static experiment properties implicit in the logical
+  benchmark
 - `metricMapping`: Maps outputs of the logical benchmark to the outputs of the
   experiment
 
@@ -363,7 +362,7 @@ propertyMapping:
     - categoricalValue:
           property:
               identifier: workload
-          value: steady_state_heavy
+          value: poisson_bursty
       predicate:
           - identifier: traffic_shape
             propertyDomain:
@@ -372,15 +371,10 @@ propertyMapping:
             propertyDomain:
                 domainRange: [1, 100]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-instanceMapping:
-    artifactMapping:
-        - benchmark: json
-          experiment: input_dataset_file
-    propertyMapping:
-        - benchmark:
-              identifier: prompt_len
-          experiment:
-              identifier: input_len
+staticFilters:
+    - property:
+          identifier: use_cache
+      value: "true"
 metricMapping:
     - benchmark:
           identifier: throughput_tokens_per_second

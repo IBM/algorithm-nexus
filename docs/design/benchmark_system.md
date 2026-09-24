@@ -10,9 +10,9 @@ An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
 scalable execution needs for evaluating **benchmark targets** against defined
 **benchmark instances**. By combining `ado` and Ray with specific **Algorithm
-Nexus Extensions**, integration definitions, and robust administrative processes,
-the team can deliver a comprehensive, end-to-end benchmarking solution capable of
-generating repeatable **benchmark results**.
+Nexus Extensions**, integration definitions, and robust administrative
+processes, the team can deliver a comprehensive, end-to-end benchmarking
+solution capable of generating repeatable **benchmark results**.
 
 To fully satisfy these requirements, the design of the Benchmarking System is
 divided into three **Architectural Pillars**: System Architecture (The
@@ -37,7 +37,7 @@ model.
 | Tier                                        | Component       | Responsibility & Behavior                                                                                                                                                                                                                                                                              |
 | ------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Tier 1: Benchmark Experiment Definition** | `ado` core      | Serves as the core capability engine. It provides the framework to define, package, and execute a self-contained benchmark experiment. It enforces strict input/output interfaces, handles versioning of the experiment logic, and manages the execution provenance independently of the target model. |
-| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: bind a specific target (the model) to a specific `ado` benchmark experiment and a defined benchmark instance.                           |
+| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: specify how an `ado` benchmark experiment can execute a given benchmark target and a defined benchmark instance.                        |
 
 <!-- markdownlint-enable line-length -->
 
@@ -51,13 +51,13 @@ technical bridge between human operations and the execution engine.
 ### 1.3 Execution and Orchestration Engine
 
 The execution architecture relies on **Ray** and **`ado`**. `ado` leverages
-**Ray** to handle parameter sweeps and single benchmark submissions mechanically.
-Thanks to `ado`'s data recording capabilities, if one submission in a sweep fails
-`ado` continues orchestration and commits successful results to the database.
-Ray allows the underlying experiments to explicitly request hardware resources
-(e.g., `@ray.remote(num_gpus=1)`) via task decorators. Ray can also create
-per-task execution environments, allowing tests with incompatible requirements
-to ado-core or other experiments to execute.
+**Ray** to handle parameter sweeps and single benchmark submissions
+mechanically. Thanks to `ado`'s data recording capabilities, if one submission
+in a sweep fails `ado` continues orchestration and commits successful results to
+the database. Ray allows the underlying experiments to explicitly request
+hardware resources (e.g., `@ray.remote(num_gpus=1)`) via task decorators. Ray
+can also create per-task execution environments, allowing tests with
+incompatible requirements to ado-core or other experiments to execute.
 
 ### 1.4 Centralized Data & Discovery
 
@@ -101,8 +101,8 @@ scaled by the administrative team and CI/CD pipelines.
 Admins configure the **Ray cluster** on K8s via KubeRay, with hard namespace
 limits to maintain resource quotas during massive sweeps. To optimize
 performance, the underlying cluster mounts a shared persistent filesystem (via
-PVC) for benchmark instance dataset caching. Ray dynamically isolates worker node
-environments to prevent dependency version clashes between concurrent
+PVC) for benchmark instance dataset caching. Ray dynamically isolates worker
+node environments to prevent dependency version clashes between concurrent
 evaluations.
 
 ### 2.2 Orchestration Triggers & Automation

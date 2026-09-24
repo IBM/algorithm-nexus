@@ -323,26 +323,6 @@ class MetricMapping(BaseModel):
     ]
 
 
-class InstanceMapping(BaseModel):
-    """Maps benchmark instances to an experiment: maps instance parameters/properties and sets static filters."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    propertyMapping: Annotated[
-        list[FieldMapping | CategoricalValueMapping] | None,
-        Field(
-            description="Remaps benchmark instance properties/parameters to experiment properties.",
-        ),
-    ] = None
-
-    staticFilters: Annotated[
-        list[PropertyValue] | None,
-        Field(
-            description="Static experiment property/parameter values set for the instance.",
-        ),
-    ] = None
-
-
 class BenchmarkRanking(BaseModel):
     """Defines how benchmark results are ranked."""
 
@@ -375,10 +355,16 @@ class BenchmarkBinding(BaseModel):
             description="Translates per-experiment metric names to canonical benchmark metric names."
         ),
     ] = None
-    instanceMapping: Annotated[
-        InstanceMapping | None,
+    propertyMapping: Annotated[
+        list[FieldMapping | CategoricalValueMapping] | None,
         Field(
-            description="Maps benchmark instance properties/parameters and static filters to experiment inputs."
+            description="Remaps benchmark instance properties/parameters to experiment inputs.",
+        ),
+    ] = None
+    staticFilters: Annotated[
+        list[PropertyValue] | None,
+        Field(
+            description="Static experiment property/parameter values set for the instance.",
         ),
     ] = None
 

@@ -513,20 +513,20 @@ def _check_binding_integrity(
                     f"{prefix}: metricMapping references unknown benchmark metric '{mid}'"
                 )
 
-    # 2. Property identifiers in instanceMapping.propertyMapping must exist in the definition
-    if binding.instanceMapping and binding.instanceMapping.propertyMapping:
-        for pm_entry in binding.instanceMapping.propertyMapping:
+    # 2. Property identifiers in propertyMapping must exist in the definition
+    if binding.propertyMapping:
+        for pm_entry in binding.propertyMapping:
             if isinstance(pm_entry, FieldMapping):
                 pid = pm_entry.benchmark.identifier
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
                     )
             elif isinstance(pm_entry, CategoricalValueMapping):
                 pid = pm_entry.categoricalValue.property.identifier
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: instanceMapping propertyMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
                     )
 
 

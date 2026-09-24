@@ -25,20 +25,19 @@ bindings:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 2.0.0
-    instanceMapping:
-      propertyMapping:
-        - benchmark:
-            identifier: dataset
-          experiment:
-            identifier: input_data_path
-        - categoricalValue:
-            property:
-              identifier: workload
-            value: steady_state_heavy
-          predicate:
-            - identifier: traffic_shape
-              propertyDomain:
-                values: ["constant"]
+    propertyMapping:
+      - benchmark:
+          identifier: dataset
+        experiment:
+          identifier: input_data_path
+      - categoricalValue:
+          property:
+            identifier: workload
+          value: steady_state_heavy
+        predicate:
+          - identifier: traffic_shape
+            propertyDomain:
+              values: ["constant"]
     metricMapping:
       - benchmark:
           identifier: throughput_tokens_per_second

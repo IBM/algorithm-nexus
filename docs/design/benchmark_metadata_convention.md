@@ -97,7 +97,7 @@ benchmark problem. It defines:
 
 <!-- markdownlint-enable line-length -->
 
-### 2.3 Example: Inference Serving
+### 2.3 Example: Graph Coloring
 
 The logical benchmark definition lives under the `logicalBenchmark` key inside
 `benchmarks/<benchmark-id>/problem.yaml`. Bindings are placed in the sibling
@@ -105,28 +105,41 @@ The logical benchmark definition lives under the `logicalBenchmark` key inside
 
 ```yaml
 logicalBenchmark:
-    benchmarkIdentifier: inference_serving
-    title: "Inference Serving Performance"
+    benchmarkIdentifier: graph_coloring
+    title: Graph Coloring
     description: >
-        Evaluation of AI model inference serving throughput and latency under
-        controlled traffic conditions.
+        Evaluates graph-coloring algorithms on their ability to produce valid
+        k-colorings with a small chromatic number. Instances span random
+        Erdős–Rényi graphs and structured benchmark graphs at varying densities.
     instance:
-        - identifier: dataset
+        - identifier: graph
+          is_artifact: true
           metadata:
-              description: "Dataset used for inference requests."
-          # No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default
-        - identifier: workload
+              description: Graph instance file artifact.
+        - identifier: graph_family
           metadata:
-              description: "Traffic pattern or workload profile."
+              description: Graph family (erdos_renyi, planar, random_regular).
           propertyDomain:
-              values: ["steady_state_heavy", "poisson_bursty", "light_load"]
+              variableType: CATEGORICAL_VARIABLE_TYPE
+              values: [erdos_renyi, planar, random_regular]
+        - identifier: num_vertices
+          metadata:
+              description: Number of vertices in the graph.
+          propertyDomain:
+              variableType: DISCRETE_VARIABLE_TYPE
+              values: [50, 100, 250, 500]
+        - identifier: edge_density
+          metadata:
+              description: Edge probability / density parameter.
+          propertyDomain:
+              variableType: CONTINUOUS_VARIABLE_TYPE
     metrics:
-        - throughput_tokens_per_second
-        - time_to_first_token_ms
+        - num_colors_used
+        - is_valid_coloring
+        - elapsed_ms
     ranking:
-        metric: throughput_tokens_per_second
-        order: desc
-    owner: "@vllm-team"
+        metric: num_colors_used
+        order: asc
 
 bindings:
     - ...
@@ -213,7 +226,8 @@ A benchmark binding serves two purposes:
 | ----------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `experiment`      | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                             |
 | `metricMapping`   | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark. |
-| `instanceMapping` | object              | No       | Maps benchmark instance properties/parameters to experiment inputs and sets static experiment filters.                                                                                            |
+| `propertyMapping` | list                | No       | Remaps benchmark instance properties/parameters to experiment inputs.                                                                                                                             |
+| `staticFilters`   | list                | No       | Sets static experiment properties to values implicit in the logical benchmark.                                                                                                                    |
 
 <!-- markdownlint-enable line-length -->
 
@@ -231,18 +245,12 @@ Metrics not listed are passed through under their original names. For two
 experiments to produce a merged metric column, both must map their respective
 metric names to the same canonical name defined by the logical benchmark.
 
-#### Instance mapping
+#### Property mapping
 
-The `instanceMapping` section maps benchmark instance properties/parameters to
+The `propertyMapping` list maps benchmark instance properties/parameters to
 experiment inputs. The artifact mapping is implicit — the experiment property
-being bound against determines which artifact is used. It supports:
-
-- **`propertyMapping`**: Remapping benchmark instance properties/parameters to
-  experiment properties.
-- **`staticFilters`**: Setting static experiment properties or parameters for
-  the instance.
-
-Two types of entry are possible in `propertyMapping`:
+being bound against determines which artifact is used. Two types of entry are
+possible:
 
 - _field mapping_: A 1-to-1 mapping for a benchmark instance property.
     - Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"
@@ -254,12 +262,11 @@ Two types of entry are possible in `propertyMapping`:
 **Field mapping** — maps an experiment property to a benchmark instance property.
 
 ```yaml
-instanceMapping:
-    propertyMapping:
-        - benchmark:
-              identifier: "<benchmark-instance-property-name>"
-          experiment:
-              identifier: "<experiment-property-name>"
+propertyMapping:
+    - benchmark:
+          identifier: "<benchmark-instance-property-name>"
+      experiment:
+          identifier: "<experiment-property-name>"
 ```
 
 **Categorical value mapping** — maps one or more values of a categorical
@@ -267,19 +274,18 @@ benchmark instance property to a set of (experiment property:allowed value set)
 pairs.
 
 ```yaml
-instanceMapping:
-    propertyMapping:
-        - categoricalValue:
-              property:
-                  identifier: "<benchmark-instance-property-name>"
-              value: "<categorical-value-from-benchmark-domain>"
-          predicate:
-              - identifier: "<experiment-property-name>"
-                propertyDomain: <PropertyDomain>
-              - ...
+propertyMapping:
+    - categoricalValue:
+          property:
+              identifier: "<benchmark-instance-property-name>"
+          value: "<categorical-value-from-benchmark-domain>"
+      predicate:
+          - identifier: "<experiment-property-name>"
+            propertyDomain: <PropertyDomain>
+          - ...
 ```
 
-**Static Filters:**
+#### Static filters
 
 Static filters allow setting a property of the experiment to a value that's
 implicit in the logical benchmark. For example, the benchmark experiment may
@@ -288,37 +294,35 @@ particular logical benchmark, essentially adding "AND production == True" to all
 queries.
 
 ```yaml
-instanceMapping:
-    staticFilters:
-        - property:
-              identifier: "<experiment-property-name>"
-          value: "<experiment-property-value>"
+staticFilters:
+    - property:
+          identifier: "<experiment-property-name>"
+      value: "<experiment-property-value>"
 ```
 
 **Full example:**
 
 ```yaml
-instanceMapping:
-    propertyMapping:
-        - benchmark:
-              identifier: num_vertices
-          experiment:
-              identifier: n_nodes
-        - benchmark:
-              identifier: edge_density
-          experiment:
-              identifier: density
-    staticFilters:
-        - property:
-              identifier: graph_type
-          value: erdos_renyi
+propertyMapping:
+    - benchmark:
+          identifier: num_vertices
+      experiment:
+          identifier: n_nodes
+    - benchmark:
+          identifier: edge_density
+      experiment:
+          identifier: density
+staticFilters:
+    - property:
+          identifier: graph_type
+      value: erdos_renyi
 ```
 
 ### 3.3 Example: `guide_llm_runner`
 
 Bindings are placed in the `bindings` list inside `problem.yaml`, alongside the
 `logicalBenchmark` definition (see
-[Section 2.3](#23-example-inference-serving)):
+[Section 2.3](#23-example-graph-coloring)):
 
 ```yaml
 bindings:
@@ -326,36 +330,35 @@ bindings:
           actuatorIdentifier: vllm_performance
           experimentIdentifier: guide_llm_runner
           experimentVersion: 2.0.0 # The binding only uses the major version
-      instanceMapping:
-          propertyMapping:
-              - benchmark:
-                    identifier: dataset
-                experiment:
-                    identifier: input_data_path # guide-llm's internal param name
-              - categoricalValue:
-                    property:
-                        identifier: workload
-                    value: steady_state_heavy
-                predicate:
-                    - identifier: traffic_shape
-                      propertyDomain:
-                          values: ["constant"]
-                    - identifier: concurrency
-                      propertyDomain:
-                          domainRange: [100, 1000]
-                          variableType: CONTINUOUS_VARIABLE_TYPE
-              - categoricalValue:
-                    property:
-                        identifier: workload
-                    value: poisson_bursty
-                predicate:
-                    - identifier: traffic_shape
-                      propertyDomain:
-                          values: ["poisson"]
-                    - identifier: concurrency
-                      propertyDomain:
-                          domainRange: [1, 100]
-                          variableType: CONTINUOUS_VARIABLE_TYPE
+      propertyMapping:
+          - benchmark:
+                identifier: dataset
+            experiment:
+                identifier: input_data_path # guide-llm's internal param name
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: steady_state_heavy
+            predicate:
+                - identifier: traffic_shape
+                  propertyDomain:
+                      values: ["constant"]
+                - identifier: concurrency
+                  propertyDomain:
+                      domainRange: [100, 1000]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
+          - categoricalValue:
+                property:
+                    identifier: workload
+                value: poisson_bursty
+            predicate:
+                - identifier: traffic_shape
+                  propertyDomain:
+                      values: ["poisson"]
+                - identifier: concurrency
+                  propertyDomain:
+                      domainRange: [1, 100]
+                      variableType: CONTINUOUS_VARIABLE_TYPE
       metricMapping:
           - benchmark:
                 identifier: throughput_tokens_per_second
