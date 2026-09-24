@@ -899,13 +899,13 @@ greenlet==3.5.6 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or 
     --hash=sha256:f96f0e30b5a95c7631b12bfe214cbc90ec8fe8cfa36920596c10514a65743519 \
     --hash=sha256:f98e8215e172f567ce80eeaed9107fb4d32b6c44f26983d9b8334658136a205a
     # via sqlalchemy
-gridfm-datakit==1.0.5 \
-    --hash=sha256:90493c61160d93d4351a5a097a9cbc08681d8155d4177e8199deb22d3609a421 \
-    --hash=sha256:bd1c910174aa3242eebb161a7f0e99c402bf00ee745a87e592b0817e680a7853
+gridfm-datakit==1.1.0 \
+    --hash=sha256:043abde247f8eb7e0bd8761408a6b47d29aaf5451a0feeec9418f8006d65b5cc \
+    --hash=sha256:378958d41d633c46a0aceb3a98b19d516d07c091955e65e72df42e7bb9833c41
     # via gridfm-graphkit
-gridfm-graphkit==0.8.1 \
-    --hash=sha256:2065037edb4a4e08d03acf4b22ec4ccbdcad3f63a34e93f785010353f09b37a0 \
-    --hash=sha256:7311ace3f3ba75728ad25b4287e0f760320f9516876f8a22f0abaa5d45e5d624
+gridfm-graphkit==0.9.0.3 \
+    --hash=sha256:1159ddaadc4847830698344621a34f82c4e71d7bf383b1f2056b563fe5d89aae \
+    --hash=sha256:473d00fa6ecf1ae4066f11e82ec3cd87f4b34f49488b43f1c3d7986c8c4a7cb6
     # via algorithm-nexus
 grpcio==1.84.0 \
     --hash=sha256:08735e3d08d24ab3132cf87e2e5dea8746cabcc7d676c2b0b7362f195feef9d9 \
@@ -1620,7 +1620,6 @@ networkx==3.6.1 \
     --hash=sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762
     # via
     #   bmfm-targets
-    #   gridfm-datakit
     #   gridfm-graphkit
     #   scanpy
     #   scikit-image
@@ -3546,6 +3545,9 @@ torch-einops-utils==0.1.28 \
 torch-geometric==2.8.0.post1 \
     --hash=sha256:2c0c81666ec10f2132f6b4e0b6c57fc813f2c9f6b57599d7b7a799c614c22fbd \
     --hash=sha256:5d9841cbfa64eadc425e445767127d103dd52fdc5890548c6364986c9bc78029
+    # via gridfm-graphkit
+torch-scatter==2.1.2 \
+    --hash=sha256:69b3aa435f2424ac6a1bfb6ff702da6eb73b33ca0db38fb26989c74159258e47
     # via gridfm-graphkit
 torchaudio==2.11.0 \
     --hash=sha256:13cff988697ccbad539987599f9dc672f40c417bed67570b365e4e5002bbd096 \
