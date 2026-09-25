@@ -1,0 +1,16 @@
+# Benchmark Instance Template
+# Copy this file to benchmarks/<benchmark-id>/instances/<instance-name>/instance.yaml
+# and replace every <...> placeholder with real values.
+# The instance directory must also contain any artifact subfolders referenced below.
+
+identifier: <instance_name>  # matches the folder name by convention
+description: >
+  <Brief description of what makes this instance specific / interesting.> #magic___^_^___line
+# Scalar properties — one entry per scalar property defined in problem.yaml.
+# Use the exact identifier from the problem.yaml instance list.
+<scalar_property_name>: <value>
+
+# Artifact property — the named subfolder must exist inside this instance directory.
+# benchmarks/<benchmark-id>/instances/<instance-name>/<subfolder-name>/
+<artifact_property_name>:
+  artifacts_location: <subfolder-name>
