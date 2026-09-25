@@ -1,0 +1,16 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# Fixture: logicalBenchmark with a `ranking` config that references an unknown metric.
+
+logicalBenchmark:
+  benchmarkIdentifier: sorting
+  description: Evaluates sorting algorithm performance.
+  instance:
+    - identifier: list_size
+  metrics:
+    - comparisons
+    - elapsed_ms
+  ranking:
+    metric: nonexistent_metric
+    order: asc

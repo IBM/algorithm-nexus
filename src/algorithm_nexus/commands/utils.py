@@ -521,7 +521,7 @@ def print_results_table(
     """Print a results table with Instance, Status, and a details column.
 
     Each row dict may contain:
-      - ``instance_path`` (str): shown in the Instance column.
+      - ``submission_path`` (str): shown in the Submission column.
       - ``status`` (str): coloured in the Status column.
       - ``details`` (str): pre-formatted text for the details column.
 
@@ -540,7 +540,7 @@ def print_results_table(
         color = get_status_color(status)
         status_display = f"[{color}]{status}[/{color}]"
         table.add_row(
-            row.get("instance_path", "Unknown"),
+            row.get("submission_path", "Unknown"),
             status_display,
             row.get("details", "-"),
         )
@@ -556,7 +556,7 @@ def print_human_readable_results(results: dict[str, Any]) -> None:
     """
     instances = results.get("instances")
     if not instances:
-        console.print("[yellow]No benchmark instances found[/yellow]")
+        console.print("[yellow]No benchmark submissions found[/yellow]")
         return
 
     rows = []
@@ -572,7 +572,7 @@ def print_human_readable_results(results: dict[str, Any]) -> None:
             details.append(f"Ray Job ID: {instance['ray_job_id']}")
         rows.append(
             {
-                "instance_path": instance.get("instance_path", "Unknown"),
+                "submission_path": instance.get("submission_path", "Unknown"),
                 "status": instance.get("status", "unknown"),
                 "details": "\n".join(details) if details else "-",
             }

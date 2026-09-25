@@ -357,6 +357,31 @@ class TestBenchmarkPackage:
             == "./packages/my-benchmark"
         )
 
+    def test_logical_benchmark_instance_property_is_artifact(self) -> None:
+        """Test LogicalBenchmarkDefinition instance properties with is_artifact flag."""
+        from algorithm_nexus.models import LogicalBenchmarkConfig
+
+        data = {
+            "logicalBenchmark": {
+                "benchmarkIdentifier": "test_bench",
+                "description": "A test benchmark",
+                "instance": [
+                    {"identifier": "graph", "is_artifact": True},
+                    {"identifier": "num_nodes", "is_artifact": False},
+                    {"identifier": "density"},
+                ],
+            }
+        }
+        config = LogicalBenchmarkConfig.model_validate(data)
+        instances = config.logicalBenchmark.instance
+        assert len(instances) == 3
+        assert instances[0].identifier == "graph"
+        assert instances[0].is_artifact is True
+        assert instances[1].identifier == "num_nodes"
+        assert instances[1].is_artifact is False
+        assert instances[2].identifier == "density"
+        assert instances[2].is_artifact is False
+
     def test_benchmark_package_empty_experiments_fails(self) -> None:
         """Test that empty experiments list is rejected."""
         data = {

@@ -5,19 +5,15 @@
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
   description: "Test benchmark"
-  target:
-    identifier: model
-  properties:
+  instance:
     - identifier: dataset
 
 bindings:
-  - benchmarkIdentifier: inference_serving
-    experiment:
+  - experiment:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 1.0.0
-    targetMapping: model_name
-    propertyMapping:
+    instanceMapping:
       - benchmark:
           identifier: nonexistent_property
         experiment:

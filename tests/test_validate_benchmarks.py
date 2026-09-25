@@ -105,7 +105,7 @@ class TestAdoValidator:
     def test_validate_space_yaml_syntax_missing_file(self):
         """Test validation with missing file."""
         result = validate_space_yaml_syntax(
-            base_path=Path("/nonexistent"), instance_path="benchmark_instances/test"
+            base_path=Path("/nonexistent"), submission_path="benchmark_submissions/test"
         )
         assert not result.success
         assert len(result.errors) == 1
@@ -131,7 +131,7 @@ experiments:
         )
 
         result = validate_space_yaml_syntax(
-            base_path=tmp_path, instance_path="test_instance"
+            base_path=tmp_path, submission_path="test_instance"
         )
         assert result.success
         assert len(result.errors) == 0
@@ -144,7 +144,7 @@ experiments:
         space_yaml.write_text("invalid: yaml: content:")
 
         result = validate_space_yaml_syntax(
-            base_path=tmp_path, instance_path="test_instance"
+            base_path=tmp_path, submission_path="test_instance"
         )
         assert not result.success
         assert len(result.errors) > 0
@@ -162,7 +162,7 @@ entitySpace:
         )
 
         result = validate_space_yaml_syntax(
-            base_path=tmp_path, instance_path="test_instance"
+            base_path=tmp_path, submission_path="test_instance"
         )
         # Should succeed but have warnings
         assert result.success
@@ -173,19 +173,19 @@ entitySpace:
         """Test ValidationResult Pydantic model."""
         result = ValidationResult(
             success=True,
-            instance_path="/test/path",
+            submission_path="/test/path",
             errors=[],
             warnings=["test warning"],
         )
 
         assert result.success
-        assert result.instance_path == "/test/path"
+        assert result.submission_path == "/test/path"
         assert len(result.errors) == 0
         assert len(result.warnings) == 1
         assert result.status == "success"
 
         summary = result.model_dump()
-        assert summary["instance_path"] == "/test/path"
+        assert summary["submission_path"] == "/test/path"
         assert summary["status"] == "success"
         assert summary["errors"] == []
         assert summary["warnings"] == ["test warning"]
@@ -219,7 +219,7 @@ class TestValidateBenchmarksCommand:
         assert "nexus list packages" in captured.out
 
     def test_validate_benchmarks_no_instances_in_package(self, tmp_path):
-        """Test validate benchmarks finds no instances when package has no benchmark_instances."""
+        """Test validate benchmarks finds no instances when package has no benchmark_submissions."""
         import contextlib
 
         import typer
@@ -230,7 +230,7 @@ class TestValidateBenchmarksCommand:
         packages_root.mkdir()
         (packages_root / "test-package").mkdir()
 
-        # No benchmark_instances directories exist, so validation exits cleanly with code 0
+        # No benchmark_submissions directories exist, so validation exits cleanly with code 0
         with contextlib.suppress(typer.Exit):
             validate_benchmarks(
                 pr_url=None,

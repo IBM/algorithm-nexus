@@ -1,0 +1,16 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# Fixture: logicalBenchmark with a valid `ranking` config using desc order.
+
+logicalBenchmark:
+  benchmarkIdentifier: inference
+  description: Evaluates inference throughput.
+  instance:
+    - identifier: batch_size
+  metrics:
+    - throughput
+    - latency_ms
+  ranking:
+    metric: throughput
+    order: desc

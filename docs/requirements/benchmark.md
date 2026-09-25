@@ -15,37 +15,38 @@ admins).
 ## Terminology
 
 To establish a clear mental model, the relationship between core components can
-be summarized as: Benchmark Instance = Benchmark Target + Benchmark (Workload +
-Benchmark Experiment)
+be summarized as: Benchmark Submission = Benchmark Target + Benchmark (Benchmark
+Instance + Benchmark Experiment), where a Benchmark Instance is a concrete
+realisation of a Logical Benchmark (Benchmark Problem).
 
-- **Workload** The problem or task an AI model or algorithm is intended to
-  solve, including the associated inputs, data, and execution pattern exercised
-  by the benchmark driver.
+- **Logical Benchmark (Benchmark Problem)** An abstract, reusable definition of
+  a problem class or evaluation task, independent of any specific dataset,
+  model, or execution context. It defines _what_ is being measured (e.g.,
+  Travelling Salesman Problem, Graph Colouring, Bin Packing, Maximum Cut)
+  without prescribing _how_ it is instantiated or executed.
+
+- **Benchmark Instance** The concrete realisation of a Logical Benchmark: the
+  problem or task an AI model or algorithm is intended to solve, including the
+  associated inputs, data, and execution pattern exercised by the benchmark
+  driver.
 
 - **Benchmark Target** The AI model or algorithm being evaluated. This is the
   element that varies across benchmark experiments while the benchmark
-  definition and workload specification are held constant.
+  definition and benchmark instance specification are held constant.
 
 - **Benchmark Experiment** A script, harness, or workflow that executes the
-  benchmark target on the workload, controlling execution conditions, and
-  collects measurements. The experiment will take benchmark target as input. The
-  benchmark experiment may hard-code the workload (**fixed**) OR the workload is
-  specified by passing certain values for the benchmark experiments parameters
-  (**parameterizable**)
-
-- **Benchmark** A standardized, repeatable evaluation used to compare the
-  behavior of a benchmark target (versions of AI models or algorithms) on a
-  problem of interest (workload) under controlled conditions. Embodied as either
-  a **fixed benchmark experiment** or a **workload** plus **parameterized
-  benchmark experiment**.
+  benchmark target on the benchmark instance, controlling execution conditions,
+  and collects measurements. The experiment might take the benchmark target and
+  instance as input (**parameterizable**) or may hard-code them (**fixed**).
 
 - **Benchmark Result** The quantitative measurements produced by executing a
   benchmark experiment (e.g., accuracy, runtime, throughput, resource
-  utilization), with the **workload** - used to compare benchmark targets.
+  utilization), with the **benchmark instance** - used to compare benchmark
+  targets.
 
-- **Benchmark Instance** A concrete execution of a benchmark, in which a
-  benchmark driver runs a workload against a specific benchmark target and
-  records measurements.
+- **Benchmark Submission** A concrete execution of a benchmark, in which a
+  benchmark driver runs a benchmark instance against a specific benchmark target
+  and records measurements.
 
 ---
 
@@ -81,8 +82,8 @@ formatted, standardized, and versioned to ensure reproducibility.
   users which benchmarks are no longer actively maintained or relevant.
 
 - **REQ 1.7: Required Data** If a benchmark experiment requires specific data
-  files to execute a workload these must be either (a) contained in the python
-  package providing the experiment; (b) downloaded by the experiment.
+  files to execute a benchmark instance these must be either (a) contained in
+  the python package providing the experiment; (b) downloaded by the experiment.
   _Rationale_: Guarantees that automated execution does not fail due to missing
   local filesystem dependencies.
 
@@ -106,7 +107,7 @@ benchmarks and benchmark experiments.
   and register a **benchmark**:
 - either as
     1. a combination of a parameterizable benchmark experiment and a benchmark
-       workload
+       instance
     2. a fixed benchmark experiment
 
 - **REQ 2.4: Benchmark Discovery** The system must provide a method for user to
@@ -142,9 +143,9 @@ This section covers operational requirements for execution, resource handling,
 and failure management.
 
 - **REQ 4.1: Single and Sweep Execution** The system must support both executing
-  single benchmark instances and parameter sweeps. _Rationale_: Sweeps are
+  single benchmark submissions and parameter sweeps. _Rationale_: Sweeps are
   essential for performance profiling and evaluating models across a spectrum of
-  workloads.
+  benchmark instances.
 
 - **REQ 4.2: Resource Specification** The system must allow benchmark
   experiments to define the compute resources they require. _Rationale_: Ensures
@@ -152,12 +153,12 @@ and failure management.
   errors and execution bottlenecks.
 
 - **REQ 4.3: Resource Limits** The system must support setting hard limits on
-  maximum resource usage (time, compute, memory) per benchmark instance or set
-  of instances. _Rationale_: Prevents processes from hogging shared
+  maximum resource usage (time, compute, memory) per benchmark submission or set
+  of submissions. _Rationale_: Prevents processes from hogging shared
   infrastructure in the admin environment.
 
 - **REQ 4.4: Result Capture** The system must ensure results from any successful
-  benchmark instance are saved.
+  benchmark submission are saved.
 
 - **REQ 4.5: Standardized Error Reporting** The system must provide a
   standardized mechanism for reporting known, handled execution errors.
@@ -183,7 +184,7 @@ and failure management.
 
 This section outlines how results and supporting context are persisted.
 
-- **REQ 5.1: Centralized Results Storage** Results of all benchmark instances
+- **REQ 5.1: Centralized Results Storage** Results of all benchmark submissions
   must be stored in a centralized location accessible by the respective package
   owners. _Rationale_: Facilitates cross-model comparison, historical tracking,
   and platform-wide reporting.

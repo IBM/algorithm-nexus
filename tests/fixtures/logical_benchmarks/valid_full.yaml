@@ -3,13 +3,10 @@
 
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
+  title: "Inference Serving Performance"
   description: >
     Evaluation of AI model inference serving throughput and latency under controlled traffic conditions.
-  target:
-    identifier: model
-    metadata:
-      description: "The id of the AI model being benchmarked"
-  properties:
+  instance:
     - identifier: dataset
       metadata:
         description: "Dataset used for inference requests."
@@ -24,13 +21,12 @@ logicalBenchmark:
   owner: "@vllm-team"
 
 bindings:
-  - benchmarkIdentifier: inference_serving
-    experiment:
+  - experiment:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 2.0.0
     targetMapping: model_name
-    propertyMapping:
+    instanceMapping:
       - benchmark:
           identifier: dataset
         experiment:

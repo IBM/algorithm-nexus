@@ -9,10 +9,10 @@ within Algorithm Nexus based on
 An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
 scalable execution needs for evaluating **benchmark targets** against defined
-**workloads**. By combining `ado` and Ray with specific **Algorithm Nexus
-Extensions**, integration definitions, and robust administrative processes, the
-team can deliver a comprehensive, end-to-end benchmarking solution capable of
-generating repeatable **benchmark results**.
+**benchmark instances**. By combining `ado` and Ray with specific **Algorithm
+Nexus Extensions**, integration definitions, and robust administrative
+processes, the team can deliver a comprehensive, end-to-end benchmarking
+solution capable of generating repeatable **benchmark results**.
 
 To fully satisfy these requirements, the design of the Benchmarking System is
 divided into three **Architectural Pillars**: System Architecture (The
@@ -37,7 +37,7 @@ model.
 | Tier                                        | Component       | Responsibility & Behavior                                                                                                                                                                                                                                                                              |
 | ------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Tier 1: Benchmark Experiment Definition** | `ado` core      | Serves as the core capability engine. It provides the framework to define, package, and execute a self-contained benchmark experiment. It enforces strict input/output interfaces, handles versioning of the experiment logic, and manages the execution provenance independently of the target model. |
-| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: bind a specific target (the model) to a specific `ado` benchmark experiment and a defined workload.                                     |
+| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: specify how an `ado` benchmark experiment can execute a given benchmark target and a defined benchmark instance.                        |
 
 <!-- markdownlint-enable line-length -->
 
@@ -51,13 +51,13 @@ technical bridge between human operations and the execution engine.
 ### 1.3 Execution and Orchestration Engine
 
 The execution architecture relies on **Ray** and **`ado`**. `ado` leverages
-**Ray** to handle parameter sweeps and single benchmark instances mechanically.
-Thanks to `ado`'s data recording capabilities, if one instance in a sweep fails
-`ado` continues orchestration and commits successful results to the database.
-Ray allows the underlying experiments to explicitly request hardware resources
-(e.g., `@ray.remote(num_gpus=1)`) via task decorators. Ray can also create
-per-task execution environments, allowing tests with incompatible requirements
-to ado-core or other experiments to execute.
+**Ray** to handle parameter sweeps and single benchmark submissions
+mechanically. Thanks to `ado`'s data recording capabilities, if one submission
+in a sweep fails `ado` continues orchestration and commits successful results to
+the database. Ray allows the underlying experiments to explicitly request
+hardware resources (e.g., `@ray.remote(num_gpus=1)`) via task decorators. Ray
+can also create per-task execution environments, allowing tests with
+incompatible requirements to ado-core or other experiments to execute.
 
 ### 1.4 Centralized Data & Discovery
 
@@ -101,8 +101,8 @@ scaled by the administrative team and CI/CD pipelines.
 Admins configure the **Ray cluster** on K8s via KubeRay, with hard namespace
 limits to maintain resource quotas during massive sweeps. To optimize
 performance, the underlying cluster mounts a shared persistent filesystem (via
-PVC) for workload dataset caching. Ray dynamically isolates worker node
-environments to prevent dependency version clashes between concurrent
+PVC) for benchmark instance dataset caching. Ray dynamically isolates worker
+node environments to prevent dependency version clashes between concurrent
 evaluations.
 
 ### 2.2 Orchestration Triggers & Automation
@@ -152,14 +152,14 @@ reliability.
 
 - **Reproducibility Contract:** Contributors must adhere to the convention that
   an experiment name plus specific parameter values defines a unique, repeatable
-  execution. Repeatable here means **the experiment instance use an identical
+  execution. Repeatable here means **the experiment submission use an identical
   process** not produces the same result, as experiments can be stochastic.
 - **Versioning**: ado provides mechanisms for experiment versioning but does not
   prescribe any. The main convention w.r.t experiment versioning is that
   whatever mechanism is chosen ensures the **Reproducibility Contract**
-- **Data Handling Guidelines:** Workload data must either be bundled directly
-  inside the benchmark experiment package or programmed to download dynamically
-  at execution time.
+- **Data Handling Guidelines:** Benchmark instance data must either be bundled
+  directly inside the benchmark experiment package or programmed to download
+  dynamically at execution time.
 
 ### 3.3 Governance of Sweeps
 
@@ -178,7 +178,7 @@ submitted to the Ray cluster for execution.
 | **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`'s convention that a given experiment name encodes a unique, repeatable experiment.                                                              |
 | **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads it dynamically.                                                                     |
 | **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As REQ 1.7                                                                                                                                                                |
-| **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a workload.                                                                              |
+| **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a benchmark instance.                                                                    |
 | **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Benchmark experiment packages (following Standardized Benchmarking Packaging Protocol) can be provided in a Nexus package in the Algorithm Nexus repo, on PyPI or GitHub. |
 | **REQ 6.1** | Admin Security                  | Process                 | CI            | Secured via trusted code submissions and mandatory CVE scans.                                                                                                             |
 | **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. \[PENDING: Nexus Repo Layout Decision\]                |

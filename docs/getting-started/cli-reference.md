@@ -67,7 +67,7 @@ nexus validate package packages/my-package
 
 #### nexus validate benchmarks
 
-Validate benchmark instances in three modes: PR changes, all instances, or
+Validate benchmark submissions in three modes: PR changes, all submissions, or
 specific package.
 
 **Usage:**
@@ -76,7 +76,7 @@ specific package.
 # Validate PR changes
 nexus validate benchmarks --pr <pr_url> [OPTIONS]
 
-# Validate all benchmark instances
+# Validate all benchmark submissions
 nexus validate benchmarks [OPTIONS]
 
 # Validate specific package
@@ -87,9 +87,9 @@ nexus validate benchmarks --package <package_name> [OPTIONS]
 
 - `--pr URL`: GitHub Pull Request URL (e.g.,
   `https://github.com/IBM/algorithm-nexus/pull/123`). If not provided, validates
-  all benchmark instances.
+  all benchmark submissions.
 - `--packages-root PATH`: Path to packages directory (default: `./packages`)
-- `--package NAME`: Validate only benchmark instances from a specific package
+- `--package NAME`: Validate only benchmark submissions from a specific package
 - `--verbose`: Show detailed validation output
 - `--fail-fast`: Stop validation on first error
 - `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
@@ -102,13 +102,13 @@ Validate benchmarks in a PR:
 nexus validate benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123
 ```
 
-Validate all benchmark instances:
+Validate all benchmark submissions:
 
 ```bash
 nexus validate benchmarks
 ```
 
-Validate only instances from a specific package:
+Validate only submissions from a specific package:
 
 ```bash
 nexus validate benchmarks --package terratorch
@@ -144,15 +144,15 @@ nexus validate benchmarks -o yaml
 
 **How it works:**
 
-1. **Discovery**: Finds benchmark instances based on mode:
-    - PR mode: Analyzes PR diff to find modified instances
-    - All mode: Scans packages directory for all instances
-    - Package mode: Finds instances in specified package
-2. **Dependency Resolution**: Groups instances by required benchmark packages
+1. **Discovery**: Finds benchmark submissions based on mode:
+    - PR mode: Analyzes PR diff to find modified submissions
+    - All mode: Scans packages directory for all submissions
+    - Package mode: Finds submissions in specified package
+2. **Dependency Resolution**: Groups submissions by required benchmark packages
 3. **Isolation**: Creates temporary virtual environments for each dependency set
 4. **Installation**: Installs required benchmark packages using `uv` (10-100x
    faster) or `pip`
-5. **Validation**: Validates each instance's `space.yaml` structure using
+5. **Validation**: Validates each submission's `space.yaml` structure using
    Pydantic models and ADO dry-run
 6. **Reporting**: Displays results in table or JSON format with validation
    status, errors, and warnings
@@ -295,15 +295,15 @@ nexus get benchmark-requirements terratorch
 
 ## nexus run
 
-Execute benchmark instances.
+Execute benchmark submissions.
 
 ### Subcommands
 
 #### nexus run benchmarks
 
 Execute benchmarks from a GitHub Pull Request. This command identifies new or
-changed benchmark instances in a PR and optionally executes them using the `ado`
-CLI.
+changed benchmark submissions in a PR and optionally executes them using the
+`ado` CLI.
 
 **Usage:**
 
@@ -339,7 +339,7 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
   Experiments in a benchmark's `space.yaml` whose `actuatorIdentifier` matches a
   key will have the corresponding `actuatorConfigurationId` added to the
   operation's `actuatorConfigurationIdentifiers` list.
-- `--dry-run`: List benchmark instances without executing them (dry run)
+- `--dry-run`: List benchmark submissions without executing them (dry run)
 - `--output-file <path>`: Output file path for execution results. If not
   specified, results are printed to screen.
 - `-o, --output-format <format>`: Output format: 'json' or 'yaml'. Can be used
@@ -353,31 +353,31 @@ The command automatically:
 
 1. Checks if the local repository is on the same commit as the PR
 2. If not, checks out the PR code to a temporary directory
-3. Analyzes the PR to find new or changed benchmark instances
+3. Analyzes the PR to find new or changed benchmark submissions
 4. Executes the benchmarks (unless `--dry-run` is specified)
 5. Writes results to the output file
 
-**Benchmark Instance Detection:**
+**Benchmark Submission Detection:**
 
-A benchmark instance is detected as changed if any file within its directory is
-modified in the PR. This includes:
+A benchmark submission is detected as changed if any file within its directory
+is modified in the PR. This includes:
 
 - Changes to `space.yaml` files
-- Changes to any other files in the `benchmark_instances/<instance-name>/`
+- Changes to any other files in the `benchmark_submissions/<submission-name>/`
   directory
-- New benchmark instance directories (any new folder under
-  `benchmark_instances/`)
+- New benchmark submission directories (any new folder under
+  `benchmark_submissions/`)
 
 The detection works for both:
 
-- **Model-level instances**:
-  `packages/<package>/models/<model>/benchmark_instances/<instance>/`
-- **Package-level instances**:
-  `packages/<package>/benchmark_instances/<instance>/`
+- **Model-level submissions**:
+  `packages/<package>/models/<model>/benchmark_submissions/<submission>/`
+- **Package-level submissions**:
+  `packages/<package>/benchmark_submissions/<submission>/`
 
 !!! note
 
-    When not running in remote mode (`--remote` not set), the benchmark instances will be executed with
+    When not running in remote mode (`--remote` not set), the benchmark submissions will be executed with
     `ado` in the local environment. It is the user responsibility to ensure that the required
     benchmark packages are installed in the local python environment. Benchmark packages are listed for
     each nexus package in the `nexus.yaml` configuration.
@@ -434,17 +434,17 @@ nexus run benchmarks \
 **Output Format:**
 
 By default, the command outputs results in a human-readable format showing the
-status, message, and IDs for each benchmark instance.
+status, message, and IDs for each benchmark submission.
 
 To get structured output (JSON or YAML), use the `--output-format` option:
 
 ```bash
 # Print JSON to console
-algorithm-nexus run packages/terratorch/models/prithvi/benchmark_instances/flood-test \
+algorithm-nexus run packages/terratorch/models/prithvi/benchmark_submissions/flood-test \
   --output-format json
 
 # Print YAML to console
-algorithm-nexus run packages/terratorch/models/prithvi/benchmark_instances/flood-test \
+algorithm-nexus run packages/terratorch/models/prithvi/benchmark_submissions/flood-test \
   --output-format yaml
 ```
 
@@ -452,9 +452,9 @@ The structured output (JSON) has the following format:
 
 ```json
 {
-    "instances": [
+    "submissions": [
         {
-            "instance_path": "packages/<package>/models/<model>/benchmark_instances/test_benchmark",
+            "submission_path": "packages/<package>/models/<model>/benchmark_submissions/test_benchmark",
             "status": "started",
             "message": "Successfully started on Ray cluster with job ID: raysubmit_snRVd4ZqTTKcaR3W | Space ID: space-a009d7-default",
             "space_id": "space-a009d7-default",
@@ -562,7 +562,7 @@ The command will:
 
 1. Automatically detect if your local repo is on the PR commit
 2. Checkout the PR code if needed (to a temporary directory)
-3. Find all new or changed benchmark instances
+3. Find all new or changed benchmark submissions
 4. Execute them and report results
 
 ## Exit Codes
