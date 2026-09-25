@@ -65,7 +65,7 @@ Validate a package at a specific path:
 nexus validate package packages/my-package
 ```
 
-#### nexus validate benchmarks
+#### nexus validate experiments
 
 Validate benchmark submissions in three modes: PR changes, all submissions, or
 specific package.
@@ -74,13 +74,13 @@ specific package.
 
 ```bash
 # Validate PR changes
-nexus validate benchmarks --pr <pr_url> [OPTIONS]
+nexus validate experiments --pr <pr_url> [OPTIONS]
 
 # Validate all benchmark submissions
-nexus validate benchmarks [OPTIONS]
+nexus validate experiments [OPTIONS]
 
-# Validate specific package
-nexus validate benchmarks --package <package_name> [OPTIONS]
+# Validate specific experiment
+nexus validate experiments --experiment <experiment_name> [OPTIONS]
 ```
 
 **Options:**
@@ -88,8 +88,8 @@ nexus validate benchmarks --package <package_name> [OPTIONS]
 - `--pr URL`: GitHub Pull Request URL (e.g.,
   `https://github.com/IBM/algorithm-nexus/pull/123`). If not provided, validates
   all benchmark submissions.
-- `--packages-root PATH`: Path to packages directory (default: `./packages`)
-- `--package NAME`: Validate only benchmark submissions from a specific package
+- `--experiments-root PATH`: Path to experiments directory (default: `./experiments`)
+- `--experiment NAME`: Validate only benchmark submissions from a specific experiment
 - `--verbose`: Show detailed validation output
 - `--fail-fast`: Stop validation on first error
 - `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
@@ -99,47 +99,47 @@ nexus validate benchmarks --package <package_name> [OPTIONS]
 Validate benchmarks in a PR:
 
 ```bash
-nexus validate benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123
+nexus validate experiments --pr https://github.com/IBM/algorithm-nexus/pull/123
 ```
 
 Validate all benchmark submissions:
 
 ```bash
-nexus validate benchmarks
+nexus validate experiments
 ```
 
-Validate only submissions from a specific package:
+Validate only submissions from a specific experiment:
 
 ```bash
-nexus validate benchmarks --package terratorch
+nexus validate experiments --experiment sorting_algorithms
 ```
 
 Validate with verbose output:
 
 ```bash
-nexus validate benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 --verbose
+nexus validate experiments --pr https://github.com/IBM/algorithm-nexus/pull/123 --verbose
 ```
 
 Validate and stop on first error:
 
 ```bash
-nexus validate benchmarks --fail-fast
+nexus validate experiments --fail-fast
 ```
 
 Get results in JSON format:
 
 ```bash
-nexus validate benchmarks --output-format json
+nexus validate experiments --output-format json
 # or using the short form
-nexus validate benchmarks -o json
+nexus validate experiments -o json
 ```
 
 Get results in YAML format:
 
 ```bash
-nexus validate benchmarks --output-format yaml
+nexus validate experiments --output-format yaml
 # or using the short form
-nexus validate benchmarks -o yaml
+nexus validate experiments -o yaml
 ```
 
 **How it works:**
@@ -363,24 +363,19 @@ A benchmark submission is detected as changed if any file within its directory
 is modified in the PR. This includes:
 
 - Changes to `space.yaml` files
-- Changes to any other files in the `benchmark_submissions/<submission-name>/`
-  directory
-- New benchmark submission directories (any new folder under
-  `benchmark_submissions/`)
+- Changes to any other files in the `submissions/<submission-name>/` directory
+- New benchmark submission directories (any new folder under `submissions/`)
 
-The detection works for both:
+The detection works for submissions located at:
 
-- **Model-level submissions**:
-  `packages/<package>/models/<model>/benchmark_submissions/<submission>/`
-- **Package-level submissions**:
-  `packages/<package>/benchmark_submissions/<submission>/`
+- `experiments/<experiment>/submissions/<submission>/`
 
 !!! note
 
     When not running in remote mode (`--remote` not set), the benchmark submissions will be executed with
     `ado` in the local environment. It is the user responsibility to ensure that the required
-    benchmark packages are installed in the local python environment. Benchmark packages are listed for
-    each nexus package in the `nexus.yaml` configuration.
+    experiment package is installed in the local Python environment. The experiment package requirement
+    specifier is declared in `experiments/<experiment>/experiment_package.yaml`.
 
 **Examples:**
 
@@ -440,11 +435,11 @@ To get structured output (JSON or YAML), use the `--output-format` option:
 
 ```bash
 # Print JSON to console
-algorithm-nexus run packages/terratorch/models/prithvi/benchmark_submissions/flood-test \
+algorithm-nexus run experiments/<experiment>/submissions/flood-test \
   --output-format json
 
 # Print YAML to console
-algorithm-nexus run packages/terratorch/models/prithvi/benchmark_submissions/flood-test \
+algorithm-nexus run experiments/<experiment>/submissions/flood-test \
   --output-format yaml
 ```
 
@@ -454,7 +449,7 @@ The structured output (JSON) has the following format:
 {
     "submissions": [
         {
-            "submission_path": "packages/<package>/models/<model>/benchmark_submissions/test_benchmark",
+            "submission_path": "experiments/<experiment>/submissions/test_benchmark",
             "status": "started",
             "message": "Successfully started on Ray cluster with job ID: raysubmit_snRVd4ZqTTKcaR3W | Space ID: space-a009d7-default",
             "space_id": "space-a009d7-default",

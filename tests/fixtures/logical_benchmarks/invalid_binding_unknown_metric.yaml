@@ -1,6 +1,6 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
-# Binding references 'nonexistent_metric' which is not in the definition's metrics list
+# Definition-only file used as the benchmark context for binding integrity tests.
 
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
@@ -9,14 +9,3 @@ logicalBenchmark:
     - identifier: dataset
   metrics:
     - throughput_tokens_per_second
-
-bindings:
-  - experiment:
-      actuatorIdentifier: vllm_performance
-      experimentIdentifier: guide_llm_runner
-      experimentVersion: 1.0.0
-    metricMapping:
-      - benchmark:
-          identifier: nonexistent_metric
-        experiment:
-          identifier: some_internal_metric

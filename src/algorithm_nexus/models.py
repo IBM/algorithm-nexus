@@ -61,6 +61,68 @@ def validate_hf_model_id(v: str) -> str:
     return v
 
 
+def validate_remote_requirement_specifier(v: str) -> str:
+    """Validate that a requirement specifier points to GitHub or PyPI, not a local path.
+
+    Local paths (starting with '.', '/', or '~') are not allowed. The specifier
+    must be either a PyPI package name (optionally with a version constraint) or
+    a GitHub repository URL.
+    """
+    stripped = v.strip()
+    if not stripped:
+        msg = "requirement_specifier must not be empty"
+        raise ValueError(msg)
+    if stripped.startswith((".", "/", "~")):
+        msg = (
+            "requirement_specifier must be a PyPI package name or a GitHub URL. "
+            "Local paths are not allowed."
+        )
+        raise ValueError(msg)
+    return v
+
+
+class ExperimentSpecifier(BaseModel):
+    """Experiment specifier in an experiment_package.yaml file.
+
+    Registers the package that provides experiments and lists the experiment
+    identifiers it exposes. The package must be available on PyPI or GitHub;
+    local paths are not permitted.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    requirement_specifier: Annotated[
+        str,
+        AfterValidator(validate_remote_requirement_specifier),
+        Field(
+            min_length=1,
+            description=(
+                "Python package requirement specifier for the experiment package. "
+                "Must be a PyPI package name (optionally with a version constraint) "
+                "or a GitHub repository URL. Local paths are not allowed."
+            ),
+        ),
+    ]
+    experiments: Annotated[
+        list[str],
+        Field(
+            min_length=1,
+            description="Experiment identifiers exposed by the package.",
+        ),
+    ]
+
+
+class ExperimentConfig(BaseModel):
+    """Top-level schema for experiment_package.yaml files inside experiments/<name>/."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    experiment_package: Annotated[
+        ExperimentSpecifier,
+        Field(description="Experiment package specifier and experiment list."),
+    ]
+
+
 class BenchmarkPackage(BaseModel):
     """Benchmark package registration in nexus.yaml.
 
@@ -266,20 +328,6 @@ class BenchmarkInstanceProperty(Property):
     ] = False
 
 
-class ArtifactLocation(BaseModel):
-    """Value type for an artifact instance property — points to a subfolder within the instance directory."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    artifacts_location: Annotated[
-        str,
-        Field(
-            min_length=1,
-            description="Name of the subfolder within the instance directory that contains the artifact files for this property.",
-        ),
-    ]
-
-
 class FieldMapping(BaseModel):
     """1-to-1 mapping of a benchmark property to an experiment property."""
 
@@ -396,6 +444,13 @@ class BenchmarkBinding(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    benchmarkIdentifier: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Identifier of the logical benchmark this binding targets.",
+        ),
+    ]
     experiment: Annotated[
         ExperimentReference,
         Field(description="The ado ExperimentReference object."),
@@ -507,7 +562,11 @@ class LogicalBenchmarkDefinition(BaseModel):
 
 
 class LogicalBenchmarkConfig(BaseModel):
-    """Root model for a logical benchmark YAML file (problem.yaml)."""
+    """Root model for a logical benchmark YAML file (benchmark.yaml).
+
+    Contains only the logical benchmark definition. Bindings live in
+    experiments/<name>/bindings/*.yaml, not in benchmark.yaml.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -515,7 +574,3 @@ class LogicalBenchmarkConfig(BaseModel):
         LogicalBenchmarkDefinition,
         Field(description="The logical benchmark definition."),
     ]
-    bindings: Annotated[
-        list[BenchmarkBinding] | None,
-        Field(description="Benchmark bindings declared in this file."),
-    ] = None

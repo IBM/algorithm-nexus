@@ -1,25 +1,9 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
-# benchmarkFilters sets 'num_vertices' which is already covered by instanceMapping
+# Definition-only file used as the benchmark context for binding integrity tests.
 
 logicalBenchmark:
   benchmarkIdentifier: graph_coloring
   description: "Graph coloring benchmark"
   instance:
     - identifier: num_vertices
-
-bindings:
-  - experiment:
-      actuatorIdentifier: custom_experiments
-      experimentIdentifier: rlx_coloring
-      experimentVersion: 1.0.0
-    instanceMapping:
-      - benchmark:
-          identifier: num_vertices
-        experiment:
-          identifier: n_nodes
-    staticFilters:
-      benchmarkFilters:
-        - property:
-            identifier: num_vertices
-          value: 50

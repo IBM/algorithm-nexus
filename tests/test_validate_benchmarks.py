@@ -94,9 +94,207 @@ class TestResolveBenchmarkPackageRequirement:
         )
         assert result == "git+ssh://git@github.com/org/repo.git"
 
+    def test_ssh_slash_shorthand_becomes_git_ssh_url(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "git@github.ibm.com/Daniele-Lotito/lightsabre-custom-experiment.git@dl_cp_custom_exp_top_level"
+        )
+        assert (
+            result
+            == "git+ssh://git@github.ibm.com/Daniele-Lotito/lightsabre-custom-experiment.git@dl_cp_custom_exp_top_level"
+        )
+
+    def test_enterprise_github_https_url_gets_git_prefix(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "https://github.ibm.com/org/repo.git"
+        )
+        assert result == "git+https://github.ibm.com/org/repo.git"
+
     def test_pypi_package_unchanged(self):
         result = self.manager._resolve_benchmark_package_requirement("mypackage==1.2.3")
         assert result == "mypackage==1.2.3"
+
+
+class TestFindBenchmarkSubmissions:
+    """Tests for BenchmarkManager.find_benchmark_submissions (PR mode)."""
+
+    def setup_method(self):
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        self.manager = BenchmarkManager(pr_url=None, execute=False)
+
+    def test_finds_submission_in_experiments_path(self):
+        changed_files = [
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml"
+        ]
+        result = self.manager.find_benchmark_submissions(changed_files)
+        assert result == [
+            Path("experiments/sorting_algorithms/submissions/bubble_sort")
+        ]
+
+    def test_deduplicates_multiple_files_in_same_submission(self):
+        changed_files = [
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml",
+            "experiments/sorting_algorithms/submissions/bubble_sort/operation.yaml",
+        ]
+        result = self.manager.find_benchmark_submissions(changed_files)
+        assert len(result) == 1
+        assert result[0] == Path(
+            "experiments/sorting_algorithms/submissions/bubble_sort"
+        )
+
+    def test_finds_multiple_submissions(self):
+        changed_files = [
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml",
+            "experiments/sorting_algorithms/submissions/merge_sort/space.yaml",
+        ]
+        result = self.manager.find_benchmark_submissions(changed_files)
+        assert len(result) == 2
+
+    def test_ignores_non_submission_paths(self):
+        changed_files = [
+            "packages/my-pkg/nexus.yaml",
+            "benchmarks/sorting/benchmark.yaml",
+            "experiments/sorting_algorithms/experiment_package.yaml",
+            "experiments/sorting_algorithms/bindings/sorting_binding.yaml",
+        ]
+        result = self.manager.find_benchmark_submissions(changed_files)
+        assert result == []
+
+    def test_ignores_path_without_enough_parts(self):
+        changed_files = [
+            "experiments/sorting_algorithms/space.yaml",  # no 'submissions' segment
+        ]
+        result = self.manager.find_benchmark_submissions(changed_files)
+        assert result == []
+
+
+class TestGetBenchmarkPackagesForSubmission:
+    """Tests for BenchmarkManager.get_benchmark_packages_for_submission."""
+
+    def setup_method(self):
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        self.manager = BenchmarkManager(pr_url=None, execute=False)
+
+    def test_reads_requirement_from_experiment_package_yaml(self, tmp_path):
+        """Test that requirement_specifier is read from experiments/<name>/experiment_package.yaml."""
+        exp_dir = tmp_path / "experiments" / "sorting_algorithms"
+        exp_dir.mkdir(parents=True)
+        (exp_dir / "experiment_package.yaml").write_text(
+            "experiment_package:\n"
+            "  requirement_specifier: sorting-benchmarks\n"
+            "  experiments:\n"
+            "    - bubble_sort\n"
+        )
+
+        self.manager.repo_root = tmp_path
+        submission = Path("experiments/sorting_algorithms/submissions/bubble_sort")
+        result = self.manager.get_benchmark_packages_for_submission(submission)
+        assert result == {"sorting-benchmarks"}
+
+    def test_github_url_gets_git_prefix(self, tmp_path):
+        """Test that GitHub HTTPS URL gets git+ prefix."""
+        exp_dir = tmp_path / "experiments" / "my_exp"
+        exp_dir.mkdir(parents=True)
+        (exp_dir / "experiment_package.yaml").write_text(
+            "experiment_package:\n"
+            "  requirement_specifier: https://github.com/org/repo.git\n"
+            "  experiments:\n"
+            "    - my_exp\n"
+        )
+
+        self.manager.repo_root = tmp_path
+        submission = Path("experiments/my_exp/submissions/run1")
+        result = self.manager.get_benchmark_packages_for_submission(submission)
+        assert result == {"git+https://github.com/org/repo.git"}
+
+    def test_returns_empty_when_no_experiment_package_yaml(self, tmp_path):
+        """Test empty set returned when experiment_package.yaml does not exist."""
+        (tmp_path / "experiments" / "my_exp").mkdir(parents=True)
+        self.manager.repo_root = tmp_path
+        submission = Path("experiments/my_exp/submissions/run1")
+        result = self.manager.get_benchmark_packages_for_submission(submission)
+        assert result == set()
+
+    def test_returns_empty_for_non_experiment_path(self, tmp_path):
+        """Test empty set for paths not under experiments/."""
+        self.manager.repo_root = tmp_path
+        submission = Path("packages/my-pkg/benchmark_submissions/run1")
+        result = self.manager.get_benchmark_packages_for_submission(submission)
+        assert result == set()
+
+
+class TestFindAllBenchmarkSubmissions:
+    """Tests for BenchmarkManager.find_all_benchmark_submissions."""
+
+    def setup_method(self):
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        self.manager = BenchmarkManager(pr_url=None, execute=False)
+
+    def _make_experiment(
+        self, experiments_root: Path, name: str, requirement: str = "my-pkg"
+    ) -> Path:
+        """Helper: create a minimal experiment directory with experiment_package.yaml."""
+        exp_dir = experiments_root / name
+        exp_dir.mkdir(parents=True, exist_ok=True)
+        (exp_dir / "experiment_package.yaml").write_text(
+            f"experiment_package:\n  requirement_specifier: {requirement}\n"
+        )
+        return exp_dir
+
+    def test_finds_submissions_with_space_yaml(self, tmp_path):
+        """Test that submissions containing space.yaml are discovered."""
+        exp_dir = self._make_experiment(tmp_path / "experiments", "sorting_algorithms")
+        sub_dir = exp_dir / "submissions" / "bubble_sort"
+        sub_dir.mkdir(parents=True)
+        (sub_dir / "space.yaml").write_text("entitySpace: []\n")
+
+        result = self.manager.find_all_benchmark_submissions(tmp_path / "experiments")
+        assert Path("experiments/sorting_algorithms/submissions/bubble_sort") in result
+
+    def test_ignores_submissions_without_space_yaml(self, tmp_path):
+        """Test that submission directories without space.yaml are ignored."""
+        exp_dir = self._make_experiment(tmp_path / "experiments", "sorting_algorithms")
+        sub_dir = exp_dir / "submissions" / "incomplete"
+        sub_dir.mkdir(parents=True)
+        # No space.yaml
+
+        result = self.manager.find_all_benchmark_submissions(tmp_path / "experiments")
+        assert result == []
+
+    def test_experiment_filter(self, tmp_path):
+        """Test that experiment_filter limits results to one experiment."""
+        experiments_root = tmp_path / "experiments"
+        for exp_name in ["exp_a", "exp_b"]:
+            exp_dir = self._make_experiment(experiments_root, exp_name)
+            sub_dir = exp_dir / "submissions" / "run1"
+            sub_dir.mkdir(parents=True)
+            (sub_dir / "space.yaml").write_text("entitySpace: []\n")
+
+        result = self.manager.find_all_benchmark_submissions(
+            experiments_root, experiment_filter="exp_a"
+        )
+        assert len(result) == 1
+        assert "exp_a" in str(result[0])
+
+    def test_missing_experiment_package_yaml_returns_empty(self, tmp_path):
+        """Test that an experiment directory without experiment_package.yaml is skipped."""
+        exp_dir = tmp_path / "experiments" / "missing_yaml"
+        exp_dir.mkdir(parents=True)
+        # No experiment_package.yaml, no submissions either
+
+        result = self.manager.find_all_benchmark_submissions(tmp_path / "experiments")
+        assert result == []
+
+    def test_nonexistent_experiments_root_exits(self, tmp_path):
+        """Test that a nonexistent experiments root raises a typer.Exit."""
+        import typer
+
+        with pytest.raises(typer.Exit):
+            self.manager.find_all_benchmark_submissions(
+                tmp_path / "nonexistent_experiments"
+            )
 
 
 class TestAdoValidator:
@@ -194,21 +392,21 @@ entitySpace:
 class TestValidateBenchmarksCommand:
     """Tests for validate benchmarks CLI command."""
 
-    def test_validate_benchmarks_nonexistent_package(self, tmp_path, capsys):
-        """Test validate benchmarks with nonexistent package."""
+    def test_validate_experiments_nonexistent_experiment(self, tmp_path, capsys):
+        """Test validate benchmarks with nonexistent experiment."""
         import typer
 
-        from algorithm_nexus.commands.validate import validate_benchmarks
+        from algorithm_nexus.commands.validate import validate_experiments
 
-        packages_root = tmp_path / "packages"
-        packages_root.mkdir()
-        (packages_root / "existing-package").mkdir()
+        experiments_root = tmp_path / "experiments"
+        experiments_root.mkdir()
+        (experiments_root / "existing-experiment").mkdir()
 
         with pytest.raises(typer.Exit) as exc_info:
-            validate_benchmarks(
+            validate_experiments(
                 pr_url=None,
-                packages_root=packages_root,
-                package="nonexistent-package",
+                experiments_root=experiments_root,
+                experiment="nonexistent-experiment",
                 verbose=False,
                 fail_fast=False,
                 output_format="table",
@@ -216,56 +414,56 @@ class TestValidateBenchmarksCommand:
         assert exc_info.value.exit_code == 1
 
         captured = capsys.readouterr()
-        assert "nexus list packages" in captured.out
+        assert "nexus list experiments" in captured.out
 
-    def test_validate_benchmarks_no_instances_in_package(self, tmp_path):
-        """Test validate benchmarks finds no instances when package has no benchmark_submissions."""
+    def test_validate_experiments_no_instances_in_experiment(self, tmp_path):
+        """Test validate benchmarks finds no instances when experiment has no submissions."""
         import contextlib
 
         import typer
 
-        from algorithm_nexus.commands.validate import validate_benchmarks
+        from algorithm_nexus.commands.validate import validate_experiments
 
-        packages_root = tmp_path / "packages"
-        packages_root.mkdir()
-        (packages_root / "test-package").mkdir()
+        experiments_root = tmp_path / "experiments"
+        experiments_root.mkdir()
+        (experiments_root / "test-experiment").mkdir()
 
-        # No benchmark_submissions directories exist, so validation exits cleanly with code 0
+        # No submissions directories exist, so validation exits cleanly with code 0
         with contextlib.suppress(typer.Exit):
-            validate_benchmarks(
+            validate_experiments(
                 pr_url=None,
-                packages_root=packages_root,
-                package="test-package",
+                experiments_root=experiments_root,
+                experiment="test-experiment",
                 verbose=False,
                 fail_fast=False,
                 output_format="table",
             )
 
-    def test_validate_benchmarks_both_package_and_pr_warns(self, tmp_path, capsys):
-        """Test that specifying both --package and --pr prints a warning."""
+    def test_validate_experiments_both_experiment_and_pr_warns(self, tmp_path, capsys):
+        """Test that specifying both --experiment and --pr prints a warning."""
         import contextlib
 
         import typer
 
-        from algorithm_nexus.commands.validate import validate_benchmarks
+        from algorithm_nexus.commands.validate import validate_experiments
 
-        packages_root = tmp_path / "packages"
-        packages_root.mkdir()
+        experiments_root = tmp_path / "experiments"
+        experiments_root.mkdir()
 
-        # Providing both package and pr_url should print a warning before proceeding
+        # Providing both experiment and pr_url should print a warning before proceeding
         # (it will then fail trying to reach GitHub, which we suppress)
         with contextlib.suppress(typer.Exit, Exception):
-            validate_benchmarks(
+            validate_experiments(
                 pr_url="https://github.com/test/repo/pull/1",
-                packages_root=packages_root,
-                package="some-package",
+                experiments_root=experiments_root,
+                experiment="some-experiment",
                 verbose=False,
                 fail_fast=False,
                 output_format="table",
             )
 
         captured = capsys.readouterr()
-        assert "--package is ignored" in captured.out
+        assert "--experiment is ignored" in captured.out
 
 
 # Made with Bob

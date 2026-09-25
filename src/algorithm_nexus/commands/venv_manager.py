@@ -113,30 +113,57 @@ def install_packages(
         return False
 
 
-def run_in_venv(
+def verify_experiments_installed(
     venv_path: Path,
-    command: list[str],
-    capture_output: bool = True,
-) -> subprocess.CompletedProcess:
-    """Execute a command in the virtual environment context.
+    experiment_ids: list[str],
+    verbose: bool = False,
+) -> tuple[bool, list[str]]:
+    """Verify that the declared experiment IDs are discoverable after package install.
+
+    Runs `ado describe experiments` in the venv and checks that each declared
+    experiment ID appears in the output.
 
     Args:
         venv_path: Path to the virtual environment
-        command: Command to execute (without python prefix)
-        capture_output: Whether to capture stdout/stderr
+        experiment_ids: List of experiment identifiers to verify
+        verbose: Whether to show command output
 
     Returns:
-        CompletedProcess instance with execution results
+        Tuple of (success, list_of_error_strings)
     """
-    python_path = venv_path / "bin" / "python"
-    full_command = [str(python_path), *command]
+    ado_binary = venv_path / "bin" / "ado"
+    if not ado_binary.is_file():
+        return False, [
+            "ADO binary not found in the virtual environment. Make sure ado-core is installed."
+        ]
 
-    return subprocess.run(  # noqa: S603
-        full_command,
-        capture_output=capture_output,
-        text=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(  # noqa: S603
+            [str(ado_binary), "get", "experiments"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return False, ["Timed out waiting for `ado get experiments`"]
+    except Exception as e:
+        return False, [f"Failed to run `ado get experiments`: {e}"]
+
+    if verbose:
+        console.print(f"  [dim]ado get experiments stdout:[/dim]\n{result.stdout}")
+        if result.stderr:
+            console.print(f"  [dim]stderr:[/dim]\n{result.stderr}")
+
+    output = result.stdout + result.stderr
+    errors = [
+        f"Experiment '{exp_id}' not found after installing package "
+        f"(not listed by `ado get experiments`)"
+        for exp_id in experiment_ids
+        if exp_id not in output
+    ]
+
+    return len(errors) == 0, errors
 
 
 def cleanup_venv(venv_path: Path) -> None:

@@ -3,27 +3,23 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Contributing a Benchmark for a Model
+# Contributing a Benchmark
 
-This guide walks you through adding a benchmark for an algorithm that you have
-already registered in Algorithm Nexus. If you have not yet registered your
-algorithm, start with
+This guide walks you through adding a benchmark to Algorithm Nexus. If you have
+not yet registered your algorithm, start with
 [Contributing a Python Algorithm Package to Algorithm Nexus](./add_new_nexus_package.md).
 
-There are four steps to add a benchmark for your algorithm:
+There are four steps to add a benchmark:
 
-1. **Find or create a benchmark experiment**
-2. **Register the experiment with your Nexus package**
-3. **Define a benchmark submission for your algorithm**
+1. **Find or create a benchmark experiment package**
+2. **Create an experiment folder and register the package**
+3. **Define a benchmark submission**
 4. **Run the benchmark**
 
 ## Prerequisites
 
 Before you begin, ensure:
 
-- Your algorithm is registered in a Nexus package under
-  `packages/<package-name>/models/<model-name>/model.yaml`. See
-  [Contributing a Python Algorithm Package](./add_new_nexus_package.md) if not.
 - `uv` is [installed](https://docs.astral.sh/uv/getting-started/installation/)
   on your system.
 - You have a
@@ -36,7 +32,7 @@ cd algorithm-nexus
 uv sync --group dev --extra cli
 ```
 
-## Step 1: Find or create a benchmark experiment
+## Step 1: Find or create a benchmark experiment package
 
 A benchmark experiment is a Python package that defines how to evaluate an
 algorithm. First check whether a suitable experiment already exists in Algorithm
@@ -51,8 +47,8 @@ uv run nexus list benchmark-experiments
 ```
 
 If an experiment covers the evaluation you need, note its experiment ID and the
-benchmark package that provides it — you will reference both in the next step.
-Skip ahead to [Step 2](#step-2-register-the-experiment-with-your-nexus-package).
+experiment folder that declares it — you will reference both in the next step.
+Skip ahead to [Step 2](#step-2-create-an-experiment-folder-and-register-the-package).
 
 To inspect the inputs, outputs, and parameters of a specific experiment, install
 the benchmark package it belongs to and use the `ado` CLI:
@@ -62,77 +58,68 @@ uv pip install <benchmark-package>
 ado describe experiment <experiment-id>
 ```
 
-### Create a new experiment
+### Create a new experiment package
 
 If no existing experiment fits your needs, create one following the
 [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/).
 A benchmark experiment is a standard `ado` custom experiment packaged as a
-Python package.
+Python package. The package must be published on PyPI or hosted on GitHub —
+local packages stored only inside the repository are not supported.
 
-Place the package under your Nexus package directory:
+## Step 2: Create an experiment folder and register the package
 
-```text
-packages/<package-name>/
-└── benchmark_packages/
-    └── <benchmark-package-name>/
-        ├── pyproject.toml
-        └── src/
-```
-
-## Step 2: Register the experiment with your Nexus package
-
-Edit `packages/<package-name>/nexus.yaml` to declare that it uses a the
-experiment from the given package
-
-```yaml
-package:
-    name: <package-name>
-
-    benchmark_packages:
-        # Local package stored in this repository
-        - requirement_specifier: "./packages/<package-name>/benchmark_packages/<experiment-package-name>"
-          experiments:
-              - "<experiment-id>"
-
-        # Remote package hosted on GitHub
-        - requirement_specifier: "https://github.com/<org>/<experiment-package-repo>"
-          experiments:
-              - "<experiment-id>"
-
-        # Package published on PyPI
-        - requirement_specifier: "<experiment-package-name>"
-          experiments:
-              - "<experiment-id>"
-```
-
-Each `requirement_specifier` must resolve to a Python package that contains an
-`ado` custom experiment.
-
-Validate the updated package configuration:
+Create a new directory under `experiments/` for your experiment:
 
 ```bash
-uv run nexus validate package packages/<package-name>
+mkdir -p experiments/<experiment-name>/submissions
+mkdir -p experiments/<experiment-name>/bindings
+```
+
+Create `experiments/<experiment-name>/experiment_package.yaml` to declare the experiment
+package and the experiment identifiers it exposes:
+
+```yaml
+experiment_package:
+    # PyPI package (optionally with version constraint)
+    requirement_specifier: "<experiment-package-name>"
+    experiments:
+        - "<experiment-id>"
+```
+
+Or for a package hosted on GitHub:
+
+```yaml
+experiment_package:
+    requirement_specifier: "https://github.com/<org>/<experiment-package-repo>"
+    experiments:
+        - "<experiment-id>"
+```
+
+The `requirement_specifier` must be a PyPI package name or a GitHub URL.
+Local paths are not allowed.
+
+Validate the new experiment folder:
+
+```bash
+uv run nexus validate experiments --experiment <experiment-name>
 ```
 
 Fix any validation errors before proceeding.
 
-## Step 3: Define a benchmark submission for your model
+## Step 3: Define a benchmark submission
 
-A benchmark submission specifies executing a registered experiment on your
-model/algorithm with a specific set of parameter values (benchmark instance).
-Each benchmark submission is a folder under your model's
-`benchmark_submissions/` directory, that contains an `ado` `space.yaml`
+A benchmark submission specifies executing a registered experiment with a
+specific set of parameter values (benchmark instance). Each submission is a
+folder under `experiments/<experiment-name>/submissions/` containing a
+`space.yaml` file.
 
-Create the directory,
+Create the directory:
 
 ```bash
-mkdir -p packages/<package-name>/models/<model-name>/benchmark_submissions/<submission-name>
+mkdir -p experiments/<experiment-name>/submissions/<submission-name>
 ```
 
-Create
-`packages/<package-name>/models/<model-name>/benchmark_submissions/<submission-name>/space.yaml`:
-
-Example:
+Create `experiments/<experiment-name>/submissions/<submission-name>/space.yaml`:
 
 ```yaml
 entitySpace:
@@ -150,20 +137,20 @@ experiments:
 
 The `entitySpace` defines the benchmark instance and any other parameters for
 this submission. The `experimentIdentifier` must match one of the experiment IDs
-you registered in `nexus.yaml` in the previous step.
+you declared in `experiment_package.yaml` in the previous step.
 
 For full details on `space.yaml` syntax, see the
 [ADO discoveryspace documentation](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace).
 
-Validate the package again to confirm the instance is well-formed:
+Validate the experiment folder again to confirm the submission is well-formed:
 
 ```bash
-uv run nexus validate package packages/<package-name>
+uv run nexus validate experiments --experiment <experiment-name>
 ```
 
 ## Step 4: Run the benchmark
 
-Install the benchmark package and run the benchmark submission locally using the
+Install the experiment package and run the benchmark submission locally using the
 `ado` CLI. First save the following operation configuration to a file `op.yaml`.
 It will execute the experiment on all points in your space.
 
@@ -183,11 +170,11 @@ operation:
             mode: random
 ```
 
-Then,
+Then:
 
 ```bash
-uv pip install packages/<package-name>/benchmark_packages/<experiment-package-name>
-ado create space -f <space-yaml-path>
+uv pip install <experiment-package-name>
+ado create space -f experiments/<experiment-name>/submissions/<submission-name>/space.yaml
 ado create operation -f op.yaml --use-latest space
 ```
 
@@ -199,9 +186,8 @@ execution options including parameter sweeps and remote execution.
 Add and commit your changes:
 
 ```bash
-git add packages/<package-name>
-git add benchmark_packages #required when also adding a benchmark package during Step 1
-git commit -s -m "feat(benchmark): Add <submission-name> benchmark for <model-name>"
+git add experiments/<experiment-name>
+git commit -s -m "feat(benchmark): Add <submission-name> submission for <experiment-name>"
 git push origin <your-branch>
 ```
 
@@ -226,7 +212,7 @@ This is done in two parts:
 Logical benchmark definitions live in the `benchmarks/` directory at the root of
 the Algorithm Nexus repository. Browse that directory to see whether a
 definition already exists for your domain (e.g.
-`benchmarks/llm-inference/problem.yaml`, `benchmarks/max-cut/problem.yaml`).
+`benchmarks/llm-inference/benchmark.yaml`, `benchmarks/max-cut/benchmark.yaml`).
 
 - **If a definition exists** — you add a binding for experiment to it. Continue
   to
@@ -237,7 +223,7 @@ definition already exists for your domain (e.g.
 ### Create a logical benchmark definition
 
 If no definition exists, create a directory in
-`benchmarks/<logical-benchmark-id>/` with a `problem.yaml` file. This file
+`benchmarks/<logical-benchmark-id>/` with a `benchmark.yaml` file. This file
 establishes the canonical vocabulary for your benchmark — property names, valid
 values, and metric names.
 
@@ -281,7 +267,6 @@ logicalBenchmark:
         metric: num_colors_used
         order: asc
     owner: "@graph-team"
-bindings: [] # List of bindings to this benchmark
 ```
 
 For the full schema and a complete worked example, see
@@ -310,17 +295,19 @@ graph:
 
 ### Add a benchmark binding for your experiment
 
-The binding is added to the list of bindings in the logical benchmark yaml.
+Create a binding file under `experiments/<experiment-name>/bindings/`. Each
+entry in the `bindings` list must include a `benchmarkIdentifier` field that
+names the logical benchmark it maps to.
 
 ```yaml
-logicalBenchmark: ... #logical benchmark fields
 bindings:
-    - experiment:
-          experimentIdentifer: myexperiment
+    - benchmarkIdentifier: <logical-benchmark-id>
+      experiment:
+          experimentIdentifier: myexperiment
           experimentVersion: 1.2
           actuatorIdentifier: customexperiments
       targetMapping: ...
-    -  #next binding
+    - # next binding (may target a different benchmarkIdentifier)
 ```
 
 A binding contains the following mapping sections:
@@ -339,32 +326,34 @@ A binding contains the following mapping sections:
 - `metricMapping`: Maps outputs of the logical benchmark to the outputs of the
   experiment
 
-An example binding is
+An example binding file (`experiments/rlx_coloring/bindings/graph_coloring_binding.yaml`):
 
 ```yaml
-experiment:
-    actuatorIdentifier: custom_experiments
-    experimentIdentifier: rlx_coloring
-    experimentVersion: 1.0.0 # The binding only uses the major version
-targetMapping: solver # The experiment property that carries the benchmark target identifier
-instanceMapping:
-    - benchmark:
-          identifier: num_vertices
+bindings:
+    - benchmarkIdentifier: graph_coloring
       experiment:
-          identifier: n_nodes # rlx_coloring's internal param name
-    - benchmark:
-          identifier: edge_density
-      experiment:
-          identifier: density # rlx_coloring's internal param name
-metricMapping:
-    - benchmark:
-          identifier: num_colors_used
-      experiment:
-          identifier: colors # rlx_coloring's internal metric name
-    - benchmark:
-          identifier: elapsed_ms
-      experiment:
-          identifier: runtime_ms # rlx_coloring's internal metric name
+          actuatorIdentifier: custom_experiments
+          experimentIdentifier: rlx_coloring
+          experimentVersion: 1.0.0 # The binding only uses the major version
+      targetMapping: solver # The experiment property that carries the benchmark target identifier
+      instanceMapping:
+          - benchmark:
+                identifier: num_vertices
+            experiment:
+                identifier: n_nodes # rlx_coloring's internal param name
+          - benchmark:
+                identifier: edge_density
+            experiment:
+                identifier: density # rlx_coloring's internal param name
+      metricMapping:
+          - benchmark:
+                identifier: num_colors_used
+            experiment:
+                identifier: colors # rlx_coloring's internal metric name
+          - benchmark:
+                identifier: elapsed_ms
+            experiment:
+                identifier: runtime_ms # rlx_coloring's internal metric name
 ```
 
 For the full benchmark binding schema and worked examples, see the
@@ -379,13 +368,13 @@ logical benchmark definitions and their bindings.
 
 ### Structure
 
-Each logical benchmark has its own directory containing `problem.yaml` and an
+Each logical benchmark has its own directory containing `benchmark.yaml` and an
 `instances/` directory with per-instance subfolders:
 
 ```text
 benchmarks/
 ├── <benchmark-id>/
-│   ├── problem.yaml
+│   ├── benchmark.yaml
 │   ├── README.md              # optional: full problem statement and context
 │   └── instances/
 │       ├── <instance-1-id>/
@@ -397,19 +386,14 @@ benchmarks/
 └── ...
 ```
 
-A `README.md` alongside `problem.yaml` is encouraged to provide a full
+A `README.md` alongside `benchmark.yaml` is encouraged to provide a full
 description of the problem. For example to explain the mathematical formulation,
 provide references, or describe the instance structure in more detail than the
-`description` field in `problem.yaml` allows.
+`description` field in `benchmark.yaml` allows.
 
-Each `problem.yaml` uses the following top-level structure:
-
-```yaml
-logicalBenchmark:
-    # Definition fields (see Section 2 of the Benchmark Metadata Convention)
-bindings:
-    # List of benchmark bindings (see Section 3 of the Benchmark Metadata Convention)
-```
+Benchmark bindings for any experiment targeting this logical benchmark live in
+`experiments/<experiment-name>/bindings/` (see
+[Section 3 of the Benchmark Metadata Convention](../design/benchmark_metadata_convention.md#3-benchmark-binding)).
 
 ### Ownership
 

@@ -21,33 +21,19 @@ from algorithm_nexus.models import BenchmarkExecutionResult
 class TestParseInstancePath:
     """Tests for _parse_submission_path method."""
 
-    def test_parse_model_level_instance(self) -> None:
-        """Test parsing model-level benchmark instance path."""
+    def test_parse_experiment_submission(self) -> None:
+        """Test parsing an experiment submission path."""
         manager = BenchmarkManager(
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
 
-        package, model, instance = manager._parse_submission_path(
-            Path("packages/terratorch/models/prithvi/benchmark_submissions/flood-test")
+        experiment, model, instance = manager._parse_submission_path(
+            Path("experiments/sorting_algorithms/submissions/bubble_sort")
         )
 
-        assert package == "terratorch"
-        assert model == "prithvi"
-        assert instance == "flood-test"
-
-    def test_parse_package_level_instance(self) -> None:
-        """Test parsing package-level benchmark instance path."""
-        manager = BenchmarkManager(
-            pr_url="https://github.com/test/repo/pull/123", execute=False
-        )
-
-        package, model, instance = manager._parse_submission_path(
-            Path("packages/terratorch/benchmark_submissions/base-test")
-        )
-
-        assert package == "terratorch"
+        assert experiment == "sorting_algorithms"
         assert model == "base"
-        assert instance == "base-test"
+        assert instance == "bubble_sort"
 
     def test_parse_invalid_path_too_short(self) -> None:
         """Test parsing fails for path that's too short."""
@@ -59,10 +45,10 @@ class TestParseInstancePath:
             ValueError,
             match="Invalid benchmark submission path format",
         ):
-            manager._parse_submission_path(Path("packages"))
+            manager._parse_submission_path(Path("experiments"))
 
-    def test_parse_invalid_model_level_path(self) -> None:
-        """Test parsing fails for incomplete model-level path."""
+    def test_parse_invalid_path_missing_submissions(self) -> None:
+        """Test parsing fails when 'submissions' segment is absent."""
         manager = BenchmarkManager(
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
@@ -72,11 +58,11 @@ class TestParseInstancePath:
             match="Invalid benchmark submission path format",
         ):
             manager._parse_submission_path(
-                Path("packages/terratorch/models/prithvi/benchmark_submissions")
+                Path("experiments/sorting_algorithms/bubble_sort")
             )
 
-    def test_parse_invalid_package_level_path(self) -> None:
-        """Test parsing fails for incomplete package-level path."""
+    def test_parse_invalid_path_old_packages_format(self) -> None:
+        """Test that old packages/<pkg>/benchmark_submissions/<sub> paths are rejected."""
         manager = BenchmarkManager(
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
@@ -86,81 +72,54 @@ class TestParseInstancePath:
             match="Invalid benchmark submission path format",
         ):
             manager._parse_submission_path(
-                Path("packages/terratorch/benchmark_submissions")
+                Path("packages/terratorch/benchmark_submissions/base-test")
             )
 
 
 class TestFindBenchmarkInstances:
     """Tests for find_benchmark_submissions method."""
 
-    def test_find_model_level_instances(self) -> None:
-        """Test finding model-level benchmark instances from changed files."""
+    def test_find_experiment_submission(self) -> None:
+        """Test finding an experiment submission from changed files."""
         manager = BenchmarkManager(
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
 
         changed_files = [
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/config.json",
-            "tests/fixtures/packages/terratorch/models/prithvi/model.yaml",
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml",
+            "experiments/sorting_algorithms/submissions/bubble_sort/operation.yaml",
+            "experiments/sorting_algorithms/experiment_package.yaml",
         ]
 
         instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 1
         assert instances[0] == Path(
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test"
+            "experiments/sorting_algorithms/submissions/bubble_sort"
         )
 
-    def test_find_package_level_instances(self) -> None:
-        """Test finding package-level benchmark instances from changed files."""
+    def test_find_multiple_experiment_submissions(self) -> None:
+        """Test finding multiple experiment submissions from changed files."""
         manager = BenchmarkManager(
             pr_url="https://github.com/test/repo/pull/123", execute=False
         )
 
         changed_files = [
-            "tests/fixtures/packages/terratorch/benchmark_submissions/base-test/space.yaml",
-            "tests/fixtures/packages/terratorch/nexus.yaml",
-        ]
-
-        instances = manager.find_benchmark_submissions(changed_files)
-
-        assert len(instances) == 1
-        assert instances[0] == Path(
-            "tests/fixtures/packages/terratorch/benchmark_submissions/base-test"
-        )
-
-    def test_find_multiple_instances(self) -> None:
-        """Test finding multiple benchmark instances."""
-        manager = BenchmarkManager(
-            pr_url="https://github.com/test/repo/pull/123", execute=False
-        )
-
-        changed_files = [
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
-            "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/fire-test/space.yaml",
-            "tests/fixtures/packages/tokamind/benchmark_submissions/base-test/space.yaml",
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml",
+            "experiments/sorting_algorithms/submissions/merge_sort/space.yaml",
+            "experiments/qubit_routing/submissions/run1/space.yaml",
         ]
 
         instances = manager.find_benchmark_submissions(changed_files)
 
         assert len(instances) == 3
         assert (
-            Path(
-                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/flood-test"
-            )
-            in instances
+            Path("experiments/sorting_algorithms/submissions/bubble_sort") in instances
         )
         assert (
-            Path(
-                "tests/fixtures/packages/terratorch/models/prithvi/benchmark_submissions/fire-test"
-            )
-            in instances
+            Path("experiments/sorting_algorithms/submissions/merge_sort") in instances
         )
-        assert (
-            Path("tests/fixtures/packages/tokamind/benchmark_submissions/base-test")
-            in instances
-        )
+        assert Path("experiments/qubit_routing/submissions/run1") in instances
 
     def test_find_no_instances(self) -> None:
         """Test when no benchmark instances are found."""
@@ -171,6 +130,7 @@ class TestFindBenchmarkInstances:
         changed_files = [
             "packages/terratorch/models/prithvi/model.yaml",
             "packages/terratorch/nexus.yaml",
+            "experiments/sorting_algorithms/experiment_package.yaml",
             "README.md",
         ]
 
@@ -185,9 +145,9 @@ class TestFindBenchmarkInstances:
         )
 
         changed_files = [
-            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/space.yaml",
-            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/config.json",
-            "packages/terratorch/models/prithvi/benchmark_submissions/flood-test/data.csv",
+            "experiments/sorting_algorithms/submissions/bubble_sort/space.yaml",
+            "experiments/sorting_algorithms/submissions/bubble_sort/config.json",
+            "experiments/sorting_algorithms/submissions/bubble_sort/data.csv",
         ]
 
         instances = manager.find_benchmark_submissions(changed_files)

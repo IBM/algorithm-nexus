@@ -1,6 +1,6 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
-# Binding uses both experimentFilters and benchmarkFilters under staticFilters
+# Definition-only file used as the benchmark context for binding integrity tests.
 
 logicalBenchmark:
   benchmarkIdentifier: graph_coloring
@@ -8,23 +8,3 @@ logicalBenchmark:
   instance:
     - identifier: num_vertices
     - identifier: graph_family
-
-bindings:
-  - experiment:
-      actuatorIdentifier: custom_experiments
-      experimentIdentifier: rlx_coloring
-      experimentVersion: 1.0.0
-    instanceMapping:
-      - benchmark:
-          identifier: num_vertices
-        experiment:
-          identifier: n_nodes
-    staticFilters:
-      experimentFilters:
-        - property:
-            identifier: graph_type
-          value: erdos_renyi
-      benchmarkFilters:
-        - property:
-            identifier: graph_family
-          value: random_regular

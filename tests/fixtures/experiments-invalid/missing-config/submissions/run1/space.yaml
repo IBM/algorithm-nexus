@@ -1,0 +1,8 @@
+entitySpace:
+  - identifier: dataset
+    propertyDomain:
+      values: ["example-dataset"]
+
+experiments:
+  - actuatorIdentifier: custom_experiments
+    experimentIdentifier: some-eval
