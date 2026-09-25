@@ -17,9 +17,9 @@ nav = [
     { "Dependency Resolution" = "design/dependency-resolution.md" },
     { "Benchmarking Architecture" = [
       "design/benchmarking/index.md",
-      { "Benchmark Execution and Operations" = "design/benchmarking/benchmark_execution.md" },
-      { "Benchmark Experiments and Submissions" = "design/benchmarking/benchmark_experiments_and_submissions.md" },
       { "Logical Benchmarks and Instances" = "design/benchmarking/logical_benchmarks_and_instances.md" },
+      { "Benchmark Experiments and Submissions" = "design/benchmarking/benchmark_experiments_and_submissions.md" },
+      { "Benchmark Execution and Operations" = "design/benchmarking/benchmark_execution.md" },
     ] },
     { "Project Release" = "design/project_release.md" },
   ] },
