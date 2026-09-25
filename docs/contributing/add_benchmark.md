@@ -270,7 +270,7 @@ logicalBenchmark:
 ```
 
 For the full schema and a complete worked example, see
-[Section 2 of the Benchmark Metadata Convention](../design/benchmark_metadata_convention.md#2-logical-benchmark-definition).
+[Section 2 of Logical Benchmarks and Instances](../design/benchmarking/logical_benchmarks_and_instances.md#2-logical-benchmark-definition).
 
 ### Add logical benchmark instances
 
@@ -357,7 +357,7 @@ bindings:
 ```
 
 For the full benchmark binding schema and worked examples, see the
-[Benchmark Metadata Convention](../design/benchmark_metadata_convention.md).
+[Logical Benchmarks and Instances](../design/benchmarking/logical_benchmarks_and_instances.md).
 
 ---
 
@@ -393,7 +393,7 @@ provide references, or describe the instance structure in more detail than the
 
 Benchmark bindings for any experiment targeting this logical benchmark live in
 `experiments/<experiment-name>/bindings/` (see
-[Section 3 of the Benchmark Metadata Convention](../design/benchmark_metadata_convention.md#3-benchmark-binding)).
+[Section 3 of Logical Benchmarks and Instances](../design/benchmarking/logical_benchmarks_and_instances.md#3-benchmark-binding)).
 
 ### Ownership
 
@@ -441,9 +441,9 @@ uv run nexus validate logical-benchmarks --file benchmarks/<logical-benchmark-id
 If you encounter issues:
 
 1. Check the
-   [Benchmark Integration Design](../design/benchmark_integration_design.md)
-2. Check the
-   [Benchmark Metadata Convention](../design/benchmark_metadata_convention.md)
+   [Benchmark Experiments and Submissions](../design/benchmarking/benchmark_experiments_and_submissions.md)
+2. Check
+   [Logical Benchmarks and Instances](../design/benchmarking/logical_benchmarks_and_instances.md)
 3. Refer to the [ADO documentation](https://ibm.github.io/ado)
 4. Search existing issues on GitHub
 5. Open a new issue with details about your problem

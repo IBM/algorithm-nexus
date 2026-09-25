@@ -1,10 +1,12 @@
-# Algorithm Nexus Benchmarking System
+# Benchmark Execution and Operations
 
 ## Executive Summary
 
-This document proposes a benchmarking system for the Algorithm Stack packages
-within Algorithm Nexus based on
-[the benchmarking requirements](../requirements/benchmark.md).
+This document specifies how benchmark experiments are executed and operated:
+`ado` and Ray, GitHub triggers, the admin cluster, and versioning conventions.
+It is the execution layer of the
+[Benchmarking Architecture](./index.md), based on
+[the benchmarking requirements](../../requirements/benchmark.md).
 
 An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
@@ -14,10 +16,9 @@ Nexus Extensions**, integration definitions, and robust administrative
 processes, the team can deliver a comprehensive, end-to-end benchmarking
 solution capable of generating repeatable **benchmark results**.
 
-To fully satisfy these requirements, the design of the Benchmarking System is
-divided into three **Architectural Pillars**: System Architecture (The
-Mechanisms), Operational Architecture (The Infrastructure), and Governance &
-Conventions (The Standards).
+This document organizes that execution design into three pillars: System
+Architecture (the mechanisms), Operational Architecture (the infrastructure),
+and Governance & Conventions (the standards).
 
 ---
 
@@ -26,20 +27,24 @@ Conventions (The Standards).
 This pillar details the technical components, automated mechanisms, and
 execution engines that make up the benchmarking system.
 
-### 1.1 Two-Tiered Packaging Architecture
+### 1.1 Layered Architecture
 
-The system utilizes a two-tiered architecture to strictly separate the
-definition of a benchmark experiment from its application to a specific AI
-model.
+Benchmarking has three layers. This document covers execution. The other two
+layers are specified in their own documents, listed from the
+[Benchmarking Architecture](./index.md) overview:
 
-<!-- markdownlint-disable line-length -->
+| Layer | Document | Responsibility |
+| --- | --- | --- |
+| **Execution** | This document | `ado` experiment packages, Ray, the result store, GitHub and admin triggers, and sweep governance. |
+| **Experiments and submissions** | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) | Which experiments a package exposes, and which submissions run those experiments. |
+| **Logical benchmarks and instances** | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md) | The shared problem definition, concrete instances, and how results are aggregated. |
 
-| Tier                                        | Component       | Responsibility & Behavior                                                                                                                                                                                                                                                                              |
-| ------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Tier 1: Benchmark Experiment Definition** | `ado` core      | Serves as the core capability engine. It provides the framework to define, package, and execute a self-contained benchmark experiment. It enforces strict input/output interfaces, handles versioning of the experiment logic, and manages the execution provenance independently of the target model. |
-| **Tier 2: Benchmark Integration**           | `nexus` Package | While `ado` knows _how_ to run an experiment, `nexus` dictates _when_ and _against what_. It provides the declarative metadata required to define a benchmark: specify how an `ado` benchmark experiment can execute a given benchmark target and a defined benchmark instance.                        |
-
-<!-- markdownlint-enable line-length -->
+`ado` defines, packages, and executes a self-contained benchmark experiment. It
+enforces input and output interfaces, versions the experiment logic, and records
+provenance independently of the target model. Nexus metadata says which
+experiment runs, and against which benchmark target and instance. That metadata
+is specified in
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
 
 ### 1.2 Event & Orchestration Broker
 
@@ -121,7 +126,7 @@ utilizes `ado`'s native search space semantics.
 | Requirement | Name                                      | Fulfillment Strategy | Component           | Proposed Solution                                                                                                                                                                                                                                                                                                                                      |
 | ----------- | ----------------------------------------- | -------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **REQ 2.1** | Benchmark Experiment Package Registration | Technology + Process | nexus               | Registering a benchmark experiments package involves adding metadata describing the package and the experiments it contains to a Nexus package, as well as validating that all referenced packages can be installed together. Packages provided via any mechanism outlined in REQ 3.2 can be registered. \[PENDING: Nexus Test Dependencies Handling\] |
-| **REQ 2.3** | Benchmark Registration                    | Technology + Process | nexus + `ado`       | Registering a benchmark (see REQ 3.1 for specification) involves adding the relevant files and metadata to a nexus package model directory AND those files passing ado+nexus validation. \[PENDING: Nexus Model Benchmark Specification Decision\].                                                                                                    |
+| **REQ 2.3** | Benchmark Registration                    | Technology + Process | nexus + `ado`       | Registering a benchmark (see REQ 3.1) is specified in [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md): each submission is a folder under `experiments/<name>/submissions/` with a `space.yaml`.                                                                                                                    |
 | **REQ 4.3** | Resource Limits                           | Technology + Process | Ray Cluster         | Admins configure Ray clusters to set hard quotas per instance.                                                                                                                                                                                                                                                                                         |
 | **REQ 4.6** | Logging                                   | Technology + Process | Ray Cluster         | Admins configure infrastructure to persist logs without indefinite retention.                                                                                                                                                                                                                                                                          |
 | **REQ 6.2** | Isolated Execution                        | Technology + Process | `ado` + Ray Runtime | Users can describe the benchmark experiment dependencies in the benchmark experiment package using `ado` + Ray semantics. Ray will dynamically create isolated virtual environments per worker.                                                                                                                                                        |
@@ -181,7 +186,7 @@ submitted to the Ray cluster for execution.
 | **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a benchmark instance.                                                                    |
 | **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Benchmark experiment packages (following Standardized Benchmarking Packaging Protocol) can be provided in a Nexus package in the Algorithm Nexus repo, on PyPI or GitHub. |
 | **REQ 6.1** | Admin Security                  | Process                 | CI            | Secured via trusted code submissions and mandatory CVE scans.                                                                                                             |
-| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | These are benchmarks defined independently using `ado` configuration semantics and stored in the nexus repository. \[PENDING: Nexus Repo Layout Decision\]                |
+| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | Defined independently of Nexus packages under `experiments/`. See [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).                    |
 | **REQ 7.3** | Sweep Review and Approval       | Process                 | GitHub PRs    | Admins retain review oversight of sweep configurations via GitHub PR workflows.                                                                                           |
 
 <!-- markdownlint-enable line-length -->
@@ -198,12 +203,6 @@ issues.
 - Nexus Test Dependencies Handling for REQ 2.2
     - The process for validating that the benchmark packages referenced by a
       nexus package can be installed together
-- Nexus Model Benchmark Specification Decision for REQ 2.3
-    - Exact YAML metadata and directory structure used to add a Nexus Model
-      benchmark specification
-- Nexus Repo Layout for REQ 7.1
-    - Exact YAML metadata and directory structure used to add a Nexus benchmark
-      specification
 
 ## How Nexus package developers will use the system
 
@@ -229,11 +228,13 @@ First developers can:
   2.2)
 - use `nexus` CLI to discover existing benchmark specifications (REQ 2.4)
 
-They then define their benchmark using an ado configuration (REQ 3.1) adding
-this to the model directory of the relevant nexus package (REQ 2.3). The
-benchmark configuration can reference any benchmark experiment registered by the
-Nexus package. If the benchmark experiment they need is not registered by the
-nexus package
+They then define their benchmark using an ado configuration (REQ 3.1). Where
+that submission is registered is specified in
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md)
+(REQ 2.3 and REQ 7.1): a folder under `experiments/<name>/submissions/`. The
+benchmark configuration can
+reference any benchmark experiment registered for that experiment. If the
+benchmark experiment they need is not registered
 [they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package).
 The benchmark configuration can also be based on one discovered via the Nexus
 CLI.

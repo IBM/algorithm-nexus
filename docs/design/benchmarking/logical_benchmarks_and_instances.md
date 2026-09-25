@@ -3,13 +3,16 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Benchmark Metadata
+# Logical Benchmarks and Instances
 
 ## Executive Summary
 
-This document defines the **Benchmark Metadata Convention** — the metadata
-design that enables benchmark results from diverse experiments to be aggregated
-in a standardized, domain-agnostic way.
+This document specifies how to add **logical benchmarks** and **benchmark
+instances**, and how an experiment binds to a logical benchmark so results from
+diverse experiments can be aggregated in a standardized, domain-agnostic way.
+It is the logical-benchmarks layer of the
+[Benchmarking Architecture](./index.md). Experiment binding stays in this
+document for now.
 
 The design rests on two complementary artifacts:
 
@@ -27,9 +30,12 @@ Together, these two artifacts allow the benchmarking system to remain agnostic
 to domain-specific concepts. All domain knowledge is expressed by the benchmark
 and experiment authors; the system only needs to read the metadata and apply it.
 
-This convention builds on the [Benchmarking System](./benchmark_system.md) and
-[Benchmark Integration Design](./benchmark_integration_design.md) documents,
-which define how experiments are packaged and registered.
+Execution is specified in
+[Benchmark Execution and Operations](./benchmark_execution.md). Which experiments
+a package exposes, and which submissions run them, is specified in
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
+That document registers runs. This document registers the shared problem and
+the instances those runs are compared on.
 
 ---
 
@@ -649,7 +655,7 @@ A benchmark binding only can change if:
 
 ### 7.1 Implicit Benchmark Target
 
-The [`benchmark_integration_design.md`](./benchmark_integration_design.md)
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md)
 establishes that the benchmark target is implicit from the enclosing model
 definition for model-level benchmark submissions. The binding does not need to
 name the target property explicitly — the target identity is determined by the

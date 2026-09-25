@@ -1,10 +1,16 @@
-# Benchmark Integration Design for Algorithm Nexus
+# Benchmark Experiments and Submissions
 
 ## Executive Summary
 
-This document defines how benchmarking metadata is integrated into Algorithm
-Nexus. Benchmark experiment registration and benchmark submissions live under
-the top-level `experiments/` directory, entirely separate from `packages/`.
+This document specifies how to add **benchmark experiments** and **benchmark
+submissions** (runs of those experiments on a problem). It is the experiments
+and submissions layer of the
+[Benchmarking Architecture](./index.md). Logical benchmarks, instances,
+and result aggregation are specified in
+[Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md).
+
+Benchmark experiment registration and benchmark submissions live under the
+top-level `experiments/` directory, entirely separate from `packages/`.
 
 **Key Design Decisions:**
 
@@ -31,7 +37,7 @@ the top-level `experiments/` directory, entirely separate from `packages/`.
 
 ### 1.1 Benchmark System Components
 
-Based on the [benchmark requirements](../requirements/benchmark.md), the system
+Based on the [benchmark requirements](../../requirements/benchmark.md), the system
 has five core concepts that must be linked together by the experiment metadata:
 
 - **Benchmark experiment**
