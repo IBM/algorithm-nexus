@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
+    ExperimentConfig,
     ModelInfo,
     NexusPackageInfo,
     VLLMConfig,
@@ -502,3 +503,135 @@ class TestBenchmarkPackage:
 
 
 # Made with Bob
+
+
+class TestExperimentConfig:
+    """Tests for ExperimentConfig and ExperimentSpecifier models."""
+
+    def test_valid_pypi_specifier(self) -> None:
+        """Test valid experiment config with a PyPI package name."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "sorting-benchmarks>=1.0.0",
+                "experiments": ["bubble_sort", "merge_sort"],
+            }
+        }
+        config = ExperimentConfig.model_validate(data)
+        assert (
+            config.experiment_package.requirement_specifier
+            == "sorting-benchmarks>=1.0.0"
+        )
+        assert config.experiment_package.experiments == ["bubble_sort", "merge_sort"]
+
+    def test_valid_github_https_url(self) -> None:
+        """Test valid experiment config with a GitHub HTTPS URL."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "https://github.com/org/repo.git",
+                "experiments": ["exp_one"],
+            }
+        }
+        config = ExperimentConfig.model_validate(data)
+        assert (
+            config.experiment_package.requirement_specifier
+            == "https://github.com/org/repo.git"
+        )
+
+    def test_valid_git_plus_prefix(self) -> None:
+        """Test valid experiment config with git+ prefixed URL."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "git+https://github.com/org/repo@main",
+                "experiments": ["exp_one"],
+            }
+        }
+        config = ExperimentConfig.model_validate(data)
+        assert (
+            config.experiment_package.requirement_specifier
+            == "git+https://github.com/org/repo@main"
+        )
+
+    def test_local_path_dot_slash_rejected(self) -> None:
+        """Test that local path starting with ./ is rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "./packages/my-benchmark",
+                "experiments": ["exp_one"],
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "local paths are not allowed" in str(exc_info.value).lower()
+
+    def test_local_path_absolute_rejected(self) -> None:
+        """Test that absolute local path is rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "/usr/local/my-pkg",
+                "experiments": ["exp_one"],
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "local paths are not allowed" in str(exc_info.value).lower()
+
+    def test_local_path_tilde_rejected(self) -> None:
+        """Test that tilde-prefixed path is rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "~/my-pkg",
+                "experiments": ["exp_one"],
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "local paths are not allowed" in str(exc_info.value).lower()
+
+    def test_empty_experiments_list_rejected(self) -> None:
+        """Test that an empty experiments list is rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "my-package",
+                "experiments": [],
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "experiments" in str(exc_info.value).lower()
+
+    def test_missing_requirement_specifier_rejected(self) -> None:
+        """Test that missing requirement_specifier is rejected."""
+        data = {
+            "experiment_package": {
+                "experiments": ["exp_one"],
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "requirement_specifier" in str(exc_info.value)
+
+    def test_extra_fields_forbidden(self) -> None:
+        """Test that extra fields are rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "my-package",
+                "experiments": ["exp_one"],
+                "extra_field": "not allowed",
+            }
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "extra_field" in str(exc_info.value).lower()
+
+    def test_extra_top_level_fields_forbidden(self) -> None:
+        """Test that extra top-level fields are rejected."""
+        data = {
+            "experiment_package": {
+                "requirement_specifier": "my-package",
+                "experiments": ["exp_one"],
+            },
+            "unexpected": "value",
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            ExperimentConfig.model_validate(data)
+        assert "unexpected" in str(exc_info.value).lower()

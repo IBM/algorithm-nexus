@@ -451,19 +451,6 @@ def get_status_color(status: str) -> str:
     return status_colors.get(status, "yellow")
 
 
-def get_status_display(status: str) -> str:
-    """Get color-coded status display string.
-
-    Args:
-        status: Status string (e.g., 'success', 'failed', 'started')
-
-    Returns:
-        Rich-formatted status string with color
-    """
-    color = get_status_color(status)
-    return f"[{color}]{status}[/{color}]"
-
-
 def determine_output_format(
     output_format: str | None,
     output_file: Path | None,

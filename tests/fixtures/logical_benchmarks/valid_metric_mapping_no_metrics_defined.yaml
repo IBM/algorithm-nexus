@@ -1,22 +1,11 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
 #
-# Fixture: metricMapping present but no metrics defined in the logical benchmark.
-# Validates that the integrity check is skipped when metric_ids is None.
+# Fixture: definition with no metrics defined in the logical benchmark.
+# Used to validate that the integrity check is skipped when metric_ids is None.
 
 logicalBenchmark:
   benchmarkIdentifier: my_bench
   description: test
   instance:
     - identifier: dataset
-
-bindings:
-  - experiment:
-      actuatorIdentifier: acme
-      experimentIdentifier: exp_a
-      experimentVersion: 1.0.0
-    metricMapping:
-      - benchmark:
-          identifier: any_metric
-        experiment:
-          identifier: internal_metric

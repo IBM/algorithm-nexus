@@ -1,0 +1,177 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# Benchmark bindings: qubit routing experiments → routing_assignment_qaoa logical benchmark
+#
+# Four Qiskit transpiler strategy combinations are bound here. All four share
+# the same artifact mapping (graph → graph_path) and the same metric mapping.
+# The only variation is the experimentIdentifier and experimentVersion.
+
+bindings:
+  # -------------------------------------------------------------------------
+  # Binding 1 — layout_dense_routing_basic
+  # Fully deterministic (no seed). Dense layout + Basic routing.
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: routing_assignment_qaoa
+    experiment:
+      experimentIdentifier: layout_dense_routing_basic
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    artifactMapping:
+      - benchmark: graph
+        experiment: graph_path
+    metricMapping:
+      - benchmark:
+          identifier: swap_gates
+        experiment:
+          identifier: swap_count
+      - benchmark:
+          identifier: swap_depth
+        experiment:
+          identifier: swap_2q_depth
+      - benchmark:
+          identifier: cz_gates
+        experiment:
+          identifier: cz_count
+      - benchmark:
+          identifier: cz_depth
+        experiment:
+          identifier: cz_2q_depth
+      - benchmark:
+          identifier: routing_time_sec
+        experiment:
+          identifier: routing_time_s
+      - benchmark:
+          identifier: native_time_sec
+        experiment:
+          identifier: native_time_s
+      - benchmark:
+          identifier: total_time_sec
+        experiment:
+          identifier: total_time_s
+
+  # -------------------------------------------------------------------------
+  # Binding 2 — layout_dense_routing_sabre
+  # Dense layout + SABRE routing.
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: routing_assignment_qaoa
+    experiment:
+      experimentIdentifier: layout_dense_routing_sabre
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    artifactMapping:
+      - benchmark: graph
+        experiment: graph_path
+    metricMapping:
+      - benchmark:
+          identifier: swap_gates
+        experiment:
+          identifier: swap_count
+      - benchmark:
+          identifier: swap_depth
+        experiment:
+          identifier: swap_2q_depth
+      - benchmark:
+          identifier: cz_gates
+        experiment:
+          identifier: cz_count
+      - benchmark:
+          identifier: cz_depth
+        experiment:
+          identifier: cz_2q_depth
+      - benchmark:
+          identifier: routing_time_sec
+        experiment:
+          identifier: routing_time_s
+      - benchmark:
+          identifier: native_time_sec
+        experiment:
+          identifier: native_time_s
+      - benchmark:
+          identifier: total_time_sec
+        experiment:
+          identifier: total_time_s
+
+  # -------------------------------------------------------------------------
+  # Binding 3 — layout_sabre_routing_basic
+  # SABRE layout + Basic routing.
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: routing_assignment_qaoa
+    experiment:
+      experimentIdentifier: layout_sabre_routing_basic
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    artifactMapping:
+      - benchmark: graph
+        experiment: graph_path
+    metricMapping:
+      - benchmark:
+          identifier: swap_gates
+        experiment:
+          identifier: swap_count
+      - benchmark:
+          identifier: swap_depth
+        experiment:
+          identifier: swap_2q_depth
+      - benchmark:
+          identifier: cz_gates
+        experiment:
+          identifier: cz_count
+      - benchmark:
+          identifier: cz_depth
+        experiment:
+          identifier: cz_2q_depth
+      - benchmark:
+          identifier: routing_time_sec
+        experiment:
+          identifier: routing_time_s
+      - benchmark:
+          identifier: native_time_sec
+        experiment:
+          identifier: native_time_s
+      - benchmark:
+          identifier: total_time_sec
+        experiment:
+          identifier: total_time_s
+
+  # -------------------------------------------------------------------------
+  # Binding 4 — layout_sabre_routing_sabre (v2)
+  # SABRE layout + SABRE routing.
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: routing_assignment_qaoa
+    experiment:
+      experimentIdentifier: layout_sabre_routing_sabre
+      experimentVersion: 2.0.0
+      actuatorIdentifier: custom_experiments
+    artifactMapping:
+      - benchmark: graph
+        experiment: graph_path
+    metricMapping:
+      - benchmark:
+          identifier: swap_gates
+        experiment:
+          identifier: swap_count
+      - benchmark:
+          identifier: swap_depth
+        experiment:
+          identifier: swap_2q_depth
+      - benchmark:
+          identifier: cz_gates
+        experiment:
+          identifier: cz_count
+      - benchmark:
+          identifier: cz_depth
+        experiment:
+          identifier: cz_2q_depth
+      - benchmark:
+          identifier: routing_time_sec
+        experiment:
+          identifier: routing_time_s
+      - benchmark:
+          identifier: native_time_sec
+        experiment:
+          identifier: native_time_s
+      - benchmark:
+          identifier: total_time_sec
+        experiment:
+          identifier: total_time_s

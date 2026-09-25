@@ -37,6 +37,7 @@ from algorithm_nexus.models import (
     BenchmarkBinding,
     BenchmarkInstance,
     CategoricalValueMapping,
+    ExperimentConfig,
     FieldMapping,
     LogicalBenchmarkConfig,
 )
@@ -201,6 +202,27 @@ def validate_model_directory(
     return model_config
 
 
+def validate_experiment_yaml(
+    experiment_dir: Path,
+    collector: ValidationErrorCollector,
+) -> ExperimentConfig | None:
+    """Validate an experiment's experiment_package.yaml file.
+
+    Returns the validated experiment config if successful, None otherwise.
+    """
+    experiment_yaml_path = experiment_dir / "experiment_package.yaml"
+    data = load_yaml_file(experiment_yaml_path, collector)
+    if data is None:
+        return None
+
+    try:
+        return ExperimentConfig.model_validate(data)
+    except ValidationError as exc:
+        for error in exc.errors():
+            collector.add(format_pydantic_error(error, experiment_yaml_path))
+        return None
+
+
 def validate_package_directory(
     package_dir: Path, collector: ValidationErrorCollector
 ) -> None:
@@ -209,51 +231,22 @@ def validate_package_directory(
         collector.add(f"Package path is not a directory: {package_dir}")
         return
 
-    # Validate nexus.yaml and extract registered experiments
+    # Validate nexus.yaml
     package_config = validate_nexus_yaml(package_dir, collector)
+
+    # Collect registered experiments for benchmark_submissions validation
+    # (benchmark_packages in nexus.yaml is deprecated; experiments now live in
+    # experiments/<name>/experiment_package.yaml alongside the repository root)
     registered_experiments: set[str] = set()
     if package_config and package_config.package.benchmark_packages:
-        # Collect all experiment identifiers from all benchmark packages
         for pkg in package_config.package.benchmark_packages:
             registered_experiments.update(pkg.experiments)
-
-        # Validate unique experiment identifiers across all packages
-        all_experiments = []
-        for pkg in package_config.package.benchmark_packages:
-            all_experiments.extend(pkg.experiments)
-        duplicates = {exp for exp in all_experiments if all_experiments.count(exp) > 1}
-        if duplicates:
-            collector.add(
-                f"Duplicate experiment identifiers across benchmark packages in nexus.yaml: {', '.join(sorted(duplicates))}"
-            )
 
     # Validate optional skills directory
     skills_dir = package_dir / "skills"
     validate_optional_dir(
         skills_dir, collector, "Optional package directory missing: skills"
     )
-
-    # Validate optional benchmark_packages directory
-    benchmark_packages_dir = package_dir / "benchmark_packages"
-    if validate_optional_dir(
-        benchmark_packages_dir,
-        collector,
-        "Optional package directory missing: benchmark_packages",
-    ):
-        # Check that each subdirectory is a valid Python package
-        for pkg_dir in benchmark_packages_dir.iterdir():
-            if not pkg_dir.is_dir():
-                continue
-            pyproject_toml = pkg_dir / "pyproject.toml"
-            if not pyproject_toml.exists():
-                collector.add_info(
-                    f"Optional file missing in benchmark_packages/{pkg_dir.name}/: pyproject.toml (required for local benchmark Python package)"
-                )
-
-    # Validate optional package-level benchmark_submissions directory
-    # The validate_benchmark_submissions function expects a directory that contains benchmark_submissions/
-    # So we pass package_dir and it will look for package_dir/benchmark_submissions/
-    validate_benchmark_submissions(package_dir, collector, registered_experiments)
 
     # Check if models directory exists
     models_dir = package_dir / "models"
@@ -348,7 +341,7 @@ def _print_validation_table(all_results: list[dict[str, Any]]) -> None:
     print_results_table(rows, title="Validation Results", details_column="Issues")
 
 
-def validate_benchmarks(
+def validate_experiments(
     pr_url: Annotated[
         str | None,
         typer.Option(
@@ -357,18 +350,18 @@ def validate_benchmarks(
             "If not provided, validates all benchmark instances.",
         ),
     ] = None,
-    packages_root: Annotated[
+    experiments_root: Annotated[
         Path,
         typer.Option(
-            "--packages-root",
-            help="Path to packages directory",
+            "--experiments-root",
+            help="Path to experiments directory",
         ),
-    ] = Path("./packages"),
-    package: Annotated[
+    ] = Path("./experiments"),
+    experiment: Annotated[
         str | None,
         typer.Option(
-            "--package",
-            help="Validate only benchmark instances from a specific package",
+            "--experiment",
+            help="Validate only benchmark submissions from a specific experiment",
         ),
     ] = None,
     verbose: Annotated[
@@ -394,16 +387,17 @@ def validate_benchmarks(
         ),
     ] = None,
 ) -> None:
-    """Validate benchmark instances.
+    """Validate experiments and their benchmark submissions.
 
     This command supports three modes:
     1. PR mode: Validate instances modified in a PR (provide pr_url)
-    2. All mode: Validate all benchmark instances (no pr_url)
-    3. Package mode: Validate instances from a specific package (use --package)
+    2. All mode: Validate all experiments and their submissions (no pr_url)
+    3. Experiment mode: Validate submissions from a specific experiment (use --experiment)
 
     The command:
-    - Installs required benchmark packages in isolated virtual environments
-    - Validates each instance with ADO dry-run
+    - Checks that each experiment folder has a valid experiment_package.yaml
+    - Installs the experiment package in an isolated virtual environment
+    - Validates each submission with ADO dry-run
     - Reports validation results
     """
     from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
@@ -414,22 +408,22 @@ def validate_benchmarks(
             output_format, allow_yaml=True, allow_csv=False, allow_table=True
         )
 
-    # Warn if both package filter and PR URL are provided (package is ignored in PR mode)
-    if package and pr_url:
+    # Warn if both experiment filter and PR URL are provided (experiment is ignored in PR mode)
+    if experiment and pr_url:
         console.print(
-            "[yellow]Warning:[/yellow] --package is ignored when --pr is specified. "
+            "[yellow]Warning:[/yellow] --experiment is ignored when --pr is specified. "
             "In PR mode, only instances changed in the PR are validated."
         )
 
-    # Validate package exists if package filter is specified (non-PR mode only)
-    if package and not pr_url:
-        package_path = packages_root / package
-        if not package_path.is_dir():
+    # Validate experiment exists if experiment filter is specified (non-PR mode only)
+    if experiment and not pr_url:
+        experiment_path = experiments_root / experiment
+        if not experiment_path.is_dir():
             console.print(
-                f"[red]Error:[/red] Package '{package}' not found in {packages_root.resolve()}"
+                f"[red]Error:[/red] Experiment '{experiment}' not found in {experiments_root.resolve()}"
             )
             console.print(
-                "\nTo see available packages, run: [cyan]nexus list packages[/cyan]"
+                "\nTo see available experiments, run: [cyan]nexus list experiments[/cyan]"
             )
             raise typer.Exit(code=1)
 
@@ -439,17 +433,17 @@ def validate_benchmarks(
             # PR mode
             manager = BenchmarkManager(pr_url=pr_url, execute=False)
             results = manager.validate(
-                packages_root=None,
-                package_filter=None,
+                experiments_root=None,
+                experiment_filter=None,
                 verbose=verbose,
                 fail_fast=fail_fast,
             )
         else:
-            # All or package mode
+            # All or experiment mode
             manager = BenchmarkManager(pr_url=None, execute=False)
             results = manager.validate(
-                packages_root=packages_root,
-                package_filter=package,
+                experiments_root=experiments_root,
+                experiment_filter=experiment,
                 verbose=verbose,
                 fail_fast=fail_fast,
             )
@@ -496,7 +490,6 @@ def _check_binding_integrity(
     binding: BenchmarkBinding,
     property_ids: set[str],
     metric_ids: set[str] | None,
-    instance_ids: set[str] | None,
     collector: ValidationErrorCollector,
     file_path: Path,
     binding_index: int,
@@ -642,7 +635,6 @@ def validate_logical_benchmark_file(
 
     # Referential integrity checks
     defn = parsed.logicalBenchmark
-    property_ids = {p.identifier for p in defn.instance}
     metric_ids = set(defn.metrics) if defn.metrics is not None else None
 
     # Ranking integrity: ranking.metric must exist in the defined metrics
@@ -656,18 +648,6 @@ def validate_logical_benchmark_file(
             f"is not defined in metrics"
         )
 
-    if parsed.bindings:
-        for i, binding in enumerate(parsed.bindings):
-            _check_binding_integrity(
-                binding,
-                property_ids,
-                metric_ids,
-                instance_ids,
-                collector,
-                file,
-                i,
-            )
-
     return parsed
 
 
@@ -675,18 +655,18 @@ def validate_logical_benchmark_directory(
     benchmark_dir: Path,
     collector: ValidationErrorCollector,
 ) -> LogicalBenchmarkConfig | None:
-    """Validate a benchmark directory (problem.yaml, instances/, artifacts/)."""
-    problem_file = benchmark_dir / "problem.yaml"
+    """Validate a benchmark directory (benchmark.yaml, instances/, artifacts/)."""
+    problem_file = benchmark_dir / "benchmark.yaml"
     if not problem_file.is_file():
-        # Fall back to single-file named after folder or any yaml if problem.yaml not found
+        # Fall back to single-file named after folder or any yaml if benchmark.yaml not found
         candidate_yamls = list(benchmark_dir.glob("*.yaml"))
         if len(candidate_yamls) == 1:
             problem_file = candidate_yamls[0]
         else:
-            collector.add(f"{benchmark_dir}: missing required 'problem.yaml' file")
+            collector.add(f"{benchmark_dir}: missing required 'benchmark.yaml' file")
             return None
 
-    # First pass: parse problem.yaml data to get property IDs
+    # First pass: parse benchmark.yaml data to get property IDs
     data = load_yaml_file(problem_file, collector)
     if data is None:
         return None
@@ -778,7 +758,7 @@ def validate_logical_benchmarks(
     2. Single target mode: validate one file or directory via --file
 
     Checks performed:
-    - Schema correctness for problem.yaml (required fields, valid structure)
+    - Schema correctness for benchmark.yaml (required fields, valid structure)
     - Referential integrity (binding identifiers match the definition, property/metric
       references exist in the definition)
     - Instance YAML validation (schema correctness, parameter validity, artifact existence)
@@ -796,7 +776,7 @@ def validate_logical_benchmarks(
     if file is not None:
         targets = [file]
     else:
-        # Look for benchmark directories first (directories with problem.yaml or instances)
+        # Look for benchmark directories first (directories with benchmark.yaml or instances)
         for item in sorted(benchmarks_root.iterdir()):
             if (item.is_dir() and not item.name.startswith(".")) or (
                 item.is_file() and item.suffix in (".yaml", ".yml")

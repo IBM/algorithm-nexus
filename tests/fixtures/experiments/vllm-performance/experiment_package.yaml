@@ -1,0 +1,5 @@
+experiment_package:
+  requirement_specifier: "ado-vllm-performance"
+  experiments:
+    - vllm-bench-deployment
+    - guidellm-bench-deployment

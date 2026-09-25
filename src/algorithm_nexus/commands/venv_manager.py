@@ -113,32 +113,6 @@ def install_packages(
         return False
 
 
-def run_in_venv(
-    venv_path: Path,
-    command: list[str],
-    capture_output: bool = True,
-) -> subprocess.CompletedProcess:
-    """Execute a command in the virtual environment context.
-
-    Args:
-        venv_path: Path to the virtual environment
-        command: Command to execute (without python prefix)
-        capture_output: Whether to capture stdout/stderr
-
-    Returns:
-        CompletedProcess instance with execution results
-    """
-    python_path = venv_path / "bin" / "python"
-    full_command = [str(python_path), *command]
-
-    return subprocess.run(  # noqa: S603
-        full_command,
-        capture_output=capture_output,
-        text=True,
-        check=False,
-    )
-
-
 def cleanup_venv(venv_path: Path) -> None:
     """Remove the temporary virtual environment.
 
