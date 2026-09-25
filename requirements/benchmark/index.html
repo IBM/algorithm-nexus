@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#requirements-for-models-benchmarking" class="md-skip">
+        <a href="#requirements-for-benchmarking" class="md-skip">
           Skip to content
         </a>
       
@@ -1223,10 +1223,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#req-2-benchmark-registration-and-discoverability" class="md-nav__link">
+  <a href="#req-2-registration-and-discoverability" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        REQ-2: Benchmark Registration and Discoverability
+        REQ-2: Registration and Discoverability
       </span>
     </span>
   </a>
@@ -1411,22 +1411,18 @@
                 
                   
 
-<h1 id="requirements-for-models-benchmarking">Requirements for models benchmarking<a class="headerlink" href="#requirements-for-models-benchmarking" title="Permanent link">&para;</a></h1>
+<h1 id="requirements-for-benchmarking">Requirements for Benchmarking<a class="headerlink" href="#requirements-for-benchmarking" title="Permanent link">&para;</a></h1>
 <p>The primary objective of this document is to establish the core requirements for
 a flexible, robust, and user-friendly benchmarking system for the Algorithm
-Nexus project. This system evaluates registered models, supports internal and
-external benchmarks, and allows users to easily discover available testing
-options.</p>
+Nexus project. This system evaluates registered targets (models, algorithms, or
+experiments), supports internal and external benchmarks, and allows users to
+easily discover available testing options.</p>
 <p>To ensure clarity, these requirements are divided into two categories: Generic
 System Requirements (applying to the framework, interfaces, and general
 execution) and Administrator Environment &amp; Process Requirements (applying
 specifically to the central execution infrastructure managed by the project
 admins).</p>
 <h2 id="terminology">Terminology<a class="headerlink" href="#terminology" title="Permanent link">&para;</a></h2>
-<p>To establish a clear mental model, the relationship between core components can
-be summarized as: Benchmark Submission = Benchmark Target + Benchmark (Benchmark
-Instance + Benchmark Experiment), where a Benchmark Instance is a concrete
-realisation of a Logical Benchmark (Benchmark Problem).</p>
 <ul>
 <li>
 <p><strong>Logical Benchmark (Benchmark Problem)</strong> An abstract, reusable definition of
@@ -1442,28 +1438,34 @@ realisation of a Logical Benchmark (Benchmark Problem).</p>
   driver.</p>
 </li>
 <li>
-<p><strong>Benchmark Target</strong> The AI model or algorithm being evaluated. This is the
-  element that varies across benchmark experiments while the benchmark
-  definition and benchmark instance specification are held constant.</p>
+<p><strong>Benchmark Target</strong> The model, algorithm, or experiment being evaluated. For
+  a given benchmark instance, this is the primary element that is varied.</p>
 </li>
 <li>
 <p><strong>Benchmark Experiment</strong> A script, harness, or workflow that executes the
   benchmark target on the benchmark instance, controlling execution conditions,
   and collects measurements. The experiment might take the benchmark target and
-  instance as input (<strong>parameterizable</strong>) or may hard-code them (<strong>fixed</strong>).</p>
+  instance as input (<strong>parameterizable</strong>) or may hard-code one or both of them
+  (<strong>fixed</strong>). A typical example is the experiment is an implementation of a
+  single algorithm (benchmark target). Often an experiment can address one or
+  more logical benchmarks.</p>
 </li>
 <li>
 <p><strong>Benchmark Result</strong> The quantitative measurements produced by executing a
-  benchmark experiment (e.g., accuracy, runtime, throughput, resource
-  utilization), with the <strong>benchmark instance</strong> - used to compare benchmark
-  targets.</p>
+  benchmark submission (e.g., accuracy, runtime, throughput, resource
+  utilization). Results are used to compare benchmark targets on a given
+  benchmark instance.</p>
 </li>
 <li>
-<p><strong>Benchmark Submission</strong> A concrete execution of a benchmark, in which a
-  benchmark driver runs a benchmark instance against a specific benchmark target
-  and records measurements.</p>
+<p><strong>Benchmark Submission</strong> One registered use of a benchmark experiment on a
+  benchmark instance for a specific benchmark target. A submission can be
+  executed to produce benchmark results. It is not the experiment definition.</p>
 </li>
 </ul>
+<p>The relationship between core components can be summarized as:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Benchmark Submission = Benchmark Experiment + Benchmark Target + Benchmark Instance.
+</span></code></pre></div>
+<p>where the Benchmark Experiment may imply the Benchmark Target.</p>
 <hr />
 <h2 id="part-i-generic-benchmarking-system-requirements">Part I: Generic Benchmarking System Requirements<a class="headerlink" href="#part-i-generic-benchmarking-system-requirements" title="Permanent link">&para;</a></h2>
 <h3 id="req-1-standardized-benchmark-packaging-protocol">REQ-1: Standardized Benchmark Packaging Protocol<a class="headerlink" href="#req-1-standardized-benchmark-packaging-protocol" title="Permanent link">&para;</a></h3>
@@ -1473,9 +1475,10 @@ formatted, standardized, and versioned to ensure reproducibility.</p>
 <li>
 <p><strong>REQ 1.1: Input/Output Specification</strong> A benchmark experiment must define its
   inputs and outputs using a standardized system schema. Experiments must accept
-  the benchmark target (model or algorithm) as a primary programmatic input, and
-  may support additional optional parameters. <em>Rationale</em>: Ensures the system
-  can uniformly interact with diverse benchmark implementations.</p>
+  the benchmark target (model, algorithm, or experiment) as a primary
+  programmatic input, and may support additional optional parameters.
+  <em>Rationale</em>: Ensures the system can uniformly interact with diverse benchmark
+  implementations.</p>
 </li>
 <li>
 <p><strong>REQ 1.2: Python Package</strong> All benchmark experiments, including wrappers for
@@ -1497,7 +1500,8 @@ formatted, standardized, and versioned to ensure reproducibility.</p>
 <li>
 <p><strong>REQ 1.5: Lifecycle Management</strong> It must be possible to mark a benchmark
   experiment as deprecated. <em>Rationale</em>: Prevents technical debt and signals to
-  users which benchmarks are no longer actively maintained or relevant.</p>
+  users which benchmark experiments are no longer actively maintained or
+  relevant.</p>
 </li>
 <li>
 <p><strong>REQ 1.7: Required Data</strong> If a benchmark experiment requires specific data
@@ -1508,59 +1512,61 @@ formatted, standardized, and versioned to ensure reproducibility.</p>
 </li>
 </ul>
 <hr />
-<h3 id="req-2-benchmark-registration-and-discoverability">REQ-2: Benchmark Registration and Discoverability<a class="headerlink" href="#req-2-benchmark-registration-and-discoverability" title="Permanent link">&para;</a></h3>
-<p>This section outlines requirements for managing and discovering available
-benchmarks and benchmark experiments.</p>
+<h3 id="req-2-registration-and-discoverability">REQ-2: Registration and Discoverability<a class="headerlink" href="#req-2-registration-and-discoverability" title="Permanent link">&para;</a></h3>
+<p>This section outlines requirements for managing and discovering logical
+benchmarks, instances, experiments, and submissions.</p>
 <ul>
 <li>
-<p><strong>REQ 2.1: Benchmark Experiment Registration</strong> The system must provide a
-  method for users to add benchmark experiments, implemented according to the
-  Standardized Benchmark Packaging Protocol</p>
+<p><strong>REQ 2.1: Logical Benchmark Registration</strong> The system must provide a method
+  for users to define and register a logical benchmark (a problem class).</p>
 </li>
 <li>
-<p><strong>REQ 2.2: Benchmark Experiment Discovery</strong> The system must provide a method
-  for users to list the registered benchmark experiments (including deprecated
-  experiments). <em>Rationale</em>: Encourages reuse and prevents duplicated effort
-  across different research teams.</p>
+<p><strong>REQ 2.2: Benchmark Instance Registration</strong> The system must provide a method
+  for users to define and register a concrete benchmark instance of a registered
+  logical benchmark.</p>
 </li>
 <li>
-<p><strong>REQ 2.3: Benchmark Registration</strong> The system must provide a method to define
-  and register a <strong>benchmark</strong>:</p>
+<p><strong>REQ 2.3: Benchmark Experiment Registration</strong> The system must provide a
+  method for users to upload and register a benchmark experiment definition,
+  implemented according to the Standardized Benchmark Packaging Protocol, and to
+  declare that the experiment can address one or more registered logical
+  benchmarks.</p>
 </li>
 <li>
-<p>either as</p>
-<ol>
-<li>a combination of a parameterizable benchmark experiment and a benchmark
-   instance</li>
-<li>a fixed benchmark experiment</li>
-</ol>
+<p><strong>REQ 2.4: Benchmark Submission Registration</strong> The system must provide a
+  method for users to define and register a benchmark submission that applies a
+  registered benchmark experiment to a benchmark instance and a benchmark
+  target. One experiment may have many submissions, across instances and
+  targets.</p>
 </li>
 <li>
-<p><strong>REQ 2.4: Benchmark Discovery</strong> The system must provide a method for user to
-  list the registered benchmarks and the models/algorithms using them.
-  <em>Rationale</em>: Allows package owners to easily compare their models against
-  established historical baselines.</p>
+<p><strong>REQ 2.5: Discoverability</strong> The system must provide a method for users to
+  list all registered artifacts: logical benchmarks, benchmark instances,
+  benchmark experiments (including deprecated experiments and which logical
+  benchmarks each can address), benchmark submissions, and associated targets.
+  <em>Rationale</em>: Encourages reuse, prevents duplicated effort, and allows users to
+  compare targets against established historical baselines.</p>
 </li>
 </ul>
 <hr />
 <h3 id="req-3-using-the-benchmarking-system">REQ-3: Using the Benchmarking System<a class="headerlink" href="#req-3-using-the-benchmarking-system" title="Permanent link">&para;</a></h3>
-<p>This section details requirement for package owners to use the benchmarking
-system</p>
+<p>This section details requirements for users to use the benchmarking system.</p>
 <ul>
 <li>
-<p><strong>REQ 3.1: Benchmark Specification</strong> To use the system to benchmark a
-  model/algorithm, the Nexus package owner must specify the benchmark to use, in
-  the manner defined by the system c.f. REQ 2-3.</p>
+<p><strong>REQ 3.1: Benchmark Submission Specification</strong> To use the system to evaluate
+  a benchmark target, the user must specify a benchmark submission in the manner
+  defined by the system, see REQ 2.4.</p>
 </li>
 <li>
-<p><strong>REQ 3.2: Providing Benchmark Experiments</strong> If a model/algorithm requires a
-  benchmark experiment not in the registry, the contributor must provide one, in
-  compliance with the Standardized Packaging Protocol c.f. REQ-1. <em>Rationale</em>:
-  Empowers contributors to expand the system's capabilities.</p>
+<p><strong>REQ 3.2: Providing Benchmark Experiments</strong> If a target requires a benchmark
+  experiment not in the registry, the contributor must provide one, in
+  compliance with the Standardized Packaging Protocol (REQ-1) and register it as
+  described in REQ 2.3. <em>Rationale</em>: Empowers contributors to expand the
+  system's capabilities.</p>
 </li>
 <li>
-<p><strong>REQ 3.3: Benchmark Experiment Reuse</strong> The system must allow referencing and
-  utilizing an existing benchmark experiment or benchmark definition across
+<p><strong>REQ 3.3: Artifact Reuse</strong> The system must allow referencing and utilizing an
+  existing benchmark experiment, logical benchmark, or benchmark instance across
   Nexus packages.</p>
 </li>
 </ul>
@@ -1597,9 +1603,9 @@ and failure management.</p>
 </li>
 <li>
 <p><strong>REQ 4.6: Logging</strong> The system must capture unexpected execution failures,
-  including the underlying Python exception and traceback. Eecution logs must be
-  captured and made accessible to the user executing the benchmark. The system
-  is not required to retain these logs indefinitely.</p>
+  including the underlying Python exception and traceback. Execution logs must
+  be captured and made accessible to the user executing the benchmark
+  submission. The system is not required to retain these logs indefinitely.</p>
 </li>
 <li>
 <p><strong>REQ 4.7: Self-Contained Execution</strong> Benchmark experiments must be
@@ -1610,8 +1616,8 @@ and failure management.</p>
 <li>
 <p><strong>REQ 4.8: Local Execution</strong> The system must enable benchmark experiments to
   be executed locally by a user with sufficient compute resources. <em>Rationale</em>:
-  Allows developers to rapidly prototype, test, and debug benchmarks and to
-  confirm results of automated benchmarkming runs.</p>
+  Allows developers to rapidly prototype, test, and debug benchmark experiments
+  and to confirm results of automated benchmarking runs.</p>
 </li>
 </ul>
 <hr />
@@ -1620,8 +1626,8 @@ and failure management.</p>
 <ul>
 <li>
 <p><strong>REQ 5.1: Centralized Results Storage</strong> Results of all benchmark submissions
-  must be stored in a centralized location accessible by the respective package
-  owners. <em>Rationale</em>: Facilitates cross-model comparison, historical tracking,
+  must be stored in a centralized location accessible by the users who submitted
+  them. <em>Rationale</em>: Facilitates cross-model comparison, historical tracking,
   and platform-wide reporting.</p>
 </li>
 <li>
@@ -1644,8 +1650,8 @@ and failure management.</p>
 benchmarking environment managed by project administrators.</p>
 <ul>
 <li>
-<p><strong>REQ 6.1: Admin Execution</strong> The system must be capable of executing
-  benchmarks on administrator infrastructure.</p>
+<p><strong>REQ 6.1: Admin Execution</strong> The system must be capable of executing benchmark
+  submissions on administrator infrastructure.</p>
 </li>
 <li>
 <p><strong>REQ 6.2: Isolated Execution</strong> The system must support isolated execution of
@@ -1667,12 +1673,14 @@ benchmarking environment managed by project administrators.</p>
 administrative oversight.</p>
 <ul>
 <li>
-<p><strong>REQ 7.1: Nexus-Level Benchmarks Definition</strong> The system must support
-  defining benchmarks independently of individual Nexus packages.</p>
+<p><strong>REQ 7.1: Nexus-Level Logical Benchmarks and Instances</strong> The system must
+  support defining logical benchmarks and benchmark instances independently of
+  individual Nexus packages.</p>
 </li>
 <li>
 <p><strong>REQ 7.2: Admin-Triggered Evaluation Execution</strong> The system must provide a
-  dedicated mechanism for administrators to trigger and execute benchmarks.</p>
+  dedicated mechanism for administrators to trigger and execute benchmark
+  submissions.</p>
 </li>
 <li>
 <p><strong>REQ 7.3: Sweep Review and Approval</strong> The administrative process must include
