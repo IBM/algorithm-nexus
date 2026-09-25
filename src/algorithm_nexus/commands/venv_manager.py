@@ -113,6 +113,59 @@ def install_packages(
         return False
 
 
+def verify_experiments_installed(
+    venv_path: Path,
+    experiment_ids: list[str],
+    verbose: bool = False,
+) -> tuple[bool, list[str]]:
+    """Verify that the declared experiment IDs are discoverable after package install.
+
+    Runs `ado describe experiments` in the venv and checks that each declared
+    experiment ID appears in the output.
+
+    Args:
+        venv_path: Path to the virtual environment
+        experiment_ids: List of experiment identifiers to verify
+        verbose: Whether to show command output
+
+    Returns:
+        Tuple of (success, list_of_error_strings)
+    """
+    ado_binary = venv_path / "bin" / "ado"
+    if not ado_binary.is_file():
+        return False, [
+            "ADO binary not found in the virtual environment. Make sure ado-core is installed."
+        ]
+
+    try:
+        result = subprocess.run(  # noqa: S603
+            [str(ado_binary), "get", "experiments"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return False, ["Timed out waiting for `ado get experiments`"]
+    except Exception as e:
+        return False, [f"Failed to run `ado get experiments`: {e}"]
+
+    if verbose:
+        console.print(f"  [dim]ado get experiments stdout:[/dim]\n{result.stdout}")
+        if result.stderr:
+            console.print(f"  [dim]stderr:[/dim]\n{result.stderr}")
+
+    output = result.stdout + result.stderr
+    errors = [
+        f"Experiment '{exp_id}' not found after installing package "
+        f"(not listed by `ado get experiments`)"
+        for exp_id in experiment_ids
+        if exp_id not in output
+    ]
+
+    return len(errors) == 0, errors
+
+
 def cleanup_venv(venv_path: Path) -> None:
     """Remove the temporary virtual environment.
 

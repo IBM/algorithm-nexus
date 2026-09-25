@@ -263,16 +263,14 @@ class TestFindAllBenchmarkSubmissions:
         assert len(result) == 1
         assert "exp_a" in str(result[0])
 
-    def test_missing_experiment_package_yaml_exits(self, tmp_path):
-        """Test that an experiment directory without experiment_package.yaml raises typer.Exit."""
-        import typer
-
+    def test_missing_experiment_package_yaml_returns_empty(self, tmp_path):
+        """Test that an experiment directory without experiment_package.yaml is skipped."""
         exp_dir = tmp_path / "experiments" / "missing_yaml"
         exp_dir.mkdir(parents=True)
-        # No experiment_package.yaml
+        # No experiment_package.yaml, no submissions either
 
-        with pytest.raises(typer.Exit):
-            self.manager.find_all_benchmark_submissions(tmp_path / "experiments")
+        result = self.manager.find_all_benchmark_submissions(tmp_path / "experiments")
+        assert result == []
 
     def test_nonexistent_experiments_root_exits(self, tmp_path):
         """Test that a nonexistent experiments root raises a typer.Exit."""
