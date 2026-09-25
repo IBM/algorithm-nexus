@@ -9,12 +9,12 @@ This guide walks you through adding a benchmark to Algorithm Nexus. If you have
 not yet registered your algorithm, start with
 [Contributing a Python Algorithm Package to Algorithm Nexus](./add_new_nexus_package.md).
 
-There are four steps to add a benchmark:
+There are four steps to add a benchmark submission:
 
 1. **Find or create a benchmark experiment package**
 2. **Create an experiment folder and register the package**
 3. **Define a benchmark submission**
-4. **Run the benchmark**
+4. **Run the benchmark submission**
 
 ## Prerequisites
 
@@ -34,9 +34,9 @@ uv sync --group dev --extra cli
 
 ## Step 1: Find or create a benchmark experiment package
 
-A benchmark experiment is a Python package that defines how to evaluate an
-algorithm. First check whether a suitable experiment already exists in Algorithm
-Nexus before creating a new one.
+A benchmark experiment is a Python package that defines how to evaluate a
+benchmark target. First check whether a suitable experiment already exists in
+Algorithm Nexus before creating a new one.
 
 ### Find an existing experiment
 
@@ -108,10 +108,10 @@ Fix any validation errors before proceeding.
 
 ## Step 3: Define a benchmark submission
 
-A benchmark submission specifies executing a registered experiment with a
-specific set of parameter values (benchmark instance). Each submission is a
-folder under `experiments/<experiment-name>/submissions/` containing a
-`space.yaml` file.
+A benchmark submission is one registered use of a benchmark experiment on a
+benchmark instance for a specific benchmark target. Each submission is a folder
+under `experiments/<experiment-name>/submissions/` containing a `space.yaml`
+file.
 
 Create the directory:
 
@@ -148,7 +148,7 @@ Validate the experiment folder again to confirm the submission is well-formed:
 uv run nexus validate experiments --experiment <experiment-name>
 ```
 
-## Step 4: Run the benchmark
+## Step 4: Run the benchmark submission
 
 Install the experiment package and run the benchmark submission locally using the
 `ado` CLI. First save the following operation configuration to a file `op.yaml`.
@@ -197,7 +197,7 @@ Open a pull request from your fork to the Algorithm Nexus main branch.
 
 ## Optional: Mapping to logical benchmarks
 
-Once your benchmark is running, you can connect it to a logical benchmark so the
+Once your submission is running, you can connect it to a logical benchmark so the
 results can be compared with results from other experiments targeting the same
 type of problem. This requires creating a _benchmark biding_ that maps the
 experiments internal parameters and metrics to a shared, canonical vocabulary.

@@ -3,7 +3,8 @@
 ## Executive Summary
 
 This document specifies how to add **benchmark experiments** and **benchmark
-submissions** (runs of those experiments on a problem).
+submissions** (a registered use of an experiment on a benchmark instance for a
+specific benchmark target).
 
 Benchmark experiment registration and benchmark submissions live under the
 top-level `experiments/` directory.
@@ -22,8 +23,8 @@ top-level `experiments/` directory.
    or a GitHub URL — local paths are not allowed
 6. Every experiment package must follow the standardized ADO custom experiment
    packaging protocol
-7. The benchmark target is the experiment property that represents the algorithm
-   or model being evaluated
+7. The benchmark target is the experiment property that represents the model,
+   algorithm, or experiment being evaluated
 8. Markdown documentation is updated before any schema, template, or validation
    implementation work
 
@@ -34,8 +35,24 @@ top-level `experiments/` directory.
 ### 1.1 Benchmark System Components
 
 Based on the [benchmark requirements](../../requirements/benchmark.md), the
-system has five core concepts that must be linked together by the experiment
-metadata:
+system has six core concepts. This document registers experiments and
+submissions. Logical benchmarks, instances, and results are specified in
+[Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md).
+
+- **Logical benchmark**
+    - an abstract problem class
+    - declared under `benchmarks/`; see
+      [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md)
+
+- **Benchmark instance**
+    - a concrete realisation of a logical benchmark
+    - registered under `benchmarks/<id>/instances/`; a submission's `space.yaml`
+      records the instance property values used for that submission
+
+- **Benchmark target**
+    - the model, algorithm, or experiment being evaluated
+    - in this design, the experiment property that identifies which target is
+      under evaluation
 
 - **Benchmark experiment**
     - a script, harness, or workflow that executes a benchmark target on a
@@ -45,30 +62,17 @@ metadata:
     - All benchmark experiments follow the
       [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
 
-- **Benchmark instance**
-    - the inputs, data, and execution pattern exercised by a benchmark driver
-    - in this design, benchmark instance parameter values are specified in
-      per-submission `space.yaml` files under
-      `experiments/<name>/submissions/<submission>/`
-
-- **Benchmark target**
-    - the model or algorithm being evaluated
-    - the benchmark target is the experiment property that identifies which
-      algorithm or model is under evaluation
-
-- **Benchmark**
-    - either a fixed benchmark experiment or a benchmark instance plus a
-      parameterizable benchmark experiment
-    - in this design, a benchmark submission references a declared benchmark
-      experiment and provides parameter values where needed
-
 - **Benchmark submission**
-    - a concrete benchmark definition for a specific use case
+    - one registered use of a benchmark experiment on a benchmark instance for a
+      specific benchmark target
     - in this design, each benchmark submission is one folder under
       `experiments/<name>/submissions/`, containing a `space.yaml` file with the
       full ADO discoveryspace definition
-    - the benchmark submission binds together the selected experiment and the
-      benchmark-instance-specific parameter values used for execution
+    - the submission is not the experiment definition and is not an execution
+
+- **Benchmark result**
+    - the measurements produced by executing a submission
+    - used to compare benchmark targets on a given benchmark instance
 
 ### 1.2 Responsibilities by File and Directory
 
@@ -82,14 +86,15 @@ metadata:
 
 ### 1.3 Requirements to Design Mapping
 
-| Requirement | Design interpretation                                                                                                                                                   |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| REQ 1.2     | Benchmark experiments are distributed as Python packages published on PyPI or GitHub — local packages are not supported                                                 |
-| REQ 2.1     | Benchmark package registration happens in `experiments/<name>/experiment_package.yaml`, including the `requirement_specifier` and the experiment identifiers it exposes |
-| REQ 2.3     | Benchmark submissions live in `experiments/<name>/submissions/`, where each submission folder contains a `space.yaml` discoveryspace definition                         |
-| REQ 3.1     | A benchmark entry specifies the benchmark to use through a dedicated discoveryspace definition in the relevant `experiments/<name>/submissions/<submission>/` folder    |
-| REQ 3.2     | New benchmark experiments are added as published Python packages (PyPI or GitHub) and declared in a new `experiments/<name>/experiment_package.yaml`                    |
-| REQ 3.3     | Multiple submissions under the same experiment can reference any experiment identifier declared in `experiment_package.yaml`                                            |
+| Requirement | Design interpretation                                                                                                                                                                             |
+| ------------| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| REQ 1.2     | Benchmark experiments are distributed as Python packages published on PyPI or GitHub — local packages are not supported                                                                           |
+| REQ 2.3     | A benchmark experiment is registered in `experiments/<name>/experiment_package.yaml`. A binding under `experiments/<name>/bindings/` declares which logical benchmarks the experiment can address |
+| REQ 2.4     | A benchmark submission is registered as `experiments/<name>/submissions/<submission>/space.yaml`                                                                                                  |
+| REQ 2.5     | Experiments and submissions are listed by scanning `experiments/` (see [Section 5](#5-benchmarks-discovery))                                                                                      |
+| REQ 3.1     | A benchmark submission is specified through the discoveryspace in `experiments/<name>/submissions/<submission>/`                                                                                  |
+| REQ 3.2     | A new experiment is added as a published Python package (PyPI or GitHub) and declared in `experiment_package.yaml`                                                                                |
+| REQ 3.3     | An experiment identifier declared in `experiment_package.yaml` can be referenced by many submissions and across Nexus packages                                                                    |
 
 ---
 
@@ -260,16 +265,16 @@ package into the current environment. This also enables listing experiments
 distributed via a remote repository that would not be discoverable by just
 installing the package.
 
-### 5.2 Benchmarks Discovery
+### 5.2 Submission Discovery
 
-Benchmarks can be discovered by scanning the top-level `experiments/` directory.
-Each `experiments/<name>/submissions/` folder lists the benchmark submissions
-for that experiment. This supports listing all benchmark submissions without
-requiring a separate benchmark index.
+Benchmark submissions can be discovered by scanning the top-level `experiments/`
+directory. Each `experiments/<name>/submissions/` folder lists the benchmark
+submissions for that experiment. This supports listing all benchmark submissions
+without requiring a separate index.
 
-### 5.3 Fetching Details About an Experiment or a Benchmark
+### 5.3 Fetching Details About an Experiment or a Submission
 
-Fetching details on experiments and benchmarks — such as expected input, metrics
-exported, etc. — can be obtained with a combination of the `nexus` CLI for
-listing and the `ado` CLI for full experiment details after installing the
+Fetching details on experiments and submissions — such as expected input,
+metrics exported, etc. — can be obtained with a combination of the `nexus` CLI
+for listing and the `ado` CLI for full experiment details after installing the
 relevant experiment package.

@@ -33,13 +33,13 @@ layers are specified in their own documents, listed from the
 | Layer                                | Document                                                                            | Responsibility                                                                                     |
 | ------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | **Execution**                        | This document                                                                       | `ado` experiment packages, Ray, the result store, GitHub and admin triggers, and sweep governance. |
-| **Experiments and submissions**      | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) | Which experiments a package exposes, and which submissions run those experiments.                  |
+| **Experiments and submissions**      | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) | Which experiments a package exposes, and the submissions that apply them to a target and instance. |
 | **Logical benchmarks and instances** | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md)           | The shared problem definition, concrete instances, and how results are aggregated.                 |
 
 `ado` defines, packages, and executes a self-contained benchmark experiment. It
 enforces input and output interfaces, versions the experiment logic, and records
-provenance independently of the target model. Nexus metadata says which
-experiment runs, and against which benchmark target and instance. That metadata
+provenance independently of the benchmark target. Nexus metadata says which
+experiment is used, and against which benchmark target and instance. That metadata
 is specified in
 [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
 
@@ -73,21 +73,16 @@ environment installation, providing built-in commands to list and discover them.
 <!-- markdownlint-disable line-length -->
 
 | Requirement | Name                           | Fulfillment Strategy | Component     | Proposed Solution                                                                                                         |
-| ----------- | ------------------------------ | -------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| ------------| -------------------------------| ---------------------| --------------| --------------------------------------------------------------------------------------------------------------------------|
 | **REQ 1.1** | Input/Output Specification     | Technology           | `ado` core    | `ado` defines a standard programmatic input/output schema for benchmark experiments.                                      |
 | **REQ 1.2** | Python Package                 | Technology           | `ado` core    | `ado` experiments are written purely in Python and distributed as standard packages.                                      |
 | **REQ 1.5** | Lifecycle Management           | Technology           | `ado` core    | `ado` natively provides a flag for experiments to mark deprecation.                                                       |
-| **REQ 2.2** | Benchmark Experiment Discovery | Technology           | nexus         | The nexus CLI provides built-in commands to list all registered experiments.                                              |
-| **REQ 2.4** | Benchmark Discovery            | Technology           | nexus         | The nexus CLI will enable listing all benchmarks defined in all packages (or a specific package or for a specific model). |
-| **REQ 3.3** | Benchmark Experiment Reuse     | Technology           | `ado` + nexus | Once registered as described in REQ 2.1, experiments can be universally referenced across projects.                       |
-| **REQ 4.1** | Single & Sweep Execution       | Technology           | Ray + `ado`   | `ado` provides the capability to execute single experiment instances and parameter sweeps.                                |
+| **REQ 4.1** | Single & Sweep Execution       | Technology           | Ray + `ado`   | `ado` provides the capability to execute single benchmark submissions and parameter sweeps.                               |
 | **REQ 4.2** | Resource Specification         | Technology           | Ray           | Ray allows a benchmark experiment to make explicit hardware resource requests.                                            |
-| **REQ 4.4** | Result Capture                 | Technology           | `ado` DB      | `ado` commits successful benchmark results even if parallel instances fail.                                               |
+| **REQ 4.4** | Result Capture                 | Technology           | `ado` DB      | `ado` commits successful benchmark results even if parallel submissions fail.                                             |
 | **REQ 4.5** | Standardized Error Reporting   | Technology           | `ado` core    | Handled natively via standard Python error handling and custom `ado` return payloads.                                     |
 | **REQ 4.8** | Local Execution                | Technology           | `ado` core    | `ado` supports local execution for rapid prototyping on local compute.                                                    |
 | **REQ 5.1** | Centralized Results Storage    | Technology           | `ado` DB      | `ado` provides centralized remote results storage.                                                                        |
-| **REQ 5.2** | Common Results Schema          | Technology           | `ado` core    | `ado` enforces a uniform, structured schema for all stored results.                                                       |
-| **REQ 5.3** | Custom Metadata Support        | Technology           | `ado` DB      | `ado` supports returning custom metadata dicts alongside core results.                                                    |
 
 <!-- markdownlint-enable line-length -->
 
@@ -121,9 +116,7 @@ utilizes `ado`'s native search space semantics.
 <!-- markdownlint-disable line-length -->
 
 | Requirement | Name                                      | Fulfillment Strategy | Component           | Proposed Solution                                                                                                                                                                                                                                                                                                                                      |
-| ----------- | ----------------------------------------- | -------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **REQ 2.1** | Benchmark Experiment Package Registration | Technology + Process | nexus               | Registering a benchmark experiments package involves adding metadata describing the package and the experiments it contains to a Nexus package, as well as validating that all referenced packages can be installed together. Packages provided via any mechanism outlined in REQ 3.2 can be registered. \[PENDING: Nexus Test Dependencies Handling\] |
-| **REQ 2.3** | Benchmark Registration                    | Technology + Process | nexus + `ado`       | Registering a benchmark (see REQ 3.1) is specified in [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md): each submission is a folder under `experiments/<name>/submissions/` with a `space.yaml`.                                                                                                                    |
+| ------------| ------------------------------------------| ---------------------| --------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **REQ 4.3** | Resource Limits                           | Technology + Process | Ray Cluster         | Admins configure Ray clusters to set hard quotas per instance.                                                                                                                                                                                                                                                                                         |
 | **REQ 4.6** | Logging                                   | Technology + Process | Ray Cluster         | Admins configure infrastructure to persist logs without indefinite retention.                                                                                                                                                                                                                                                                          |
 | **REQ 6.2** | Isolated Execution                        | Technology + Process | `ado` + Ray Runtime | Users can describe the benchmark experiment dependencies in the benchmark experiment package using `ado` + Ray semantics. Ray will dynamically create isolated virtual environments per worker.                                                                                                                                                        |
@@ -154,7 +147,7 @@ reliability.
 
 - **Reproducibility Contract:** Contributors must adhere to the convention that
   an experiment name plus specific parameter values defines a unique, repeatable
-  execution. Repeatable here means **the experiment submission use an identical
+  execution. Repeatable here means **the benchmark submission uses an identical
   process** not produces the same result, as experiments can be stochastic.
 - **Versioning**: ado provides mechanisms for experiment versioning but does not
   prescribe any. The main convention w.r.t experiment versioning is that
@@ -175,15 +168,12 @@ submitted to the Ray cluster for execution.
 <!-- markdownlint-disable line-length -->
 
 | Requirement | Name                            | Fulfillment Strategy    | Component     | Proposed Solution                                                                                                                                                         |
-| ----------- | ------------------------------- | ----------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------| --------------------------------| ------------------------| --------------| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **REQ 1.3** | Versioning                      | Technology + Convention | `ado` + nexus | Users leverage `ado` capabilities to specify versions while adhering to semantic naming standards. \[PENDING: Versioning Semantics Decision\]                             |
 | **REQ 1.4** | Reproducible Execution          | Technology + Convention | `ado` + nexus | Users must adhere to ado`'s convention that a given experiment name encodes a unique, repeatable experiment.                                                              |
 | **REQ 1.7** | Required Data                   | Technology + Convention | `ado`         | Developers bundle data with benchmark experiment packages or the experiment downloads it dynamically.                                                                     |
 | **REQ 4.7** | Self-Contained Execution        | Technology + Convention | `ado`         | As REQ 1.7                                                                                                                                                                |
-| **REQ 3.1** | Benchmark Specification         | Technology + Process    | `ado` config  | Users specify benchmarks by creating an `ado` config that binds an experiment to a benchmark instance.                                                                    |
-| **REQ 3.2** | Providing Benchmark Experiments | Technology + Process    | `ado` + nexus | Benchmark experiment packages (following Standardized Benchmarking Packaging Protocol) can be provided in a Nexus package in the Algorithm Nexus repo, on PyPI or GitHub. |
-| **REQ 6.1** | Admin Security                  | Process                 | CI            | Secured via trusted code submissions and mandatory CVE scans.                                                                                                             |
-| **REQ 7.1** | Nexus-Level Benchmarks          | Technology + Process    | `ado` + nexus | Defined independently of Nexus packages under `experiments/`. See [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).                    |
+| **REQ 6.1** | Admin Execution                 | Process                 | CI            | Admin infrastructure can execute submissions. Access is limited to trusted code and mandatory CVE scans.                                                                  |
 | **REQ 7.3** | Sweep Review and Approval       | Process                 | GitHub PRs    | Admins retain review oversight of sweep configurations via GitHub PR workflows.                                                                                           |
 
 <!-- markdownlint-enable line-length -->
@@ -197,9 +187,9 @@ issues.
 
 - Versioning Semantics for REQ 1.3
     - Rules and conventions for versioning benchmark experiments
-- Nexus Test Dependencies Handling for REQ 2.2
-    - The process for validating that the benchmark packages referenced by a
-      nexus package can be installed together
+- Nexus Test Dependencies Handling for REQ 2.3
+    - The process for validating that the benchmark experiment packages
+      referenced by an experiment registration can be installed together
 
 ## How Nexus package developers will use the system
 
@@ -207,30 +197,27 @@ issues.
 
 Developers write and package the experiment according to the standardized
 packaging protocol (REQ 3.2) i.e. as an ado custom experiment or
-actuator+experiments. They put the package on GitHub, PyPI or in the algorithm
-nexus repo (REQ 3.2).
+actuator+experiments. They put the package on GitHub or PyPI (REQ 3.2).
 
-### Defining the benchmark experiment packages used by a nexus package
+### Registering a benchmark experiment
 
-Nexus package owners register the benchmark experiment packages, and the
-experiments they want to use, by referencing them in their nexus package's
-metadata (REQ 2.1) and validating that all the benchmark experiments the package
-needs can be installed together.
+Experiment packages, and the experiment identifiers they expose, are registered
+in `experiments/<name>/experiment_package.yaml` (REQ 2.3). See
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
 
-### Defining a benchmark to use for a model
+### Defining a benchmark submission
 
 First developers can:
 
 - use `nexus` CLI and `ado` CLI to discover existing benchmark experiments (REQ
-  2.2)
-- use `nexus` CLI to discover existing benchmark specifications (REQ 2.4)
+  2.5)
+- use `nexus` CLI to discover existing benchmark submissions (REQ 2.5)
 
-They then define their benchmark using an ado configuration (REQ 3.1). Where
-that submission is registered is specified in
-[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md)
-(REQ 2.3 and REQ 7.1): a folder under `experiments/<name>/submissions/`. The
-benchmark configuration can reference any benchmark experiment registered for
-that experiment. If the benchmark experiment they need is not registered
-[they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package).
-The benchmark configuration can also be based on one discovered via the Nexus
-CLI.
+They then register a benchmark submission using an ado configuration (REQ 3.1,
+REQ 2.4). Where that submission is registered is specified in
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md):
+a folder under `experiments/<name>/submissions/`. The submission can reference
+any registered benchmark experiment. If the experiment they need is not
+registered
+[they can add it.](#registering-a-benchmark-experiment).
+The submission can also be based on one discovered via the Nexus CLI.
