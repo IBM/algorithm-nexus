@@ -4,9 +4,6 @@
 
 This document specifies how benchmark experiments are executed and operated:
 `ado` and Ray, GitHub triggers, the admin cluster, and versioning conventions.
-It is the execution layer of the
-[Benchmarking Architecture](./index.md), based on
-[the benchmarking requirements](../../requirements/benchmark.md).
 
 An analysis of the benchmarking requirements indicates that `ado` natively
 fulfills the majority of the complex orchestration, data provenance, and
@@ -33,11 +30,11 @@ Benchmarking has three layers. This document covers execution. The other two
 layers are specified in their own documents, listed from the
 [Benchmarking Architecture](./index.md) overview:
 
-| Layer | Document | Responsibility |
-| --- | --- | --- |
-| **Execution** | This document | `ado` experiment packages, Ray, the result store, GitHub and admin triggers, and sweep governance. |
-| **Experiments and submissions** | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) | Which experiments a package exposes, and which submissions run those experiments. |
-| **Logical benchmarks and instances** | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md) | The shared problem definition, concrete instances, and how results are aggregated. |
+| Layer                                | Document                                                                            | Responsibility                                                                                     |
+| ------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Execution**                        | This document                                                                       | `ado` experiment packages, Ray, the result store, GitHub and admin triggers, and sweep governance. |
+| **Experiments and submissions**      | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) | Which experiments a package exposes, and which submissions run those experiments.                  |
+| **Logical benchmarks and instances** | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md)           | The shared problem definition, concrete instances, and how results are aggregated.                 |
 
 `ado` defines, packages, and executes a self-contained benchmark experiment. It
 enforces input and output interfaces, versions the experiment logic, and records
@@ -232,9 +229,8 @@ They then define their benchmark using an ado configuration (REQ 3.1). Where
 that submission is registered is specified in
 [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md)
 (REQ 2.3 and REQ 7.1): a folder under `experiments/<name>/submissions/`. The
-benchmark configuration can
-reference any benchmark experiment registered for that experiment. If the
-benchmark experiment they need is not registered
+benchmark configuration can reference any benchmark experiment registered for
+that experiment. If the benchmark experiment they need is not registered
 [they can add it.](#defining-the-benchmark-experiment-packages-used-by-a-nexus-package).
 The benchmark configuration can also be based on one discovered via the Nexus
 CLI.

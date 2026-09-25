@@ -3,14 +3,10 @@
 ## Executive Summary
 
 This document specifies how to add **benchmark experiments** and **benchmark
-submissions** (runs of those experiments on a problem). It is the experiments
-and submissions layer of the
-[Benchmarking Architecture](./index.md). Logical benchmarks, instances,
-and result aggregation are specified in
-[Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md).
+submissions** (runs of those experiments on a problem).
 
 Benchmark experiment registration and benchmark submissions live under the
-top-level `experiments/` directory, entirely separate from `packages/`.
+top-level `experiments/` directory.
 
 **Key Design Decisions:**
 
@@ -37,8 +33,9 @@ top-level `experiments/` directory, entirely separate from `packages/`.
 
 ### 1.1 Benchmark System Components
 
-Based on the [benchmark requirements](../../requirements/benchmark.md), the system
-has five core concepts that must be linked together by the experiment metadata:
+Based on the [benchmark requirements](../../requirements/benchmark.md), the
+system has five core concepts that must be linked together by the experiment
+metadata:
 
 - **Benchmark experiment**
     - a script, harness, or workflow that executes a benchmark target on a

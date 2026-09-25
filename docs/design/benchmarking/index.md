@@ -1,10 +1,7 @@
 # Benchmarking Architecture
 
-This is the entry point for the benchmarking design. It names the concepts, the
-three layers, and which document answers each requirement group. Schemas and
-operational detail live in the child documents.
-
-The requirements are in
+This section describes the architecture of our benchmarking system which
+satisfies the requirements defined in
 [Requirements for models benchmarking](../../requirements/benchmark.md).
 
 ## Terminology
@@ -22,25 +19,24 @@ The requirements are in
 
 ## Layers
 
-1. **Execution** — `ado` experiment packages, Ray, and the result store.
-   [Benchmark Execution and Operations](./benchmark_execution.md).
-2. **Experiments and submissions** — which experiments a package exposes, and
-   which submissions run them.
-   [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
-3. **Logical benchmarks and instances** — the shared problem definition,
-   concrete instances, and comparable results.
-   [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md).
+There are three layers to the system
 
-Experiment binding (how an experiment's outputs map onto a logical benchmark)
-stays in the logical benchmarks document for now.
+1. [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md). —
+   covers problem definitions (logical benchmarks), defining concrete benchmark
+   instances, and enabling comparable results
+2. [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
+   — adding benchmark experiments, and defining benchmark submissions that uses
+   them
+3. [Benchmark Execution and Operations](./benchmark_execution.md).— `ado`
+   experiment packages, Ray, and the result store.
 
 ## Requirements map
 
-| Requirements | Document |
-| --- | --- |
-| REQ-1, REQ-4, REQ-5.1, REQ-6, REQ-7 | [Benchmark Execution and Operations](./benchmark_execution.md) |
-| REQ-2, REQ-3 | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) |
-| REQ-5.2, REQ-5.3 | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md) |
+| Requirements                        | Document                                                                            |
+| ----------------------------------- | ----------------------------------------------------------------------------------- |
+| REQ-1, REQ-4, REQ-5.1, REQ-6, REQ-7 | [Benchmark Execution and Operations](./benchmark_execution.md)                      |
+| REQ-2, REQ-3                        | [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md) |
+| REQ-5.2, REQ-5.3                    | [Logical Benchmarks and Instances](./logical_benchmarks_and_instances.md)           |
 
 REQ-5.1 (centralized result storage) is part of execution. REQ-5.2 and REQ-5.3
 (a common results schema and custom metadata used for aggregation) are answered

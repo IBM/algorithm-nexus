@@ -8,11 +8,9 @@ SPDX-License-Identifier: Apache-2.0
 ## Executive Summary
 
 This document specifies how to add **logical benchmarks** and **benchmark
-instances**, and how an experiment binds to a logical benchmark so results from
-diverse experiments can be aggregated in a standardized, domain-agnostic way.
-It is the logical-benchmarks layer of the
-[Benchmarking Architecture](./index.md). Experiment binding stays in this
-document for now.
+instances**. It also defines how an experiment binds to a logical benchmark so
+results from diverse experiments can be aggregated in a standardized,
+domain-agnostic way.
 
 The design rests on two complementary artifacts:
 
@@ -27,15 +25,9 @@ The design rests on two complementary artifacts:
    results from that experiment's data.
 
 Together, these two artifacts allow the benchmarking system to remain agnostic
-to domain-specific concepts. All domain knowledge is expressed by the benchmark
-and experiment authors; the system only needs to read the metadata and apply it.
-
-Execution is specified in
-[Benchmark Execution and Operations](./benchmark_execution.md). Which experiments
-a package exposes, and which submissions run them, is specified in
-[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md).
-That document registers runs. This document registers the shared problem and
-the instances those runs are compared on.
+to domain-specific concepts. All domain knowledge is expressed by the logical
+benchmark, benchmark instance and benchmark experiment authors; the system only
+needs to read the metadata and apply it.
 
 ---
 
@@ -108,7 +100,8 @@ benchmark problem. It defines:
 
 The logical benchmark definition lives under the `logicalBenchmark` key inside
 `benchmarks/<benchmark-id>/benchmark.yaml`. Bindings live separately in
-`experiments/<experiment-name>/bindings/` (see [Section 3](#3-benchmark-binding)).
+`experiments/<experiment-name>/bindings/` (see
+[Section 3](#3-benchmark-binding)).
 
 ```yaml
 logicalBenchmark:
@@ -153,7 +146,7 @@ See
 [the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/)
 for more information about the types of domains that can be specified.
 
-### 2.4 Logical Benchmark Instances and Artifacts
+### 2.4 Benchmark Instances and Artifacts
 
 A logical benchmark can define concrete problem instances (e.g. specific graphs,
 routing networks, or datasets). Each instance lives in its own folder under
@@ -182,11 +175,11 @@ match the property identifiers defined under `instance:` in `benchmark.yaml`:
   instance directory that contains the valid files for that property. The folder
   must exist inside the instance directory.
 
-| Field           | Type                                                                                      | Required | Description                                                                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier`    | string                                                                                    | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                          |
-| `description`   | string                                                                                    | No       | Human-readable description of this specific instance.                                                                                                                   |
-| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties)   | No       | Value for a property defined in `benchmark.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; folder must exist in the instance directory.   |
+| Field           | Type                                                                                    | Required | Description                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identifier`    | string                                                                                  | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                        |
+| `description`   | string                                                                                  | No       | Human-readable description of this specific instance.                                                                                                                 |
+| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties) | No       | Value for a property defined in `benchmark.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; folder must exist in the instance directory. |
 
 #### Example Instance (`benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`)
 
@@ -405,10 +398,9 @@ workload: steady_state_heavy
 
 #### Binding
 
-The binding lives in
-`experiments/guidellm/bindings/llm_inference_binding.yaml`. Each entry in the
-`bindings` list carries a `benchmarkIdentifier` to identify which logical
-benchmark it maps to:
+The binding lives in `experiments/guidellm/bindings/llm_inference_binding.yaml`.
+Each entry in the `bindings` list carries a `benchmarkIdentifier` to identify
+which logical benchmark it maps to:
 
 ```yaml
 bindings:
