@@ -28,7 +28,7 @@ candidate = [
   "opencv-python-headless!=5.0.0.93",
   "terrakit==0.2.0",
   "terratorch[vllm]==1.2.13",
-  "vllm==0.29.0",
+  "vllm>=0.30.0,<0.31.0",
 ]
 cli = [
   "ado-core>=2.0",
@@ -54,7 +54,7 @@ product = [
   "opencv-python-headless!=5.0.0.93",
   "terrakit==0.2.0",
   "terratorch[vllm]==1.2.13",
-  "vllm>=0.28.0,<0.29.0",
+  "vllm>=0.30.0,<0.31.0",
 ]
 
 [dependency-groups]
