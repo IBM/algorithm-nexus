@@ -1519,7 +1519,7 @@ into the Algorithm Nexus ecosystem.</p>
 <li>Defines which models are supported by that Python package</li>
 <li>Enables dependency resolution across all packages in the Algorithm Nexus</li>
 <li>Can optionally register benchmark packages, package-level baseline benchmark
-  instances, and model-specific benchmark instances for benchmarking workflows</li>
+  submissions, and model-specific benchmark submissions for benchmarking workflows</li>
 </ul>
 <hr />
 <h2 id="2-folder-structure">2. Folder Structure<a class="headerlink" href="#2-folder-structure" title="Permanent link">&para;</a></h2>
@@ -1531,15 +1531,15 @@ following structure:</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    ├── nexus.yaml               # Required package metadata
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ├── skills                   # Optional agent skills resources
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ├── benchmark_packages/      # Optional local benchmark packages
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── benchmark_instances/     # Optional package-level baseline benchmark instances
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    │   └── &lt;benchmark-instance-name&gt;/
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    │       └── space.yaml       # Required ADO discoveryspace for that benchmark instance
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── benchmark_submissions/   # Optional package-level baseline benchmark submissions
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    │   └── &lt;benchmark-submission-name&gt;/
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    │       └── space.yaml       # Required ADO discoveryspace for that benchmark submission
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    └── models/
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        ├── &lt;model-1&gt;/
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        │   ├── model.yaml       # Required model metadata
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        │   ├── benchmark_instances/ # Optional per-model benchmark instances
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        │   │   └── &lt;benchmark-instance-name&gt;/
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        │   │       └── space.yaml   # Required ADO discoveryspace for that benchmark instance
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        │   ├── benchmark_submissions/ # Optional per-model benchmark submissions
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        │   │   └── &lt;benchmark-submission-name&gt;/
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        │   │       └── space.yaml   # Required ADO discoveryspace for that benchmark submission
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        │   └── usage.md         # Optional usage documentation
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        ├── &lt;model-2&gt;/
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        │   └── ...
@@ -1552,16 +1552,16 @@ provides agent skills to assist users in using the package. The optional
 package should follow the
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/">ADO custom experiment</a>
 template. A Nexus package can also optionally define a top-level
-<code>benchmark_instances/</code> folder for baseline experiments that live at package
-scope rather than under a specific model. Each benchmark instance in that folder
-must have its own sub-folder containing a <code>space.yaml</code> file. The <code>models/</code>
-folder is required whenever a Nexus package wants to advertise one or more
-models, with one sub-folder for each model. Each model folder must contain a
+<code>benchmark_submissions/</code> folder for baseline experiments that live at package
+scope rather than under a specific model. Each benchmark submission in that
+folder must have its own sub-folder containing a <code>space.yaml</code> file. The
+<code>models/</code> folder is required whenever a Nexus package wants to advertise one or
+more models, with one sub-folder for each model. Each model folder must contain a
 <code>model.yaml</code> file describing the model metadata and optional vLLM integration.
-Each model folder can optionally include a sibling <code>benchmark_instances/</code>
-folder. Inside <code>benchmark_instances/</code>, each benchmark instance must have its own
-sub-folder, and that sub-folder must contain a <code>space.yaml</code> file defining the
-full ADO discoveryspace for that specific benchmark instance. A <code>usage.md</code> file
+Each model folder can optionally include a sibling <code>benchmark_submissions/</code>
+folder. Inside <code>benchmark_submissions/</code>, each benchmark submission must have its
+own sub-folder, and that sub-folder must contain a <code>space.yaml</code> file defining the
+full ADO discoveryspace for that specific benchmark submission. A <code>usage.md</code> file
 can also be included to provide users with model-specific usage guidance.</p>
 <hr />
 <h2 id="3-configuration-files">3. Configuration Files<a class="headerlink" href="#3-configuration-files" title="Permanent link">&para;</a></h2>
@@ -1758,10 +1758,10 @@ maximum interoperability across different agents.</p>
 <h4 id="323-benchmarks">3.2.3. Benchmarks<a class="headerlink" href="#323-benchmarks" title="Permanent link">&para;</a></h4>
 <p>Benchmark configuration should remain separate from
 <code>models/&lt;model-name&gt;/model.yaml</code>. When a Nexus package defines baseline
-benchmarks, they should be described in a top-level <code>benchmark_instances/</code>
+benchmarks, they should be described in a top-level <code>benchmark_submissions/</code>
 folder in the package root. When a model defines model-specific benchmarks, they
-should be described in a sibling <code>benchmark_instances/</code> folder. In either
-location, each benchmark instance must have its own sub-folder that provides a
+should be described in a sibling <code>benchmark_submissions/</code> folder. In either
+location, each benchmark submission must have its own sub-folder that provides a
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace"><code>space.yaml</code></a>
 file with the full ADO discoveryspace definition for that benchmark run. The
 experiment referenced in <code>space.yaml</code> must be one of the experiment identifiers

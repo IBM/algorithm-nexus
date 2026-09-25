@@ -1574,10 +1574,10 @@ within Algorithm Nexus based on
 <p>An analysis of the benchmarking requirements indicates that <code>ado</code> natively
 fulfills the majority of the complex orchestration, data provenance, and
 scalable execution needs for evaluating <strong>benchmark targets</strong> against defined
-<strong>workloads</strong>. By combining <code>ado</code> and Ray with specific <strong>Algorithm Nexus
-Extensions</strong>, integration definitions, and robust administrative processes, the
-team can deliver a comprehensive, end-to-end benchmarking solution capable of
-generating repeatable <strong>benchmark results</strong>.</p>
+<strong>benchmark instances</strong>. By combining <code>ado</code> and Ray with specific <strong>Algorithm
+Nexus Extensions</strong>, integration definitions, and robust administrative
+processes, the team can deliver a comprehensive, end-to-end benchmarking
+solution capable of generating repeatable <strong>benchmark results</strong>.</p>
 <p>To fully satisfy these requirements, the design of the Benchmarking System is
 divided into three <strong>Architectural Pillars</strong>: System Architecture (The
 Mechanisms), Operational Architecture (The Infrastructure), and Governance &amp;
@@ -1609,7 +1609,7 @@ model.</p>
 <tr>
 <td><strong>Tier 2: Benchmark Integration</strong></td>
 <td><code>nexus</code> Package</td>
-<td>While <code>ado</code> knows <em>how</em> to run an experiment, <code>nexus</code> dictates <em>when</em> and <em>against what</em>. It provides the declarative metadata required to define a benchmark: bind a specific target (the model) to a specific <code>ado</code> benchmark experiment and a defined workload.</td>
+<td>While <code>ado</code> knows <em>how</em> to run an experiment, <code>nexus</code> dictates <em>when</em> and <em>against what</em>. It provides the declarative metadata required to define a benchmark: specify how an <code>ado</code> benchmark experiment can execute a given benchmark target and a defined benchmark instance.</td>
 </tr>
 </tbody>
 </table>
@@ -1622,13 +1622,13 @@ routing these events to the underlying execution infrastructure. It acts as the
 technical bridge between human operations and the execution engine.</p>
 <h3 id="13-execution-and-orchestration-engine">1.3 Execution and Orchestration Engine<a class="headerlink" href="#13-execution-and-orchestration-engine" title="Permanent link">&para;</a></h3>
 <p>The execution architecture relies on <strong>Ray</strong> and <strong><code>ado</code></strong>. <code>ado</code> leverages
-<strong>Ray</strong> to handle parameter sweeps and single benchmark instances mechanically.
-Thanks to <code>ado</code>'s data recording capabilities, if one instance in a sweep fails
-<code>ado</code> continues orchestration and commits successful results to the database.
-Ray allows the underlying experiments to explicitly request hardware resources
-(e.g., <code>@ray.remote(num_gpus=1)</code>) via task decorators. Ray can also create
-per-task execution environments, allowing tests with incompatible requirements
-to ado-core or other experiments to execute.</p>
+<strong>Ray</strong> to handle parameter sweeps and single benchmark submissions
+mechanically. Thanks to <code>ado</code>'s data recording capabilities, if one submission
+in a sweep fails <code>ado</code> continues orchestration and commits successful results to
+the database. Ray allows the underlying experiments to explicitly request
+hardware resources (e.g., <code>@ray.remote(num_gpus=1)</code>) via task decorators. Ray
+can also create per-task execution environments, allowing tests with
+incompatible requirements to ado-core or other experiments to execute.</p>
 <h3 id="14-centralized-data-discovery">1.4 Centralized Data &amp; Discovery<a class="headerlink" href="#14-centralized-data-discovery" title="Permanent link">&para;</a></h3>
 <p>The architecture utilizes <code>ado</code> distributed projects capabilities to store data,
 enforcing a uniform schema for results and custom metadata dictionaries.
@@ -1758,8 +1758,8 @@ scaled by the administrative team and CI/CD pipelines.</p>
 <p>Admins configure the <strong>Ray cluster</strong> on K8s via KubeRay, with hard namespace
 limits to maintain resource quotas during massive sweeps. To optimize
 performance, the underlying cluster mounts a shared persistent filesystem (via
-PVC) for workload dataset caching. Ray dynamically isolates worker node
-environments to prevent dependency version clashes between concurrent
+PVC) for benchmark instance dataset caching. Ray dynamically isolates worker
+node environments to prevent dependency version clashes between concurrent
 evaluations.</p>
 <h3 id="22-orchestration-triggers-automation">2.2 Orchestration Triggers &amp; Automation<a class="headerlink" href="#22-orchestration-triggers-automation" title="Permanent link">&para;</a></h3>
 <p>The mechanism for triggering centralized administrative evaluations is fully
@@ -1851,14 +1851,14 @@ reliability.</p>
 <ul>
 <li><strong>Reproducibility Contract:</strong> Contributors must adhere to the convention that
   an experiment name plus specific parameter values defines a unique, repeatable
-  execution. Repeatable here means <strong>the experiment instance use an identical
+  execution. Repeatable here means <strong>the experiment submission use an identical
   process</strong> not produces the same result, as experiments can be stochastic.</li>
 <li><strong>Versioning</strong>: ado provides mechanisms for experiment versioning but does not
   prescribe any. The main convention w.r.t experiment versioning is that
   whatever mechanism is chosen ensures the <strong>Reproducibility Contract</strong></li>
-<li><strong>Data Handling Guidelines:</strong> Workload data must either be bundled directly
-  inside the benchmark experiment package or programmed to download dynamically
-  at execution time.</li>
+<li><strong>Data Handling Guidelines:</strong> Benchmark instance data must either be bundled
+  directly inside the benchmark experiment package or programmed to download
+  dynamically at execution time.</li>
 </ul>
 <h3 id="33-governance-of-sweeps">3.3 Governance of Sweeps<a class="headerlink" href="#33-governance-of-sweeps" title="Permanent link">&para;</a></h3>
 <p>Because parameter sweeps are computationally expensive, they must undergo
@@ -1912,7 +1912,7 @@ submitted to the Ray cluster for execution.</p>
 <td>Benchmark Specification</td>
 <td>Technology + Process</td>
 <td><code>ado</code> config</td>
-<td>Users specify benchmarks by creating an <code>ado</code> config that binds an experiment to a workload.</td>
+<td>Users specify benchmarks by creating an <code>ado</code> config that binds an experiment to a benchmark instance.</td>
 </tr>
 <tr>
 <td><strong>REQ 3.2</strong></td>

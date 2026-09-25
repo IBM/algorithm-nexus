@@ -1424,43 +1424,44 @@ specifically to the central execution infrastructure managed by the project
 admins).</p>
 <h2 id="terminology">Terminology<a class="headerlink" href="#terminology" title="Permanent link">&para;</a></h2>
 <p>To establish a clear mental model, the relationship between core components can
-be summarized as: Benchmark Instance = Benchmark Target + Benchmark (Workload +
-Benchmark Experiment)</p>
+be summarized as: Benchmark Submission = Benchmark Target + Benchmark (Benchmark
+Instance + Benchmark Experiment), where a Benchmark Instance is a concrete
+realisation of a Logical Benchmark (Benchmark Problem).</p>
 <ul>
 <li>
-<p><strong>Workload</strong> The problem or task an AI model or algorithm is intended to
-  solve, including the associated inputs, data, and execution pattern exercised
-  by the benchmark driver.</p>
+<p><strong>Logical Benchmark (Benchmark Problem)</strong> An abstract, reusable definition of
+  a problem class or evaluation task, independent of any specific dataset,
+  model, or execution context. It defines <em>what</em> is being measured (e.g.,
+  Travelling Salesman Problem, Graph Colouring, Bin Packing, Maximum Cut)
+  without prescribing <em>how</em> it is instantiated or executed.</p>
+</li>
+<li>
+<p><strong>Benchmark Instance</strong> The concrete realisation of a Logical Benchmark: the
+  problem or task an AI model or algorithm is intended to solve, including the
+  associated inputs, data, and execution pattern exercised by the benchmark
+  driver.</p>
 </li>
 <li>
 <p><strong>Benchmark Target</strong> The AI model or algorithm being evaluated. This is the
   element that varies across benchmark experiments while the benchmark
-  definition and workload specification are held constant.</p>
+  definition and benchmark instance specification are held constant.</p>
 </li>
 <li>
 <p><strong>Benchmark Experiment</strong> A script, harness, or workflow that executes the
-  benchmark target on the workload, controlling execution conditions, and
-  collects measurements. The experiment will take benchmark target as input. The
-  benchmark experiment may hard-code the workload (<strong>fixed</strong>) OR the workload is
-  specified by passing certain values for the benchmark experiments parameters
-  (<strong>parameterizable</strong>)</p>
-</li>
-<li>
-<p><strong>Benchmark</strong> A standardized, repeatable evaluation used to compare the
-  behavior of a benchmark target (versions of AI models or algorithms) on a
-  problem of interest (workload) under controlled conditions. Embodied as either
-  a <strong>fixed benchmark experiment</strong> or a <strong>workload</strong> plus <strong>parameterized
-  benchmark experiment</strong>.</p>
+  benchmark target on the benchmark instance, controlling execution conditions,
+  and collects measurements. The experiment might take the benchmark target and
+  instance as input (<strong>parameterizable</strong>) or may hard-code them (<strong>fixed</strong>).</p>
 </li>
 <li>
 <p><strong>Benchmark Result</strong> The quantitative measurements produced by executing a
   benchmark experiment (e.g., accuracy, runtime, throughput, resource
-  utilization), with the <strong>workload</strong> - used to compare benchmark targets.</p>
+  utilization), with the <strong>benchmark instance</strong> - used to compare benchmark
+  targets.</p>
 </li>
 <li>
-<p><strong>Benchmark Instance</strong> A concrete execution of a benchmark, in which a
-  benchmark driver runs a workload against a specific benchmark target and
-  records measurements.</p>
+<p><strong>Benchmark Submission</strong> A concrete execution of a benchmark, in which a
+  benchmark driver runs a benchmark instance against a specific benchmark target
+  and records measurements.</p>
 </li>
 </ul>
 <hr />
@@ -1500,8 +1501,8 @@ formatted, standardized, and versioned to ensure reproducibility.</p>
 </li>
 <li>
 <p><strong>REQ 1.7: Required Data</strong> If a benchmark experiment requires specific data
-  files to execute a workload these must be either (a) contained in the python
-  package providing the experiment; (b) downloaded by the experiment.
+  files to execute a benchmark instance these must be either (a) contained in
+  the python package providing the experiment; (b) downloaded by the experiment.
   <em>Rationale</em>: Guarantees that automated execution does not fail due to missing
   local filesystem dependencies.</p>
 </li>
@@ -1530,7 +1531,7 @@ benchmarks and benchmark experiments.</p>
 <p>either as</p>
 <ol>
 <li>a combination of a parameterizable benchmark experiment and a benchmark
-   workload</li>
+   instance</li>
 <li>a fixed benchmark experiment</li>
 </ol>
 </li>
@@ -1570,9 +1571,9 @@ and failure management.</p>
 <ul>
 <li>
 <p><strong>REQ 4.1: Single and Sweep Execution</strong> The system must support both executing
-  single benchmark instances and parameter sweeps. <em>Rationale</em>: Sweeps are
+  single benchmark submissions and parameter sweeps. <em>Rationale</em>: Sweeps are
   essential for performance profiling and evaluating models across a spectrum of
-  workloads.</p>
+  benchmark instances.</p>
 </li>
 <li>
 <p><strong>REQ 4.2: Resource Specification</strong> The system must allow benchmark
@@ -1582,13 +1583,13 @@ and failure management.</p>
 </li>
 <li>
 <p><strong>REQ 4.3: Resource Limits</strong> The system must support setting hard limits on
-  maximum resource usage (time, compute, memory) per benchmark instance or set
-  of instances. <em>Rationale</em>: Prevents processes from hogging shared
+  maximum resource usage (time, compute, memory) per benchmark submission or set
+  of submissions. <em>Rationale</em>: Prevents processes from hogging shared
   infrastructure in the admin environment.</p>
 </li>
 <li>
 <p><strong>REQ 4.4: Result Capture</strong> The system must ensure results from any successful
-  benchmark instance are saved.</p>
+  benchmark submission are saved.</p>
 </li>
 <li>
 <p><strong>REQ 4.5: Standardized Error Reporting</strong> The system must provide a
@@ -1618,7 +1619,7 @@ and failure management.</p>
 <p>This section outlines how results and supporting context are persisted.</p>
 <ul>
 <li>
-<p><strong>REQ 5.1: Centralized Results Storage</strong> Results of all benchmark instances
+<p><strong>REQ 5.1: Centralized Results Storage</strong> Results of all benchmark submissions
   must be stored in a centralized location accessible by the respective package
   owners. <em>Rationale</em>: Facilitates cross-model comparison, historical tracking,
   and platform-wide reporting.</p>

@@ -1008,10 +1008,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-define-a-benchmark-instance-for-your-model" class="md-nav__link">
+  <a href="#step-3-define-a-benchmark-submission-for-your-model" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 3: Define a benchmark instance for your model
+        Step 3: Define a benchmark submission for your model
       </span>
     </span>
   </a>
@@ -1068,6 +1068,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Create a logical benchmark definition
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-logical-benchmark-instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Add logical benchmark instances
       </span>
     </span>
   </a>
@@ -1519,7 +1530,7 @@ algorithm, start with
 <ol>
 <li><strong>Find or create a benchmark experiment</strong></li>
 <li><strong>Register the experiment with your Nexus package</strong></li>
-<li><strong>Define a benchmark instance for your algorithm</strong></li>
+<li><strong>Define a benchmark submission for your algorithm</strong></li>
 <li><strong>Run the benchmark</strong></li>
 </ol>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
@@ -1594,16 +1605,16 @@ experiment from the given package</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/&lt;package-name&gt;
 </span></code></pre></div>
 <p>Fix any validation errors before proceeding.</p>
-<h2 id="step-3-define-a-benchmark-instance-for-your-model">Step 3: Define a benchmark instance for your model<a class="headerlink" href="#step-3-define-a-benchmark-instance-for-your-model" title="Permanent link">&para;</a></h2>
-<p>A benchmark instance specifies executing a registered experiment on your
-model/algorithm with a specific set of parameter values (workload). Each
-benchmark instance is a folder under your model's <code>benchmark_instances/</code>
-directory, that contains a <code>ado</code> <code>space.yaml</code></p>
+<h2 id="step-3-define-a-benchmark-submission-for-your-model">Step 3: Define a benchmark submission for your model<a class="headerlink" href="#step-3-define-a-benchmark-submission-for-your-model" title="Permanent link">&para;</a></h2>
+<p>A benchmark submission specifies executing a registered experiment on your
+model/algorithm with a specific set of parameter values (benchmark instance).
+Each benchmark submission is a folder under your model's
+<code>benchmark_submissions/</code> directory, that contains an <code>ado</code> <code>space.yaml</code></p>
 <p>Create the directory,</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>packages/&lt;package-name&gt;/models/&lt;model-name&gt;/benchmark_instances/&lt;instance-name&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>packages/&lt;package-name&gt;/models/&lt;model-name&gt;/benchmark_submissions/&lt;submission-name&gt;
 </span></code></pre></div>
 <p>Create
-<code>packages/&lt;package-name&gt;/models/&lt;model-name&gt;/benchmark_instances/&lt;instance-name&gt;/space.yaml</code>:</p>
+<code>packages/&lt;package-name&gt;/models/&lt;model-name&gt;/benchmark_submissions/&lt;submission-name&gt;/space.yaml</code>:</p>
 <p>Example:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">entitySpace</span><span class="p">:</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
@@ -1617,16 +1628,16 @@ directory, that contains a <code>ado</code> <code>space.yaml</code></p>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_experiments</span>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">      </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;experiment-id&gt;</span>
 </span></code></pre></div>
-<p>The <code>entitySpace</code> defines the workload parameters for this instance. The
-<code>experimentIdentifier</code> must match one of the experiment IDs you registered in
-<code>nexus.yaml</code> in the previous step.</p>
+<p>The <code>entitySpace</code> defines the benchmark instance and any other parameters for
+this submission. The <code>experimentIdentifier</code> must match one of the experiment IDs
+you registered in <code>nexus.yaml</code> in the previous step.</p>
 <p>For full details on <code>space.yaml</code> syntax, see the
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace">ADO discoveryspace documentation</a>.</p>
 <p>Validate the package again to confirm the instance is well-formed:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/&lt;package-name&gt;
 </span></code></pre></div>
 <h2 id="step-4-run-the-benchmark">Step 4: Run the benchmark<a class="headerlink" href="#step-4-run-the-benchmark" title="Permanent link">&para;</a></h2>
-<p>Install the benchmark package and run the benchmark instance locally using the
+<p>Install the benchmark package and run the benchmark submission locally using the
 <code>ado</code> CLI. First save the following operation configuration to a file <code>op.yaml</code>.
 It will execute the experiment on all points in your space.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">metadata</span><span class="p">:</span>
@@ -1654,7 +1665,7 @@ execution options including parameter sweeps and remote execution.</p>
 <p>Add and commit your changes:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>add<span class="w"> </span>packages/&lt;package-name&gt;
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>git<span class="w"> </span>add<span class="w"> </span>benchmark_packages<span class="w"> </span><span class="c1">#required when also adding a benchmark package during Step 1</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-s<span class="w"> </span>-m<span class="w"> </span><span class="s2">"feat(benchmark): Add &lt;instance-name&gt; benchmark for &lt;model-name&gt;"</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-s<span class="w"> </span>-m<span class="w"> </span><span class="s2">"feat(benchmark): Add &lt;submission-name&gt; benchmark for &lt;model-name&gt;"</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>&lt;your-branch&gt;
 </span></code></pre></div>
 <p>Open a pull request from your fork to the Algorithm Nexus main branch.</p>
@@ -1672,8 +1683,8 @@ experiments internal parameters and metrics to a shared, canonical vocabulary.</
 <h3 id="check-for-an-existing-logical-benchmark-definition">Check for an existing logical benchmark definition<a class="headerlink" href="#check-for-an-existing-logical-benchmark-definition" title="Permanent link">&para;</a></h3>
 <p>Logical benchmark definitions live in the <code>benchmarks/</code> directory at the root of
 the Algorithm Nexus repository. Browse that directory to see whether a
-definition already exists for your domain (e.g. <code>inference_serving.yaml</code>,
-<code>max_cut_solver.yaml</code>).</p>
+definition already exists for your domain (e.g.
+<code>benchmarks/llm-inference/problem.yaml</code>, <code>benchmarks/max-cut/problem.yaml</code>).</p>
 <ul>
 <li><strong>If a definition exists</strong> — you add a binding for experiment to it. Continue
   to
@@ -1682,101 +1693,121 @@ definition already exists for your domain (e.g. <code>inference_serving.yaml</co
   <a href="#create-a-logical-benchmark-definition">Create a logical benchmark definition</a>.</li>
 </ul>
 <h3 id="create-a-logical-benchmark-definition">Create a logical benchmark definition<a class="headerlink" href="#create-a-logical-benchmark-definition" title="Permanent link">&para;</a></h3>
-<p>If no definition exists, create a YAML file in
-<code>benchmarks/&lt;logical-benchmark-id&gt;.yaml</code>. This file establishes the canonical
-vocabulary for your benchmark — property names, valid values, and metric names.</p>
+<p>If no definition exists, create a directory in
+<code>benchmarks/&lt;logical-benchmark-id&gt;/</code> with a <code>problem.yaml</code> file. This file
+establishes the canonical vocabulary for your benchmark — property names, valid
+values, and metric names.</p>
 <p>A minimal example:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inference_serving</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="no">Evaluation of AI model inference serving throughput and latency under</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="no">controlled traffic conditions.</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">target</span><span class="p">:</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">        </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">            </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"The</span><span class="nv"> </span><span class="s">id</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">AI</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">being</span><span class="nv"> </span><span class="s">benchmarked"</span>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">  </span><span class="nt">properties</span><span class="p">:</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">        </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">            </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Dataset</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">inference</span><span class="nv"> </span><span class="s">requests."</span>
-</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">            </span><span class="c1"># No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default</span>
-</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">        </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">            </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Traffic</span><span class="nv"> </span><span class="s">pattern</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">workload</span><span class="nv"> </span><span class="s">profile."</span>
-</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">        </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">            </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"steady_state_heavy"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"poisson_bursty"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"light_load"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
-</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
-</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
-</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">  </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">"@vllm-team"</span>
-</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="nt">bindings</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w"> </span><span class="c1"># List of bindings to this benchmark</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_coloring</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph Coloring</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">        </span><span class="no">Evaluates graph-coloring algorithms on their ability to produce valid</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">        </span><span class="no">k-colorings with a small chromatic number. Instances span random</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="no">Erdős–Rényi graphs and structured benchmark graphs at varying densities.</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nt">instance</span><span class="p">:</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_family</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph family (erdos_renyi, planar, random_regular).</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CATEGORICAL_VARIABLE_TYPE</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">              </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">erdos_renyi</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">planar</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">random_regular</span><span class="p p-Indicator">]</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_vertices</span>
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Number of vertices in the graph.</span>
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DISCRETE_VARIABLE_TYPE</span>
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">              </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">50</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">500</span><span class="p p-Indicator">]</span>
+</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge_density</span>
+</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Edge probability / density parameter.</span>
+</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-12-25"><a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-12-26"><a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph</span>
+</span><span id="__span-12-27"><a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="w">          </span><span class="nt">is_artifact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-12-28"><a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-12-29"><a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph input files in various formats.</span>
+</span><span id="__span-12-30"><a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="w">    </span><span class="nt">metrics</span><span class="p">:</span>
+</span><span id="__span-12-31"><a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_colors_used</span>
+</span><span id="__span-12-32"><a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">is_valid_coloring</span>
+</span><span id="__span-12-33"><a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elapsed_ms</span>
+</span><span id="__span-12-34"><a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a><span class="w">    </span><span class="nt">ranking</span><span class="p">:</span>
+</span><span id="__span-12-35"><a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a><span class="w">        </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_colors_used</span>
+</span><span id="__span-12-36"><a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a><span class="w">        </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asc</span>
+</span><span id="__span-12-37"><a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">"@graph-team"</span>
+</span><span id="__span-12-38"><a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a><span class="nt">bindings</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w"> </span><span class="c1"># List of bindings to this benchmark</span>
 </span></code></pre></div>
 <p>For the full schema and a complete worked example, see
 <a href="../../design/benchmark_metadata_convention/#2-logical-benchmark-definition">Section 2 of the Benchmark Metadata Convention</a>.</p>
+<h3 id="add-logical-benchmark-instances">Add logical benchmark instances<a class="headerlink" href="#add-logical-benchmark-instances" title="Permanent link">&para;</a></h3>
+<p>To define specific benchmark problem instances (e.g., individual graphs, routing
+problem instances, or datasets), add a subfolder per instance in
+<code>benchmarks/&lt;logical-benchmark-id&gt;/instances/&lt;instance-name&gt;/</code> containing an
+<code>instance.yaml</code> file and any subfolders holding artifact files referenced by the
+instance.</p>
+<p>Example instance YAML
+(<code>benchmarks/&lt;logical-benchmark-id&gt;/instances/graph_01/instance.yaml</code>):</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_01</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50-node random graph</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="nt">graph_family</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">random_regular</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="nt">num_vertices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="nt">edge_density</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="nt">graph</span><span class="p">:</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="nt">artifacts_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_files</span><span class="w"> </span><span class="c1"># subfolder that exists inside instances/graph_01/</span>
+</span></code></pre></div>
 <h3 id="add-a-benchmark-binding-for-your-experiment">Add a benchmark binding for your experiment<a class="headerlink" href="#add-a-benchmark-binding-for-your-experiment" title="Permanent link">&para;</a></h3>
 <p>The binding is added to the list of bindings in the logical benchmark yaml.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1">#logical benchmark fields</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nt">bindings</span><span class="p">:</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">          </span><span class="nt">experimentIdentifer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myexperiment</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">          </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.2</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">          </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">customexperiments</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">      </span><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w">  </span><span class="c1">#next binding</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1">#logical benchmark fields</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">          </span><span class="nt">experimentIdentifer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myexperiment</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">          </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.2</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">          </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">customexperiments</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">      </span><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w">  </span><span class="c1">#next binding</span>
 </span></code></pre></div>
-<p>A binding contains the following mapping sections: `</p>
+<p>A binding contains the following mapping sections:</p>
 <ul>
-<li><code>targetMapping</code>: Maps the target property of the benchmark to an experiment input property</li>
-<li><code>propertyMapping</code>: Maps the other inputs of the logical benchmark to inputs of the
-  experiment</li>
-<li><code>metricMappings</code>: Maps outputs of the logical benchmark to the outputs of the
+<li><code>targetMapping</code>: Names the experiment property that carries the benchmark
+  target (e.g. the algorithm or model identifier)</li>
+<li><code>instanceMapping</code>: Maps benchmark instance properties to experiment inputs</li>
+<li><code>staticFilters</code>: Sets static property values implicit in either the logical
+  benchmark or the experiment. Contains two optional sub-keys:<ul>
+<li><code>experimentFilters</code>: pins experiment properties to values that are
+  implicit in the logical benchmark (adds a constant <code>WHERE</code> clause to every
+  query)</li>
+<li><code>benchmarkFilters</code>: pins benchmark instance properties to values that are
+  implicit in the experiment (injects a constant value into leaderboard rows
+  without reading it from the experiment results)</li>
+</ul>
+</li>
+<li><code>metricMapping</code>: Maps outputs of the logical benchmark to the outputs of the
   experiment</li>
 </ul>
 <p>An example binding is</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inference_serving</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_performance</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guide_llm_runner</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0.0</span><span class="w"> </span><span class="c1"># The binding only uses the major version</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_name</span><span class="w"> </span><span class="c1">#The property model_name maps to the target property defined in the benchmark</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nt">propertyMapping</span><span class="p">:</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_data_path</span><span class="w"> </span><span class="c1"># guide-llm's internal param name</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
-</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic_shape</span>
-</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"constant"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">concurrency</span>
-</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1000</span><span class="p p-Indicator">]</span>
-</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-14-26"><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-14-27"><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
-</span><span id="__span-14-28"><a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-14-29"><a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic_shape</span>
-</span><span id="__span-14-30"><a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-14-31"><a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"poisson"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-14-32"><a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">concurrency</span>
-</span><span id="__span-14-33"><a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-14-34"><a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">]</span>
-</span><span id="__span-14-35"><a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-14-36"><a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a><span class="nt">metricMapping</span><span class="p">:</span>
-</span><span id="__span-14-37"><a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-14-38"><a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
-</span><span id="__span-14-39"><a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-14-40"><a id="__codelineno-14-40" name="__codelineno-14-40" href="#__codelineno-14-40"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_rps</span><span class="w"> </span><span class="c1"># guide-llm's internal param name</span>
-</span><span id="__span-14-41"><a id="__codelineno-14-41" name="__codelineno-14-41" href="#__codelineno-14-41"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-14-42"><a id="__codelineno-14-42" name="__codelineno-14-42" href="#__codelineno-14-42"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
-</span><span id="__span-14-43"><a id="__codelineno-14-43" name="__codelineno-14-43" href="#__codelineno-14-43"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-14-44"><a id="__codelineno-14-44" name="__codelineno-14-44" href="#__codelineno-14-44"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttft_ms</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_experiments</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span><span class="w"> </span><span class="c1"># The binding only uses the major version</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solver</span><span class="w"> </span><span class="c1"># The experiment property that carries the benchmark target identifier</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_vertices</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span><span class="w"> </span><span class="c1"># rlx_coloring's internal param name</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge_density</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">density</span><span class="w"> </span><span class="c1"># rlx_coloring's internal param name</span>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="nt">metricMapping</span><span class="p">:</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_colors_used</span>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colors</span><span class="w"> </span><span class="c1"># rlx_coloring's internal metric name</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elapsed_ms</span>
+</span><span id="__span-15-22"><a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-15-23"><a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">runtime_ms</span><span class="w"> </span><span class="c1"># rlx_coloring's internal metric name</span>
 </span></code></pre></div>
 <p>For the full benchmark binding schema and worked examples, see the
 <a href="../../design/benchmark_metadata_convention/">Benchmark Metadata Convention</a>.</p>
@@ -1785,17 +1816,30 @@ vocabulary for your benchmark — property names, valid values, and metric names
 <p>The top-level <code>benchmarks/</code> directory is the single source of truth for all
 logical benchmark definitions and their bindings.</p>
 <h3 id="structure">Structure<a class="headerlink" href="#structure" title="Permanent link">&para;</a></h3>
-<p>One YAML file per logical benchmark, named after the <code>benchmarkIdentifier</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>benchmarks/
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>├── inference_serving.yaml
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>├── max_cut_solver.yaml
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>└── ...
+<p>Each logical benchmark has its own directory containing <code>problem.yaml</code> and an
+<code>instances/</code> directory with per-instance subfolders:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>benchmarks/
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>├── &lt;benchmark-id&gt;/
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>│   ├── problem.yaml
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>│   ├── README.md              # optional: full problem statement and context
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>│   └── instances/
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>│       ├── &lt;instance-1-id&gt;/
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>│       │   ├── instance.yaml
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>│       │   └── &lt;artifacts-subfolder&gt;/   # named by artifacts_location in instance.yaml
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>│       │       ├── graph.dimacs
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>│       │       └── graph.json
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>│       └── ...
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>└── ...
 </span></code></pre></div>
-<p>Each file uses the following top-level structure:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="c1"># Definition fields (see Section 2 of the Benchmark Metadata Convention)</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nt">bindings</span><span class="p">:</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="c1"># List of benchmark bindings (see Section 3 of the Benchmark Metadata Convention)</span>
+<p>A <code>README.md</code> alongside <code>problem.yaml</code> is encouraged to provide a full
+description of the problem. For example to explain the mathematical formulation,
+provide references, or describe the instance structure in more detail than the
+<code>description</code> field in <code>problem.yaml</code> allows.</p>
+<p>Each <code>problem.yaml</code> uses the following top-level structure:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="c1"># Definition fields (see Section 2 of the Benchmark Metadata Convention)</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="c1"># List of benchmark bindings (see Section 3 of the Benchmark Metadata Convention)</span>
 </span></code></pre></div>
 <h3 id="ownership">Ownership<a class="headerlink" href="#ownership" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1814,8 +1858,8 @@ logical benchmark definitions and their bindings.</p>
   retained alongside the new one.</li>
 <li><strong>Logical benchmark property names or values change</strong> — if the existing
   mappings become invalid, update the definition and all affected bindings in
-  place. If the original mappings are still valid, create a new logical benchmark
-  instead.</li>
+  place. If the original mappings are still valid, create a new logical
+  benchmark instead.</li>
 <li><strong>New non-default experiment properties are added in a minor version bump</strong> —
   if those properties must be set to non-default values to reproduce the same
   measurement, the binding must be updated because a different subset of
@@ -1823,10 +1867,10 @@ logical benchmark definitions and their bindings.</p>
 </ul>
 <h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h3>
 <p>Validate all logical benchmark files before opening a pull request:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks
 </span></code></pre></div>
-<p>To validate a single file:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks<span class="w"> </span>--file<span class="w"> </span>benchmarks/&lt;logical-benchmark-id&gt;.yaml
+<p>To validate a single file or benchmark folder:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks<span class="w"> </span>--file<span class="w"> </span>benchmarks/&lt;logical-benchmark-id&gt;
 </span></code></pre></div>
 <hr />
 <h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>

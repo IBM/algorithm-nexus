@@ -866,10 +866,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#32-package-level-benchmark-instances-in-benchmark_instances" class="md-nav__link">
+  <a href="#32-package-level-benchmark-submissions-in-benchmark_submissions" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        3.2 Package-Level Benchmark Instances in <code>benchmark_instances/</code>
+        3.2 Package-Level Benchmark Submissions in <code>benchmark_submissions/</code>
       </span>
     </span>
   </a>
@@ -877,10 +877,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#33-model-level-benchmark-instances-in-modelsmodel-namebenchmark_instances" class="md-nav__link">
+  <a href="#33-model-level-benchmark-submissions-in-modelsmodel-namebenchmark_submissions" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        3.3 Model-Level Benchmark Instances in <code>models/&lt;model-name&gt;/benchmark_instances/</code>
+        3.3 Model-Level Benchmark Submissions in <code>models/&lt;model-name&gt;/benchmark_submissions/</code>
       </span>
     </span>
   </a>
@@ -916,10 +916,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-benchmark-instance-validation" class="md-nav__link">
+  <a href="#42-benchmark-submission-validation" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        4.2 Benchmark Instance Validation
+        4.2 Benchmark Submission Validation
       </span>
     </span>
   </a>
@@ -966,10 +966,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52-fetching-details-about-an-experiment-or-a-benchmark" class="md-nav__link">
+  <a href="#53-fetching-details-about-an-experiment-or-a-benchmark" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        5.2 Fetching details about an experiment or a benchmark
+        5.3 Fetching details about an experiment or a benchmark
       </span>
     </span>
   </a>
@@ -1547,17 +1547,17 @@
 <h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
 <p>This document defines how benchmarking metadata is integrated into Algorithm
 Nexus packages. The design keeps benchmark experiment registration at the Nexus
-package level and benchmark specification in <code>benchmark_instances/</code> folders that
-may exist either at package level for baselines or at model level for
+package level and benchmark specification in <code>benchmark_submissions/</code> folders
+that may exist either at package level for baselines or at model level for
 model-specific benchmarks.</p>
 <p><strong>Key Design Decisions:</strong></p>
 <ol>
 <li><code>nexus.yaml</code> registers benchmark packages and the benchmark experiments they
    expose to the package</li>
 <li><code>model.yaml</code> remains focused on model metadata</li>
-<li>model-level <code>benchmark_instances/</code> specifies benchmark instances tied to a
-   model</li>
-<li>package-level <code>benchmark_instances/</code> specifies benchmark instances for
+<li>model-level <code>benchmark_submissions/</code> specifies benchmark submissions tied to
+   a model</li>
+<li>package-level <code>benchmark_submissions/</code> specifies benchmark submissions for
    baseline experiments that live at the top level of the Nexus package</li>
 <li>The package-level <code>benchmark_packages/</code> folder stores local benchmark
    packages, and each such package follows the ADO custom experiment template</li>
@@ -1566,7 +1566,7 @@ model-specific benchmarks.</p>
 <li>Every registration must resolve to an ADO custom experiment that follows the
    standardized benchmark packaging protocol</li>
 <li>The benchmark target is implicit from the enclosing model definition for
-   model-specific benchmark instances</li>
+   model-specific benchmark submissions</li>
 <li>Markdown documentation is updated before any schema, template, or validation
    implementation work</li>
 </ol>
@@ -1580,7 +1580,7 @@ has five core concepts that must be linked together by package metadata:</p>
 <p><strong>Benchmark experiment</strong></p>
 <ul>
 <li>a script, harness, or workflow that executes a benchmark target on a
-  workload and collects measurements</li>
+  benchmark instance and collects measurements</li>
 <li>in this design, benchmark experiments are registered at package level in
   <code>nexus.yaml</code></li>
 <li>All benchmark experiments follow the
@@ -1588,12 +1588,12 @@ has five core concepts that must be linked together by package metadata:</p>
 </ul>
 </li>
 <li>
-<p><strong>Workload</strong></p>
+<p><strong>Benchmark instance</strong></p>
 <ul>
 <li>the inputs, data, and execution pattern exercised by a benchmark driver</li>
-<li>in this design, workload or experiment parameter values are specified in
-  per-instance <code>space.yaml</code> files under model-level or package-level
-  <code>benchmark_instances/</code></li>
+<li>in this design, benchmark instance or experiment parameter values are
+  specified in per-submission <code>space.yaml</code> files under model-level or
+  package-level <code>benchmark_submissions/</code></li>
 </ul>
 </li>
 <li>
@@ -1601,43 +1601,43 @@ has five core concepts that must be linked together by package metadata:</p>
 <ul>
 <li>the model or algorithm being evaluated</li>
 <li>in this design, the benchmark target is implicit from the enclosing model
-  definition in <code>model.yaml</code> for model-level benchmark instances</li>
-<li>for package-level baseline benchmark instances, the benchmark target is
-  defined directly by the benchmark instance itself</li>
+  definition in <code>model.yaml</code> for model-level benchmark submissions</li>
+<li>for package-level baseline benchmark submissions, the benchmark target is
+  defined directly by the benchmark submission itself</li>
 </ul>
 </li>
 <li>
 <p><strong>Benchmark</strong></p>
 <ul>
-<li>either a fixed benchmark experiment or a workload plus a parameterizable
-  benchmark experiment</li>
-<li>in this design, a benchmark instance references a registered benchmark
+<li>either a fixed benchmark experiment or a benchmark instance plus a
+  parameterizable benchmark experiment</li>
+<li>in this design, a benchmark submission references a registered benchmark
   experiment and provides parameter values where needed</li>
 </ul>
 </li>
 <li>
-<p><strong>Benchmark instance</strong></p>
+<p><strong>Benchmark submission</strong></p>
 <ul>
 <li>a concrete benchmark definition for a specific use case</li>
-<li>in this design, each benchmark instance is represented by one folder under
-  a model-level or package-level <code>benchmark_instances/</code> directory,
+<li>in this design, each benchmark submission is represented by one folder
+  under a model-level or package-level <code>benchmark_submissions/</code> directory,
   containing a <code>space.yaml</code> file with the full ADO discoveryspace definition</li>
-<li>for model-level benchmark instances, the benchmark target is the enclosing
-  model</li>
-<li>package-level benchmark instances support baseline experiments that live
+<li>for model-level benchmark submissions, the benchmark target is the
+  enclosing model</li>
+<li>package-level benchmark submissions support baseline experiments that live
   at the top level of the Nexus package</li>
-<li>the benchmark instance binds together the selected experiment and the
-  workload-specific parameter values used for execution</li>
+<li>the benchmark submission binds together the selected experiment and the
+  benchmark-instance-specific parameter values used for execution</li>
 </ul>
 </li>
 </ul>
-<p>This follows the requirements terminology that a benchmark instance is formed
+<p>This follows the requirements terminology that a benchmark submission is formed
 from a benchmark target together with a benchmark, where the benchmark is
-represented as either a fixed benchmark experiment or a workload plus a
-parameterizable benchmark experiment. For model-level benchmark instances, the
+represented as either a fixed benchmark experiment or a benchmark instance plus a
+parameterizable benchmark experiment. For model-level benchmark submissions, the
 benchmark target comes from the enclosing model. For package-level baseline
-benchmark instances, the benchmark target is defined directly by the benchmark
-instance itself.</p>
+benchmark submissions, the benchmark target is defined directly by the benchmark
+submission itself.</p>
 <h3 id="12-responsibilities-by-file-and-directory">1.2 Responsibilities by File and Directory<a class="headerlink" href="#12-responsibilities-by-file-and-directory" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -1656,16 +1656,16 @@ instance itself.</p>
 <td>Stores one or more local benchmark packages, each following the ADO custom experiment template</td>
 </tr>
 <tr>
-<td>package-level <code>benchmark_instances/</code> folder</td>
-<td>Stores one folder per baseline benchmark instance at the top level of the Nexus package, each with a <code>space.yaml</code> ADO discoveryspace definition</td>
+<td>package-level <code>benchmark_submissions/</code> folder</td>
+<td>Stores one folder per baseline benchmark submission at the top level of the Nexus package, each with a <code>space.yaml</code> ADO discoveryspace definition</td>
 </tr>
 <tr>
 <td><code>model.yaml</code></td>
 <td>Declares model metadata</td>
 </tr>
 <tr>
-<td>model-level <code>benchmark_instances/</code> folder</td>
-<td>Stores one folder per model-specific benchmark instance, each with a <code>space.yaml</code> ADO discoveryspace definition</td>
+<td>model-level <code>benchmark_submissions/</code> folder</td>
+<td>Stores one folder per model-specific benchmark submission, each with a <code>space.yaml</code> ADO discoveryspace definition</td>
 </tr>
 </tbody>
 </table>
@@ -1688,11 +1688,11 @@ instance itself.</p>
 </tr>
 <tr>
 <td>REQ 2.3</td>
-<td>Benchmark registration happens in <code>benchmark_instances/</code> folders, either at package level for baseline experiments or at model level for model-specific benchmarks, where each instance is represented by a <code>space.yaml</code> discoveryspace definition</td>
+<td>Benchmark registration happens in <code>benchmark_submissions/</code> folders, either at package level for baseline experiments or at model level for model-specific benchmarks, where each submission is represented by a <code>space.yaml</code> discoveryspace definition</td>
 </tr>
 <tr>
 <td>REQ 3.1</td>
-<td>A benchmark entry specifies the benchmark to use through a dedicated discoveryspace definition in the relevant <code>benchmark_instances/</code> folder</td>
+<td>A benchmark entry specifies the benchmark to use through a dedicated discoveryspace definition in the relevant <code>benchmark_submissions/</code> folder</td>
 </tr>
 <tr>
 <td>REQ 3.2</td>
@@ -1711,23 +1711,23 @@ instance itself.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>└── &lt;nexus-package-name&gt;/
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    ├── nexus.yaml
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ├── skills/
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ├── benchmark_packages/            # Local benchmark packages
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ├── benchmark_packages/             # Local benchmark packages
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    │   ├── &lt;benchmark-package-a&gt;/
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    │   │   ├── pyproject.toml
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    │   │   ├── src/
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    │   └── &lt;benchmark-package-b&gt;/
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── benchmark_instances/           # Package-level baseline benchmark instances
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    │   ├── &lt;benchmark-instance-a&gt;/
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── benchmark_submissions/          # Package-level baseline benchmark submissions
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    │   ├── &lt;benchmark-submission-a&gt;/
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    │   │   └── space.yaml
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    │   └── &lt;benchmark-instance-b&gt;/
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    │   └── &lt;benchmark-submission-b&gt;/
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    │       └── space.yaml
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    └── models/
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        └── &lt;model-name&gt;/
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>            ├── model.yaml
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>            ├── benchmark_instances/
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>            │   ├── &lt;benchmark-instance-a&gt;/
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>            ├── benchmark_submissions/
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>            │   ├── &lt;benchmark-submission-a&gt;/
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>            │   │   └── space.yaml
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            │   └── &lt;benchmark-instance-b&gt;/
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            │   └── &lt;benchmark-submission-b&gt;/
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            │       └── space.yaml
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>            └── usage.md
 </span></code></pre></div>
@@ -1744,19 +1744,19 @@ instance itself.</p>
 </ul>
 </li>
 <li>
-<p>package-level <code>benchmark_instances/</code></p>
+<p>package-level <code>benchmark_submissions/</code></p>
 <ul>
-<li>records which baseline benchmark instances the package makes available</li>
-<li>stores one folder per package-level benchmark instance</li>
-<li>carries a <code>space.yaml</code> ADO discoveryspace definition for each instance</li>
+<li>records which baseline benchmark submissions the package makes available</li>
+<li>stores one folder per package-level benchmark submission</li>
+<li>carries a <code>space.yaml</code> ADO discoveryspace definition for each submission</li>
 </ul>
 </li>
 <li>
-<p>model-level <code>benchmark_instances/</code></p>
+<p>model-level <code>benchmark_submissions/</code></p>
 <ul>
-<li>records which benchmark instances a model should use</li>
-<li>stores one folder per model-specific benchmark instance</li>
-<li>carries a <code>space.yaml</code> ADO discoveryspace definition for each instance</li>
+<li>records which benchmark submissions a model should use</li>
+<li>stores one folder per model-specific benchmark submission</li>
+<li>carries a <code>space.yaml</code> ADO discoveryspace definition for each submission</li>
 </ul>
 </li>
 </ul>
@@ -1813,27 +1813,27 @@ packaging protocol.</p>
 <li><code>experiments</code> lists the experiment identifiers exposed from that package and
   made available to models in the Nexus package</li>
 </ul>
-<h3 id="32-package-level-benchmark-instances-in-benchmark_instances">3.2 Package-Level Benchmark Instances in <code>benchmark_instances/</code><a class="headerlink" href="#32-package-level-benchmark-instances-in-benchmark_instances" title="Permanent link">&para;</a></h3>
-<p>A Nexus package may define a top-level <code>benchmark_instances/</code> folder. That
-folder contains one subfolder per package-level benchmark instance. Each
-benchmark instance folder must contain a file named <code>space.yaml</code>.</p>
-<p>These package-level benchmark instances are intended for baseline experiments
+<h3 id="32-package-level-benchmark-submissions-in-benchmark_submissions">3.2 Package-Level Benchmark Submissions in <code>benchmark_submissions/</code><a class="headerlink" href="#32-package-level-benchmark-submissions-in-benchmark_submissions" title="Permanent link">&para;</a></h3>
+<p>A Nexus package may define a top-level <code>benchmark_submissions/</code> folder. That
+folder contains one subfolder per package-level benchmark submission. Each
+benchmark submission folder must contain a file named <code>space.yaml</code>.</p>
+<p>These package-level benchmark submissions are intended for baseline experiments
 that live at the top level of the Nexus package rather than under a specific
 model.</p>
 <p>Example structure:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>benchmark_instances/
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>benchmark_submissions/
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>└── flood-baseline-test/
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    └── space.yaml
 </span></code></pre></div>
-<h3 id="33-model-level-benchmark-instances-in-modelsmodel-namebenchmark_instances">3.3 Model-Level Benchmark Instances in <code>models/&lt;model-name&gt;/benchmark_instances/</code><a class="headerlink" href="#33-model-level-benchmark-instances-in-modelsmodel-namebenchmark_instances" title="Permanent link">&para;</a></h3>
-<p>Each model may also define a <code>benchmark_instances/</code> folder. That folder contains
-one subfolder per benchmark instance. Each benchmark instance folder must
-contain a file named <code>space.yaml</code>.</p>
+<h3 id="33-model-level-benchmark-submissions-in-modelsmodel-namebenchmark_submissions">3.3 Model-Level Benchmark Submissions in <code>models/&lt;model-name&gt;/benchmark_submissions/</code><a class="headerlink" href="#33-model-level-benchmark-submissions-in-modelsmodel-namebenchmark_submissions" title="Permanent link">&para;</a></h3>
+<p>Each model may also define a <code>benchmark_submissions/</code> folder. That folder
+contains one subfolder per benchmark submission. Each benchmark submission
+folder must contain a file named <code>space.yaml</code>.</p>
 <p>The <code>space.yaml</code> file must contain a full ADO discoveryspace definition for the
-specific experiment the benchmark instance wants to use.</p>
+specific experiment the benchmark submission wants to use.</p>
 <p>Example structure:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>models/&lt;model-name&gt;/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── benchmark_instances/
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── benchmark_submissions/
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    └── flood-segmentation-test/
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        └── space.yaml
 </span></code></pre></div>
@@ -1852,24 +1852,24 @@ specific experiment the benchmark instance wants to use.</p>
 </span></code></pre></div>
 <p><strong>Fields and expectations:</strong></p>
 <ul>
-<li>package-level <code>benchmark_instances/</code> is optional</li>
-<li>model-level <code>benchmark_instances/</code> is optional</li>
-<li>each subfolder name identifies one benchmark instance in its enclosing scope</li>
-<li>each benchmark instance subfolder must contain <code>space.yaml</code></li>
+<li>package-level <code>benchmark_submissions/</code> is optional</li>
+<li>model-level <code>benchmark_submissions/</code> is optional</li>
+<li>each subfolder name identifies one benchmark submission in its enclosing scope</li>
+<li>each benchmark submission subfolder must contain <code>space.yaml</code></li>
 <li>each <code>space.yaml</code> must define a complete ADO discoveryspace for the benchmark
-  instance</li>
-<li>model-level benchmark instances implicitly target the enclosing model</li>
-<li>package-level benchmark instances are used for baseline experiments defined at
-  the top level of the Nexus package</li>
+  submission</li>
+<li>model-level benchmark submissions implicitly target the enclosing model</li>
+<li>package-level benchmark submissions are used for baseline experiments defined
+  at the top level of the Nexus package</li>
 <li>the experiment referenced in <code>space.yaml</code> must be one of the experiment
   identifiers registered through <code>package.benchmark_packages</code></li>
 </ul>
 <p>For reference on the expected discoveryspace structure, see
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace">Using your custom experiment in a discoveryspace</a>.</p>
 <p>This structure supports the requirement language in which a benchmark is either
-a fixed benchmark experiment or a workload plus a parameterizable benchmark
-experiment. Also, we assume that any dataset to be used for the benchmark is
-fetched or provided with the experiment itself.</p>
+a fixed benchmark experiment or a benchmark instance plus a parameterizable
+benchmark experiment. Also, we assume that any dataset to be used for the
+benchmark is fetched or provided with the experiment itself.</p>
 <hr />
 <h2 id="4-validation-considerations">4. Validation Considerations<a class="headerlink" href="#4-validation-considerations" title="Permanent link">&para;</a></h2>
 <h3 id="41-package-level-validation">4.1 Package-Level Validation<a class="headerlink" href="#41-package-level-validation" title="Permanent link">&para;</a></h3>
@@ -1889,23 +1889,23 @@ fetched or provided with the experiment itself.</p>
 <li>all referenced requirement specifiers resolve to valid benchmark experiments
    that follow the ADO custom experiment format</li>
 </ol>
-<h3 id="42-benchmark-instance-validation">4.2 Benchmark Instance Validation<a class="headerlink" href="#42-benchmark-instance-validation" title="Permanent link">&para;</a></h3>
+<h3 id="42-benchmark-submission-validation">4.2 Benchmark Submission Validation<a class="headerlink" href="#42-benchmark-submission-validation" title="Permanent link">&para;</a></h3>
 <p>Validation should eventually check that:</p>
 <ol>
-<li>every package-level and model-level benchmark instance folder contains a
+<li>every package-level and model-level benchmark submission folder contains a
    <code>space.yaml</code> file</li>
 <li>each <code>space.yaml</code> contains a valid ADO discoveryspace definition</li>
 <li>each <code>space.yaml</code> references an experiment identifier registered in the same
    package</li>
-<li>package-level benchmark instances define their benchmark target explicitly
+<li>package-level benchmark submissions define their benchmark target explicitly
    where needed, since they are not enclosed by a model</li>
-<li>duplicate benchmark instance names are rejected if uniqueness is desired</li>
+<li>duplicate benchmark submission names are rejected if uniqueness is desired</li>
 <li>each <code>space.yaml</code> contains a valid ADO discoveryspace definition</li>
 <li>each <code>space.yaml</code> references an experiment identifier registered in the same
    package</li>
-<li>package-level benchmark instances define their benchmark target explicitly
+<li>package-level benchmark submissions define their benchmark target explicitly
    where needed, since they are not enclosed by a model</li>
-<li>duplicate benchmark instance names are rejected if uniqueness is desired</li>
+<li>duplicate benchmark submission names are rejected if uniqueness is desired</li>
 </ol>
 <hr />
 <h2 id="5-benchmarks-discovery">5. Benchmarks discovery<a class="headerlink" href="#5-benchmarks-discovery" title="Permanent link">&para;</a></h2>
@@ -1917,13 +1917,13 @@ that are distributed via a remote repository, that would not be discoverable by
 just installing the benchmark. package and the nexus package itself.</p>
 <h3 id="52-benchmarks-discovery">5.2 Benchmarks discovery<a class="headerlink" href="#52-benchmarks-discovery" title="Permanent link">&para;</a></h3>
 <p>Similarly to experiments, benchmarks can be discovered from the top folder of a
-Nexus package by scanning the package-level <code>benchmark_instances/</code> folder for
+Nexus package by scanning the package-level <code>benchmark_submissions/</code> folder for
 baseline experiments and scanning the
 <a href="../../../packages/terratorch/models/"><code>models/</code></a> tree for model-level
-<code>benchmark_instances/</code> folders. This supports listing both package-level
-baseline benchmark instances and model-specific benchmark instances without
+<code>benchmark_submissions/</code> folders. This supports listing both package-level
+baseline benchmark submissions and model-specific benchmark submissions without
 requiring a separate benchmark index.</p>
-<h3 id="52-fetching-details-about-an-experiment-or-a-benchmark">5.2 Fetching details about an experiment or a benchmark<a class="headerlink" href="#52-fetching-details-about-an-experiment-or-a-benchmark" title="Permanent link">&para;</a></h3>
+<h3 id="53-fetching-details-about-an-experiment-or-a-benchmark">5.3 Fetching details about an experiment or a benchmark<a class="headerlink" href="#53-fetching-details-about-an-experiment-or-a-benchmark" title="Permanent link">&para;</a></h3>
 <p>Fetching details on experiments and benchmarks, such as the expected input,
 metrics exported, etc. can be obtained with a combination of the <code>nexus</code> cli,
 used for listing, and the <code>ado</code> cli that after installing the relevant benchmark

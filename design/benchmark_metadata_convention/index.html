@@ -832,13 +832,63 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#23-example-inference-serving" class="md-nav__link">
+  <a href="#23-example-graph-coloring" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        2.3 Example: Inference Serving
+        2.3 Example: Graph Coloring
       </span>
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-logical-benchmark-instances-and-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2.4 Logical Benchmark Instances and Artifacts
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4 Logical Benchmark Instances and Artifacts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-directory-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Instance Directory Layout
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instance-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Instance Schema
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-instance-benchmarksgraph-coloringinstanceserdos_renyi_50_02instanceyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Example Instance (<code>benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml</code>)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -883,10 +933,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#property-mapping" class="md-nav__link">
+  <a href="#metric-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Property Mapping
+        Metric mapping
       </span>
     </span>
   </a>
@@ -894,10 +944,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#metric-mapping" class="md-nav__link">
+  <a href="#instance-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Metric mapping
+        Instance mapping
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Static filters
       </span>
     </span>
   </a>
@@ -910,13 +971,52 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#33-example-guide_llm_runner" class="md-nav__link">
+  <a href="#33-example-guidellm-bench-deployment" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        3.3 Example: <code>guide_llm_runner</code>
+        3.3 Example: <code>guidellm-bench-deployment</code>
       </span>
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="3.3 Example: guidellm-bench-deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problemyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>problem.yaml</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instanceyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>instance.yaml</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Binding
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1049,10 +1149,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#71-target_mapping-and-the-implicit-benchmark-target" class="md-nav__link">
+  <a href="#71-implicit-benchmark-target" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        7.1 <code>target_mapping</code> and the Implicit Benchmark Target
+        7.1 Implicit Benchmark Target
       </span>
     </span>
   </a>
@@ -1060,10 +1160,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#72-benchmark-package-registration-and-instances" class="md-nav__link">
+  <a href="#72-benchmark-package-registration-and-submissions" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        7.2 Benchmark Package Registration and Instances
+        7.2 Benchmark Package Registration and Submissions
       </span>
     </span>
   </a>
@@ -1668,8 +1768,8 @@ experiments:</p>
 <td>The system must support dynamic, per-benchmark, properties.</td>
 </tr>
 <tr>
-<td><strong>Workload Property Fragmentation</strong></td>
-<td>Defining a workload often involves a matrix of runtime properties. If results are differentiated by raw property values, results from minor variations (<code>concurrency=100</code> vs <code>concurrency=105</code>) can never be aggregated. Further, the properties required to run the same benchmark with different experiments may be very different</td>
+<td><strong>Benchmark Instance Property Fragmentation</strong></td>
+<td>Defining a benchmark instance often involves a matrix of runtime properties. If results are differentiated by raw property values, results from minor variations (<code>concurrency=100</code> vs <code>concurrency=105</code>) can never be aggregated. Further, the properties required to run the same benchmark with different experiments may be very different</td>
 <td>The design must allow related property combinations to be collapsed into a single canonical value.</td>
 </tr>
 </tbody>
@@ -1683,8 +1783,8 @@ experiments:</p>
 benchmark problem. It defines:</p>
 <ul>
 <li>a unique identifier</li>
-<li>the <strong>properties</strong> on which the benchmark is evaluated (e.g. <code>dataset</code>,
-  <code>workload</code>) and the valid values each property may take</li>
+<li>the <strong>instance</strong> properties defining the benchmark problem instances and the
+  valid values each property may take</li>
 <li>the canonical <strong>metric names</strong> that results should be reported under</li>
 </ul>
 <h3 id="22-schema">2.2 Schema<a class="headerlink" href="#22-schema" title="Permanent link">&para;</a></h3>
@@ -1708,28 +1808,34 @@ benchmark problem. It defines:</p>
 <td>The canonical identifier.</td>
 </tr>
 <tr>
+<td><code>title</code></td>
+<td>string</td>
+<td>No</td>
+<td>Short human-readable display name for this benchmark.</td>
+</tr>
+<tr>
 <td><code>description</code></td>
 <td>string</td>
 <td>Yes</td>
 <td>Human-readable description of the abstract problem being evaluated.</td>
 </tr>
 <tr>
-<td><code>target</code></td>
-<td>Property</td>
+<td><code>instance</code></td>
+<td>list of BenchmarkInstanceProperty</td>
 <td>Yes</td>
-<td>The property that identifies the quantity being benchmarked</td>
-</tr>
-<tr>
-<td><code>properties</code></td>
-<td>list of Property</td>
-<td>Yes</td>
-<td>The properties on which this benchmark is evaluated. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions of those values.</td>
+<td>The properties defining a benchmark instance. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions. See fields below.</td>
 </tr>
 <tr>
 <td><code>metrics</code></td>
 <td>list of strings</td>
 <td>No</td>
 <td>Canonical metric names for this benchmark.</td>
+</tr>
+<tr>
+<td><code>ranking</code></td>
+<td>Ranking</td>
+<td>No</td>
+<td>Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.</td>
 </tr>
 <tr>
 <td><code>owner</code></td>
@@ -1739,7 +1845,7 @@ benchmark problem. It defines:</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Property fields:</strong></p>
+<p><strong>BenchmarkInstanceProperty fields:</strong></p>
 <table>
 <thead>
 <tr>
@@ -1757,6 +1863,12 @@ benchmark problem. It defines:</p>
 <td>Canonical property identifier.</td>
 </tr>
 <tr>
+<td><code>is_artifact</code></td>
+<td>boolean</td>
+<td>No</td>
+<td>Uses artifact files rather than a scalar value. Default: <code>false</code>.</td>
+</tr>
+<tr>
 <td><code>metadata</code></td>
 <td>map</td>
 <td>No</td>
@@ -1764,41 +1876,152 @@ benchmark problem. It defines:</p>
 </tr>
 <tr>
 <td><code>propertyDomain</code></td>
-<td>orchestrator.schema.PropertyDomain</td>
+<td>ado.schema.domain.PropertyDomain</td>
 <td>No</td>
 <td>Valid values for this property. If omitted, an open categorical domain is assumed.</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Ranking fields:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metric</code></td>
+<td>string</td>
+<td>Yes</td>
+<td>Identifier of the metric used for ranking. Must be in the <code>metrics</code> list.</td>
+</tr>
+<tr>
+<td><code>order</code></td>
+<td>"asc" or "desc"</td>
+<td>Yes</td>
+<td>Sort order: "asc" for lower-is-better, "desc" for higher-is-better.</td>
+</tr>
+</tbody>
+</table>
 <!-- markdownlint-enable line-length -->
 
-<h3 id="23-example-inference-serving">2.3 Example: Inference Serving<a class="headerlink" href="#23-example-inference-serving" title="Permanent link">&para;</a></h3>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inference_serving</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="no">Evaluation of AI model inference serving throughput and latency under</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="no">controlled traffic conditions.</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">target</span><span class="p">:</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"The</span><span class="nv"> </span><span class="s">id</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">AI</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">being</span><span class="nv"> </span><span class="s">benchmarked"</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">properties</span><span class="p">:</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Dataset</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">inference</span><span class="nv"> </span><span class="s">requests."</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="c1"># No propertyDomain: Will be OPEN_CATEGORICAL_DOMAIN by default</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">      </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Traffic</span><span class="nv"> </span><span class="s">pattern</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">workload</span><span class="nv"> </span><span class="s">profile."</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"steady_state_heavy"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"poisson_bursty"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"light_load"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nt">metrics</span><span class="p">:</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">"@vllm-team"</span>
+<h3 id="23-example-graph-coloring">2.3 Example: Graph Coloring<a class="headerlink" href="#23-example-graph-coloring" title="Permanent link">&para;</a></h3>
+<p>The logical benchmark definition lives under the <code>logicalBenchmark</code> key inside
+<code>benchmarks/&lt;benchmark-id&gt;/problem.yaml</code>. Bindings are placed in the sibling
+<code>bindings</code> list in the same file (see <a href="#3-benchmark-binding">Section 3</a>).</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_coloring</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph Coloring</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="no">Evaluates graph-coloring algorithms on their ability to produce valid</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="no">k-colorings with a small chromatic number. Instances span random</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="no">Erdős–Rényi graphs and structured benchmark graphs at varying densities.</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">instance</span><span class="p">:</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">          </span><span class="nt">is_artifact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph instance file artifact.</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_family</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph family (erdos_renyi, planar, random_regular).</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CATEGORICAL_VARIABLE_TYPE</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">              </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">erdos_renyi</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">planar</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">random_regular</span><span class="p p-Indicator">]</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_vertices</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Number of vertices in the graph.</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DISCRETE_VARIABLE_TYPE</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">              </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">50</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">250</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">500</span><span class="p p-Indicator">]</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge_density</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Edge probability / density parameter.</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="nt">metrics</span><span class="p">:</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_colors_used</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">is_valid_coloring</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elapsed_ms</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">    </span><span class="nt">ranking</span><span class="p">:</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">        </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_colors_used</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">        </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asc</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 </span></code></pre></div>
 <p>See
 <a href="https://ibm.github.io/ado/core-concepts/properties-and-domains/">the ado property domain documentation</a>
 for more information about the types of domains that can be specified.</p>
+<h3 id="24-logical-benchmark-instances-and-artifacts">2.4 Logical Benchmark Instances and Artifacts<a class="headerlink" href="#24-logical-benchmark-instances-and-artifacts" title="Permanent link">&para;</a></h3>
+<p>A logical benchmark can define concrete problem instances (e.g. specific graphs,
+routing networks, or datasets). Each instance lives in its own folder under
+<code>instances/&lt;instance-name&gt;/</code> with an <code>instance.yaml</code> file and one or more
+subfolders containing the actual artifact files for that instance.</p>
+<h4 id="instance-directory-layout">Instance Directory Layout<a class="headerlink" href="#instance-directory-layout" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>benchmarks/&lt;benchmark-id&gt;/instances/&lt;instance-name&gt;/
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>├── instance.yaml
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>└── &lt;artifacts-subfolder&gt;/        # name matches artifacts_location in instance.yaml
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ├── graph.dimacs
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    └── graph.json
+</span></code></pre></div>
+<h4 id="instance-schema">Instance Schema<a class="headerlink" href="#instance-schema" title="Permanent link">&para;</a></h4>
+<p>Each <code>instance.yaml</code> defines a concrete problem instance. Instance properties
+match the property identifiers defined under <code>instance:</code> in <code>problem.yaml</code>:</p>
+<ul>
+<li><strong>Scalar properties</strong> (<code>is_artifact: false</code>, the default) are specified
+  directly as scalar/primitive values.</li>
+<li><strong>Artifact properties</strong> (<code>is_artifact: true</code>) are specified as a map with a
+  mandatory <code>artifacts_location</code> key whose value is a subfolder name within the
+  instance directory that contains the valid files for that property. The folder
+  must exist inside the instance directory.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>identifier</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>Unique identifier for this benchmark instance.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string</td>
+<td>No</td>
+<td>Human-readable description of this specific instance.</td>
+</tr>
+<tr>
+<td><code>&lt;property_id&gt;</code></td>
+<td>scalar (for scalar properties) or <code>{artifacts_location: str}</code> (for artifact properties)</td>
+<td>No</td>
+<td>Value for a property defined in <code>problem.yaml</code>. Artifact properties must use the <code>{artifacts_location: &lt;folder&gt;}</code> map; the folder must exist in the instance directory.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-instance-benchmarksgraph-coloringinstanceserdos_renyi_50_02instanceyaml">Example Instance (<code>benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml</code>)<a class="headerlink" href="#example-instance-benchmarksgraph-coloringinstanceserdos_renyi_50_02instanceyaml" title="Permanent link">&para;</a></h4>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">erdos_renyi_50_02</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50-node Erdos-Renyi graph with edge density 0.2</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Scalar instance properties</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">graph_family</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">erdos_renyi</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nt">num_vertices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">edge_density</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Artifact instance property</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nt">graph</span><span class="p">:</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">artifacts_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_graphs</span>
+</span></code></pre></div>
 <h2 id="3-benchmark-binding">3. Benchmark Binding<a class="headerlink" href="#3-benchmark-binding" title="Permanent link">&para;</a></h2>
 <h3 id="31-concept">3.1 Concept<a class="headerlink" href="#31-concept" title="Permanent link">&para;</a></h3>
 <p>For an experiment to target a logical benchmark it must provide a mapping of its
@@ -1837,28 +2060,10 @@ property names and values to the logical benchmark's. This is called a
 <td>The <code>ado</code> ExperimentReference object.</td>
 </tr>
 <tr>
-<td><code>benchmarkIdentifier</code></td>
-<td>string</td>
-<td><strong>Yes</strong></td>
-<td>The <code>id</code> of the logical benchmark this experiment targets.</td>
-</tr>
-<tr>
 <td><code>targetMapping</code></td>
 <td>string</td>
-<td><strong>Yes</strong></td>
-<td>The name of the experiment property that carries the benchmark target (model or algorithm identifier).</td>
-</tr>
-<tr>
-<td><code>staticFilters</code></td>
-<td>list</td>
 <td>No</td>
-<td>Sets values of experiment internal properties to those implicitly required by the logical benchmark</td>
-</tr>
-<tr>
-<td><code>propertyMapping</code></td>
-<td>list</td>
-<td>No</td>
-<td>Maps the experiment's internal properties to the canonical properties defined by the logical benchmark.</td>
+<td>Identifies the leaderboard target (row key) for this binding. Can be a custom string label, or the name of an experiment property whose value is resolved at query time. Defaults to the experiment identifier when omitted.</td>
 </tr>
 <tr>
 <td><code>metricMapping</code></td>
@@ -1866,113 +2071,216 @@ property names and values to the logical benchmark's. This is called a
 <td>No</td>
 <td>Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.</td>
 </tr>
+<tr>
+<td><code>instanceMapping</code></td>
+<td>list</td>
+<td>No</td>
+<td>Remaps benchmark instance properties/parameters to experiment inputs.</td>
+</tr>
+<tr>
+<td><code>staticFilters</code></td>
+<td>list</td>
+<td>No</td>
+<td>Sets static experiment properties to values implicit in the logical benchmark.</td>
+</tr>
 </tbody>
 </table>
 <!-- markdownlint-enable line-length -->
 
-<h4 id="property-mapping">Property Mapping<a class="headerlink" href="#property-mapping" title="Permanent link">&para;</a></h4>
-<p>Each entry in <code>propertyMapping</code> specifies how one or more experiment properties
-map to canonical benchmark properties. Benchmark properties not listed
-are assumed to have a 1:1 mapping with a experiment property of same name.</p>
-<p>Two types of mapping are possible:</p>
+<h4 id="metric-mapping">Metric mapping<a class="headerlink" href="#metric-mapping" title="Permanent link">&para;</a></h4>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">metricMapping</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;canonical-benchmark-metric-name&gt;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;experiment-metric-name&gt;</span>
+</span></code></pre></div>
+<p>Metrics not listed are passed through under their original names. For two
+experiments to produce a merged metric column, both must map their respective
+metric names to the same canonical name defined by the logical benchmark.</p>
+<h4 id="instance-mapping">Instance mapping<a class="headerlink" href="#instance-mapping" title="Permanent link">&para;</a></h4>
+<p>The <code>instanceMapping</code> list maps benchmark instance properties/parameters to
+experiment inputs. The artifact mapping is implicit — the experiment property
+being bound against determines which artifact is used. Two types of entry are
+possible:</p>
 <ul>
-<li><em>field mapping</em>: A 1-to-1 mapping for logical benchmark properties<ul>
+<li><em>field mapping</em>: A 1-to-1 mapping for a benchmark instance property.<ul>
 <li>Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"</li>
 </ul>
 </li>
 <li><em>categorical value mapping</em>: 1-to-many mapping for the values of a categorical
-  logical benchmark properties<ul>
+  benchmark instance property.<ul>
 <li>Allows translating "WHERE logical_dim = CategoryA" to e.g. "WHERE
   exp_param_1 &gt; X and exp_param_2 = y"</li>
 </ul>
 </li>
 </ul>
-<p><strong>Field mapping</strong> — maps an experiment property to a benchmark property.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">propertyMapping</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;logical-benchmark-property-name&gt;"</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
+<p><strong>Field mapping</strong> — maps an experiment property to a benchmark instance
+property.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;benchmark-instance-property-name&gt;"</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
 </span></code></pre></div>
 <p><strong>Categorical value mapping</strong> — maps one or more values of a categorical
-benchmark property to a set of (experiment property:allowed value set) pairs.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">propertyMapping</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;logical-benchmark-property-name&gt;"</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;categorical-value-from-logical-benchmark-domain&gt;"</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;PropertyDomain&gt;</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+benchmark instance property to a set of (experiment property:allowed value set)
+pairs.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;benchmark-instance-property-name&gt;"</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;categorical-value-from-benchmark-domain&gt;"</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;PropertyDomain&gt;</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 </span></code></pre></div>
-<p><strong>Static Filters:</strong></p>
-<p>Static filters allow setting a property of the experiment to a value that's
-implicit in the logical benchmark. For example, the benchmark experiment may
-have two modes, "debug" and "production", and one should be used for a
-particular logical benchmark, essentially adding "AND production == True" to all
-queries.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">staticFilters</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-value&gt;"</span>
+<h4 id="static-filters">Static filters<a class="headerlink" href="#static-filters" title="Permanent link">&para;</a></h4>
+<p>Static filters pin known-constant property values to a binding without recording
+them in experiment results or benchmark instances. Two directions are supported:</p>
+<ul>
+<li>
+<p><strong><code>experimentFilters</code></strong> <em>(benchmark → experiment)</em>: A property of the
+  experiment is fixed to a value that is implicit in the logical benchmark.
+  Every query against this experiment automatically adds
+  <code>AND &lt;experiment-property&gt; = &lt;value&gt;</code>. For example, the experiment may expose
+  a <code>mode</code> property with values <code>"debug"</code> and <code>"production"</code>, and the logical
+  benchmark always requires <code>"production"</code>.</p>
+</li>
+<li>
+<p><strong><code>benchmarkFilters</code></strong> <em>(experiment → benchmark)</em>: A benchmark instance
+  property is fixed to a value that is implicit in the experiment. When building
+  a leaderboard row the system injects <code>&lt;benchmark-property&gt; = &lt;value&gt;</code> without
+  reading it from the experiment results. For example, a benchmark instance
+  property <code>framework</code> is always <code>"pytorch"</code> for a particular experiment, so the
+  binding asserts that rather than expecting a <code>framework</code> column in the
+  results. Only benchmark instance properties that are <strong>not</strong> already covered
+  by an <code>instanceMapping</code> entry may appear here — a property that is mapped from
+  the experiment cannot also be statically asserted.</p>
+</li>
+</ul>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">staticFilters</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nt">experimentFilters</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-name&gt;"</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;experiment-property-value&gt;"</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">benchmarkFilters</span><span class="p">:</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;benchmark-instance-property-name&gt;"</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;benchmark-property-value&gt;"</span>
 </span></code></pre></div>
-<h4 id="metric-mapping">Metric mapping<a class="headerlink" href="#metric-mapping" title="Permanent link">&para;</a></h4>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">metricMapping</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;canonical-benchmark-property-name&gt;</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;experiment-target-property-name&gt;</span>
+<p>Either sub-key may be omitted when only one direction is needed.</p>
+<p><strong>Full example:</strong></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_vertices</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge_density</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">density</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="nt">staticFilters</span><span class="p">:</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="nt">experimentFilters</span><span class="p">:</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_type</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">erdos_renyi</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="nt">benchmarkFilters</span><span class="p">:</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_family</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">random_regular</span>
 </span></code></pre></div>
-<p>Metrics not listed are passed through under their original names. For two
-experiments to produce a merged metric column, both must map their respective
-metric names to the same canonical name defined by the logical benchmark.</p>
-<h3 id="33-example-guide_llm_runner">3.3 Example: <code>guide_llm_runner</code><a class="headerlink" href="#33-example-guide_llm_runner" title="Permanent link">&para;</a></h3>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inference_serving</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_name</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_performance</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guide_llm_runner</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0.0</span><span class="w"> </span><span class="c1"># The binding only uses the major version</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="nt">propertyMapping</span><span class="p">:</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_data_path</span><span class="w"> </span><span class="c1"># guide-llm's internal param name</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic_shape</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"constant"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">concurrency</span>
-</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1000</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
-</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic_shape</span>
-</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"poisson"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">concurrency</span>
-</span><span id="__span-5-34"><a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-5-35"><a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">]</span>
-</span><span id="__span-5-36"><a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-5-37"><a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="nt">metricMapping</span><span class="p">:</span>
-</span><span id="__span-5-38"><a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-5-39"><a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
-</span><span id="__span-5-40"><a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-5-41"><a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_rps</span><span class="w"> </span><span class="c1"># guide-llm's internal param name</span>
-</span><span id="__span-5-42"><a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-5-43"><a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
-</span><span id="__span-5-44"><a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-5-45"><a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ttft_ms</span>
+<h3 id="33-example-guidellm-bench-deployment">3.3 Example: <code>guidellm-bench-deployment</code><a class="headerlink" href="#33-example-guidellm-bench-deployment" title="Permanent link">&para;</a></h3>
+<h4 id="problemyaml"><code>problem.yaml</code><a class="headerlink" href="#problemyaml" title="Permanent link">&para;</a></h4>
+<p>The logical benchmark definition lives under
+<code>benchmarks/llm-inference/problem.yaml</code>. The <code>bindings</code> list in the same file
+then wires the <code>guidellm-bench-deployment</code> experiment to it:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm_inference</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LLM Inference Performance</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="no">Evaluates LLM serving systems on throughput and latency under different</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="no">traffic workloads. Instances are characterised by the workload category</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">        </span><span class="no">(traffic intensity and concurrency regime).</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nt">instance</span><span class="p">:</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">                  </span><span class="no">Canonical workload category that captures traffic intensity</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">                  </span><span class="no">and concurrency regime.</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CATEGORICAL_VARIABLE_TYPE</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">              </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">steady_state_heavy</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">poisson_bursty</span><span class="p p-Indicator">]</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="nt">metrics</span><span class="p">:</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">    </span><span class="nt">ranking</span><span class="p">:</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">        </span><span class="nt">order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">desc</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</span></code></pre></div>
+<h4 id="instanceyaml"><code>instance.yaml</code><a class="headerlink" href="#instanceyaml" title="Permanent link">&para;</a></h4>
+<p>A concrete instance lives under
+<code>benchmarks/llm-inference/instances/steady_state_heavy/instance.yaml</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="no">Steady-state heavy workload: requests sent as fast as possible at high</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="no">concurrency.</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nt">workload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
+</span></code></pre></div>
+<h4 id="binding">Binding<a class="headerlink" href="#binding" title="Permanent link">&para;</a></h4>
+<p>Bindings are placed in the <code>bindings</code> list inside <code>problem.yaml</code>, alongside the
+<code>logicalBenchmark</code> definition (see <a href="#23-example-graph-coloring">Section 2.3</a>):</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">          </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_performance</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">          </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guidellm-bench-deployment</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">          </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1.0</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">      </span><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">                </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">            </span><span class="nt">predicate</span><span class="p">:</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">request_rate</span><span class="w"> </span><span class="c1"># -1 = send as fast as possible</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">                      </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-1</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">max_concurrency</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">200</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">500</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">                </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">poisson_bursty</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">            </span><span class="nt">predicate</span><span class="p">:</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">request_rate</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">max_concurrency</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="w">      </span><span class="nt">metricMapping</span><span class="p">:</span>
+</span><span id="__span-10-33"><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-10-34"><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="w">                </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
+</span><span id="__span-10-35"><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="w">            </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-10-36"><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="w">                </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_throughput</span>
+</span><span id="__span-10-37"><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
+</span><span id="__span-10-38"><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="w">                </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
+</span><span id="__span-10-39"><a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="w">            </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-10-40"><a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a><span class="w">                </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mean_ttft_ms</span>
+</span><span id="__span-10-41"><a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="w">      </span><span class="nt">staticFilters</span><span class="p">:</span>
+</span><span id="__span-10-42"><a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="w">          </span><span class="nt">experimentFilters</span><span class="p">:</span>
+</span><span id="__span-10-43"><a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a><span class="w">              </span><span class="c1"># The experiment's 'dataset' param controls synthetic prompt generation;</span>
+</span><span id="__span-10-44"><a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">              </span><span class="c1"># pinned to 'random' because this binding does not vary the prompt dataset.</span>
+</span><span id="__span-10-45"><a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-10-46"><a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
+</span><span id="__span-10-47"><a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">random</span>
 </span></code></pre></div>
 <hr />
 <h2 id="4-leaderboards-and-routing">4. Leaderboards and Routing<a class="headerlink" href="#4-leaderboards-and-routing" title="Permanent link">&para;</a></h2>
@@ -1992,10 +2300,10 @@ filters to it.</p>
 <h3 id="42-routing-key">4.2 Routing Key<a class="headerlink" href="#42-routing-key" title="Permanent link">&para;</a></h3>
 <p>A deterministic routing key can be constructed from a result and the benchmark
 binding:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>{benchmarkIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>{benchmarkIdentifier}-{experimentIdentifier}-{property1=value}-{property2=value}
 </span></code></pre></div>
 <p>Properties are sorted alphabetically. For example:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>inference_serving-guide_llm_runner-dataset=sharegpt-workload=steady_state_heavy
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>llm_inference-guidellm-bench-deployment-workload=steady_state_heavy
 </span></code></pre></div>
 <p>The routing key identifies a specific leaderboard slot. Leaderboard queries can
 match on any prefix or subset of these components.</p>
@@ -2010,89 +2318,99 @@ database of raw results needs to be maintained.</p>
 <li>For each experiment, use its benchmark binding to construct a query against
    the result store (ado <code>samplestore</code>) (using the experiment's own internal
    property names as the filter criteria).</li>
-<li>Rename result dataframe columns using <code>propertyMapping</code> and <code>metricMapping</code>
+<li>Rename result dataframe columns using <code>instanceMapping</code> and <code>metricMapping</code>
    (metric names).</li>
 <li>Merge the resulting dataframes. All share the same canonical column names.</li>
 </ol>
 <h3 id="44-cross-experiment-aggregation-example">4.4 Cross-Experiment Aggregation Example<a class="headerlink" href="#44-cross-experiment-aggregation-example" title="Permanent link">&para;</a></h3>
-<p>A second experiment, <code>vllm_bench_runner</code>, targets the same logical benchmark
-with entirely different internal property and metric names:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">benchmarkIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inference_serving</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_performance</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_bench_runner</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nt">targetMapping</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">model_name</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nt">propertyMapping</span><span class="p">:</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset_path</span><span class="w"> </span><span class="c1"># vllm bench serve internal param name</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">distribution</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"fixed"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_concurrent_requests</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">99999</span><span class="p p-Indicator">]</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">          </span><span class="nt">property</span><span class="p">:</span>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">              </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
-</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">light_load</span>
-</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">      </span><span class="nt">predicate</span><span class="p">:</span>
-</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">distribution</span>
-</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"fixed"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">num_concurrent_requests</span>
-</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="w">            </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="w">                </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">]</span>
-</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="w">                </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="nt">metricMapping</span><span class="p">:</span>
-</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">throughput_tokens_per_second</span>
-</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">req_per_sec</span>
-</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">benchmark</span><span class="p">:</span>
-</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token_ms</span>
-</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a><span class="w">      </span><span class="nt">experiment</span><span class="p">:</span>
-</span><span id="__span-8-44"><a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="w">          </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">time_to_first_token</span>
+<p>A second experiment, <code>vllm-bench-deployment</code>, targets the same logical benchmark
+in <a href="#33-example-guidellm-bench-deployment">Section 3.3</a>. Both experiments share
+the same parameter names, so no <code>metricMapping</code> is needed and the
+<code>instanceMapping</code> uses the same predicate identifiers — only the concurrency
+ranges differ, reflecting each tool's calibration of what constitutes
+"steady-state heavy":</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experiment</span><span class="p">:</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">          </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm_performance</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">          </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vllm-bench-deployment</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">          </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1.0</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">      </span><span class="nt">instanceMapping</span><span class="p">:</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">                </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state_heavy</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">            </span><span class="nt">predicate</span><span class="p">:</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">request_rate</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w">                      </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-1</span><span class="p p-Indicator">]</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">max_concurrency</span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">100</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">500</span><span class="p p-Indicator">]</span>
+</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">categoricalValue</span><span class="p">:</span>
+</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="w">                </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">workload</span>
+</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">poisson_bursty</span>
+</span><span id="__span-13-23"><a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="w">            </span><span class="nt">predicate</span><span class="p">:</span>
+</span><span id="__span-13-24"><a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">request_rate</span>
+</span><span id="__span-13-25"><a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-13-26"><a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]</span>
+</span><span id="__span-13-27"><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-13-28"><a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">max_concurrency</span>
+</span><span id="__span-13-29"><a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="w">                  </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-13-30"><a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="w">                      </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">50</span><span class="p p-Indicator">]</span>
+</span><span id="__span-13-31"><a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="w">                      </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-13-32"><a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="w">      </span><span class="nt">staticFilters</span><span class="p">:</span>
+</span><span id="__span-13-33"><a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="w">          </span><span class="nt">experimentFilters</span><span class="p">:</span>
+</span><span id="__span-13-34"><a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">property</span><span class="p">:</span>
+</span><span id="__span-13-35"><a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="w">                    </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
+</span><span id="__span-13-36"><a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">                </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">random</span>
 </span></code></pre></div>
 <p>A leaderboard query for
-<code>logical_benchmark=inference_serving, dataset=sharegpt, workload=steady_state_heavy</code>
-will:</p>
+<code>logical_benchmark=llm_inference, workload=steady_state_heavy</code> will:</p>
 <ol>
-<li>Fetch the manifest for <code>guide_llm_runner</code> and <code>vllm_bench_runner</code> (all
-   experiments declaring <code>logical_benchmark: inference_serving</code>).</li>
-<li>Query <code>guide_llm_runner</code> results where <code>input_data_path=sharegpt</code> AND
-   <code>traffic_shape=constant</code> AND <code>concurrency &gt;= 100</code>. Rename <code>throughput_rps</code> →
-   <code>throughput_tokens_per_second</code> and <code>ttft_ms</code> → <code>time_to_first_token_ms</code>.</li>
-<li>Query <code>vllm_bench_runner</code> results where <code>dataset_path=sharegpt</code> AND
-   <code>distribution=fixed</code> AND <code>num_concurrent_requests &gt;= 100</code>. Rename
-   <code>req_per_sec</code> → <code>throughput_tokens_per_second</code> and <code>time_to_first_token</code> →
-   <code>time_to_first_token_ms</code>.</li>
-<li>Merge both dataframes. Both now share identical column names and can be
-   displayed in a single table keyed by model.</li>
+<li>Fetch the bindings for <code>guidellm-bench-deployment</code> and
+   <code>vllm-bench-deployment</code> (all experiments with a binding to <code>llm_inference</code>).</li>
+<li>Query <code>guidellm-bench-deployment</code> results where <code>dataset=random</code> AND
+   <code>request_rate=-1</code> AND <code>max_concurrency</code> between 200 and 500. The
+   <code>output_throughput</code> and <code>mean_ttft_ms</code> columns are renamed to
+   <code>throughput_tokens_per_second</code> and <code>time_to_first_token_ms</code>.</li>
+<li>Query <code>vllm-bench-deployment</code> results where <code>dataset=random</code> AND
+   <code>request_rate=-1</code> AND <code>max_concurrency</code> between 100 and 500. No metric
+   renaming is needed (output column names are identical).</li>
+<li>Merge both dataframes. Both now share the same canonical column names and can
+   be displayed in a single leaderboard table keyed by model.</li>
 </ol>
 <hr />
 <h2 id="5-governance">5. Governance<a class="headerlink" href="#5-governance" title="Permanent link">&para;</a></h2>
 <h3 id="51-logical-benchmark-location-ownership">5.1 Logical Benchmark Location &amp; Ownership<a class="headerlink" href="#51-logical-benchmark-location-ownership" title="Permanent link">&para;</a></h3>
-<p>Logical benchmark definition files are stored at the top level of the Algorithm
-Nexus repository. Its suggested to create a top-level dir <code>benchmarks</code> which
-contains one YAML file per logical benchmark.</p>
+<p>Logical benchmark definition files are stored under the <code>benchmarks/</code> directory
+at the top level of the Algorithm Nexus repository. Each logical benchmark has
+its own subdirectory named after its <code>benchmarkIdentifier</code>, containing a
+<code>problem.yaml</code> file that holds both the <code>logicalBenchmark</code> definition and its
+<code>bindings</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>benchmarks/
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>└── &lt;benchmark-id&gt;/
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    ├── problem.yaml        # logicalBenchmark definition + bindings
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    ├── README.md           # optional: full problem statement and context
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    └── instances/          # optional concrete problem instances
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        └── &lt;instance-name&gt;/
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>            ├── instance.yaml
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>            └── artifacts/
+</span></code></pre></div>
+<p>A <code>README.md</code> alongside <code>problem.yaml</code> is encouraged to provide a full
+description of the problem. For example to give the mathematical formulation,
+cite references, or explain the instance structure beyond what the <code>description</code>
+field in <code>problem.yaml</code> allows.</p>
 <p>A logical benchmark owner is given by the value of the "owner" field. If this is
 ambiguous the author of the PR adding the benchmark will be treated as the
 owner.</p>
 <h3 id="52-benchmark-binding-location">5.2 Benchmark Binding Location<a class="headerlink" href="#52-benchmark-binding-location" title="Permanent link">&para;</a></h3>
 <p>Benchmark bindings are stored in the YAML file with the logical benchmarks they
 target e.g. the structure of this file could be</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1">#logical benchmark fields</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">bindings</span><span class="p">:</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w">  </span><span class="c1">#List of benchmark bindings</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">logicalBenchmark</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"> </span><span class="c1">#logical benchmark fields</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nt">bindings</span><span class="p">:</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w">  </span><span class="c1">#List of benchmark bindings</span>
 </span></code></pre></div>
 <p>This simplifies validating the field ands values in the bindings, and
 discovering bindings.</p>
@@ -2127,24 +2445,15 @@ discovering bindings.</p>
 </ul>
 <hr />
 <h2 id="7-relationship-to-existing-benchmark-design">7. Relationship to Existing Benchmark Design<a class="headerlink" href="#7-relationship-to-existing-benchmark-design" title="Permanent link">&para;</a></h2>
-<h3 id="71-target_mapping-and-the-implicit-benchmark-target">7.1 <code>target_mapping</code> and the Implicit Benchmark Target<a class="headerlink" href="#71-target_mapping-and-the-implicit-benchmark-target" title="Permanent link">&para;</a></h3>
+<h3 id="71-implicit-benchmark-target">7.1 Implicit Benchmark Target<a class="headerlink" href="#71-implicit-benchmark-target" title="Permanent link">&para;</a></h3>
 <p>The <a href=".././benchmark_integration_design/"><code>benchmark_integration_design.md</code></a>
 establishes that the benchmark target is implicit from the enclosing model
-definition for model-level benchmark instances. The <code>target_mapping</code> field is
-complementary, not conflicting:</p>
-<ul>
-<li><code>target_mapping</code> in the benchmark binding names the <strong>experiment property</strong>
-  that carries the target identifier (e.g. <code>model_name</code>).</li>
-<li>The <strong>value</strong> of that property for a specific benchmark instance is determined
-  by the enclosing model definition.</li>
-</ul>
-<p>For example, if the benchmark binding declares <code>target_mapping: model_name</code>, and
-a model-level benchmark instance is defined for <code>ibm/granite-3b</code>, the
-leaderboard system knows that <code>model_name=ibm/granite-3b</code> is the target for that
-result.</p>
-<h3 id="72-benchmark-package-registration-and-instances">7.2 Benchmark Package Registration and Instances<a class="headerlink" href="#72-benchmark-package-registration-and-instances" title="Permanent link">&para;</a></h3>
+definition for model-level benchmark submissions. The binding does not need to
+name the target property explicitly — the target identity is determined by the
+enclosing model or algorithm definition that owns the benchmark submission.</p>
+<h3 id="72-benchmark-package-registration-and-submissions">7.2 Benchmark Package Registration and Submissions<a class="headerlink" href="#72-benchmark-package-registration-and-submissions" title="Permanent link">&para;</a></h3>
 <p>The existing <code>nexus.yaml</code> benchmark package registrations and
-<code>benchmark_instances/space.yaml</code> remain unchanged. The benchmark binding is an
+<code>benchmark_submissions/space.yaml</code> remain unchanged. The benchmark binding is an
 additional artifact and does not alter the Nexus package structure.</p>
 
 
