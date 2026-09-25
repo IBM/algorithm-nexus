@@ -719,28 +719,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#packagebenchmark_packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>package.benchmark_packages[]</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#packagebenchmark_packagesexperiments" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>package.benchmark_packages[].experiments[]</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1518,8 +1496,7 @@ into the Algorithm Nexus ecosystem.</p>
 <li>References a Python package with versioned releases on GitHub or PyPI</li>
 <li>Defines which models are supported by that Python package</li>
 <li>Enables dependency resolution across all packages in the Algorithm Nexus</li>
-<li>Can optionally register benchmark packages, package-level baseline benchmark
-  submissions, and model-specific benchmark submissions for benchmarking workflows</li>
+<li>Can optionally register model-specific benchmark submissions for benchmarking workflows</li>
 </ul>
 <hr />
 <h2 id="2-folder-structure">2. Folder Structure<a class="headerlink" href="#2-folder-structure" title="Permanent link">&para;</a></h2>
@@ -1529,40 +1506,26 @@ following structure:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>packages/
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>└── &lt;nexus-package-name&gt;/
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    ├── nexus.yaml               # Required package metadata
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ├── skills                   # Optional agent skills resources
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    ├── benchmark_packages/      # Optional local benchmark packages
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── benchmark_submissions/   # Optional package-level baseline benchmark submissions
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    │   └── &lt;benchmark-submission-name&gt;/
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    │       └── space.yaml       # Required ADO discoveryspace for that benchmark submission
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    └── models/
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        ├── &lt;model-1&gt;/
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        │   ├── model.yaml       # Required model metadata
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        │   ├── benchmark_submissions/ # Optional per-model benchmark submissions
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        │   │   └── &lt;benchmark-submission-name&gt;/
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        │   │       └── space.yaml   # Required ADO discoveryspace for that benchmark submission
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        │   └── usage.md         # Optional usage documentation
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        ├── &lt;model-2&gt;/
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        │   └── ...
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        └── ...
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ├── skills/                  # Optional agent skills resources
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    └── models/
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        ├── &lt;model-1&gt;/
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        │   ├── model.yaml       # Required model metadata
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        │   └── usage.md         # Optional usage documentation
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        ├── &lt;model-2&gt;/
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        │   └── ...
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        └── ...
 </span></code></pre></div>
 <p>The required root file is <code>nexus.yaml</code>, which declares the Nexus package
 metadata. <code>skills</code> is optional and should only be included when the package
-provides agent skills to assist users in using the package. The optional
-<code>benchmark_packages/</code> folder stores local benchmark packages, and each such
-package should follow the
-<a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/">ADO custom experiment</a>
-template. A Nexus package can also optionally define a top-level
-<code>benchmark_submissions/</code> folder for baseline experiments that live at package
-scope rather than under a specific model. Each benchmark submission in that
-folder must have its own sub-folder containing a <code>space.yaml</code> file. The
-<code>models/</code> folder is required whenever a Nexus package wants to advertise one or
-more models, with one sub-folder for each model. Each model folder must contain a
-<code>model.yaml</code> file describing the model metadata and optional vLLM integration.
-Each model folder can optionally include a sibling <code>benchmark_submissions/</code>
-folder. Inside <code>benchmark_submissions/</code>, each benchmark submission must have its
-own sub-folder, and that sub-folder must contain a <code>space.yaml</code> file defining the
-full ADO discoveryspace for that specific benchmark submission. A <code>usage.md</code> file
+provides agent skills to assist users in using the package. The <code>models/</code> folder
+is required whenever a Nexus package wants to advertise one or more models, with
+one sub-folder for each model. Each model folder must contain a <code>model.yaml</code> file
+describing the model metadata and optional vLLM integration. A <code>usage.md</code> file
 can also be included to provide users with model-specific usage guidance.</p>
+<p>Benchmark experiments and submissions are no longer hosted inside <code>packages/</code>.
+They live instead under the top-level <code>experiments/</code> directory — see
+<a href="#323-benchmarks">Section 3.2.3 Benchmarks</a> and the
+<a href="../benchmark_integration_design/">Benchmark Integration Design</a>.</p>
 <hr />
 <h2 id="3-configuration-files">3. Configuration Files<a class="headerlink" href="#3-configuration-files" title="Permanent link">&para;</a></h2>
 <h3 id="31-nexus-package-configuration-nexusyaml">3.1. Nexus Package Configuration (<code>nexus.yaml</code>)<a class="headerlink" href="#31-nexus-package-configuration-nexusyaml" title="Permanent link">&para;</a></h3>
@@ -1586,90 +1549,12 @@ Python package and its supported models.</p>
 <td>Yes</td>
 <td>Python package name used as the Nexus package identifier. The package must publish versioned releases on GitHub or PyPI.</td>
 </tr>
-<tr>
-<td><code>benchmark_packages</code></td>
-<td><code>list</code></td>
-<td>No</td>
-<td>Package-level benchmark package registrations available to models in this Nexus package.</td>
-</tr>
-</tbody>
-</table>
-<h5 id="packagebenchmark_packages"><code>package.benchmark_packages[]</code><a class="headerlink" href="#packagebenchmark_packages" title="Permanent link">&para;</a></h5>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Required</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>requirement_specifier</code></td>
-<td><code>string</code></td>
-<td>Yes</td>
-<td>Python package requirement target for the benchmark package. It may be a Python package name, a URL to a Python package or source repository, or a local path to a Python package within <code>./packages</code> in the Nexus repository root.</td>
-</tr>
-<tr>
-<td><code>experiments</code></td>
-<td><code>list[ExperimentReference]</code></td>
-<td>Yes</td>
-<td>List of ado ExperimentReference objects describing the experiments exposed by that benchmark package and made available to models in the Nexus package.</td>
-</tr>
-</tbody>
-</table>
-<h5 id="packagebenchmark_packagesexperiments"><code>package.benchmark_packages[].experiments[]</code><a class="headerlink" href="#packagebenchmark_packagesexperiments" title="Permanent link">&para;</a></h5>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Required</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>experimentIdentifier</code></td>
-<td><code>string</code></td>
-<td>Yes</td>
-<td>The identifier of an experiment in an ado actuator experiment catalog.</td>
-</tr>
-<tr>
-<td><code>actuatorIdentifier</code></td>
-<td><code>string</code></td>
-<td>Yes</td>
-<td>The identifier of the ado actuator that supplies the experiment.</td>
-</tr>
 </tbody>
 </table>
 <h4 id="312-example">3.1.2. Example<a class="headerlink" href="#312-example" title="Permanent link">&para;</a></h4>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">package</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"terratorch"</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">benchmark_packages</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"./packages/terratorch/benchmark_packages/segmentation-benchmarks"</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"local-segmentation-eval"</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"local-boundary-eval"</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"https://github.com/example-org/example-benchmarks"</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"leaderboard-baseline"</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"example-benchmark-package"</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">          </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"packaged-baseline"</span>
 </span></code></pre></div>
-<p>Benchmark packages are registered only at package level. Each registration uses
-a <code>requirement_specifier</code> to identify how the benchmark package is resolved and
-an <code>experiments</code> list to declare which experiment identifiers from that package
-are made available to the Nexus package. The <code>requirement_specifier</code> may be a
-Python package name, a URL to a Python package or source repository, or a local
-path to a Python package within <code>./packages</code> in the Nexus repository root. In
-all cases, the referenced package is expected to follow the ADO custom
-experiment template.</p>
 <h4 id="313-agent-skills">3.1.3. Agent Skills<a class="headerlink" href="#313-agent-skills" title="Permanent link">&para;</a></h4>
 <p>Nexus packages can optionally include agent skills to assist users in working
 with the package. Agent skills must be placed in the <code>skills</code> folder in the
@@ -1756,16 +1641,23 @@ maximum interoperability across different agents.</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"terratorch-tm-segmentation"</span>
 </span></code></pre></div>
 <h4 id="323-benchmarks">3.2.3. Benchmarks<a class="headerlink" href="#323-benchmarks" title="Permanent link">&para;</a></h4>
-<p>Benchmark configuration should remain separate from
-<code>models/&lt;model-name&gt;/model.yaml</code>. When a Nexus package defines baseline
-benchmarks, they should be described in a top-level <code>benchmark_submissions/</code>
-folder in the package root. When a model defines model-specific benchmarks, they
-should be described in a sibling <code>benchmark_submissions/</code> folder. In either
-location, each benchmark submission must have its own sub-folder that provides a
-<a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace"><code>space.yaml</code></a>
-file with the full ADO discoveryspace definition for that benchmark run. The
-experiment referenced in <code>space.yaml</code> must be one of the experiment identifiers
-registered through <code>package.benchmark_packages</code>.</p>
+<p>Benchmark configuration is kept separate from <code>models/&lt;model-name&gt;/model.yaml</code>
+and from the <code>packages/</code> tree entirely. Benchmark experiments and submissions
+live under the top-level <code>experiments/</code> directory:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>experiments/
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── &lt;experiment-name&gt;/
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    ├── experiment_package.yaml  # Required: experiment package specifier
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    ├── bindings/                # Optional: benchmark binding YAML files
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    └── submissions/
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        └── &lt;submission-name&gt;/
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>            └── space.yaml       # Required: ADO discoveryspace definition
+</span></code></pre></div>
+<p>Each <code>experiments/&lt;experiment-name&gt;/experiment_package.yaml</code> declares the Python package
+(on PyPI or GitHub) that provides the experiment and lists its experiment
+identifiers. Each benchmark submission must have a <code>space.yaml</code> file with the
+full ADO discoveryspace definition for that run. See the
+<a href="../benchmark_integration_design/">Benchmark Integration Design</a> for the complete
+schema and workflow.</p>
 
 
 

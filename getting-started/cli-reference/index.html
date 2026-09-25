@@ -625,10 +625,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#nexus-validate-benchmarks" class="md-nav__link">
+  <a href="#nexus-validate-experiments" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        nexus validate benchmarks
+        nexus validate experiments
       </span>
     </span>
   </a>
@@ -1682,55 +1682,55 @@ Nexus packages.</p>
 <p>Validate a package at a specific path:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>package<span class="w"> </span>packages/my-package
 </span></code></pre></div>
-<h4 id="nexus-validate-benchmarks">nexus validate benchmarks<a class="headerlink" href="#nexus-validate-benchmarks" title="Permanent link">&para;</a></h4>
+<h4 id="nexus-validate-experiments">nexus validate experiments<a class="headerlink" href="#nexus-validate-experiments" title="Permanent link">&para;</a></h4>
 <p>Validate benchmark submissions in three modes: PR changes, all submissions, or
 specific package.</p>
 <p><strong>Usage:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Validate PR changes</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>&lt;pr_url&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--pr<span class="w"> </span>&lt;pr_url&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Validate all benchmark submissions</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Validate specific package</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--package<span class="w"> </span>&lt;package_name&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Validate specific experiment</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--experiment<span class="w"> </span>&lt;experiment_name&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Options:</strong></p>
 <ul>
 <li><code>--pr URL</code>: GitHub Pull Request URL (e.g.,
   <code>https://github.com/IBM/algorithm-nexus/pull/123</code>). If not provided, validates
   all benchmark submissions.</li>
-<li><code>--packages-root PATH</code>: Path to packages directory (default: <code>./packages</code>)</li>
-<li><code>--package NAME</code>: Validate only benchmark submissions from a specific package</li>
+<li><code>--experiments-root PATH</code>: Path to experiments directory (default: <code>./experiments</code>)</li>
+<li><code>--experiment NAME</code>: Validate only benchmark submissions from a specific experiment</li>
 <li><code>--verbose</code>: Show detailed validation output</li>
 <li><code>--fail-fast</code>: Stop validation on first error</li>
 <li><code>-o, --output-format [table|json|yaml]</code>: Output format (default: <code>table</code>)</li>
 </ul>
 <p><strong>Examples:</strong></p>
 <p>Validate benchmarks in a PR:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123
 </span></code></pre></div>
 <p>Validate all benchmark submissions:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments
 </span></code></pre></div>
-<p>Validate only submissions from a specific package:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--package<span class="w"> </span>terratorch
+<p>Validate only submissions from a specific experiment:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--experiment<span class="w"> </span>sorting_algorithms
 </span></code></pre></div>
 <p>Validate with verbose output:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span>--verbose
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--pr<span class="w"> </span>https://github.com/IBM/algorithm-nexus/pull/123<span class="w"> </span>--verbose
 </span></code></pre></div>
 <p>Validate and stop on first error:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--fail-fast
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--fail-fast
 </span></code></pre></div>
 <p>Get results in JSON format:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--output-format<span class="w"> </span>json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--output-format<span class="w"> </span>json
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># or using the short form</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>-o<span class="w"> </span>json
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>-o<span class="w"> </span>json
 </span></code></pre></div>
 <p>Get results in YAML format:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>--output-format<span class="w"> </span>yaml
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--output-format<span class="w"> </span>yaml
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># or using the short form</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>nexus<span class="w"> </span>validate<span class="w"> </span>benchmarks<span class="w"> </span>-o<span class="w"> </span>yaml
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>-o<span class="w"> </span>yaml
 </span></code></pre></div>
 <p><strong>How it works:</strong></p>
 <ol>
@@ -1889,24 +1889,19 @@ configured in the command execution environment.</p>
 is modified in the PR. This includes:</p>
 <ul>
 <li>Changes to <code>space.yaml</code> files</li>
-<li>Changes to any other files in the <code>benchmark_submissions/&lt;submission-name&gt;/</code>
-  directory</li>
-<li>New benchmark submission directories (any new folder under
-  <code>benchmark_submissions/</code>)</li>
+<li>Changes to any other files in the <code>submissions/&lt;submission-name&gt;/</code> directory</li>
+<li>New benchmark submission directories (any new folder under <code>submissions/</code>)</li>
 </ul>
-<p>The detection works for both:</p>
+<p>The detection works for submissions located at:</p>
 <ul>
-<li><strong>Model-level submissions</strong>:
-  <code>packages/&lt;package&gt;/models/&lt;model&gt;/benchmark_submissions/&lt;submission&gt;/</code></li>
-<li><strong>Package-level submissions</strong>:
-  <code>packages/&lt;package&gt;/benchmark_submissions/&lt;submission&gt;/</code></li>
+<li><code>experiments/&lt;experiment&gt;/submissions/&lt;submission&gt;/</code></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>When not running in remote mode (<code>--remote</code> not set), the benchmark submissions will be executed with
 <code>ado</code> in the local environment. It is the user responsibility to ensure that the required
-benchmark packages are installed in the local python environment. Benchmark packages are listed for
-each nexus package in the <code>nexus.yaml</code> configuration.</p>
+experiment package is installed in the local Python environment. The experiment package requirement
+specifier is declared in <code>experiments/&lt;experiment&gt;/experiment_package.yaml</code>.</p>
 </div>
 <p><strong>Examples:</strong></p>
 <p>List benchmarks in a PR without executing (dry run):</p>
@@ -1943,18 +1938,18 @@ each nexus package in the <code>nexus.yaml</code> configuration.</p>
 status, message, and IDs for each benchmark submission.</p>
 <p>To get structured output (JSON or YAML), use the <code>--output-format</code> option:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># Print JSON to console</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>packages/terratorch/models/prithvi/benchmark_submissions/flood-test<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>experiments/&lt;experiment&gt;/submissions/flood-test<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span>--output-format<span class="w"> </span>json
 </span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>
 </span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="c1"># Print YAML to console</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>packages/terratorch/models/prithvi/benchmark_submissions/flood-test<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>algorithm-nexus<span class="w"> </span>run<span class="w"> </span>experiments/&lt;experiment&gt;/submissions/flood-test<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span>--output-format<span class="w"> </span>yaml
 </span></code></pre></div>
 <p>The structured output (JSON) has the following format:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
 </span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="nt">"submissions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 </span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">        </span><span class="p">{</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">            </span><span class="nt">"submission_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"packages/&lt;package&gt;/models/&lt;model&gt;/benchmark_submissions/test_benchmark"</span><span class="p">,</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">            </span><span class="nt">"submission_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"experiments/&lt;experiment&gt;/submissions/test_benchmark"</span><span class="p">,</span>
 </span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">            </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"started"</span><span class="p">,</span>
 </span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">            </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Successfully started on Ray cluster with job ID: raysubmit_snRVd4ZqTTKcaR3W | Space ID: space-a009d7-default"</span><span class="p">,</span>
 </span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="w">            </span><span class="nt">"space_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"space-a009d7-default"</span><span class="p">,</span>
