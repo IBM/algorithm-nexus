@@ -9,7 +9,7 @@ import re
 import sys
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator, computed_field
+from pydantic import AfterValidator, computed_field, model_validator
 
 try:
     from ado.schema.property import Property
@@ -266,6 +266,20 @@ class BenchmarkInstanceProperty(Property):
     ] = False
 
 
+class ArtifactLocation(BaseModel):
+    """Value type for an artifact instance property — points to a subfolder within the instance directory."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    artifacts_location: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="Name of the subfolder within the instance directory that contains the artifact files for this property.",
+        ),
+    ]
+
+
 class FieldMapping(BaseModel):
     """1-to-1 mapping of a benchmark property to an experiment property."""
 
@@ -340,6 +354,43 @@ class BenchmarkRanking(BaseModel):
     ]
 
 
+class StaticFilters(BaseModel):
+    """Static property filters for a benchmark binding.
+
+    Two directions are supported:
+
+    * ``experimentFilters`` — experiment properties whose values are implicit in
+      the logical benchmark.  When querying this experiment's results the system
+      adds ``WHERE <experiment-property> = <value>`` automatically.
+    * ``benchmarkFilters`` — benchmark instance properties whose values are
+      implicit in the experiment.  When building a leaderboard row the system
+      injects ``<benchmark-property> = <value>`` without reading it from the
+      experiment results.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    experimentFilters: Annotated[
+        list[PropertyValue] | None,
+        Field(
+            description=(
+                "Experiment property values that are implicit in the logical benchmark. "
+                "Each entry is added as a constant filter when querying the experiment."
+            ),
+        ),
+    ] = None
+    benchmarkFilters: Annotated[
+        list[PropertyValue] | None,
+        Field(
+            description=(
+                "Benchmark instance property values that are implicit in the experiment. "
+                "Each entry is injected as a known constant into the leaderboard row "
+                "without reading it from the experiment results."
+            ),
+        ),
+    ] = None
+
+
 class BenchmarkBinding(BaseModel):
     """Binding that maps an experiment's properties and metrics to a logical benchmark."""
 
@@ -349,24 +400,47 @@ class BenchmarkBinding(BaseModel):
         ExperimentReference,
         Field(description="The ado ExperimentReference object."),
     ]
+    targetMapping: Annotated[
+        str | None,
+        Field(
+            min_length=1,
+            description=(
+                "Identifies the leaderboard target (row key) for this binding. "
+                "Can be a custom label string, the name of an experiment property "
+                "whose value will be resolved at query time, or omitted to default "
+                "to the experiment identifier."
+            ),
+        ),
+    ] = None
     metricMapping: Annotated[
         list[MetricMapping] | None,
         Field(
             description="Translates per-experiment metric names to canonical benchmark metric names."
         ),
     ] = None
-    propertyMapping: Annotated[
+    instanceMapping: Annotated[
         list[FieldMapping | CategoricalValueMapping] | None,
         Field(
             description="Remaps benchmark instance properties/parameters to experiment inputs.",
         ),
     ] = None
     staticFilters: Annotated[
-        list[PropertyValue] | None,
+        StaticFilters | None,
         Field(
-            description="Static experiment property/parameter values set for the instance.",
+            description=(
+                "Static property filters for this binding. "
+                "``experimentFilters`` pins experiment properties to values implicit in the benchmark; "
+                "``benchmarkFilters`` pins benchmark properties to values implicit in the experiment."
+            ),
         ),
     ] = None
+
+    @model_validator(mode="after")
+    def default_target_mapping(self) -> BenchmarkBinding:
+        """Default targetMapping to the experiment identifier when omitted."""
+        if self.targetMapping is None:
+            self.targetMapping = self.experiment.experimentIdentifier
+        return self
 
 
 class BenchmarkInstance(BaseModel):

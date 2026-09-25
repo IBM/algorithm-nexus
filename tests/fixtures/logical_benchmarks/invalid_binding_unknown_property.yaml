@@ -13,7 +13,7 @@ bindings:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 1.0.0
-    propertyMapping:
+    instanceMapping:
       - benchmark:
           identifier: nonexistent_property
         experiment:

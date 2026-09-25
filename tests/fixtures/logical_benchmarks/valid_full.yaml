@@ -25,7 +25,8 @@ bindings:
       actuatorIdentifier: vllm_performance
       experimentIdentifier: guide_llm_runner
       experimentVersion: 2.0.0
-    propertyMapping:
+    targetMapping: model_name
+    instanceMapping:
       - benchmark:
           identifier: dataset
         experiment:

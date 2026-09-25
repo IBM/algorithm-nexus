@@ -513,21 +513,39 @@ def _check_binding_integrity(
                     f"{prefix}: metricMapping references unknown benchmark metric '{mid}'"
                 )
 
-    # 2. Property identifiers in propertyMapping must exist in the definition
-    if binding.propertyMapping:
-        for pm_entry in binding.propertyMapping:
+    # 2. Property identifiers in instanceMapping must exist in the definition
+    mapped_benchmark_properties: set[str] = set()
+    if binding.instanceMapping:
+        for pm_entry in binding.instanceMapping:
             if isinstance(pm_entry, FieldMapping):
                 pid = pm_entry.benchmark.identifier
+                mapped_benchmark_properties.add(pid)
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: instanceMapping references unknown benchmark property '{pid}'"
                     )
             elif isinstance(pm_entry, CategoricalValueMapping):
                 pid = pm_entry.categoricalValue.property.identifier
+                mapped_benchmark_properties.add(pid)
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: propertyMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: instanceMapping references unknown benchmark property '{pid}'"
                     )
+
+    # 3. benchmarkFilters property identifiers must exist in the definition and
+    #    must not duplicate a property already covered by instanceMapping.
+    if binding.staticFilters and binding.staticFilters.benchmarkFilters:
+        for pv in binding.staticFilters.benchmarkFilters:
+            pid = pv.property.identifier
+            if pid not in property_ids:
+                collector.add(
+                    f"{prefix}: staticFilters.benchmarkFilters references unknown benchmark property '{pid}'"
+                )
+            elif pid in mapped_benchmark_properties:
+                collector.add(
+                    f"{prefix}: staticFilters.benchmarkFilters property '{pid}' is already "
+                    f"covered by instanceMapping and must not be statically set"
+                )
 
 
 def validate_instance(
@@ -552,10 +570,8 @@ def validate_instance(
                     f"{instance_target}: missing required 'instance.yaml' file"
                 )
                 return None
-        artifacts_dir = instance_target / "artifacts"
     else:
         instance_file = instance_target
-        artifacts_dir = instance_target.parent / "artifacts"
 
     data = load_yaml_file(instance_file, collector)
     if data is None:
@@ -583,20 +599,21 @@ def validate_instance(
 
         is_artifact_prop = instance_props[field_name]
         if is_artifact_prop and field_val is not None:
-            # Check artifact files exist
-            artifact_files: list[str] = []
-            if isinstance(field_val, list):
-                artifact_files = [str(x) for x in field_val]
-            elif isinstance(field_val, dict):
-                artifact_files = [str(x) for x in field_val.values()]
-            elif isinstance(field_val, str):
-                artifact_files = [field_val]
-
-            for art in artifact_files:
-                art_path = artifacts_dir / art
-                if not art_path.is_file():
+            # field_val must be a dict with mandatory key 'artifacts_location'
+            if not isinstance(field_val, dict) or "artifacts_location" not in field_val:
+                collector.add(
+                    f"{instance_file}: artifact property '{field_name}' must be a map with a mandatory 'artifacts_location' key"
+                )
+            else:
+                folder_name = str(field_val["artifacts_location"])
+                folder_path = (
+                    instance_target / folder_name
+                    if instance_target.is_dir()
+                    else instance_target.parent / folder_name
+                )
+                if not folder_path.is_dir():
                     collector.add(
-                        f"{instance_file}: artifact file '{art}' for property '{field_name}' does not exist in {artifacts_dir}"
+                        f"{instance_file}: artifacts_location folder '{folder_name}' for property '{field_name}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
                     )
 
     return instance

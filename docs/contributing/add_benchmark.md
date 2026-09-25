@@ -292,8 +292,8 @@ For the full schema and a complete worked example, see
 To define specific benchmark problem instances (e.g., individual graphs, routing
 problem instances, or datasets), add a subfolder per instance in
 `benchmarks/<logical-benchmark-id>/instances/<instance-name>/` containing an
-`instance.yaml` file and an optional `artifacts/` folder for instance data files
-(which allows having multiple formats for the same instance).
+`instance.yaml` file and any subfolders holding artifact files referenced by the
+instance.
 
 Example instance YAML
 (`benchmarks/<logical-benchmark-id>/instances/graph_01/instance.yaml`):
@@ -305,8 +305,7 @@ graph_family: random_regular
 num_vertices: 50
 edge_density: 0.2
 graph:
-    - graph_01.dimacs
-    - graph_01.json
+    artifacts_location: graph_files # subfolder that exists inside instances/graph_01/
 ```
 
 ### Add a benchmark binding for your experiment
@@ -328,9 +327,15 @@ A binding contains the following mapping sections:
 
 - `targetMapping`: Names the experiment property that carries the benchmark
   target (e.g. the algorithm or model identifier)
-- `propertyMapping`: Maps benchmark instance properties to experiment inputs
-- `staticFilters`: Sets static experiment properties implicit in the logical
-  benchmark
+- `instanceMapping`: Maps benchmark instance properties to experiment inputs
+- `staticFilters`: Sets static property values implicit in either the logical
+  benchmark or the experiment. Contains two optional sub-keys:
+    - `experimentFilters`: pins experiment properties to values that are
+      implicit in the logical benchmark (adds a constant `WHERE` clause to every
+      query)
+    - `benchmarkFilters`: pins benchmark instance properties to values that are
+      implicit in the experiment (injects a constant value into leaderboard rows
+      without reading it from the experiment results)
 - `metricMapping`: Maps outputs of the logical benchmark to the outputs of the
   experiment
 
@@ -338,52 +343,28 @@ An example binding is
 
 ```yaml
 experiment:
-    actuatorIdentifier: vllm_performance
-    experimentIdentifier: guide_llm_runner
-    experimentVersion: 2.0.0 # The binding only uses the major version
-targetMapping: model_name # The experiment property that carries the benchmark target identifier
-propertyMapping:
+    actuatorIdentifier: custom_experiments
+    experimentIdentifier: rlx_coloring
+    experimentVersion: 1.0.0 # The binding only uses the major version
+targetMapping: solver # The experiment property that carries the benchmark target identifier
+instanceMapping:
     - benchmark:
-          identifier: dataset
+          identifier: num_vertices
       experiment:
-          identifier: input_data_path # guide-llm's internal param name
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: steady_state_heavy
-      predicate:
-          - identifier: traffic_shape
-            propertyDomain:
-                values: ["constant"]
-          - identifier: concurrency
-            propertyDomain:
-                domainRange: [100, 1000]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-    - categoricalValue:
-          property:
-              identifier: workload
-          value: poisson_bursty
-      predicate:
-          - identifier: traffic_shape
-            propertyDomain:
-                values: ["poisson"]
-          - identifier: concurrency
-            propertyDomain:
-                domainRange: [1, 100]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-staticFilters:
-    - property:
-          identifier: use_cache
-      value: "true"
+          identifier: n_nodes # rlx_coloring's internal param name
+    - benchmark:
+          identifier: edge_density
+      experiment:
+          identifier: density # rlx_coloring's internal param name
 metricMapping:
     - benchmark:
-          identifier: throughput_tokens_per_second
+          identifier: num_colors_used
       experiment:
-          identifier: throughput_rps # guide-llm's internal param name
+          identifier: colors # rlx_coloring's internal metric name
     - benchmark:
-          identifier: time_to_first_token_ms
+          identifier: elapsed_ms
       experiment:
-          identifier: ttft_ms
+          identifier: runtime_ms # rlx_coloring's internal metric name
 ```
 
 For the full benchmark binding schema and worked examples, see the
@@ -405,15 +386,21 @@ Each logical benchmark has its own directory containing `problem.yaml` and an
 benchmarks/
 ├── <benchmark-id>/
 │   ├── problem.yaml
+│   ├── README.md              # optional: full problem statement and context
 │   └── instances/
 │       ├── <instance-1-id>/
 │       │   ├── instance.yaml
-│       │   └── artifacts/
+│       │   └── <artifacts-subfolder>/   # named by artifacts_location in instance.yaml
 │       │       ├── graph.dimacs
 │       │       └── graph.json
 │       └── ...
 └── ...
 ```
+
+A `README.md` alongside `problem.yaml` is encouraged to provide a full
+description of the problem. For example to explain the mathematical formulation,
+provide references, or describe the instance structure in more detail than the
+`description` field in `problem.yaml` allows.
 
 Each `problem.yaml` uses the following top-level structure:
 

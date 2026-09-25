@@ -1,0 +1,9 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# Fixture: logicalBenchmark with an empty `instance` list (schema validation failure: min_length=1).
+
+logicalBenchmark:
+  benchmarkIdentifier: sorting
+  description: Evaluates sorting algorithm performance.
+  instance: []
