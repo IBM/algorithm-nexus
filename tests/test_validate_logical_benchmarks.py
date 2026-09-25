@@ -15,8 +15,8 @@ FIXTURES = Path(__file__).parent / "fixtures" / "logical_benchmarks"
 
 
 class TestValidFiles:
-    def test_valid_file_with_bindings_passes(self) -> None:
-        """A fully valid file with definition and bindings returns a parsed object."""
+    def test_valid_file_without_bindings_passes_schema(self) -> None:
+        """A definition-only file (no bindings key) is valid."""
         collector = ValidationErrorCollector()
         result = validate_logical_benchmark_file(
             FIXTURES / "valid_full.yaml", collector
@@ -26,29 +26,19 @@ class TestValidFiles:
         assert not collector.has_errors
         assert result.logicalBenchmark.benchmarkIdentifier == "inference_serving"
         assert result.logicalBenchmark.title == "Inference Serving Performance"
-        assert result.bindings is not None
-        assert len(result.bindings) == 1
 
     def test_target_mapping_defaults_to_experiment_identifier(self) -> None:
         """When targetMapping is omitted, it defaults to the experiment's experimentIdentifier."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "valid_full.yaml", collector
-        )
-
-        assert result is not None
-        assert result.bindings is not None
-        # valid_full.yaml omits targetMapping on the second binding (if any); here we
-        # test by constructing a binding directly to confirm the validator fires.
         from ado.schema.reference import ExperimentReference
 
         from algorithm_nexus.models import BenchmarkBinding
 
         binding = BenchmarkBinding(
+            benchmarkIdentifier="sorting",
             experiment=ExperimentReference(
                 actuatorIdentifier="my_actuator",
                 experimentIdentifier="solve_mip",
-            )
+            ),
         )
         assert binding.targetMapping == "solve_mip"
 
@@ -59,6 +49,7 @@ class TestValidFiles:
         from algorithm_nexus.models import BenchmarkBinding
 
         binding = BenchmarkBinding(
+            benchmarkIdentifier="sorting",
             experiment=ExperimentReference(
                 actuatorIdentifier="my_actuator",
                 experimentIdentifier="solve_mip",
@@ -66,6 +57,38 @@ class TestValidFiles:
             targetMapping="custom_label",
         )
         assert binding.targetMapping == "custom_label"
+
+    def test_benchmark_identifier_on_binding(self) -> None:
+        """benchmarkIdentifier is required on BenchmarkBinding entries."""
+        from ado.schema.reference import ExperimentReference
+
+        from algorithm_nexus.models import BenchmarkBinding
+
+        binding = BenchmarkBinding(
+            benchmarkIdentifier="sorting",
+            experiment=ExperimentReference(
+                actuatorIdentifier="custom_experiments",
+                experimentIdentifier="bubble_sort",
+            ),
+        )
+        assert binding.benchmarkIdentifier == "sorting"
+        assert binding.targetMapping == "bubble_sort"
+
+    def test_benchmark_identifier_required(self) -> None:
+        """benchmarkIdentifier raises ValidationError when omitted."""
+        import pytest
+        from ado.schema.reference import ExperimentReference
+        from pydantic import ValidationError
+
+        from algorithm_nexus.models import BenchmarkBinding
+
+        with pytest.raises(ValidationError):
+            BenchmarkBinding(
+                experiment=ExperimentReference(
+                    actuatorIdentifier="custom_experiments",
+                    experimentIdentifier="bubble_sort",
+                ),
+            )
 
     def test_valid_file_without_bindings_passes(self) -> None:
         """A valid definition-only file (no bindings) returns a parsed object."""
@@ -76,7 +99,6 @@ class TestValidFiles:
 
         assert result is not None
         assert not collector.has_errors
-        assert result.bindings is None
 
 
 class TestSchemaValidation:
@@ -116,105 +138,197 @@ class TestSchemaValidation:
 
 
 class TestReferentialIntegrity:
-    def test_binding_with_unknown_property_fails(self) -> None:
-        """A binding referencing a property not in the definition is an integrity error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "invalid_binding_unknown_property.yaml", collector
+    """Binding integrity checks via _check_binding_integrity (bindings live in experiments/)."""
+
+    def _make_binding(self, **kwargs):
+        from ado.schema.reference import ExperimentReference
+
+        from algorithm_nexus.models import BenchmarkBinding
+
+        return BenchmarkBinding(
+            benchmarkIdentifier=kwargs.pop("benchmarkIdentifier", "test_bench"),
+            experiment=ExperimentReference(
+                actuatorIdentifier="custom",
+                experimentIdentifier="exp1",
+                experimentVersion="1.0.0",
+            ),
+            **kwargs,
         )
 
-        assert (
-            result is not None
-        )  # schema is valid; integrity error is collected separately
+    def test_binding_with_unknown_property_fails(self) -> None:
+        """instanceMapping referencing a property not in the definition is an integrity error."""
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import FieldMapping
+
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            instanceMapping=[
+                FieldMapping(
+                    benchmark={"identifier": "nonexistent_property"},
+                    experiment={"identifier": "exp_param"},
+                )
+            ]
+        )
+        _check_binding_integrity(
+            binding, {"real_property"}, None, collector, Path("test.yaml"), 0
+        )
         assert collector.has_errors
         assert "nonexistent_property" in " ".join(collector.errors)
 
     def test_binding_with_unknown_metric_fails(self) -> None:
-        """A binding referencing a metric not in the definition is an integrity error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "invalid_binding_unknown_metric.yaml", collector
-        )
+        """metricMapping referencing a metric not in the definition is an integrity error."""
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import MetricIdentifier, MetricMapping
 
-        assert result is not None
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            metricMapping=[
+                MetricMapping(
+                    benchmark=MetricIdentifier(identifier="nonexistent_metric"),
+                    experiment=MetricIdentifier(identifier="internal_metric"),
+                )
+            ]
+        )
+        _check_binding_integrity(
+            binding,
+            set(),
+            {"throughput_tokens_per_second"},
+            collector,
+            Path("test.yaml"),
+            0,
+        )
         assert collector.has_errors
         assert "nonexistent_metric" in " ".join(collector.errors)
 
     def test_static_filters_both_directions_passes(self) -> None:
         """A binding with both experimentFilters and benchmarkFilters is valid."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "valid_static_filters_both_directions.yaml", collector
-        )
+        from ado.schema.property import Property
+        from ado.schema.property_value import PropertyValue
 
-        assert result is not None
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import StaticFilters
+
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            staticFilters=StaticFilters(
+                experimentFilters=[
+                    PropertyValue(
+                        property=Property(identifier="graph_type"), value="erdos_renyi"
+                    )
+                ],
+                benchmarkFilters=[
+                    PropertyValue(
+                        property=Property(identifier="graph_family"),
+                        value="random_regular",
+                    )
+                ],
+            )
+        )
+        _check_binding_integrity(
+            binding,
+            {"graph_family"},
+            None,
+            collector,
+            Path("test.yaml"),
+            0,
+        )
         assert not collector.has_errors
-        assert result.bindings is not None
-        binding = result.bindings[0]
         assert binding.staticFilters is not None
-        assert binding.staticFilters.experimentFilters is not None
         assert (
             binding.staticFilters.experimentFilters[0].property.identifier
             == "graph_type"
         )
-        assert binding.staticFilters.benchmarkFilters is not None
         assert (
             binding.staticFilters.benchmarkFilters[0].property.identifier
             == "graph_family"
         )
 
     def test_benchmark_filter_unknown_property_fails(self) -> None:
-        """A benchmarkFilter referencing a property not in the definition is an integrity error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "invalid_static_filters_unknown_benchmark_property.yaml",
-            collector,
-        )
+        """benchmarkFilters referencing a property not in the definition is an integrity error."""
+        from ado.schema.property import Property
+        from ado.schema.property_value import PropertyValue
 
-        assert (
-            result is not None
-        )  # schema is valid; integrity error is collected separately
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import StaticFilters
+
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            staticFilters=StaticFilters(
+                benchmarkFilters=[
+                    PropertyValue(
+                        property=Property(identifier="nonexistent_prop"),
+                        value="random_regular",
+                    )
+                ]
+            )
+        )
+        _check_binding_integrity(
+            binding, {"num_vertices"}, None, collector, Path("test.yaml"), 0
+        )
         assert collector.has_errors
         assert "nonexistent_prop" in " ".join(collector.errors)
 
     def test_benchmark_filter_overlapping_instance_mapping_fails(self) -> None:
-        """A benchmarkFilter for a property already in instanceMapping is an integrity error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "invalid_static_filters_overlap_with_instance_mapping.yaml",
-            collector,
-        )
+        """benchmarkFilters for a property already in instanceMapping is an integrity error."""
+        from ado.schema.property import Property
+        from ado.schema.property_value import PropertyValue
 
-        assert (
-            result is not None
-        )  # schema is valid; integrity error is collected separately
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import FieldMapping, StaticFilters
+
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            instanceMapping=[
+                FieldMapping(
+                    benchmark={"identifier": "num_vertices"},
+                    experiment={"identifier": "n_nodes"},
+                )
+            ],
+            staticFilters=StaticFilters(
+                benchmarkFilters=[
+                    PropertyValue(
+                        property=Property(identifier="num_vertices"), value="50"
+                    )
+                ]
+            ),
+        )
+        _check_binding_integrity(
+            binding, {"num_vertices"}, None, collector, Path("test.yaml"), 0
+        )
         assert collector.has_errors
         assert "num_vertices" in " ".join(collector.errors)
         assert "already covered by instanceMapping" in " ".join(collector.errors)
 
     def test_metric_mapping_allowed_when_no_metrics_defined(self) -> None:
-        """metricMapping with no metrics defined in the definition does not raise an error."""
-        collector = ValidationErrorCollector()
-        result = validate_logical_benchmark_file(
-            FIXTURES / "valid_metric_mapping_no_metrics_defined.yaml", collector
-        )
+        """metricMapping with metric_ids=None does not raise an integrity error."""
+        from algorithm_nexus.commands.validate import _check_binding_integrity
+        from algorithm_nexus.models import MetricIdentifier, MetricMapping
 
-        # No metrics defined → metric_ids is None → no integrity check is performed
-        assert result is not None
+        collector = ValidationErrorCollector()
+        binding = self._make_binding(
+            metricMapping=[
+                MetricMapping(
+                    benchmark=MetricIdentifier(identifier="any_metric"),
+                    experiment=MetricIdentifier(identifier="internal_metric"),
+                )
+            ]
+        )
+        # metric_ids=None → integrity check is skipped
+        _check_binding_integrity(binding, set(), None, collector, Path("test.yaml"), 0)
         assert not collector.has_errors
 
 
 class TestBenchmarkDirectoryAndInstances:
     def test_valid_benchmark_directory(self, tmp_path: Path) -> None:
-        """A complete benchmark folder with problem.yaml and instances folder with per-instance folder layout passes validation."""
+        """A complete benchmark folder with benchmark.yaml and instances folder with per-instance folder layout passes validation."""
         bench_dir = tmp_path / "test_benchmark"
         instances_dir = bench_dir / "instances"
         inst1_dir = instances_dir / "inst_1"
         inst1_data_dir = inst1_dir / "data"
         inst1_data_dir.mkdir(parents=True)
 
-        # Create problem.yaml with artifact and scalar properties
-        problem_content = """
+        # Create benchmark.yaml with artifact and scalar properties
+        benchmark_content = """
 logicalBenchmark:
   benchmarkIdentifier: inference_serving
   description: Test description
@@ -223,7 +337,7 @@ logicalBenchmark:
       is_artifact: true
     - identifier: workload
 """
-        (bench_dir / "problem.yaml").write_text(problem_content)
+        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
 
         # Create artifact files inside the named subfolder
         (inst1_data_dir / "data.json").write_text("{}")
@@ -252,7 +366,7 @@ workload: "steady_state_heavy"
         inst1_dir.mkdir(parents=True)
 
         problem_yaml = FIXTURES / "valid_full.yaml"
-        (bench_dir / "problem.yaml").write_text(problem_yaml.read_text())
+        (bench_dir / "benchmark.yaml").write_text(problem_yaml.read_text())
 
         instance_content = """
 identifier: test_inst_1
@@ -272,7 +386,7 @@ nonexistent_param: "value"
         inst1_dir = bench_dir / "instances" / "inst_1"
         inst1_dir.mkdir(parents=True)
 
-        problem_content = """
+        benchmark_content = """
 logicalBenchmark:
   benchmarkIdentifier: test_bench
   description: Test description
@@ -280,7 +394,7 @@ logicalBenchmark:
     - identifier: graph
       is_artifact: true
 """
-        (bench_dir / "problem.yaml").write_text(problem_content)
+        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
 
         instance_content = """
 identifier: test_inst_1
@@ -295,90 +409,33 @@ graph:
         assert collector.has_errors
         assert "nonexistent_folder" in " ".join(collector.errors)
 
-    def test_binding_with_valid_instance_mapping_passes(self, tmp_path: Path) -> None:
-        """A binding with instanceMapping referencing valid instance passes."""
+    def test_valid_benchmark_directory_with_instance_validates(
+        self, tmp_path: Path
+    ) -> None:
+        """A complete benchmark folder with benchmark.yaml and an instance with instanceMapping validates cleanly."""
         bench_dir = tmp_path / "test_benchmark"
         instances_dir = bench_dir / "instances"
         bench_dir.mkdir(parents=True)
         instances_dir.mkdir(parents=True)
 
-        problem_content = """
+        benchmark_content = """
 logicalBenchmark:
   benchmarkIdentifier: test_bench
   description: Test description
   instance:
     - identifier: size
-
-bindings:
-  - experiment:
-      actuatorIdentifier: custom
-      experimentIdentifier: exp1
-      experimentVersion: 1.0.0
-    instanceMapping:
-      - benchmark:
-          identifier: size
-        experiment:
-          identifier: n_nodes
-    staticFilters:
-      experimentFilters:
-        - property:
-            identifier: graph_type
-          value: erdos_renyi
 """
-        (bench_dir / "problem.yaml").write_text(problem_content)
+        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
 
         inst_dir = instances_dir / "graph_01"
         inst_dir.mkdir(parents=True)
-        instance_content = """
-identifier: graph_01
-size: 10
-"""
-        (inst_dir / "instance.yaml").write_text(instance_content)
+        (inst_dir / "instance.yaml").write_text("identifier: graph_01\nsize: 10\n")
 
         collector = ValidationErrorCollector()
         config = validate_logical_benchmark_directory(bench_dir, collector)
 
         assert config is not None
         assert not collector.has_errors
-        assert config.bindings is not None
-        assert config.bindings[0].instanceMapping is not None
-        assert config.bindings[0].staticFilters is not None
-        assert config.bindings[0].staticFilters.experimentFilters is not None
-
-    def test_binding_with_invalid_instance_property_mapping_fails(
-        self, tmp_path: Path
-    ) -> None:
-        """A binding with instanceMapping referencing an unknown property fails."""
-        bench_dir = tmp_path / "test_benchmark"
-        instances_dir = bench_dir / "instances"
-        bench_dir.mkdir(parents=True)
-        instances_dir.mkdir(parents=True)
-
-        problem_content = """
-logicalBenchmark:
-  benchmarkIdentifier: test_bench
-  description: Test description
-  instance:
-    - identifier: num_vertices
-
-bindings:
-  - experiment:
-      actuatorIdentifier: custom
-      experimentIdentifier: exp1
-      experimentVersion: 1.0.0
-    instanceMapping:
-      - benchmark:
-          identifier: unknown_property
-        experiment:
-          identifier: n_nodes
-"""
-        (bench_dir / "problem.yaml").write_text(problem_content)
-
-        collector = ValidationErrorCollector()
-        validate_logical_benchmark_directory(bench_dir, collector)
-
-        assert collector.has_errors
-        assert "unknown_property" in " ".join(collector.errors)
 
 
 class TestRankingValidation:

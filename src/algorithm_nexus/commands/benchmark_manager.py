@@ -43,8 +43,8 @@ except ImportError:
 
 from algorithm_nexus.commands.utils import strip_ansi_codes
 from algorithm_nexus.models import (
-    AlgorithmNexusPackageConfig,
     BenchmarkExecutionResult,
+    ExperimentConfig,
     ValidationReport,
 )
 
@@ -163,14 +163,14 @@ class BenchmarkManager:
 
     def _discover_instances(
         self,
-        packages_root: Path | None = None,
-        package_filter: str | None = None,
+        experiments_root: Path | None = None,
+        experiment_filter: str | None = None,
     ) -> list[Path]:
-        """Discover benchmark submissions based on mode (PR or all/package).
+        """Discover benchmark submissions based on mode (PR or all/experiment).
 
         Args:
-            packages_root: Path to packages directory (for all/package mode)
-            package_filter: Optional package name to filter by
+            experiments_root: Path to experiments directory (for all/experiment mode)
+            experiment_filter: Optional experiment name to filter by
 
         Returns:
             List of benchmark instance paths
@@ -189,57 +189,59 @@ class BenchmarkManager:
             changed_files = self.get_changed_files()
             return self.find_benchmark_submissions(changed_files)
 
-        elif packages_root:
-            # All or package mode
+        elif experiments_root:
+            # All or experiment mode
             console.print("Discovering benchmark submissions...")
-            return self.find_all_benchmark_submissions(packages_root, package_filter)
+            return self.find_all_benchmark_submissions(
+                experiments_root, experiment_filter
+            )
 
         else:
             console.print(
-                "[red]Error:[/red] Either pr_url or packages_root must be provided"
+                "[red]Error:[/red] Either pr_url or experiments_root must be provided"
             )
             raise typer.Exit(code=1)
 
     def _print_mode_header(
         self,
-        packages_root: Path | None = None,
-        package_filter: str | None = None,
+        experiments_root: Path | None = None,
+        experiment_filter: str | None = None,
         mode_name: str = "execution",
     ) -> None:
         """Print mode header and configuration.
 
         Args:
-            packages_root: Path to packages directory (for all/package mode)
-            package_filter: Optional package name to filter by
+            experiments_root: Path to experiments directory (for all/experiment mode)
+            experiment_filter: Optional experiment name to filter by
             mode_name: Name of the mode (e.g., "Executing", "Validating")
         """
         if self.pr_url:
             console.print(f"\n[bold]Mode:[/bold] {mode_name} PR changes")
             console.print(f"PR URL: {self.pr_url}")
-        elif package_filter:
+        elif experiment_filter:
             console.print(
-                f"\n[bold]Mode:[/bold] {mode_name} package '{package_filter}'"
+                f"\n[bold]Mode:[/bold] {mode_name} experiment '{experiment_filter}'"
             )
         else:
             console.print(f"\n[bold]Mode:[/bold] {mode_name} all benchmark submissions")
 
-        # Print packages root when not in PR mode
-        if not self.pr_url and packages_root:
-            console.print(f"Packages root: {packages_root.resolve()}")
+        # Print experiments root when not in PR mode
+        if not self.pr_url and experiments_root:
+            console.print(f"Experiments root: {experiments_root.resolve()}")
 
         console.print("=" * 60)
 
     def _print_instances_found(
         self,
         benchmark_submissions: list[Path],
-        package_filter: str | None = None,
+        experiment_filter: str | None = None,
         show_list: bool = True,
     ) -> None:
         """Print found instances or empty message.
 
         Args:
             benchmark_submissions: List of found benchmark submissions
-            package_filter: Optional package name (for empty message)
+            experiment_filter: Optional experiment name (for empty message)
             show_list: Whether to show the list of instances
         """
         if not benchmark_submissions:
@@ -247,9 +249,9 @@ class BenchmarkManager:
                 console.print(
                     "\n[yellow]No benchmark submissions found in this PR.[/yellow]"
                 )
-            elif package_filter:
+            elif experiment_filter:
                 console.print(
-                    f"\n[yellow]No benchmark submissions found in package '{package_filter}'.[/yellow]"
+                    f"\n[yellow]No benchmark submissions found in experiment '{experiment_filter}'.[/yellow]"
                 )
             else:
                 console.print("\n[yellow]No benchmark submissions found.[/yellow]")
@@ -293,49 +295,35 @@ class BenchmarkManager:
         return instance_dependencies
 
     def _parse_submission_path(self, submission_path: Path) -> tuple[str, str, str]:
-        """Parse benchmark instance path to extract package, model, and instance names.
+        """Parse benchmark instance path to extract experiment, model, and instance names.
 
         Args:
             submission_path: Path to benchmark instance directory
 
         Returns:
-            Tuple of (package_name, model_name, instance_name)
-            For package-level instances, model_name will be "base"
+            Tuple of (experiment_name, model_name, instance_name)
+            model_name is always "base" for experiment submissions.
 
         Raises:
             ValueError: If the instance path format is invalid
         """
-        # Parse submission path using regex:
-        # - Model-level: packages/<package>/models/<model>/benchmark_submissions/<submission>
-        # - Package-level: packages/<package>/benchmark_submissions/<submission>
+        # Pattern: experiments/<experiment>/submissions/<submission>
         path_str = str(submission_path)
-
-        # Try model-level pattern first
-        model_pattern = (
-            r"^packages/([^/]+)/models/([^/]+)/benchmark_submissions/([^/]+)$"
-        )
-        match = re.match(model_pattern, path_str)
+        pattern = r"^experiments/([^/]+)/submissions/([^/]+)$"
+        match = re.match(pattern, path_str)
         if match:
-            package_name, model_name, instance_name = match.groups()
-            return package_name, model_name, instance_name
+            experiment_name, instance_name = match.groups()
+            return experiment_name, "base", instance_name
 
-        # Try package-level pattern
-        package_pattern = r"^packages/([^/]+)/benchmark_submissions/([^/]+)$"
-        match = re.match(package_pattern, path_str)
-        if match:
-            package_name, instance_name = match.groups()
-            model_name = "base"
-            return package_name, model_name, instance_name
-
-        # If neither pattern matches, raise an error
         raise ValueError(
             f"Invalid benchmark submission path format: {submission_path}. "
-            "Expected: packages/<package>/benchmark_submissions/<submission> or "
-            "packages/<package>/models/<model>/benchmark_submissions/<submission>"
+            "Expected: experiments/<experiment>/submissions/<submission>"
         )
 
     def find_benchmark_submissions(self, changed_files: list[str]) -> list[Path]:
         """Find benchmark instance directories from changed files.
+
+        Recognises paths under experiments/<name>/submissions/<submission>/.
 
         Args:
             changed_files: List of changed file paths
@@ -347,14 +335,15 @@ class BenchmarkManager:
 
         for file_path in changed_files:
             path = Path(file_path)
-            if "benchmark_submissions" in path.parts:
-                # Find the index of 'benchmark_submissions' in the path parts
-                bench_idx = path.parts.index("benchmark_submissions")
-                # Ensure there's at least one part after 'benchmark_submissions'
-                if bench_idx + 1 < len(path.parts):
-                    # Reconstruct path up to and including the first directory after 'benchmark_submissions'
-                    instance_dir = Path(*path.parts[: bench_idx + 2])
-                    benchmark_dirs.add(instance_dir)
+            parts = path.parts
+            # Pattern: experiments/<name>/submissions/<submission>/...
+            if (
+                len(parts) >= 4
+                and parts[0] == "experiments"
+                and parts[2] == "submissions"
+            ):
+                instance_dir = Path(*parts[:4])
+                benchmark_dirs.add(instance_dir)
 
         return sorted(benchmark_dirs)
 
@@ -464,94 +453,69 @@ class BenchmarkManager:
         if resolved_path.exists():
             return str(resolved_path)
 
-        # uv requires git+ prefix for GitHub HTTPS URLs
-        if requirement.startswith(("https://github.com/", "http://github.com/")):
-            return (
-                f"git+{requirement}"
-                if not requirement.startswith("git+")
-                else requirement
-            )
+        # Already has git+ scheme (e.g. git+https://, git+ssh://, git+http://)
+        if requirement.startswith("git+"):
+            return requirement
 
-        # SSH shorthand (git@github.com:org/repo) must become git+ssh://git@github.com/org/repo
-        if requirement.startswith("git@github.com:"):
-            return requirement.replace(
-                "git@github.com:", "git+ssh://git@github.com/", 1
-            )
+        # SSH URL with ssh:// prefix (e.g. ssh://git@...) -> git+ssh://git@...
+        if requirement.startswith("ssh://"):
+            return f"git+{requirement}"
+
+        # SSH scp-like or slash shorthand (e.g. git@github.com:org/repo or git@github.ibm.com/org/repo)
+        if requirement.startswith("git@"):
+            # If formatted like git@host:path -> git+ssh://git@host/path
+            if ":" in requirement:
+                host, path = requirement.split(":", 1)
+                return f"git+ssh://{host}/{path}"
+            # If formatted like git@host/path -> git+ssh://git@host/path
+            return f"git+ssh://{requirement}"
+
+        # HTTP/HTTPS URLs (e.g. https://github.com/..., https://github.ibm.com/...) -> git+https://...
+        if requirement.startswith(("https://", "http://")):
+            return f"git+{requirement}"
 
         return requirement
 
     def get_benchmark_packages_for_submission(self, submission_path: Path) -> set[str]:
         """Get the benchmark packages required for a specific benchmark instance.
 
+        For submissions under experiments/<name>/submissions/<submission>/, the
+        requirement specifier is read from experiments/<name>/experiment_package.yaml.
+
         Args:
-            submission_path: Path to benchmark instance directory
+            submission_path: Path to benchmark instance directory (relative to repo_root)
 
         Returns:
             Set of requirement specifiers for benchmark packages
         """
-        packages = set()
-
         try:
             repo_root = self.repo_root
+            parts = submission_path.parts
 
-            space_yaml_path = repo_root / submission_path / "space.yaml"
-            if not space_yaml_path.is_file():
-                return set()
+            # Expect: experiments/<experiment_name>/submissions/<submission_name>/...
+            if len(parts) >= 2 and parts[0] == "experiments":
+                experiment_name = parts[1]
+                experiment_yaml_path = (
+                    repo_root
+                    / "experiments"
+                    / experiment_name
+                    / "experiment_package.yaml"
+                )
+                if not experiment_yaml_path.is_file():
+                    return set()
 
-            # Load space configuration using DiscoverySpaceConfiguration
-            space_config_dict = yaml.safe_load(space_yaml_path.read_text())
-            space_config = DiscoverySpaceConfiguration.model_validate(space_config_dict)
+                experiment_config_dict = yaml.safe_load(
+                    experiment_yaml_path.read_text()
+                )
+                experiment_config = ExperimentConfig.model_validate(
+                    experiment_config_dict
+                )
+                resolved_req = self._resolve_benchmark_package_requirement(
+                    experiment_config.experiment_package.requirement_specifier
+                )
+                return {resolved_req}
 
-            # Extract experiment identifiers
-            # Convert experiments to reference list for easier processing
-            space_config_with_refs = (
-                space_config.convert_experiments_to_reference_list()
-            )
-
-            if not space_config_with_refs.experiments:
-                return set()
-
-            # After conversion, experiments is a list of ExperimentReference
-            experiment_ids: set[str] = {
-                exp_ref.experimentIdentifier  # type: ignore[union-attr]
-                for exp_ref in space_config_with_refs.experiments  # type: ignore[union-attr]
-            }
-
-            current_path = repo_root / submission_path
-            nexus_yaml_path = None
-
-            # Find the deepest nexus.yaml file up to repo_root
-            for parent in [current_path, *current_path.parents]:
-                if parent == repo_root.parent:
-                    break
-                potential_nexus = parent / "nexus.yaml"
-                if potential_nexus.is_file():
-                    nexus_yaml_path = potential_nexus
-                    break
-
-            if not nexus_yaml_path:
-                parts = submission_path.parts
-                if len(parts) > 0 and parts[0] == "packages" and len(parts) > 1:
-                    potential_nexus = repo_root / "packages" / parts[1] / "nexus.yaml"
-                    if potential_nexus.exists():
-                        nexus_yaml_path = potential_nexus
-
-            if not nexus_yaml_path or not nexus_yaml_path.exists():
-                return set()
-
-            # Load nexus config using AlgorithmNexusPackageConfig
-            nexus_config_dict = yaml.safe_load(nexus_yaml_path.read_text())
-            nexus_config = AlgorithmNexusPackageConfig.model_validate(nexus_config_dict)
-
-            for bench_pkg in nexus_config.package.benchmark_packages:
-                pkg_experiments = set(bench_pkg.experiments)
-                if experiment_ids & pkg_experiments:
-                    resolved_req = self._resolve_benchmark_package_requirement(
-                        bench_pkg.requirement_specifier
-                    )
-                    packages.add(resolved_req)
-
-            return packages
+            return set()
 
         except Exception as e:
             console_err.print(
@@ -1040,19 +1004,11 @@ class BenchmarkManager:
 
             if self.execute:
                 console.print("\nExecuting benchmarks with ADO CLI...")
-                successful = 0
-                failed = 0
 
                 for submission_path in benchmark_submissions:
                     console.print(f"\nProcessing: {submission_path}")
                     exec_result = self.execute_benchmark(submission_path)
                     results["submissions"].append(exec_result.model_dump())
-
-                    # When execution is local we return "success" when remote we return "started"
-                    if exec_result.status in ["started", "success"]:
-                        successful += 1
-                    else:
-                        failed += 1
 
             else:
                 for submission_path in benchmark_submissions:
@@ -1066,184 +1022,365 @@ class BenchmarkManager:
             self.cleanup_temp_dir()
 
     def find_all_benchmark_submissions(
-        self, packages_root: Path, package_filter: str | None = None
+        self, experiments_root: Path, experiment_filter: str | None = None
     ) -> list[Path]:
-        """Find all benchmark submissions in the packages directory.
+        """Find all benchmark submissions in the experiments directory.
+
+        Scans experiments/<name>/submissions/<submission>/ for space.yaml files.
+        Experiments without experiment_package.yaml are skipped with a warning.
 
         Args:
-            packages_root: Path to packages directory
-            package_filter: Optional package name to filter by
+            experiments_root: Path to experiments directory
+            experiment_filter: Optional experiment name to filter by
 
         Returns:
             List of benchmark instance directory paths (relative to repo_root)
         """
         benchmark_submissions = []
 
-        # Resolve packages_root to absolute path
-        packages_root_abs = packages_root.resolve()
+        # Resolve experiments_root to absolute path
+        experiments_root_abs = experiments_root.resolve()
 
-        if not packages_root_abs.exists():
+        if not experiments_root_abs.exists():
             console.print(
-                f"[red]Error:[/red] Packages directory not found: {packages_root_abs}"
+                f"[red]Error:[/red] Experiments directory not found: {experiments_root_abs}"
             )
             raise typer.Exit(code=1)
 
         # Only update repo_root after confirming the path exists
-        self.repo_root = packages_root_abs.parent  # Parent of packages directory
+        self.repo_root = experiments_root_abs.parent  # Parent of experiments directory
 
-        # Walk through packages directory
-        for pkg_dir in packages_root_abs.iterdir():
-            if not pkg_dir.is_dir() or pkg_dir.name.startswith("."):
+        # Walk through experiments directory
+        for exp_dir in sorted(experiments_root_abs.iterdir()):
+            if not exp_dir.is_dir() or exp_dir.name.startswith("."):
                 continue
 
-            # Filter by package name if specified
-            if package_filter and pkg_dir.name != package_filter:
+            # Filter by experiment name if specified
+            if experiment_filter and exp_dir.name != experiment_filter:
                 continue
 
-            # Find benchmark_submissions directories
-            # Check package-level benchmark_submissions
-            pkg_benchmark_dir = pkg_dir / "benchmark_submissions"
-            if pkg_benchmark_dir.exists() and pkg_benchmark_dir.is_dir():
+            # Find submissions/<submission>/ directories that contain space.yaml
+            submissions_dir = exp_dir / "submissions"
+            if submissions_dir.exists() and submissions_dir.is_dir():
                 benchmark_submissions.extend(
                     instance_dir.relative_to(self.repo_root)
-                    for instance_dir in pkg_benchmark_dir.iterdir()
+                    for instance_dir in submissions_dir.iterdir()
                     if instance_dir.is_dir() and (instance_dir / "space.yaml").exists()
                 )
 
-            # Check model-level benchmark_submissions
-            models_dir = pkg_dir / "models"
-            if models_dir.exists() and models_dir.is_dir():
-                for model_dir in models_dir.iterdir():
-                    if not model_dir.is_dir():
-                        continue
-                    model_benchmark_dir = model_dir / "benchmark_submissions"
-                    if model_benchmark_dir.exists() and model_benchmark_dir.is_dir():
-                        benchmark_submissions.extend(
-                            instance_dir.relative_to(self.repo_root)
-                            for instance_dir in model_benchmark_dir.iterdir()
-                            if instance_dir.is_dir()
-                            and (instance_dir / "space.yaml").exists()
-                        )
-
         return sorted(benchmark_submissions)
+
+    def _scan_experiments(
+        self, experiments_root: Path, experiment_filter: str | None = None
+    ) -> list[tuple[str, Path, ExperimentConfig | None, list[Path]]]:
+        """Scan experiments directory and return structured per-experiment data.
+
+        For each experiment directory returns a tuple of:
+          (experiment_name, experiment_dir, experiment_config_or_None, submission_paths)
+
+        experiment_config is None when experiment_package.yaml is absent or invalid.
+        submission_paths are relative to self.repo_root.
+
+        Args:
+            experiments_root: Absolute path to the experiments directory
+            experiment_filter: Optional experiment name to filter by
+
+        Returns:
+            List of (name, dir, config, submissions) tuples, sorted by name
+        """
+        results = []
+
+        for exp_dir in sorted(experiments_root.iterdir()):
+            if not exp_dir.is_dir() or exp_dir.name.startswith("."):
+                continue
+
+            if experiment_filter and exp_dir.name != experiment_filter:
+                continue
+
+            # Phase 1 — optional experiment_package.yaml
+            experiment_config: ExperimentConfig | None = None
+            experiment_yaml = exp_dir / "experiment_package.yaml"
+            if experiment_yaml.is_file():
+                try:
+                    experiment_config = ExperimentConfig.model_validate(
+                        yaml.safe_load(experiment_yaml.read_text())
+                    )
+                except Exception as e:
+                    console.print(
+                        f"[yellow]Warning:[/yellow] Could not parse "
+                        f"{experiment_yaml}: {e}"
+                    )
+
+            # Phase 2 — optional submissions directory
+            submissions: list[Path] = []
+            submissions_dir = exp_dir / "submissions"
+            if submissions_dir.is_dir():
+                submissions = sorted(
+                    instance_dir.relative_to(self.repo_root)
+                    for instance_dir in submissions_dir.iterdir()
+                    if instance_dir.is_dir() and (instance_dir / "space.yaml").exists()
+                )
+
+            results.append((exp_dir.name, exp_dir, experiment_config, submissions))
+
+        return results
 
     def validate(
         self,
-        packages_root: Path | None = None,
-        package_filter: str | None = None,
+        experiments_root: Path | None = None,
+        experiment_filter: str | None = None,
         verbose: bool = False,
         fail_fast: bool = False,
     ) -> ValidationReport:
-        """Validate benchmark submissions with ADO dry-run in isolated venvs.
+        """Validate experiments in two phases per experiment, using one shared venv.
+
+        Phase 1 (experiment_package): If experiment_package.yaml is present, install
+        the package and verify the declared experiment IDs are discoverable.
+
+        Phase 2 (submissions): If submissions/<name>/space.yaml files are present,
+        validate each with ADO dry-run using the same venv.
+
+        Both phases are optional and independent; an experiment may trigger either,
+        neither, or both.
 
         Args:
-            packages_root: Path to packages directory (for all/package mode)
-            package_filter: Optional package name to filter by
+            experiments_root: Path to experiments directory (for all/experiment mode)
+            experiment_filter: Optional experiment name to filter by
             verbose: Show detailed validation output
             fail_fast: Stop validation on first error
 
         Returns:
-            Dictionary with validation results
+            ValidationReport with all results
         """
         from algorithm_nexus.commands.ado_validator import validate_with_ado
         from algorithm_nexus.commands.venv_manager import (
             cleanup_venv,
             create_temp_venv,
             install_packages,
+            verify_experiments_installed,
         )
         from algorithm_nexus.models import ValidationResult
 
         try:
             # Print mode header
-            self._print_mode_header(packages_root, package_filter, "Validating")
+            self._print_mode_header(experiments_root, experiment_filter, "Validating")
 
-            # Discover benchmark submissions
-            benchmark_submissions = self._discover_instances(
-                packages_root, package_filter
-            )
+            if self.pr_url:
+                # PR mode — original per-submission flow (no experiment_package phase)
+                benchmark_submissions = self._discover_instances(
+                    experiments_root, experiment_filter
+                )
+                self._print_instances_found(benchmark_submissions, experiment_filter)
 
-            # Print found instances
-            self._print_instances_found(benchmark_submissions, package_filter)
-
-            if not benchmark_submissions:
-                return ValidationReport(instances=[], successful=0, failed=0, total=0)
-
-            # Resolve dependencies for all instances
-            instance_dependencies = self._resolve_all_dependencies(
-                benchmark_submissions, verbose
-            )
-
-            # Validate each instance with its own venv
-            console.print("\n[bold]Validating benchmark submissions...[/bold]")
-            console.print("=" * 60)
-
-            all_results = []
-            total_success = 0
-            total_failed = 0
-
-            for instance in benchmark_submissions:
-                resolved_req_list = instance_dependencies[instance]
-
-                console.print(f"\n[cyan]Validating:[/cyan] {instance}")
-                if resolved_req_list:
-                    console.print(
-                        f"  [cyan]Dependencies:[/cyan] {', '.join(resolved_req_list)}"
+                if not benchmark_submissions:
+                    return ValidationReport(
+                        instances=[], successful=0, failed=0, total=0
                     )
-                else:
-                    console.print("  [cyan]No dependencies required[/cyan]")
 
-                # Create venv for this instance
-                venv_path = None
-                try:
-                    venv_path = create_temp_venv()
+                instance_dependencies = self._resolve_all_dependencies(
+                    benchmark_submissions, verbose
+                )
 
-                    # Install benchmark packages if needed
-                    if resolved_req_list:
-                        success = install_packages(
+                all_results: list[dict] = []
+                total_success = 0
+                total_failed = 0
+
+                for instance in benchmark_submissions:
+                    resolved_req_list = instance_dependencies[instance]
+                    venv_path = None
+                    try:
+                        venv_path = create_temp_venv()
+                        if resolved_req_list and not install_packages(
                             venv_path, resolved_req_list, verbose=verbose
-                        )
-                        if not success:
-                            console.print(
-                                "[red]✗[/red] Failed to install packages, skipping validation"
+                        ):
+                            all_results.append(
+                                ValidationResult(
+                                    success=False,
+                                    submission_path=str(instance),
+                                    errors=["Failed to install dependencies"],
+                                    warnings=[],
+                                ).model_dump()
                             )
-                            # Create ValidationResult for failed dependency installation
-                            failed_result = ValidationResult(
-                                success=False,
-                                submission_path=str(instance),
-                                errors=["Failed to install dependencies"],
-                                warnings=[],
-                            )
-                            all_results.append(failed_result.model_dump())
                             total_failed += 1
                             if fail_fast:
                                 break
                             continue
 
-                    # Validate this instance
-                    console.print("  Running validation...")
+                        result = validate_with_ado(
+                            base_path=self.repo_root,
+                            submission_path=str(instance),
+                            venv_path=venv_path,
+                        )
+                        all_results.append(result.model_dump())
+                        if result.success:
+                            total_success += 1
+                        else:
+                            total_failed += 1
+                    finally:
+                        if venv_path:
+                            cleanup_venv(venv_path)
 
-                    result = validate_with_ado(
-                        base_path=self.repo_root,
-                        submission_path=str(instance),
-                        venv_path=venv_path,
+                    if fail_fast and total_failed > 0:
+                        break
+
+                return ValidationReport(
+                    instances=all_results,
+                    successful=total_success,
+                    failed=total_failed,
+                    total=len(benchmark_submissions),
+                )
+
+            # All / experiment mode — two-phase validation per experiment
+            if not experiments_root:
+                console.print(
+                    "[red]Error:[/red] Either pr_url or experiments_root must be provided"
+                )
+                raise typer.Exit(code=1)
+
+            experiments_root_abs = experiments_root.resolve()
+            if not experiments_root_abs.exists():
+                console.print(
+                    f"[red]Error:[/red] Experiments directory not found: {experiments_root_abs}"
+                )
+                raise typer.Exit(code=1)
+
+            self.repo_root = experiments_root_abs.parent
+
+            console.print("Discovering experiments...")
+            experiments = self._scan_experiments(
+                experiments_root_abs, experiment_filter
+            )
+
+            if not experiments:
+                console.print("\n[yellow]No experiments found.[/yellow]")
+                return ValidationReport(instances=[], successful=0, failed=0, total=0)
+
+            console.print(f"\n[bold]Found {len(experiments)} experiment(s):[/bold]")
+            for exp_name, _, exp_cfg, submissions in experiments:
+                pkg_label = (
+                    f"package: {exp_cfg.experiment_package.requirement_specifier}"
+                    if exp_cfg
+                    else "no package"
+                )
+                console.print(
+                    f"  • {exp_name}  [{pkg_label}, {len(submissions)} submission(s)]"
+                )
+
+            all_results = []
+            total_success = 0
+            total_failed = 0
+            total_items = 0
+
+            console.print("\n[bold]Validating experiments...[/bold]")
+            console.print("=" * 60)
+
+            for exp_name, _exp_dir, exp_cfg, submissions in experiments:
+                console.print(f"\n[bold cyan]Experiment:[/bold cyan] {exp_name}")
+
+                # Skip entirely if there is nothing to validate
+                if exp_cfg is None and not submissions:
+                    console.print(
+                        "  [yellow]Skipping:[/yellow] no experiment_package.yaml "
+                        "and no submissions found"
                     )
+                    continue
 
-                    # Convert ValidationResult to summary dict
-                    all_results.append(result.model_dump())
+                venv_path = None
+                package_install_ok = True
+                try:
+                    venv_path = create_temp_venv()
 
-                    if result.success:
-                        console.print("  [green]✓[/green] Validation passed")
-                        total_success += 1
-                    else:
-                        console.print("  [red]✗[/red] Validation failed")
-                        total_failed += 1
+                    # ── Phase 1: experiment_package ──────────────────────────
+                    if exp_cfg is not None:
+                        req = self._resolve_benchmark_package_requirement(
+                            exp_cfg.experiment_package.requirement_specifier
+                        )
+                        console.print(
+                            f"  [cyan]Phase 1:[/cyan] Installing package {req!r}"
+                        )
+                        if not install_packages(venv_path, [req], verbose=verbose):
+                            pkg_result = ValidationResult(
+                                success=False,
+                                submission_path=f"experiments/{exp_name}/experiment_package",
+                                errors=[f"Failed to install package: {req}"],
+                                warnings=[],
+                            )
+                            all_results.append(pkg_result.model_dump())
+                            total_failed += 1
+                            total_items += 1
+                            package_install_ok = False
+                            if fail_fast:
+                                break
+                        else:
+                            # Verify declared experiments are discoverable
+                            ok, errors = verify_experiments_installed(
+                                venv_path,
+                                exp_cfg.experiment_package.experiments,
+                                verbose=verbose,
+                            )
+                            pkg_result = ValidationResult(
+                                success=ok,
+                                submission_path=f"experiments/{exp_name}/experiment_package",
+                                errors=errors,
+                                warnings=[],
+                            )
+                            all_results.append(pkg_result.model_dump())
+                            total_items += 1
+                            if ok:
+                                console.print(
+                                    "  [green]✓[/green] Package installed and all "
+                                    "experiments verified"
+                                )
+                                total_success += 1
+                            else:
+                                console.print(
+                                    "  [red]✗[/red] Experiment verification failed"
+                                )
+                                total_failed += 1
+                                for err in errors:
+                                    console.print(f"    [red]Error:[/red] {err}")
+                                if fail_fast:
+                                    break
 
-                    if not result.success:
-                        for error in result.errors:
-                            console.print(f"    [red]Error:[/red] {error}")
-
-                        for warning in result.warnings:
-                            console.print(f"    [yellow]Warning:[/yellow] {warning}")
+                    # ── Phase 2: submissions ─────────────────────────────────
+                    if submissions:
+                        if not package_install_ok:
+                            console.print(
+                                "  [yellow]Skipping submissions:[/yellow] "
+                                "package install failed"
+                            )
+                        else:
+                            console.print(
+                                f"  [cyan]Phase 2:[/cyan] Validating "
+                                f"{len(submissions)} submission(s)"
+                            )
+                            for instance in submissions:
+                                console.print(
+                                    f"    [cyan]Validating:[/cyan] {instance}"
+                                )
+                                result = validate_with_ado(
+                                    base_path=self.repo_root,
+                                    submission_path=str(instance),
+                                    venv_path=venv_path,
+                                )
+                                all_results.append(result.model_dump())
+                                total_items += 1
+                                if result.success:
+                                    console.print(
+                                        "    [green]✓[/green] Validation passed"
+                                    )
+                                    total_success += 1
+                                else:
+                                    console.print("    [red]✗[/red] Validation failed")
+                                    total_failed += 1
+                                    for err in result.errors:
+                                        console.print(f"      [red]Error:[/red] {err}")
+                                    for warn in result.warnings:
+                                        console.print(
+                                            f"      [yellow]Warning:[/yellow] {warn}"
+                                        )
+                                if fail_fast and total_failed > 0:
+                                    break
 
                 finally:
                     if venv_path:
@@ -1255,12 +1392,11 @@ class BenchmarkManager:
                     )
                     break
 
-            # Return results
             return ValidationReport(
                 instances=all_results,
                 successful=total_success,
                 failed=total_failed,
-                total=len(benchmark_submissions),
+                total=total_items,
             )
 
         finally:

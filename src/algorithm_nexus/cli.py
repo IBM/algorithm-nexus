@@ -26,7 +26,7 @@ from algorithm_nexus.commands.list import (
 )
 from algorithm_nexus.commands.run import run_benchmarks
 from algorithm_nexus.commands.validate import (
-    validate_benchmarks,
+    validate_experiments,
     validate_logical_benchmarks,
     validate_package,
 )
@@ -68,11 +68,6 @@ validate_app = typer.Typer(
 app.add_typer(validate_app, name="validate")
 
 
-@app.callback(invoke_without_command=True)
-def main_callback(ctx: typer.Context) -> None:
-    pass
-
-
 # Register list commands
 list_app.command(name="packages")(list_packages)
 list_app.command(name="benchmark-packages")(list_benchmark_packages)
@@ -86,7 +81,7 @@ run_app.command(name="benchmarks")(run_benchmarks)
 
 # Register validate commands
 validate_app.command(name="package")(validate_package)
-validate_app.command(name="benchmarks")(validate_benchmarks)
+validate_app.command(name="experiments")(validate_experiments)
 validate_app.command(name="logical-benchmarks")(validate_logical_benchmarks)
 
 

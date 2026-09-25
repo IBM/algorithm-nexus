@@ -1,0 +1,63 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# Benchmark bindings: sorting algorithms → sorting logical benchmark
+#
+# Three experiments from the sorting-benchmarks package are bound here.
+# bubble_sort and merge_sort use canonical property/metric names directly.
+# quick_sort uses experiment-internal names that are translated via the
+# instanceMapping and metricMapping fields.
+
+bindings:
+  # -------------------------------------------------------------------------
+  # bubble_sort — canonical property and metric names, no translation needed
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: sorting
+    experiment:
+      experimentIdentifier: bubble_sort
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    targetMapping: algorithm
+
+  # -------------------------------------------------------------------------
+  # merge_sort — canonical property and metric names, no translation needed
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: sorting
+    experiment:
+      experimentIdentifier: merge_sort
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    targetMapping: algorithm
+
+  # -------------------------------------------------------------------------
+  # quick_sort — uses internal names; translated to canonical names below
+  #   n_elements  → list_size
+  #   input_order → distribution
+  #   sort_algo   → algorithm (target)
+  #   cmp_count   → comparisons
+  #   runtime_ms  → elapsed_ms
+  # -------------------------------------------------------------------------
+  - benchmarkIdentifier: sorting
+    experiment:
+      experimentIdentifier: quick_sort
+      experimentVersion: 1.0.0
+      actuatorIdentifier: custom_experiments
+    targetMapping: sort_algo
+    instanceMapping:
+      - benchmark:
+          identifier: list_size
+        experiment:
+          identifier: n_elements
+      - benchmark:
+          identifier: distribution
+        experiment:
+          identifier: input_order
+    metricMapping:
+      - benchmark:
+          identifier: comparisons
+        experiment:
+          identifier: cmp_count
+      - benchmark:
+          identifier: elapsed_ms
+        experiment:
+          identifier: runtime_ms

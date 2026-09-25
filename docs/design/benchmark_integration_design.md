@@ -3,29 +3,26 @@
 ## Executive Summary
 
 This document defines how benchmarking metadata is integrated into Algorithm
-Nexus packages. The design keeps benchmark experiment registration at the Nexus
-package level and benchmark specification in `benchmark_submissions/` folders
-that may exist either at package level for baselines or at model level for
-model-specific benchmarks.
+Nexus. Benchmark experiment registration and benchmark submissions live under
+the top-level `experiments/` directory, entirely separate from `packages/`.
 
 **Key Design Decisions:**
 
-1. `nexus.yaml` registers benchmark packages and the benchmark experiments they
-   expose to the package
-2. `model.yaml` remains focused on model metadata
-3. model-level `benchmark_submissions/` specifies benchmark submissions tied to
-   a model
-4. package-level `benchmark_submissions/` specifies benchmark submissions for
-   baseline experiments that live at the top level of the Nexus package
-5. The package-level `benchmark_packages/` folder stores local benchmark
-   packages, and each such package follows the ADO custom experiment template
-6. Benchmark package registrations in `nexus.yaml` use a `requirement_specifier`
-   plus an `experiments` list
-7. Every registration must resolve to an ADO custom experiment that follows the
-   standardized benchmark packaging protocol
-8. The benchmark target is implicit from the enclosing model definition for
-   model-specific benchmark submissions
-9. Markdown documentation is updated before any schema, template, or validation
+1. `experiments/<name>/experiment_package.yaml` registers a single benchmark
+   experiment package and lists the experiment identifiers it exposes
+2. `experiments/<name>/submissions/<submission>/space.yaml` is the
+   per-submission ADO discoveryspace definition
+3. `model.yaml` remains focused on model metadata — it carries no benchmark
+   references
+4. `nexus.yaml` carries only Nexus package identity (`name`) — benchmark package
+   registrations have been removed from it
+5. Experiment package `requirement_specifier` values must be a PyPI package name
+   or a GitHub URL — local paths are not allowed
+6. Every experiment package must follow the standardized ADO custom experiment
+   packaging protocol
+7. The benchmark target is the experiment property that represents the algorithm
+   or model being evaluated
+8. Markdown documentation is updated before any schema, template, or validation
    implementation work
 
 ---
@@ -35,223 +32,164 @@ model-specific benchmarks.
 ### 1.1 Benchmark System Components
 
 Based on the [benchmark requirements](../requirements/benchmark.md), the system
-has five core concepts that must be linked together by package metadata:
+has five core concepts that must be linked together by the experiment metadata:
 
 - **Benchmark experiment**
     - a script, harness, or workflow that executes a benchmark target on a
       benchmark instance and collects measurements
-    - in this design, benchmark experiments are registered at package level in
-      `nexus.yaml`
+    - in this design, experiments are declared in
+      `experiments/<name>/experiment_package.yaml`
     - All benchmark experiments follow the
       [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
 
 - **Benchmark instance**
     - the inputs, data, and execution pattern exercised by a benchmark driver
-    - in this design, benchmark instance or experiment parameter values are
-      specified in per-submission `space.yaml` files under model-level or
-      package-level `benchmark_submissions/`
+    - in this design, benchmark instance parameter values are specified in
+      per-submission `space.yaml` files under
+      `experiments/<name>/submissions/<submission>/`
 
 - **Benchmark target**
     - the model or algorithm being evaluated
-    - in this design, the benchmark target is implicit from the enclosing model
-      definition in `model.yaml` for model-level benchmark submissions
-    - for package-level baseline benchmark submissions, the benchmark target is
-      defined directly by the benchmark submission itself
+    - the benchmark target is the experiment property that identifies which
+      algorithm or model is under evaluation
 
 - **Benchmark**
     - either a fixed benchmark experiment or a benchmark instance plus a
       parameterizable benchmark experiment
-    - in this design, a benchmark submission references a registered benchmark
+    - in this design, a benchmark submission references a declared benchmark
       experiment and provides parameter values where needed
 
 - **Benchmark submission**
     - a concrete benchmark definition for a specific use case
-    - in this design, each benchmark submission is represented by one folder
-      under a model-level or package-level `benchmark_submissions/` directory,
-      containing a `space.yaml` file with the full ADO discoveryspace definition
-    - for model-level benchmark submissions, the benchmark target is the
-      enclosing model
-    - package-level benchmark submissions support baseline experiments that live
-      at the top level of the Nexus package
+    - in this design, each benchmark submission is one folder under
+      `experiments/<name>/submissions/`, containing a `space.yaml` file with the
+      full ADO discoveryspace definition
     - the benchmark submission binds together the selected experiment and the
       benchmark-instance-specific parameter values used for execution
 
-This follows the requirements terminology that a benchmark submission is formed
-from a benchmark target together with a benchmark, where the benchmark is
-represented as either a fixed benchmark experiment or a benchmark instance plus a
-parameterizable benchmark experiment. For model-level benchmark submissions, the
-benchmark target comes from the enclosing model. For package-level baseline
-benchmark submissions, the benchmark target is defined directly by the benchmark
-submission itself.
-
 ### 1.2 Responsibilities by File and Directory
 
-| Location                                                                 | Responsibility                                                                                                                                    |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`nexus.yaml`](../../packages/terratorch/nexus.yaml)                     | Declares benchmark packages available to the package and the experiments exposed by each package                                                  |
-| package-level [`benchmark_packages/`](../../packages/terratorch/) folder | Stores one or more local benchmark packages, each following the ADO custom experiment template                                                    |
-| package-level `benchmark_submissions/` folder                            | Stores one folder per baseline benchmark submission at the top level of the Nexus package, each with a `space.yaml` ADO discoveryspace definition |
-| `model.yaml`                                                             | Declares model metadata                                                                                                                           |
-| model-level `benchmark_submissions/` folder                              | Stores one folder per model-specific benchmark submission, each with a `space.yaml` ADO discoveryspace definition                                 |
+| Location                                                 | Responsibility                                                                                 |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `experiments/<name>/experiment_package.yaml`             | Declares the experiment package (PyPI or GitHub) and the experiment identifiers it exposes     |
+| `experiments/<name>/bindings/`                           | Optional benchmark binding YAML files that map experiment outputs to logical benchmark metrics |
+| `experiments/<name>/submissions/<submission>/space.yaml` | Full ADO discoveryspace definition for one benchmark submission                                |
+| `packages/<pkg>/nexus.yaml`                              | Declares Nexus package identity (`name`) only — no benchmark package references                |
+| `packages/<pkg>/models/<model>/model.yaml`               | Declares model metadata — no benchmark references                                              |
 
 ### 1.3 Requirements to Design Mapping
 
-| Requirement | Design interpretation                                                                                                                                                                                                                                  |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| REQ 1.2     | Benchmark experiments are distributed as Python packages, including local benchmark packages under the package-level [`benchmark_packages/`](../../packages/terratorch/) directory and remote repositories addressed by URL                            |
-| REQ 2.1     | Benchmark package registration happens in `nexus.yaml`, including the benchmark package `requirement_specifier` and the experiment identifiers it exposes                                                                                              |
-| REQ 2.3     | Benchmark registration happens in `benchmark_submissions/` folders, either at package level for baseline experiments or at model level for model-specific benchmarks, where each submission is represented by a `space.yaml` discoveryspace definition |
-| REQ 3.1     | A benchmark entry specifies the benchmark to use through a dedicated discoveryspace definition in the relevant `benchmark_submissions/` folder                                                                                                         |
-| REQ 3.2     | New package-provided benchmark experiments are normally added as benchmark packages under the package-level [`benchmark_packages/`](packages/terratorch/) directory and then registered in `nexus.yaml` with their experiment identifiers              |
-| REQ 3.3     | Models may reuse any experiment registered by the package, whether the experiment is provided by a local benchmark package or by remote repositories                                                                                                   |
+| Requirement | Design interpretation                                                                                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REQ 1.2     | Benchmark experiments are distributed as Python packages published on PyPI or GitHub — local packages are not supported                                                 |
+| REQ 2.1     | Benchmark package registration happens in `experiments/<name>/experiment_package.yaml`, including the `requirement_specifier` and the experiment identifiers it exposes |
+| REQ 2.3     | Benchmark submissions live in `experiments/<name>/submissions/`, where each submission folder contains a `space.yaml` discoveryspace definition                         |
+| REQ 3.1     | A benchmark entry specifies the benchmark to use through a dedicated discoveryspace definition in the relevant `experiments/<name>/submissions/<submission>/` folder    |
+| REQ 3.2     | New benchmark experiments are added as published Python packages (PyPI or GitHub) and declared in a new `experiments/<name>/experiment_package.yaml`                    |
+| REQ 3.3     | Multiple submissions under the same experiment can reference any experiment identifier declared in `experiment_package.yaml`                                            |
 
 ---
 
 ## 2. Folder Structure Design
 
-### 2.1 Complete Nexus Package Structure
+### 2.1 Complete Experiments Structure
 
 ```text
-packages/
-└── <nexus-package-name>/
-    ├── nexus.yaml
-    ├── skills/
-    ├── benchmark_packages/             # Local benchmark packages
-    │   ├── <benchmark-package-a>/
-    │   │   ├── pyproject.toml
-    │   │   ├── src/
-    │   └── <benchmark-package-b>/
-    ├── benchmark_submissions/          # Package-level baseline benchmark submissions
-    │   ├── <benchmark-submission-a>/
-    │   │   └── space.yaml
-    │   └── <benchmark-submission-b>/
-    │       └── space.yaml
-    └── models/
-        └── <model-name>/
-            ├── model.yaml
-            ├── benchmark_submissions/
-            │   ├── <benchmark-submission-a>/
-            │   │   └── space.yaml
-            │   └── <benchmark-submission-b>/
-            │       └── space.yaml
-            └── usage.md
+experiments/
+└── <experiment-name>/
+    ├── experiment_package.yaml       # Required: experiment package specifier + experiment IDs
+    ├── bindings/                     # Optional: benchmark binding YAML files
+    │   └── <binding-name>.yaml
+    └── submissions/                  # Optional: benchmark submissions
+        ├── <submission-a>/
+        │   └── space.yaml            # Required per submission
+        └── <submission-b>/
+            └── space.yaml
 ```
 
 ### 2.2 Ownership Model
 
-The canonical benchmark metadata is split across three locations:
+The canonical benchmark metadata is split across two locations within each
+experiment folder:
 
-- [`nexus.yaml`](../../packages/terratorch/nexus.yaml)
-    - registers the benchmark packages a package makes available
-    - records the `requirement_specifier` for each registered benchmark package
-    - records the experiment identifiers exposed by each registered benchmark
-      package
+- `experiments/<name>/experiment_package.yaml`
+    - registers the package that provides benchmark experiments
+    - records a single `requirement_specifier` (PyPI name or GitHub URL)
+    - records the experiment identifiers exposed by that package
 
-- package-level `benchmark_submissions/`
-    - records which baseline benchmark submissions the package makes available
-    - stores one folder per package-level benchmark submission
+- `experiments/<name>/submissions/`
+    - records which benchmark submissions belong to this experiment
+    - stores one folder per benchmark submission
     - carries a `space.yaml` ADO discoveryspace definition for each submission
 
-- model-level `benchmark_submissions/`
-    - records which benchmark submissions a model should use
-    - stores one folder per model-specific benchmark submission
-    - carries a `space.yaml` ADO discoveryspace definition for each submission
+- `experiments/<name>/bindings/`
+    - optional; contains benchmark binding YAML files mapping experiment outputs
+      to logical benchmark metrics
 
-The package-level [`benchmark_packages/`](../../packages/terratorch/) directory
-stores local benchmark packages that live with the Nexus package. Each local
-benchmark package must follow the ADO custom experiment template and may expose
-one or more ADO custom benchmark experiments.
+### 2.3 Experiment Package Specifiers
 
-### 2.3 Benchmark Package Registrations
+An experiment package specifier uses:
 
-A package-level benchmark package registration uses:
-
-- a `requirement_specifier` to identify how the benchmark package should be
+- a `requirement_specifier` to identify how the experiment package should be
   resolved
 - an `experiments` list to declare which experiment identifiers from that
-  package are made available to the Nexus package
+  package are made available
 
-The `requirement_specifier` may be any valid Python package requirement target,
-including:
+The `requirement_specifier` must be one of:
 
-1. a Python package name
-2. a URL pointing to a Python package or source repository
-3. a local path pointing to a Python package within [`./packages`](packages/)
+1. a Python package name published on PyPI (optionally with a version
+   constraint)
+2. a GitHub repository URL (HTTPS or `git+` prefixed)
 
-In all cases, the referenced material must resolve to a Python package that
-follows the ADO custom experiment format and the standardized benchmark
-packaging protocol.
+Local paths are explicitly **not** allowed. The package must be publicly
+accessible from either PyPI or a GitHub repository.
+
+In all cases, the referenced package must follow the ADO custom experiment
+format and the standardized benchmark packaging protocol.
 
 ---
 
 ## 3. Schema Design
 
-### 3.1 Package-Level Benchmark Package Registration in `nexus.yaml`
+### 3.1 Experiment Package Registration in `experiment_package.yaml`
 
 ```yaml
-package:
-    name: "terratorch"
+experiment_package:
+    requirement_specifier: "sorting-benchmarks>=1.0.0" # PyPI package name
+    experiments:
+        - bubble_sort
+        - merge_sort
+        - quick_sort
+```
 
-    benchmark_packages:
-        - requirement_specifier: "./packages/terratorch/benchmark_packages/segmentation-benchmarks"
-          experiments:
-              - "local-segmentation-eval"
-              - "local-boundary-eval"
+GitHub URL example:
 
-        - requirement_specifier: "https://github.com/example-org/example-benchmarks"
-          experiments:
-              - "leaderboard-baseline"
-
-        - requirement_specifier: "example-benchmark-package"
-          experiments:
-              - "packaged-baseline"
+```yaml
+experiment_package:
+    requirement_specifier: "https://github.com/example-org/example-benchmarks"
+    experiments:
+        - leaderboard-baseline
 ```
 
 **Fields:**
 
-- `package.benchmark_packages` is optional
-- each entry in `benchmark_packages` identifies one benchmark package source
-- `requirement_specifier` is a valid Python package requirement specifier string
-  to be used for installing the benchmark experiments. It may be a Python
-  package name, a URL to a Python package or source repository, or a local path
-  to a Python package within the `./packages` folder in the Nexus project root.
-- `experiments` lists the experiment identifiers exposed from that package and
-  made available to models in the Nexus package
+- `experiment_package.requirement_specifier` — required; PyPI package name or
+  GitHub URL (local paths are rejected by schema validation)
+- `experiment_package.experiments` — required; non-empty list of experiment
+  identifiers exposed by the package
 
-### 3.2 Package-Level Benchmark Submissions in `benchmark_submissions/`
+### 3.2 Benchmark Submissions in `submissions/`
 
-A Nexus package may define a top-level `benchmark_submissions/` folder. That
-folder contains one subfolder per package-level benchmark submission. Each
-benchmark submission folder must contain a file named `space.yaml`.
-
-These package-level benchmark submissions are intended for baseline experiments
-that live at the top level of the Nexus package rather than under a specific
-model.
+An experiment folder may define a `submissions/` directory. That folder contains
+one subfolder per benchmark submission. Each benchmark submission folder must
+contain a file named `space.yaml`.
 
 Example structure:
 
 ```text
-benchmark_submissions/
+submissions/
 └── flood-baseline-test/
     └── space.yaml
-```
-
-### 3.3 Model-Level Benchmark Submissions in `models/<model-name>/benchmark_submissions/`
-
-Each model may also define a `benchmark_submissions/` folder. That folder
-contains one subfolder per benchmark submission. Each benchmark submission
-folder must contain a file named `space.yaml`.
-
-The `space.yaml` file must contain a full ADO discoveryspace definition for the
-specific experiment the benchmark submission wants to use.
-
-Example structure:
-
-```text
-models/<model-name>/
-└── benchmark_submissions/
-    └── flood-segmentation-test/
-        └── space.yaml
 ```
 
 Example `space.yaml`:
@@ -272,92 +210,63 @@ experiments:
 
 **Fields and expectations:**
 
-- package-level `benchmark_submissions/` is optional
-- model-level `benchmark_submissions/` is optional
-- each subfolder name identifies one benchmark submission in its enclosing scope
+- `submissions/` is optional
+- each subfolder name identifies one benchmark submission
 - each benchmark submission subfolder must contain `space.yaml`
 - each `space.yaml` must define a complete ADO discoveryspace for the benchmark
   submission
-- model-level benchmark submissions implicitly target the enclosing model
-- package-level benchmark submissions are used for baseline experiments defined
-  at the top level of the Nexus package
 - the experiment referenced in `space.yaml` must be one of the experiment
-  identifiers registered through `package.benchmark_packages`
+  identifiers declared in the sibling `experiment_package.yaml`
 
 For reference on the expected discoveryspace structure, see
 [Using your custom experiment in a discoveryspace](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace).
-
-This structure supports the requirement language in which a benchmark is either
-a fixed benchmark experiment or a benchmark instance plus a parameterizable
-benchmark experiment. Also, we assume that any dataset to be used for the
-benchmark is fetched or provided with the experiment itself.
 
 ---
 
 ## 4. Validation Considerations
 
-### 4.1 Package-Level Validation
+### 4.1 Experiment-Level Validation
 
-Validation should eventually check that:
+Validation checks that:
 
-1. each benchmark package registration provides a `requirement_specifier`
-2. each benchmark package registration provides an `experiments` list
-3. experiment identifiers are unique within the package
-4. each local `requirement_specifier` resolves to exactly one Python package
-   within [`./packages`](packages/)
-5. each referenced local benchmark package follows the ADO custom experiment
-   template
-6. each URL-valued `requirement_specifier` points to a valid Python package or
-   repository location
-7. each package-name-valued `requirement_specifier` is a valid Python package
-   requirement target
-8. all referenced requirement specifiers resolve to valid benchmark experiments
-   that follow the ADO custom experiment format
+1. `experiment_package.yaml` is present in the experiment folder
+2. `requirement_specifier` is a valid PyPI name or GitHub URL (local paths are
+   rejected)
+3. `experiments` list is non-empty
+4. extra fields are forbidden (`extra="forbid"`)
 
 ### 4.2 Benchmark Submission Validation
 
-Validation should eventually check that:
+Validation checks that:
 
-1. every package-level and model-level benchmark submission folder contains a
-   `space.yaml` file
+1. every benchmark submission folder under `submissions/` contains a
+   `space.yaml`
 2. each `space.yaml` contains a valid ADO discoveryspace definition
-3. each `space.yaml` references an experiment identifier registered in the same
-   package
-4. package-level benchmark submissions define their benchmark target explicitly
-   where needed, since they are not enclosed by a model
-5. duplicate benchmark submission names are rejected if uniqueness is desired
-6. each `space.yaml` contains a valid ADO discoveryspace definition
-7. each `space.yaml` references an experiment identifier registered in the same
-   package
-8. package-level benchmark submissions define their benchmark target explicitly
-   where needed, since they are not enclosed by a model
-9. duplicate benchmark submission names are rejected if uniqueness is desired
+3. each `space.yaml` references experiment identifiers declared in
+   `experiment_package.yaml`
 
 ---
 
-## 5. Benchmarks discovery
+## 5. Benchmarks Discovery
 
-### 5.1 Experiments discovery
+### 5.1 Experiments Discovery
 
-The medatata available in each Nexus package (`nexus.yaml`) can be used to list
-all the experiment available in the package, without installing the benchmark
-packages into the current environment. Also, this enables listing experiments
-that are distributed via a remote repository, that would not be discoverable by
-just installing the benchmark. package and the nexus package itself.
+The metadata available in each experiment folder (`experiment_package.yaml`) can
+be used to list all experiments available without installing the experiment
+package into the current environment. This also enables listing experiments
+distributed via a remote repository that would not be discoverable by just
+installing the package.
 
-### 5.2 Benchmarks discovery
+### 5.2 Benchmarks Discovery
 
-Similarly to experiments, benchmarks can be discovered from the top folder of a
-Nexus package by scanning the package-level `benchmark_submissions/` folder for
-baseline experiments and scanning the
-[`models/`](../../packages/terratorch/models/) tree for model-level
-`benchmark_submissions/` folders. This supports listing both package-level
-baseline benchmark submissions and model-specific benchmark submissions without
+Benchmarks can be discovered by scanning the top-level `experiments/` directory.
+Each `experiments/<name>/submissions/` folder lists the benchmark submissions
+for that experiment. This supports listing all benchmark submissions without
 requiring a separate benchmark index.
 
-### 5.3 Fetching details about an experiment or a benchmark
+### 5.3 Fetching Details About an Experiment or a Benchmark
 
-Fetching details on experiments and benchmarks, such as the expected input,
-metrics exported, etc. can be obtained with a combination of the `nexus` cli,
-used for listing, and the `ado` cli that after installing the relevant benchmark
-packages can be used for getting full details on the experiment or benchmark.
+Fetching details on experiments and benchmarks — such as expected input, metrics
+exported, etc. — can be obtained with a combination of the `nexus` CLI for
+listing and the `ado` CLI for full experiment details after installing the
+relevant experiment package.

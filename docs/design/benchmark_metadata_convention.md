@@ -101,8 +101,8 @@ benchmark problem. It defines:
 ### 2.3 Example: Graph Coloring
 
 The logical benchmark definition lives under the `logicalBenchmark` key inside
-`benchmarks/<benchmark-id>/problem.yaml`. Bindings are placed in the sibling
-`bindings` list in the same file (see [Section 3](#3-benchmark-binding)).
+`benchmarks/<benchmark-id>/benchmark.yaml`. Bindings live separately in
+`experiments/<experiment-name>/bindings/` (see [Section 3](#3-benchmark-binding)).
 
 ```yaml
 logicalBenchmark:
@@ -141,9 +141,6 @@ logicalBenchmark:
     ranking:
         metric: num_colors_used
         order: asc
-
-bindings:
-    - ...
 ```
 
 See
@@ -170,7 +167,7 @@ benchmarks/<benchmark-id>/instances/<instance-name>/
 #### Instance Schema
 
 Each `instance.yaml` defines a concrete problem instance. Instance properties
-match the property identifiers defined under `instance:` in `problem.yaml`:
+match the property identifiers defined under `instance:` in `benchmark.yaml`:
 
 - **Scalar properties** (`is_artifact: false`, the default) are specified
   directly as scalar/primitive values.
@@ -179,11 +176,11 @@ match the property identifiers defined under `instance:` in `problem.yaml`:
   instance directory that contains the valid files for that property. The folder
   must exist inside the instance directory.
 
-| Field           | Type                                                                                    | Required | Description                                                                                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier`    | string                                                                                  | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                          |
-| `description`   | string                                                                                  | No       | Human-readable description of this specific instance.                                                                                                                   |
-| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties) | No       | Value for a property defined in `problem.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; the folder must exist in the instance directory. |
+| Field           | Type                                                                                      | Required | Description                                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identifier`    | string                                                                                    | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                          |
+| `description`   | string                                                                                    | No       | Human-readable description of this specific instance.                                                                                                                   |
+| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties)   | No       | Value for a property defined in `benchmark.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; folder must exist in the instance directory.   |
 
 #### Example Instance (`benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`)
 
@@ -220,17 +217,23 @@ A benchmark binding serves two purposes:
 
 ### 3.2 Schema
 
-**Top-level fields:**
+Binding files live under `experiments/<experiment-name>/bindings/`. Each file
+contains a top-level `bindings:` list; every entry in that list carries its own
+`benchmarkIdentifier` field so a single file can bind one experiment to multiple
+logical benchmarks.
+
+**Per-entry fields:**
 
 <!-- markdownlint-disable line-length -->
 
-| Field             | Type                | Required | Description                                                                                                                                                                                                                  |
-| ----------------- | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `experiment`      | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                                                        |
-| `targetMapping`   | string              | No       | Identifies the leaderboard target (row key) for this binding. Can be a custom string label, or the name of an experiment property whose value is resolved at query time. Defaults to the experiment identifier when omitted. |
-| `metricMapping`   | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                            |
-| `instanceMapping` | list                | No       | Remaps benchmark instance properties/parameters to experiment inputs.                                                                                                                                                        |
-| `staticFilters`   | list                | No       | Sets static experiment properties to values implicit in the logical benchmark.                                                                                                                                               |
+| Field                 | Type                | Required | Description                                                                                                                                                                                                                  |
+| --------------------- | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkIdentifier` | string              | **Yes**  | The `benchmarkIdentifier` of the logical benchmark this entry maps to.                                                                                                                                                       |
+| `experiment`          | ExperimentReference | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                                                        |
+| `targetMapping`       | string              | No       | Identifies the leaderboard target (row key) for this binding. Can be a custom string label, or the name of an experiment property whose value is resolved at query time. Defaults to the experiment identifier when omitted. |
+| `metricMapping`       | list                | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical benchmark.                            |
+| `instanceMapping`     | list                | No       | Remaps benchmark instance properties/parameters to experiment inputs.                                                                                                                                                        |
+| `staticFilters`       | list                | No       | Sets static experiment properties to values implicit in the logical benchmark.                                                                                                                                               |
 
 <!-- markdownlint-enable line-length -->
 
@@ -350,11 +353,10 @@ staticFilters:
 
 ### 3.3 Example: `guidellm-bench-deployment`
 
-#### `problem.yaml`
+#### `benchmark.yaml`
 
 The logical benchmark definition lives under
-`benchmarks/llm-inference/problem.yaml`. The `bindings` list in the same file
-then wires the `guidellm-bench-deployment` experiment to it:
+`benchmarks/llm-inference/benchmark.yaml`:
 
 ```yaml
 logicalBenchmark:
@@ -379,9 +381,6 @@ logicalBenchmark:
     ranking:
         metric: throughput_tokens_per_second
         order: desc
-
-bindings:
-    - ...
 ```
 
 #### `instance.yaml`
@@ -400,12 +399,15 @@ workload: steady_state_heavy
 
 #### Binding
 
-Bindings are placed in the `bindings` list inside `problem.yaml`, alongside the
-`logicalBenchmark` definition (see [Section 2.3](#23-example-graph-coloring)):
+The binding lives in
+`experiments/guidellm/bindings/llm_inference_binding.yaml`. Each entry in the
+`bindings` list carries a `benchmarkIdentifier` to identify which logical
+benchmark it maps to:
 
 ```yaml
 bindings:
-    - experiment:
+    - benchmarkIdentifier: llm_inference
+      experiment:
           actuatorIdentifier: vllm_performance
           experimentIdentifier: guidellm-bench-deployment
           experimentVersion: 1.1.0
@@ -579,13 +581,12 @@ A leaderboard query for
 Logical benchmark definition files are stored under the `benchmarks/` directory
 at the top level of the Algorithm Nexus repository. Each logical benchmark has
 its own subdirectory named after its `benchmarkIdentifier`, containing a
-`problem.yaml` file that holds both the `logicalBenchmark` definition and its
-`bindings`:
+`benchmark.yaml` file that holds the `logicalBenchmark` definition:
 
 ```text
 benchmarks/
 └── <benchmark-id>/
-    ├── problem.yaml        # logicalBenchmark definition + bindings
+    ├── benchmark.yaml      # logicalBenchmark definition
     ├── README.md           # optional: full problem statement and context
     └── instances/          # optional concrete problem instances
         └── <instance-name>/
@@ -593,10 +594,10 @@ benchmarks/
             └── artifacts/
 ```
 
-A `README.md` alongside `problem.yaml` is encouraged to provide a full
+A `README.md` alongside `benchmark.yaml` is encouraged to provide a full
 description of the problem. For example to give the mathematical formulation,
 cite references, or explain the instance structure beyond what the `description`
-field in `problem.yaml` allows.
+field in `benchmark.yaml` allows.
 
 A logical benchmark owner is given by the value of the "owner" field. If this is
 ambiguous the author of the PR adding the benchmark will be treated as the
@@ -656,6 +657,8 @@ enclosing model or algorithm definition that owns the benchmark submission.
 
 ### 7.2 Benchmark Package Registration and Submissions
 
-The existing `nexus.yaml` benchmark package registrations and
-`benchmark_submissions/space.yaml` remain unchanged. The benchmark binding is an
-additional artifact and does not alter the Nexus package structure.
+Benchmark experiment packages are registered in
+`experiments/<name>/experiment_package.yaml` (not in `nexus.yaml`). Benchmark
+submissions live under `experiments/<name>/submissions/<submission>/space.yaml`.
+The benchmark binding is an additional artifact that sits alongside these files
+in `experiments/<name>/bindings/` and does not alter their structure.
