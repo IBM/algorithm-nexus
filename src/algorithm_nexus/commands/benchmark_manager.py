@@ -453,19 +453,26 @@ class BenchmarkManager:
         if resolved_path.exists():
             return str(resolved_path)
 
-        # uv requires git+ prefix for GitHub HTTPS URLs
-        if requirement.startswith(("https://github.com/", "http://github.com/")):
-            return (
-                f"git+{requirement}"
-                if not requirement.startswith("git+")
-                else requirement
-            )
+        # Already has git+ scheme (e.g. git+https://, git+ssh://, git+http://)
+        if requirement.startswith("git+"):
+            return requirement
 
-        # SSH shorthand (git@github.com:org/repo) must become git+ssh://git@github.com/org/repo
-        if requirement.startswith("git@github.com:"):
-            return requirement.replace(
-                "git@github.com:", "git+ssh://git@github.com/", 1
-            )
+        # SSH URL with ssh:// prefix (e.g. ssh://git@...) -> git+ssh://git@...
+        if requirement.startswith("ssh://"):
+            return f"git+{requirement}"
+
+        # SSH scp-like or slash shorthand (e.g. git@github.com:org/repo or git@github.ibm.com/org/repo)
+        if requirement.startswith("git@"):
+            # If formatted like git@host:path -> git+ssh://git@host/path
+            if ":" in requirement:
+                host, path = requirement.split(":", 1)
+                return f"git+ssh://{host}/{path}"
+            # If formatted like git@host/path -> git+ssh://git@host/path
+            return f"git+ssh://{requirement}"
+
+        # HTTP/HTTPS URLs (e.g. https://github.com/..., https://github.ibm.com/...) -> git+https://...
+        if requirement.startswith(("https://", "http://")):
+            return f"git+{requirement}"
 
         return requirement
 

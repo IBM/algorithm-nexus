@@ -94,6 +94,21 @@ class TestResolveBenchmarkPackageRequirement:
         )
         assert result == "git+ssh://git@github.com/org/repo.git"
 
+    def test_ssh_slash_shorthand_becomes_git_ssh_url(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "git@github.ibm.com/Daniele-Lotito/lightsabre-custom-experiment.git@dl_cp_custom_exp_top_level"
+        )
+        assert (
+            result
+            == "git+ssh://git@github.ibm.com/Daniele-Lotito/lightsabre-custom-experiment.git@dl_cp_custom_exp_top_level"
+        )
+
+    def test_enterprise_github_https_url_gets_git_prefix(self):
+        result = self.manager._resolve_benchmark_package_requirement(
+            "https://github.ibm.com/org/repo.git"
+        )
+        assert result == "git+https://github.ibm.com/org/repo.git"
+
     def test_pypi_package_unchanged(self):
         result = self.manager._resolve_benchmark_package_requirement("mypackage==1.2.3")
         assert result == "mypackage==1.2.3"
