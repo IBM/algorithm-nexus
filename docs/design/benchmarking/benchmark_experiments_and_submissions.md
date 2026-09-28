@@ -2,9 +2,16 @@
 
 ## Executive Summary
 
-This document specifies how to add **benchmark experiments** and **benchmark
-submissions** (a registered use of an experiment on a benchmark instance for a
-specific benchmark target).
+This document specifies **benchmark experiments** and **benchmark submissions**
+(a registered use of an experiment on a benchmark instance for a specific
+benchmark target).
+
+To register an experiment, see
+[How to add a benchmark experiment](../../contributing/benchmarks/add_benchmark_experiment.md).
+To bind an experiment to a problem, see
+[How to bind an experiment to a problem](../../contributing/benchmarks/add_benchmark_binding.md).
+To add a submission, see
+[How to add a benchmark submission](../../contributing/benchmarks/add_benchmark_submission.md).
 
 Benchmark experiment registration and benchmark submissions live under the
 top-level `experiments/` directory.
@@ -86,15 +93,15 @@ submissions. Logical benchmarks, instances, and results are specified in
 
 ### 1.3 Requirements to Design Mapping
 
-| Requirement | Design interpretation                                                                                                                                                                             |
-| ------------| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| REQ 1.2     | Benchmark experiments are distributed as Python packages published on PyPI or GitHub — local packages are not supported                                                                           |
-| REQ 2.3     | A benchmark experiment is registered in `experiments/<name>/experiment_package.yaml`. A binding under `experiments/<name>/bindings/` declares which logical benchmarks the experiment can address as well as the experiment target for that specific benchmark.|
-| REQ 2.4     | A benchmark submission is registered as `experiments/<name>/submissions/<submission>/space.yaml`                                                                                                  |
-| REQ 2.5     | Experiments and submissions are listed by scanning `experiments/` (see [Section 5](#5-benchmarks-discovery))                                                                                      |
-| REQ 3.1     | A benchmark submission is specified through the discoveryspace in `experiments/<name>/submissions/<submission>/`                                                                                  |
-| REQ 3.2     | A new experiment is added as a published Python package (PyPI or GitHub) and declared in `experiment_package.yaml`                                                                                |
-| REQ 3.3     | An experiment identifier declared in `experiment_package.yaml` can be referenced by many submissions and across Nexus packages                                                                    |
+| Requirement | Design interpretation                                                                                                                                                                                                                                           |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| REQ 1.2     | Benchmark experiments are distributed as Python packages published on PyPI or GitHub — local packages are not supported                                                                                                                                         |
+| REQ 2.3     | A benchmark experiment is registered in `experiments/<name>/experiment_package.yaml`. A binding under `experiments/<name>/bindings/` declares which logical benchmarks the experiment can address as well as the experiment target for that specific benchmark. |
+| REQ 2.4     | A benchmark submission is registered as `experiments/<name>/submissions/<submission>/space.yaml`                                                                                                                                                                |
+| REQ 2.5     | Experiments and submissions are listed by scanning `experiments/` (see [Section 5](#5-benchmarks-discovery)).                                                                                                                                                   |
+| REQ 3.1     | A benchmark submission is specified through the discoveryspace in `experiments/<name>/submissions/<submission>/`                                                                                                                                                |
+| REQ 3.2     | A new experiment is added as a published Python package (PyPI or GitHub) and declared in `experiment_package.yaml`                                                                                                                                              |
+| REQ 3.3     | An experiment identifier declared in `experiment_package.yaml` can be referenced by many submissions and across Nexus packages                                                                                                                                  |
 
 ---
 

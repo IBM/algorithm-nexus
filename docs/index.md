@@ -17,7 +17,8 @@ organized and how to contribute packages and models.
 - Review [Design](design/index.md) section to understand package layout,
   dependency resolution, and the current website design direction.
 - Use the [Contributing](contributing/index.md) section if you want to add a new
-  Nexus package or understand package owner responsibilities.
+  Nexus package, contribute a [benchmark](contributing/benchmarks/index.md), or
+  understand package owner responsibilities.
 - Browse the [Requirements](requirements/index.md) section for the normative
   project requirements that guide package, testing, and dependency decisions.
 
