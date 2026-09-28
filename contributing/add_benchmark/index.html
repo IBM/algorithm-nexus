@@ -238,10 +238,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -525,10 +521,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -640,15 +632,85 @@
   
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../design/benchmarking/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Benchmarking Architecture
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_2_4">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Benchmarking Architecture
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+              
+                
+                  
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../design/benchmark_system/" class="md-nav__link">
+      <a href="../../design/benchmarking/logical_benchmarks_and_instances/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmarking System
+  Logical Benchmarks and Instances
 
     
   </span>
@@ -668,14 +730,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/benchmark_integration_design/" class="md-nav__link">
+      <a href="../../design/benchmarking/benchmark_experiments_and_submissions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmark Integration Design
+  Benchmark Experiments and Submissions
 
     
   </span>
@@ -695,14 +757,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/benchmark_metadata_convention/" class="md-nav__link">
+      <a href="../../design/benchmarking/benchmark_execution/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmark Metadata
+  Benchmark Execution and Operations
 
     
   </span>
@@ -710,6 +772,15 @@
   
 
       </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
     </li>
   
 
@@ -1019,10 +1090,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-run-the-benchmark" class="md-nav__link">
+  <a href="#step-4-run-the-benchmark-submission" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 4: Run the benchmark
+        Step 4: Run the benchmark submission
       </span>
     </span>
   </a>
@@ -1525,12 +1596,12 @@ SPDX-License-Identifier: Apache-2.0
 <p>This guide walks you through adding a benchmark to Algorithm Nexus. If you have
 not yet registered your algorithm, start with
 <a href=".././add_new_nexus_package/">Contributing a Python Algorithm Package to Algorithm Nexus</a>.</p>
-<p>There are four steps to add a benchmark:</p>
+<p>There are four steps to add a benchmark submission:</p>
 <ol>
 <li><strong>Find or create a benchmark experiment package</strong></li>
 <li><strong>Create an experiment folder and register the package</strong></li>
 <li><strong>Define a benchmark submission</strong></li>
-<li><strong>Run the benchmark</strong></li>
+<li><strong>Run the benchmark submission</strong></li>
 </ol>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <p>Before you begin, ensure:</p>
@@ -1546,9 +1617,9 @@ not yet registered your algorithm, start with
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev<span class="w"> </span>--extra<span class="w"> </span>cli
 </span></code></pre></div>
 <h2 id="step-1-find-or-create-a-benchmark-experiment-package">Step 1: Find or create a benchmark experiment package<a class="headerlink" href="#step-1-find-or-create-a-benchmark-experiment-package" title="Permanent link">&para;</a></h2>
-<p>A benchmark experiment is a Python package that defines how to evaluate an
-algorithm. First check whether a suitable experiment already exists in Algorithm
-Nexus before creating a new one.</p>
+<p>A benchmark experiment is a Python package that defines how to evaluate a
+benchmark target. First check whether a suitable experiment already exists in
+Algorithm Nexus before creating a new one.</p>
 <h3 id="find-an-existing-experiment">Find an existing experiment<a class="headerlink" href="#find-an-existing-experiment" title="Permanent link">&para;</a></h3>
 <p>List all benchmark experiments registered across Algorithm Nexus:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
@@ -1593,10 +1664,10 @@ Local paths are not allowed.</p>
 </span></code></pre></div>
 <p>Fix any validation errors before proceeding.</p>
 <h2 id="step-3-define-a-benchmark-submission">Step 3: Define a benchmark submission<a class="headerlink" href="#step-3-define-a-benchmark-submission" title="Permanent link">&para;</a></h2>
-<p>A benchmark submission specifies executing a registered experiment with a
-specific set of parameter values (benchmark instance). Each submission is a
-folder under <code>experiments/&lt;experiment-name&gt;/submissions/</code> containing a
-<code>space.yaml</code> file.</p>
+<p>A benchmark submission is one registered use of a benchmark experiment on a
+benchmark instance for a specific benchmark target. Each submission is a folder
+under <code>experiments/&lt;experiment-name&gt;/submissions/</code> containing a <code>space.yaml</code>
+file.</p>
 <p>Create the directory:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>experiments/&lt;experiment-name&gt;/submissions/&lt;submission-name&gt;
 </span></code></pre></div>
@@ -1621,7 +1692,7 @@ you declared in <code>experiment_package.yaml</code> in the previous step.</p>
 <p>Validate the experiment folder again to confirm the submission is well-formed:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--experiment<span class="w"> </span>&lt;experiment-name&gt;
 </span></code></pre></div>
-<h2 id="step-4-run-the-benchmark">Step 4: Run the benchmark<a class="headerlink" href="#step-4-run-the-benchmark" title="Permanent link">&para;</a></h2>
+<h2 id="step-4-run-the-benchmark-submission">Step 4: Run the benchmark submission<a class="headerlink" href="#step-4-run-the-benchmark-submission" title="Permanent link">&para;</a></h2>
 <p>Install the experiment package and run the benchmark submission locally using the
 <code>ado</code> CLI. First save the following operation configuration to a file <code>op.yaml</code>.
 It will execute the experiment on all points in your space.</p>
@@ -1655,7 +1726,7 @@ execution options including parameter sweeps and remote execution.</p>
 <p>Open a pull request from your fork to the Algorithm Nexus main branch.</p>
 <hr />
 <h2 id="optional-mapping-to-logical-benchmarks">Optional: Mapping to logical benchmarks<a class="headerlink" href="#optional-mapping-to-logical-benchmarks" title="Permanent link">&para;</a></h2>
-<p>Once your benchmark is running, you can connect it to a logical benchmark so the
+<p>Once your submission is running, you can connect it to a logical benchmark so the
 results can be compared with results from other experiments targeting the same
 type of problem. This requires creating a <em>benchmark biding</em> that maps the
 experiments internal parameters and metrics to a shared, canonical vocabulary.</p>
@@ -1721,7 +1792,7 @@ values, and metric names.</p>
 </span><span id="__span-13-37"><a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">"@graph-team"</span>
 </span></code></pre></div>
 <p>For the full schema and a complete worked example, see
-<a href="../../design/benchmark_metadata_convention/#2-logical-benchmark-definition">Section 2 of the Benchmark Metadata Convention</a>.</p>
+<a href="../../design/benchmarking/logical_benchmarks_and_instances/#2-logical-benchmark-definition">Section 2 of Logical Benchmarks and Instances</a>.</p>
 <h3 id="add-logical-benchmark-instances">Add logical benchmark instances<a class="headerlink" href="#add-logical-benchmark-instances" title="Permanent link">&para;</a></h3>
 <p>To define specific benchmark problem instances (e.g., individual graphs, routing
 problem instances, or datasets), add a subfolder per instance in
@@ -1797,7 +1868,7 @@ names the logical benchmark it maps to.</p>
 </span><span id="__span-16-25"><a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="w">                </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">runtime_ms</span><span class="w"> </span><span class="c1"># rlx_coloring's internal metric name</span>
 </span></code></pre></div>
 <p>For the full benchmark binding schema and worked examples, see the
-<a href="../../design/benchmark_metadata_convention/">Benchmark Metadata Convention</a>.</p>
+<a href="../../design/benchmarking/logical_benchmarks_and_instances/">Logical Benchmarks and Instances</a>.</p>
 <hr />
 <h2 id="benchmarks-directory-convention"><code>benchmarks/</code> Directory Convention<a class="headerlink" href="#benchmarks-directory-convention" title="Permanent link">&para;</a></h2>
 <p>The top-level <code>benchmarks/</code> directory is the single source of truth for all
@@ -1824,7 +1895,7 @@ provide references, or describe the instance structure in more detail than the
 <code>description</code> field in <code>benchmark.yaml</code> allows.</p>
 <p>Benchmark bindings for any experiment targeting this logical benchmark live in
 <code>experiments/&lt;experiment-name&gt;/bindings/</code> (see
-<a href="../../design/benchmark_metadata_convention/#3-benchmark-binding">Section 3 of the Benchmark Metadata Convention</a>).</p>
+<a href="../../design/benchmarking/logical_benchmarks_and_instances/#3-benchmark-binding">Section 3 of Logical Benchmarks and Instances</a>).</p>
 <h3 id="ownership">Ownership<a class="headerlink" href="#ownership" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The <strong>logical benchmark owner</strong> is given by the <code>owner</code> field in the
@@ -1861,9 +1932,9 @@ provide references, or describe the instance structure in more detail than the
 <p>If you encounter issues:</p>
 <ol>
 <li>Check the
-   <a href="../../design/benchmark_integration_design/">Benchmark Integration Design</a></li>
-<li>Check the
-   <a href="../../design/benchmark_metadata_convention/">Benchmark Metadata Convention</a></li>
+   <a href="../../design/benchmarking/benchmark_experiments_and_submissions/">Benchmark Experiments and Submissions</a></li>
+<li>Check
+   <a href="../../design/benchmarking/logical_benchmarks_and_instances/">Logical Benchmarks and Instances</a></li>
 <li>Refer to the <a href="https://ibm.github.io/ado">ADO documentation</a></li>
 <li>Search existing issues on GitHub</li>
 <li>Open a new issue with details about your problem</li>

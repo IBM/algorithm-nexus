@@ -240,10 +240,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -527,10 +523,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -645,15 +637,85 @@
   
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./benchmarking/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Benchmarking Architecture
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_2_4">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Benchmarking Architecture
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+              
+                
+                  
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="./benchmark_system/" class="md-nav__link">
+      <a href="./benchmarking/logical_benchmarks_and_instances/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmarking System
+  Logical Benchmarks and Instances
 
     
   </span>
@@ -673,14 +735,14 @@
   
   
     <li class="md-nav__item">
-      <a href="./benchmark_integration_design/" class="md-nav__link">
+      <a href="./benchmarking/benchmark_experiments_and_submissions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmark Integration Design
+  Benchmark Experiments and Submissions
 
     
   </span>
@@ -700,14 +762,14 @@
   
   
     <li class="md-nav__item">
-      <a href="./benchmark_metadata_convention/" class="md-nav__link">
+      <a href="./benchmarking/benchmark_execution/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  Benchmark Metadata
+  Benchmark Execution and Operations
 
     
   </span>
@@ -715,6 +777,15 @@
   
 
       </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
     </li>
   
 
@@ -1216,10 +1287,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -1248,15 +1315,21 @@
 
 <h1 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h1>
 <p>The Design section explains how Algorithm Nexus is structured, how the project
-currently approaches package metadata, dependency management, and the design of
-the benchmarking system.</p>
+currently approaches package metadata, dependency management, and benchmarking.</p>
 <p>Below is a list of the design documents available:</p>
 <ul>
 <li><a href="./nexus_package/">Nexus Metadata Package Structure</a></li>
 <li><a href="./dependency-resolution/">Nexus Dependency Resolution Process</a></li>
-<li><a href="./benchmark_system/">Benchmarking System</a></li>
-<li><a href="./benchmark_integration_design/">Benchmark Integration Design</a></li>
-<li><a href="./benchmark_metadata_convention/">Benchmark Metadata Convention</a></li>
+<li><a href="./benchmarking/">Benchmarking Architecture</a> — concepts, layers, and
+  which document answers each requirement group</li>
+<li><a href="./benchmarking/benchmark_execution/">Benchmark Execution and Operations</a> —
+  <code>ado</code>, Ray, the result store, triggers, and sweep governance (REQ-1, REQ-4,
+  REQ-5.1, REQ-6, REQ-7.2, REQ-7.3)</li>
+<li><a href="./benchmarking/benchmark_experiments_and_submissions/">Benchmark Experiments and Submissions</a>
+  — adding experiments and submissions (REQ-2.3, REQ-2.4, REQ-3.1, REQ-3.2)</li>
+<li><a href="./benchmarking/logical_benchmarks_and_instances/">Logical Benchmarks and Instances</a>
+  — logical benchmarks, instances, and result aggregation (REQ-2.1, REQ-2.2,
+  REQ-5.2, REQ-5.3, REQ-7.1)</li>
 <li><a href="./project_release/">Project Release</a></li>
 </ul>
 
