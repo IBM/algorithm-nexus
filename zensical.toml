@@ -27,7 +27,13 @@ nav = [
     { "Overview" = "contributing/index.md" },
     { "Contributing Guidelines" = "contributing/guidelines.md" },
     { "Add New Nexus Package" = "contributing/add_new_nexus_package.md" },
-    { "Contributing a Benchmark for a Model" = "contributing/add_benchmark.md" },
+    { "Benchmarks" = [
+      "contributing/benchmarks/index.md",
+      { "How to Add a Benchmark Problem and Instance" = "contributing/benchmarks/add_benchmark_problem.md" },
+      { "How to Add a Benchmark Experiment" = "contributing/benchmarks/add_benchmark_experiment.md" },
+      { "How to Bind an Experiment to a Problem" = "contributing/benchmarks/add_benchmark_binding.md" },
+      { "How to Add a Benchmark Submission" = "contributing/benchmarks/add_benchmark_submission.md" },
+    ] },
     { "Owner Responsibilities" = "contributing/owner_responsibilities.md" },
   ] },
   { "Requirements" = [

@@ -7,10 +7,14 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Executive Summary
 
-This document specifies how to add **logical benchmarks** and **benchmark
-instances**. It also defines how an experiment binds to a logical benchmark so
-results from diverse experiments can be aggregated in a standardized,
-domain-agnostic way.
+This document specifies **logical benchmarks** and **benchmark instances**, and
+how an experiment binds to a logical benchmark so results from diverse
+experiments can be aggregated in a standardized, domain-agnostic way.
+
+To register a problem and instance, see
+[How to add a benchmark problem and instance](../../contributing/benchmarks/add_benchmark_problem.md).
+To bind an experiment to a problem, see
+[How to bind an experiment to a problem](../../contributing/benchmarks/add_benchmark_binding.md).
 
 The design rests on two complementary artifacts:
 
