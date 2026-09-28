@@ -187,9 +187,6 @@ issues.
 
 - Versioning Semantics for REQ 1.3
     - Rules and conventions for versioning benchmark experiments
-- Nexus Test Dependencies Handling for REQ 2.3
-    - The process for validating that the benchmark experiment packages
-      referenced by an experiment registration can be installed together
 
 ## How Nexus package developers will use the system
 
