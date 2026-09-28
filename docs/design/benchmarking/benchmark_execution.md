@@ -216,8 +216,8 @@ First developers can:
 They then register a benchmark submission using an ado configuration (REQ 3.1,
 REQ 2.4). Where that submission is registered is specified in
 [Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md):
-a folder under `experiments/<name>/submissions/`. The submission can reference
-any registered benchmark experiment. If the experiment they need is not
+a folder under `experiments/<name>/submissions/`. The submission can only reference
+benchmark experiment registered within the current experiment package. If the experiment they need is not
 registered
 [they can add it.](#registering-a-benchmark-experiment).
 The submission can also be based on one discovered via the Nexus CLI.
