@@ -1,0 +1,25 @@
+Portfolio optimization data and generated models in this directory are taken
+from QOBLIB (Quantum Optimization Benchmarking Library), problem 06.
+
+Source repository: https://github.com/ZIB-AOPT/QOBLIB
+Problem page: https://zib-aopt.github.io/QOBLIB/problem/06/
+Instance page: https://zib-aopt.github.io/QOBLIB/instance.html?problem=06&name=a010_t10_s00_b004
+
+The registered instance a010_t10_s00_b004_l1e-4 keeps one published lambda,
+tag 1e-4 (lambda 0.0001). That folder contains both the constrained LP and the
+penalty QUBO.
+
+Market data (stock_prices.txt.gz and covariance_matrices.txt.gz) is licensed
+under the Creative Commons Attribution 4.0 International License:
+https://creativecommons.org/licenses/by/4.0/
+Give appropriate credit, provide a link to the license, and indicate if
+changes were made. These files were copied unchanged from
+06-portfolio/instances/po_a010_t10_s00/.
+
+The generated BQP (.lp.xz) and QUBO (.qs.xz) models, and the QOBLIB model
+sources they come from, are licensed under the Apache License, Version 2.0.
+Copyright 2025 Maximilian Schicker.
+
+The model files were copied unchanged from:
+- 06-portfolio/models/binary_quadratic_programming/lp_files/a010_t10_s00_b004/bqp_a010_t10_s00_b004_l1e-4.lp.xz
+- 06-portfolio/models/unconstrained_quadratic_optimization/qs_files/a010_t10_s00_b004/uqo_a010_t10_s00_b004_l1e-4.qs.xz

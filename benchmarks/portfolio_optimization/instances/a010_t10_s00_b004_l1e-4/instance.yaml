@@ -1,0 +1,18 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: a010_t10_s00_b004_l1e-4
+description: >
+  QOBLIB portfolio instance a010_t10_s00_b004 at lambda 0.0001. Ten S&P 500 names (AAPL, AMZN, AVGO, GOOG, GOOGL, META, MSFT,
+  NVDA, TSLA, WMT), ten periods (days 0-9), cardinality budget 4, market-data seed s00. Note, the QUBO objective is not exactly
+  the LP objective. Both equalities are moved into the QUBO with penalty7, the .qs file records an ObjectiveOffset, and ZIMPL
+  conversion halves quadratic terms, which changes the .qs objective.
+num_assets: 10
+num_periods: 10
+budget: 4
+scenario: s00
+risk_aversion: "1e-4"
+market_data:
+  artifacts_location: market_data
+models:
+  artifacts_location: models

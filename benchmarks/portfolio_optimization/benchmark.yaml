@@ -1,0 +1,69 @@
+# Copyright IBM Corp. 2026
+# SPDX-License-Identifier: Apache-2.0
+#
+# QOBLIB problem 06 (Portfolio Optimization).
+# https://github.com/ZIB-AOPT/QOBLIB/tree/main/06-portfolio
+
+logicalBenchmark:
+  benchmarkIdentifier: portfolio_optimization
+  title: Portfolio Optimization
+  description: >
+    Multi-period portfolio optimization with transaction costs and short selling, as published by QOBLIB problem 06. Choose
+    holdings over time to minimize a risk-adjusted objective subject to a capital limit and a cardinality limit on the number
+    of positions. An instance fixes the market data, the budget, and the risk-aversion weight. Each instance ships a constrained
+    LP and a penalty QUBO of that same problem. The QUBO energy is not numerically the same as the LP objective.
+  instance:
+    - identifier: num_assets
+      metadata:
+        description: Number of stocks.
+      propertyDomain:
+        variableType: DISCRETE_VARIABLE_TYPE
+        values: [3, 4, 5, 10, 50, 200, 400]
+    - identifier: num_periods
+      metadata:
+        description: Number of allocation periods. Price rows use day indices 0 through num_periods - 1.
+      propertyDomain:
+        variableType: DISCRETE_VARIABLE_TYPE
+        values: [2, 4, 10, 15]
+    - identifier: budget
+      metadata:
+        description: >
+          Cardinality limit B on the number of positions held in a period. In the published suite B is determined by the asset
+          count.
+      propertyDomain:
+        variableType: DISCRETE_VARIABLE_TYPE
+        values: [3, 4, 20, 50, 100]
+    - identifier: scenario
+      metadata:
+        description: >
+          Market-data variant. orig is the source series. s00, s01, and s02 are generated seeds.
+      propertyDomain:
+        variableType: CATEGORICAL_VARIABLE_TYPE
+        values: [orig, s00, s01, s02]
+    - identifier: risk_aversion
+      metadata:
+        description: >
+          Risk-aversion weight lambda, stored as the QOBLIB filename tag. 0 is 0, 1e-6 is 0.000001, 1e-5 is 0.00001, 5e-5
+          is 0.00005, 1e-4 is 0.0001, 5e-4 is 0.0005, 1e-3 is 0.001, and 1e-2 is 0.01. Each instance sets one tag.
+      propertyDomain:
+        variableType: CATEGORICAL_VARIABLE_TYPE
+        values: ["0", "1e-6", "1e-5", "5e-5", "1e-4", "5e-4", "1e-3", "1e-2"]
+    - identifier: market_data
+      is_artifact: true
+      metadata:
+        description: >
+          Gzipped price and return-covariance tables. Prices are stock_prices.txt.gz (day, symbol, price). Covariances are
+          covariance_matrices.txt.gz (day, symbol, symbol, covariance). These files are CC BY 4.0.
+    - identifier: model
+      is_artifact: true
+      metadata:
+        description: >
+          File containing a formulation of an instance
+  metrics:
+    - objective_value
+    - optimality_gap
+    - is_feasible
+    - runtime_seconds
+  ranking:
+    metric: objective_value
+    order: asc
