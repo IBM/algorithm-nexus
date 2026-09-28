@@ -56,7 +56,7 @@ can also be included to provide users with model-specific usage guidance.
 Benchmark experiments and submissions are no longer hosted inside `packages/`.
 They live instead under the top-level `experiments/` directory — see
 [Section 3.2.3 Benchmarks](#323-benchmarks) and the
-[Benchmark Integration Design](benchmark_integration_design.md).
+[Benchmark Experiments and Submissions](benchmarking/benchmark_experiments_and_submissions.md).
 
 ---
 
@@ -151,5 +151,5 @@ Each `experiments/<experiment-name>/experiment_package.yaml` declares the Python
 (on PyPI or GitHub) that provides the experiment and lists its experiment
 identifiers. Each benchmark submission must have a `space.yaml` file with the
 full ADO discoveryspace definition for that run. See the
-[Benchmark Integration Design](benchmark_integration_design.md) for the complete
+[Benchmark Experiments and Submissions](benchmarking/benchmark_experiments_and_submissions.md) for the complete
 schema and workflow.

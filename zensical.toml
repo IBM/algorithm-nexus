@@ -15,9 +15,12 @@ nav = [
     { "Overview" = "design/index.md" },
     { "Nexus Package Structure Guide" = "design/nexus_package.md" },
     { "Dependency Resolution" = "design/dependency-resolution.md" },
-    { "Benchmarking System" = "design/benchmark_system.md" },
-    { "Benchmark Integration Design" = "design/benchmark_integration_design.md" },
-    { "Benchmark Metadata" = "design/benchmark_metadata_convention.md" },
+    { "Benchmarking Architecture" = [
+      "design/benchmarking/index.md",
+      { "Logical Benchmarks and Instances" = "design/benchmarking/logical_benchmarks_and_instances.md" },
+      { "Benchmark Experiments and Submissions" = "design/benchmarking/benchmark_experiments_and_submissions.md" },
+      { "Benchmark Execution and Operations" = "design/benchmarking/benchmark_execution.md" },
+    ] },
     { "Project Release" = "design/project_release.md" },
   ] },
   { "Contributing" = [
@@ -139,9 +142,7 @@ base_path = [".", "docs"]
 [project.markdown_extensions.pymdownx.smartsymbols]
 
 [project.markdown_extensions.pymdownx.superfences]
-custom_fences = [
-  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }
-]
+custom_fences = [{ name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }]
 
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true

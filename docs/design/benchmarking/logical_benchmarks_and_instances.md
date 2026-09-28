@@ -3,13 +3,14 @@ Copyright IBM Corporation 2026
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Benchmark Metadata
+# Logical Benchmarks and Instances
 
 ## Executive Summary
 
-This document defines the **Benchmark Metadata Convention** — the metadata
-design that enables benchmark results from diverse experiments to be aggregated
-in a standardized, domain-agnostic way.
+This document specifies how to add **logical benchmarks** and **benchmark
+instances**. It also defines how an experiment binds to a logical benchmark so
+results from diverse experiments can be aggregated in a standardized,
+domain-agnostic way.
 
 The design rests on two complementary artifacts:
 
@@ -24,12 +25,21 @@ The design rests on two complementary artifacts:
    results from that experiment's data.
 
 Together, these two artifacts allow the benchmarking system to remain agnostic
-to domain-specific concepts. All domain knowledge is expressed by the benchmark
-and experiment authors; the system only needs to read the metadata and apply it.
+to domain-specific concepts. All domain knowledge is expressed by the logical
+benchmark, benchmark instance and benchmark experiment authors; the system only
+needs to read the metadata and apply it.
 
-This convention builds on the [Benchmarking System](./benchmark_system.md) and
-[Benchmark Integration Design](./benchmark_integration_design.md) documents,
-which define how experiments are packaged and registered.
+### Requirements to Design Mapping
+
+| Requirement | Design interpretation                                                                                                     |
+| ------------| --------------------------------------------------------------------------------------------------------------------------|
+| REQ 2.1     | A logical benchmark is registered as `benchmarks/<id>/benchmark.yaml`                                                     |
+| REQ 2.2     | A benchmark instance is registered as `benchmarks/<id>/instances/<name>/instance.yaml`                                    |
+| REQ 2.5     | Logical benchmarks and instances are listed by scanning `benchmarks/`                                                     |
+| REQ 3.3     | A logical benchmark or instance can be referenced by any experiment or submission                                         |
+| REQ 5.2     | Bindings map experiment outputs onto the logical benchmark's properties and metric names so stored results share a schema |
+| REQ 5.3     | Bindings and instance metadata carry the domain-specific context stored alongside results                                 |
+| REQ 7.1     | Logical benchmarks and instances live under top-level `benchmarks/`, independent of any Nexus package                     |
 
 ---
 
@@ -44,9 +54,9 @@ experiments:
 
 | Challenge                                       | Description                                                                                                                                                                                                                                                                                                                                    | Design Requirement                                                                                              |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **Heterogeneous Tooling for Homogeneous Tasks** | Different experiments may evaluate the same logical problem. For example, both `vllm-bench` and `guide-llm` measure inference-serving performance, but the system has no way to know they can address the same benchmark.                                                                                                                      | The system must have a standardized way to recognize that disparate experiments can execute the same benchmark. |
-| **Ambiguous and Domain-Specific Properties**    | Benchmarking domains are too diverse to share a fixed schema. A synthetic math benchmark has no "dataset" column; a quantum max-cut benchmark is characterized by `graph_type` and `node_count`.                                                                                                                                               | The system must support dynamic, per-benchmark, properties.                                                     |
-| **Benchmark Instance Property Fragmentation**   | Defining a benchmark instance often involves a matrix of runtime properties. If results are differentiated by raw property values, results from minor variations (`concurrency=100` vs `concurrency=105`) can never be aggregated. Further, the properties required to run the same benchmark with different experiments may be very different | The design must allow related property combinations to be collapsed into a single canonical value.              |
+| **Heterogeneous Tooling for Homogeneous Tasks** | Different experiments may evaluate the same logical problem. For example, both `vllm-bench` and `guide-llm` measure inference-serving performance, but the system has no way to know they can address the same logical benchmark.                                                                                                              | The system must recognize that disparate experiments can address the same logical benchmark.                    |
+| **Ambiguous and Domain-Specific Properties**    | Benchmarking domains are too diverse to share a fixed schema. A synthetic math logical benchmark has no "dataset" column; a quantum max-cut logical benchmark is characterized by `graph_type` and `node_count`.                                                                                                                               | The system must support dynamic, per-logical-benchmark, properties.                                             |
+| **Benchmark Instance Property Fragmentation**   | Defining a benchmark instance often involves a matrix of runtime properties. If results are differentiated by raw property values, results from minor variations (`concurrency=100` vs `concurrency=105`) can never be aggregated. Further, the properties required to address the same logical benchmark with different experiments may differ| The design must allow related property combinations to be collapsed into a single canonical value.              |
 
 <!-- markdownlint-enable line-length -->
 
@@ -56,8 +66,8 @@ experiments:
 
 ### 2.1 Concept
 
-A **logical benchmark** is an abstract, domain-specific definition of a
-benchmark problem. It defines:
+A **logical benchmark** is an abstract, reusable definition of a problem class
+or evaluation task (the benchmark problem). It defines:
 
 - a unique identifier
 - the **instance** properties defining the benchmark problem instances and the
@@ -73,10 +83,10 @@ benchmark problem. It defines:
 | Field                 | Type                              | Required | Description                                                                                                                                                                  |
 | --------------------- | --------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `benchmarkIdentifier` | string                            | Yes      | The canonical identifier.                                                                                                                                                    |
-| `title`               | string                            | No       | Short human-readable display name for this benchmark.                                                                                                                        |
+| `title`               | string                            | No       | Short human-readable display name for this logical benchmark.                                                                                                                |
 | `description`         | string                            | Yes      | Human-readable description of the abstract problem being evaluated.                                                                                                          |
 | `instance`            | list of BenchmarkInstanceProperty | Yes      | The properties defining a benchmark instance. Each entry specifies the property name, an optional domain of valid values, and human-readable descriptions. See fields below. |
-| `metrics`             | list of strings                   | No       | Canonical metric names for this benchmark.                                                                                                                                   |
+| `metrics`             | list of strings                   | No       | Canonical metric names for this logical benchmark.                                                                                                                           |
 | `ranking`             | Ranking                           | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                                                                        |
 | `owner`               | string                            | No       | Team or individual responsible for maintaining this definition.                                                                                                              |
 
@@ -102,7 +112,8 @@ benchmark problem. It defines:
 
 The logical benchmark definition lives under the `logicalBenchmark` key inside
 `benchmarks/<benchmark-id>/benchmark.yaml`. Bindings live separately in
-`experiments/<experiment-name>/bindings/` (see [Section 3](#3-benchmark-binding)).
+`experiments/<experiment-name>/bindings/` (see
+[Section 3](#3-benchmark-binding)).
 
 ```yaml
 logicalBenchmark:
@@ -147,9 +158,9 @@ See
 [the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/)
 for more information about the types of domains that can be specified.
 
-### 2.4 Logical Benchmark Instances and Artifacts
+### 2.4 Benchmark Instances and Artifacts
 
-A logical benchmark can define concrete problem instances (e.g. specific graphs,
+A logical benchmark can define concrete benchmark instances (e.g. specific graphs,
 routing networks, or datasets). Each instance lives in its own folder under
 `instances/<instance-name>/` with an `instance.yaml` file and one or more
 subfolders containing the actual artifact files for that instance.
@@ -166,7 +177,7 @@ benchmarks/<benchmark-id>/instances/<instance-name>/
 
 #### Instance Schema
 
-Each `instance.yaml` defines a concrete problem instance. Instance properties
+Each `instance.yaml` defines a concrete benchmark instance. Instance properties
 match the property identifiers defined under `instance:` in `benchmark.yaml`:
 
 - **Scalar properties** (`is_artifact: false`, the default) are specified
@@ -176,11 +187,11 @@ match the property identifiers defined under `instance:` in `benchmark.yaml`:
   instance directory that contains the valid files for that property. The folder
   must exist inside the instance directory.
 
-| Field           | Type                                                                                      | Required | Description                                                                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier`    | string                                                                                    | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                          |
-| `description`   | string                                                                                    | No       | Human-readable description of this specific instance.                                                                                                                   |
-| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties)   | No       | Value for a property defined in `benchmark.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; folder must exist in the instance directory.   |
+| Field           | Type                                                                                    | Required | Description                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identifier`    | string                                                                                  | **Yes**  | Unique identifier for this benchmark instance.                                                                                                                        |
+| `description`   | string                                                                                  | No       | Human-readable description of this specific instance.                                                                                                                 |
+| `<property_id>` | scalar (for scalar properties) or `{artifacts_location: str}` (for artifact properties) | No       | Value for a property defined in `benchmark.yaml`. Artifact properties must use the `{artifacts_location: <folder>}` map; folder must exist in the instance directory. |
 
 #### Example Instance (`benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`)
 
@@ -399,10 +410,9 @@ workload: steady_state_heavy
 
 #### Binding
 
-The binding lives in
-`experiments/guidellm/bindings/llm_inference_binding.yaml`. Each entry in the
-`bindings` list carries a `benchmarkIdentifier` to identify which logical
-benchmark it maps to:
+The binding lives in `experiments/guidellm/bindings/llm_inference_binding.yaml`.
+Each entry in the `bindings` list carries a `benchmarkIdentifier` to identify
+which logical benchmark it maps to:
 
 ```yaml
 bindings:
@@ -649,7 +659,7 @@ A benchmark binding only can change if:
 
 ### 7.1 Implicit Benchmark Target
 
-The [`benchmark_integration_design.md`](./benchmark_integration_design.md)
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md)
 establishes that the benchmark target is implicit from the enclosing model
 definition for model-level benchmark submissions. The binding does not need to
 name the target property explicitly — the target identity is determined by the
