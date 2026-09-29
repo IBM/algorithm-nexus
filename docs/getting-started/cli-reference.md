@@ -21,6 +21,7 @@ nexus --help
 nexus validate --help
 nexus list --help
 nexus get --help
+nexus run --help
 ```
 
 ### Version Information
@@ -226,45 +227,83 @@ List all Nexus packages discovered in the packages directory.
 **Usage:**
 
 ```bash
-nexus list packages
+nexus list packages [packages_root]
 ```
+
+**Arguments:**
+
+- `packages_root` (optional): Path to the packages root directory (default: `./packages`)
+
+**Options:**
+
+- `-o, --output-format [csv|json]`: Output format. Default is table output.
+- `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
+- `--strict`: Warn on stderr when packages fail to load due to invalid YAML or schema errors.
 
 **Example:**
 
 ```bash
 nexus list packages
+nexus list packages path/to/packages
+nexus list packages -o json
 ```
 
-#### nexus list benchmark-packages
+#### nexus list experiment-packages
 
-List all benchmark packages discovered across all Nexus packages.
+List all experiment packages discovered under the experiments directory. Shows
+a table of experiment packages with their folder, requirement specifier,
+experiment IDs, and logical benchmark bindings.
 
 **Usage:**
 
 ```bash
-nexus list benchmark-packages
+nexus list experiment-packages [experiments_root]
 ```
+
+**Arguments:**
+
+- `experiments_root` (optional): Path to the experiments root directory (default: `./experiments`)
+
+**Options:**
+
+- `-o, --output-format [csv|json]`: Output format. Default is table output.
+- `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
+- `--strict`: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.
 
 **Example:**
 
 ```bash
-nexus list benchmark-packages
+nexus list experiment-packages
+nexus list experiment-packages path/to/experiments
+nexus list experiment-packages -o json
 ```
 
 #### nexus list benchmark-experiments
 
-List all benchmark experiments discovered across all Nexus packages.
+List all benchmark experiments discovered under the experiments directory.
 
 **Usage:**
 
 ```bash
-nexus list benchmark-experiments
+nexus list benchmark-experiments [experiments_root]
 ```
+
+**Arguments:**
+
+- `experiments_root` (optional): Path to the experiments root directory (default: `./experiments`)
+
+**Options:**
+
+- `-o, --output-format [csv|json]`: Output format. Default is table output.
+- `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
+- `--strict`: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.
 
 **Example:**
 
 ```bash
 nexus list benchmark-experiments
+nexus list benchmark-experiments path/to/experiments
+nexus list benchmark-experiments -o json
 ```
 
 ## nexus get
@@ -510,8 +549,8 @@ View all packages and their resources:
 # List all packages
 nexus list packages
 
-# List all benchmark packages
-nexus list benchmark-packages
+# List all experiment packages
+nexus list experiment-packages
 
 # List all benchmark experiments
 nexus list benchmark-experiments

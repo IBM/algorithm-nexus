@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 try:
     import typer
@@ -21,7 +21,6 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import (
-    collect_benchmark_data,
     output_data,
     try_load_package_config,
     validate_output_format,
@@ -102,24 +101,17 @@ def list_packages(
         console.print(f"\n[bold]Total:[/bold] {len(nexus_packages)} packages\n")
 
 
-def list_benchmark_packages(
-    packages_root: Annotated[
+def list_experiment_packages(
+    experiments_root: Annotated[
         Path,
         typer.Argument(
-            help="Path to the packages root directory (default: ./packages).",
+            help="Path to the experiments root directory (default: ./experiments).",
             dir_okay=True,
             file_okay=False,
             readable=True,
             resolve_path=True,
         ),
-    ] = Path("./packages"),
-    nexus_package: Annotated[
-        str | None,
-        typer.Option(
-            "--nexus-package",
-            help="Filter results to show only benchmark packages used by the specified nexus package",
-        ),
-    ] = None,
+    ] = Path("./experiments"),
     output_format: Annotated[
         str | None,
         typer.Option(
@@ -139,104 +131,126 @@ def list_benchmark_packages(
         bool,
         typer.Option(
             "--strict",
-            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+            help="Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.",
         ),
     ] = False,
 ) -> None:
-    """List all benchmark packages discovered across all Nexus packages.
+    """List all experiment packages discovered under experiments/.
 
-    By default, shows a deduplicated table of benchmark packages with the nexus
-    packages that use them. Use --nexus-package to filter results for a specific
-    nexus package.
+    Shows a table of experiment packages with their folder, requirement
+    specifier, experiment IDs, and logical benchmark bindings.
     """
+    import yaml
+
+    from algorithm_nexus.models import ExperimentConfig
+
     validate_output_format(output_format)
 
-    if not packages_root.is_dir():
-        console.print(f"[red]Error:[/red] {packages_root} is not a directory")
+    if not experiments_root.is_dir():
+        console.print(f"[red]Error:[/red] {experiments_root} is not a directory")
         raise typer.Exit(code=1)
 
-    # Collect all benchmark data
-    benchmark_data = collect_benchmark_data(packages_root, warn_on_error=strict)
+    data: list[dict[str, Any]] = []
 
-    if not benchmark_data:
+    for exp_dir in sorted(experiments_root.iterdir()):
+        if not exp_dir.is_dir() or exp_dir.name.startswith("."):
+            continue
+
+        exp_yaml = exp_dir / "experiment_package.yaml"
+        if not exp_yaml.exists():
+            if strict:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                    f"no experiment_package.yaml found"
+                )
+            continue
+
+        try:
+            config_dict = yaml.safe_load(exp_yaml.read_text(encoding="utf-8"))
+            if not config_dict or "experiment_package" not in config_dict:
+                raise ValueError("Missing 'experiment_package' key")
+            config = ExperimentConfig.model_validate(config_dict)
+            exp_package = config.experiment_package
+        except Exception as e:
+            if strict:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                    f"Failed to load or validate experiment_package.yaml: {e}"
+                )
+            continue
+
+        # Collect all benchmark identifiers referenced in bindings/
+        all_benchmarks: set[str] = set()
+        bindings_dir = exp_dir / "bindings"
+        if bindings_dir.is_dir():
+            for binding_file in sorted(bindings_dir.iterdir()):
+                if (
+                    not binding_file.is_file()
+                    or binding_file.name.startswith(".")
+                    or binding_file.suffix not in (".yaml", ".yml")
+                ):
+                    continue
+                try:
+                    binding_data = yaml.safe_load(
+                        binding_file.read_text(encoding="utf-8")
+                    )
+                    if binding_data and "bindings" in binding_data:
+                        for entry in binding_data["bindings"]:
+                            bench_id = entry.get("benchmarkIdentifier")
+                            if bench_id:
+                                all_benchmarks.add(bench_id)
+                except Exception as e:
+                    if strict:
+                        error_console = Console(stderr=True)
+                        error_console.print(
+                            f"[yellow]Warning:[/yellow] Failed to load binding file "
+                            f"{binding_file.name}: {e}"
+                        )
+
+        data.append(
+            {
+                "Experiment Folder": exp_dir.name,
+                "Requirement Specifier": exp_package.requirement_specifier,
+                "Experiments": ", ".join(sorted(exp_package.experiments)),
+                "Bindings": ", ".join(sorted(all_benchmarks))
+                if all_benchmarks
+                else "None",
+            }
+        )
+
+    if not data:
         console.print(
-            "\n[yellow]No benchmark packages found in any packages[/yellow]\n"
+            "\n[yellow]No experiment packages found under experiments/[/yellow]\n"
         )
         return
 
-    # Filter by nexus package if specified
-    title = "Discovered Benchmark Packages"
-    if nexus_package:
-        filtered_data: dict[str, dict[str, list[str]]] = {}
-        for bench_pkg, experiments in benchmark_data.items():
-            for exp_id, pkg_list in experiments.items():
-                if nexus_package in pkg_list:
-                    if bench_pkg not in filtered_data:
-                        filtered_data[bench_pkg] = {}
-                    filtered_data[bench_pkg][exp_id] = [nexus_package]
-
-        if not filtered_data:
-            console.print(
-                f"\n[yellow]No benchmark packages found for nexus package '{nexus_package}'[/yellow]\n"
-            )
-            return
-
-        benchmark_data = filtered_data
-        title = f"Benchmark Packages for Nexus Package: {nexus_package}"
-
-    # Prepare data for output
-    if nexus_package:
-        headers = ["Benchmark Package"]
-        data = [
-            {"Benchmark Package": bench_pkg}
-            for bench_pkg in sorted(benchmark_data.keys())
-        ]
-    else:
-        headers = ["Benchmark Package", "Registered By"]
-        data = []
-        for bench_pkg in sorted(benchmark_data.keys()):
-            all_packages = set()
-            for exp_packages in benchmark_data[bench_pkg].values():
-                all_packages.update(exp_packages)
-            data.append(
-                {
-                    "Benchmark Package": bench_pkg,
-                    "Registered By": ", ".join(sorted(all_packages)),
-                }
-            )
+    headers = ["Experiment Folder", "Requirement Specifier", "Experiments", "Bindings"]
 
     output_data(
         data=data,
         headers=headers,
         output_format=output_format,
         output_file=output_file,
-        table_title=title,
+        table_title="Discovered Experiment Packages",
     )
 
     if not output_format:
-        console.print(
-            f"\n[bold]Total:[/bold] {len(benchmark_data)} benchmark packages\n"
-        )
+        console.print(f"\n[bold]Total:[/bold] {len(data)} experiment packages\n")
 
 
 def list_benchmark_experiments(
-    packages_root: Annotated[
+    experiments_root: Annotated[
         Path,
         typer.Argument(
-            help="Path to the packages root directory (default: ./packages).",
+            help="Path to the experiments root directory (default: ./experiments).",
             dir_okay=True,
             file_okay=False,
             readable=True,
             resolve_path=True,
         ),
-    ] = Path("./packages"),
-    nexus_package: Annotated[
-        str | None,
-        typer.Option(
-            "--nexus-package",
-            help="Filter results to show only experiments used by the specified nexus package",
-        ),
-    ] = None,
+    ] = Path("./experiments"),
     output_format: Annotated[
         str | None,
         typer.Option(
@@ -256,92 +270,130 @@ def list_benchmark_experiments(
         bool,
         typer.Option(
             "--strict",
-            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+            help="Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.",
         ),
     ] = False,
 ) -> None:
-    """List all benchmark experiments discovered across all Nexus packages.
+    """List all benchmark experiments discovered under experiments/."""
+    import yaml
 
-    By default, shows a unified table with experiments and their nexus packages.
-    Use --nexus-package to filter results for a specific nexus package.
-    """
+    from algorithm_nexus.models import ExperimentConfig
+
     validate_output_format(output_format)
 
-    if not packages_root.is_dir():
-        console.print(f"[red]Error:[/red] {packages_root} is not a directory")
+    if not experiments_root.is_dir():
+        console.print(f"[red]Error:[/red] {experiments_root} is not a directory")
         raise typer.Exit(code=1)
 
-    # Collect all benchmark data
-    benchmark_data = collect_benchmark_data(packages_root, warn_on_error=strict)
+    data: list[dict[str, Any]] = []
 
-    if not benchmark_data:
+    # Traverse experiments_root
+    for exp_dir in sorted(experiments_root.iterdir()):
+        if not exp_dir.is_dir() or exp_dir.name.startswith("."):
+            continue
+
+        exp_yaml = exp_dir / "experiment_package.yaml"
+        if not exp_yaml.exists():
+            if strict:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                    f"no experiment_package.yaml found"
+                )
+            continue
+
+        try:
+            config_dict = yaml.safe_load(exp_yaml.read_text(encoding="utf-8"))
+            if not config_dict or "experiment_package" not in config_dict:
+                raise ValueError("Missing 'experiment_package' key")
+
+            config = ExperimentConfig.model_validate(config_dict)
+            exp_package = config.experiment_package
+        except Exception as e:
+            if strict:
+                error_console = Console(stderr=True)
+                error_console.print(
+                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                    f"Failed to load or validate experiment_package.yaml: {e}"
+                )
+            continue
+
+        # Load bindings in experiments/<name>/bindings/
+        bindings_dir = exp_dir / "bindings"
+        exp_id_to_benchmarks: dict[str, set[str]] = {
+            exp_id: set() for exp_id in exp_package.experiments
+        }
+
+        if bindings_dir.is_dir():
+            for binding_file in sorted(bindings_dir.iterdir()):
+                if (
+                    not binding_file.is_file()
+                    or binding_file.name.startswith(".")
+                    or binding_file.suffix not in (".yaml", ".yml")
+                ):
+                    continue
+
+                try:
+                    binding_data = yaml.safe_load(
+                        binding_file.read_text(encoding="utf-8")
+                    )
+                    if binding_data and "bindings" in binding_data:
+                        for binding_entry in binding_data["bindings"]:
+                            bench_id = binding_entry.get("benchmarkIdentifier")
+                            exp_ref = binding_entry.get("experiment")
+                            if bench_id and exp_ref:
+                                exp_id = exp_ref.get("experimentIdentifier")
+                                if exp_id in exp_id_to_benchmarks:
+                                    exp_id_to_benchmarks[exp_id].add(bench_id)
+                except Exception as e:
+                    if strict:
+                        error_console = Console(stderr=True)
+                        error_console.print(
+                            f"[yellow]Warning:[/yellow] Failed to load binding file {binding_file.name}: {e}"
+                        )
+
+        # For each experiment ID, create an entry
+        for exp_id in sorted(exp_package.experiments):
+            associated_benchmarks = sorted(list(exp_id_to_benchmarks[exp_id]))
+            data.append(
+                {
+                    "Experiment ID": exp_id,
+                    "Experiment Folder": exp_dir.name,
+                    "Requirement Specifier": exp_package.requirement_specifier,
+                    "Associated Bindings": ", ".join(associated_benchmarks)
+                    if associated_benchmarks
+                    else "None",
+                }
+            )
+
+    if not data:
         console.print(
-            "\n[yellow]No benchmark experiments found in any packages[/yellow]\n"
+            "\n[yellow]No benchmark experiments found under experiments/[/yellow]\n"
         )
         return
 
-    # Filter by nexus package if specified
-    if nexus_package:
-        filtered_data: dict[str, dict[str, list[str]]] = {}
-        for bench_pkg, experiments in benchmark_data.items():
-            for exp_id, pkg_list in experiments.items():
-                if nexus_package in pkg_list:
-                    if bench_pkg not in filtered_data:
-                        filtered_data[bench_pkg] = {}
-                    filtered_data[bench_pkg][exp_id] = [nexus_package]
-
-        if not filtered_data:
-            console.print(
-                f"\n[yellow]No benchmark experiments found for nexus package '{nexus_package}'[/yellow]\n"
-            )
-            return
-
-        benchmark_data = filtered_data
-
-    # Prepare data for output
-    if nexus_package:
-        headers = ["Experiment ID", "Benchmark Package"]
-        title = f"Benchmark Experiments for Nexus Package: {nexus_package}"
-        data = [
-            {
-                "Experiment ID": exp_id,
-                "Benchmark Package": bench_pkg,
-            }
-            for bench_pkg in sorted(benchmark_data.keys())
-            for exp_id in sorted(benchmark_data[bench_pkg].keys())
-        ]
-    else:
-        headers = ["Experiment ID", "Benchmark Package", "Used By"]
-        title = "Discovered Benchmark Experiments"
-        data = []
-        for bench_pkg in sorted(benchmark_data.keys()):
-            for exp_id in sorted(benchmark_data[bench_pkg].keys()):
-                nexus_packages = sorted(benchmark_data[bench_pkg][exp_id])
-                data.append(
-                    {
-                        "Experiment ID": exp_id,
-                        "Benchmark Package": bench_pkg,
-                        "Used By": ", ".join(nexus_packages),
-                    }
-                )
+    headers = [
+        "Experiment ID",
+        "Experiment Folder",
+        "Requirement Specifier",
+        "Associated Bindings",
+    ]
 
     output_data(
         data=data,
         headers=headers,
         output_format=output_format,
         output_file=output_file,
-        table_title=title,
+        table_title="Discovered Benchmark Experiments",
     )
 
     if not output_format:
-        console.print(
-            f"\n[bold]Total:[/bold] {len(data)} experiments across {len(benchmark_data)} benchmark packages\n"
-        )
+        console.print(f"\n[bold]Total:[/bold] {len(data)} experiments discovered\n")
 
         # Add instructions for getting more details
         console.print("[bold]For further details on each experiment:[/bold]")
-        console.print("1. Install the Benchmark package the experiment belongs to")
-        console.print("   [cyan]uv pip install <benchmark_package>[/cyan]")
+        console.print("1. Install the experiment package containing the experiment")
+        console.print("   [cyan]uv pip install <requirement_specifier>[/cyan]")
         console.print("2. Describe the experiment")
         console.print("   [cyan]ado describe experiment <experiment_id>[/cyan]\n")
 
