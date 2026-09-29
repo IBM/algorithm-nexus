@@ -10,7 +10,7 @@ submissions as separate artifacts.
 
 * A **benchmark problem** is the abstract task.
 * A **benchmark instance** is one concrete realisation of that task.
-* A **benchmark experiment** is a `ado` experiment that evaluates a **benchmark target** (an algorithm or model).
+* A **benchmark experiment** is an `ado` experiment that evaluates a **benchmark target** (an algorithm or model).
 * A **benchmark experiment package** is a python package containing one or more **benchmark experiments**.
 * A **benchmark binding** maps a benchmark experiment's property and metric names onto the problem's.
 * A **benchmark submission** applies one benchmark experiment to one benchmark instance for one benchmark target.
