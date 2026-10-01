@@ -651,6 +651,11 @@ def validate_logical_benchmark_file(
     return parsed
 
 
+_ALLOWED_BENCHMARK_NAMES: frozenset[str] = frozenset(
+    {"benchmark.yaml", "README.md", "NOTICE", "instances"}
+)
+
+
 def validate_logical_benchmark_directory(
     benchmark_dir: Path,
     collector: ValidationErrorCollector,
@@ -665,6 +670,30 @@ def validate_logical_benchmark_directory(
         else:
             collector.add(f"{benchmark_dir}: missing required 'benchmark.yaml' file")
             return None
+
+    # Check instances/ presence unconditionally so the note always appears,
+    # even when other errors are present.
+    instances_dir = benchmark_dir / "instances"
+    if not instances_dir.exists():
+        collector.add_info(
+            f"{benchmark_dir.name}: benchmark has no instances (instances/ folder not present)"
+        )
+    elif not instances_dir.is_dir():
+        collector.add(f"{instances_dir}: 'instances' must be a directory")
+
+    # Reject any entries that are not benchmark.yaml, README.md, or instances/
+    for entry in sorted(benchmark_dir.iterdir()):
+        if entry.name.startswith("."):
+            continue
+        if entry.name not in _ALLOWED_BENCHMARK_NAMES:
+            collector.add(
+                f"{benchmark_dir}: unexpected entry '{entry.name}' — "
+                "a benchmark folder may only contain 'benchmark.yaml', "
+                "'README.md' (optional), 'NOTICE' (optional), and 'instances/' (optional)"
+            )
+
+    if collector.has_errors:
+        return None
 
     # First pass: parse benchmark.yaml data to get property IDs
     data = load_yaml_file(problem_file, collector)
@@ -682,18 +711,20 @@ def validate_logical_benchmark_directory(
         p.identifier: p.is_artifact for p in config.logicalBenchmark.instance
     }
 
-    # Validate instances folder if present and collect instance identifiers
-    instances_dir = benchmark_dir / "instances"
+    # Validate instances folder contents (already confirmed it exists and is a dir above)
     discovered_instance_ids: set[str] = set()
-    if instances_dir.exists():
-        if not instances_dir.is_dir():
-            collector.add(f"{instances_dir}: 'instances' must be a directory")
+    if instances_dir.is_dir():
+        visible_items = [
+            item
+            for item in sorted(instances_dir.iterdir())
+            if not item.name.startswith(".")
+        ]
+        if not visible_items:
+            collector.add_info(
+                f"{benchmark_dir.name}: benchmark has no instances (instances/ folder is empty)"
+            )
         else:
-            # Each instance can be a subdirectory (instances/<instance-id>/instance.yaml)
-            # or a standalone YAML (instances/<instance-id>.yaml)
-            for item in sorted(instances_dir.iterdir()):
-                if item.name.startswith("."):
-                    continue
+            for item in visible_items:
                 if item.is_dir() or (
                     item.is_file() and item.suffix in (".yaml", ".yml")
                 ):
@@ -807,7 +838,7 @@ def validate_logical_benchmarks(
             "submission_path": str(target),
             "status": "success" if success else "failed",
             "errors": collector.errors,
-            "warnings": [],
+            "warnings": collector.info,
         }
         all_results.append(result)
 

@@ -438,6 +438,123 @@ logicalBenchmark:
         assert not collector.has_errors
 
 
+class TestBenchmarkDirectoryContents:
+    """Checks that a benchmark folder rejects unexpected entries and warns about missing instances."""
+
+    _MINIMAL_BENCHMARK = """\
+logicalBenchmark:
+  benchmarkIdentifier: test_bench
+  description: Test description
+  instance:
+    - identifier: size
+"""
+
+    def test_unexpected_file_in_benchmark_dir_fails(self, tmp_path: Path) -> None:
+        """Any file other than benchmark.yaml, README.md, or instances/ causes a validation error."""
+        bench_dir = tmp_path / "my_benchmark"
+        bench_dir.mkdir()
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+        (bench_dir / "extra_file.txt").write_text("oops")
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is None
+        assert collector.has_errors
+        assert "extra_file.txt" in " ".join(collector.errors)
+
+    def test_unexpected_directory_in_benchmark_dir_fails(self, tmp_path: Path) -> None:
+        """An unexpected subdirectory (not 'instances') causes a validation error."""
+        bench_dir = tmp_path / "my_benchmark"
+        bench_dir.mkdir()
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+        (bench_dir / "random_subdir").mkdir()
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is None
+        assert collector.has_errors
+        assert "random_subdir" in " ".join(collector.errors)
+
+    def test_readme_and_instances_are_allowed(self, tmp_path: Path) -> None:
+        """benchmark.yaml + README.md + instances/ is a fully valid layout."""
+        bench_dir = tmp_path / "my_benchmark"
+        instances_dir = bench_dir / "instances"
+        inst_dir = instances_dir / "inst_1"
+        inst_dir.mkdir(parents=True)
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+        (bench_dir / "README.md").write_text("# Benchmark")
+        (inst_dir / "instance.yaml").write_text("identifier: inst_1\n")
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+
+    def test_notice_file_is_allowed(self, tmp_path: Path) -> None:
+        """benchmark.yaml + NOTICE is a valid layout."""
+        bench_dir = tmp_path / "my_benchmark"
+        bench_dir.mkdir()
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+        (bench_dir / "NOTICE").write_text("Copyright notice")
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+
+    def test_no_instances_folder_produces_info(self, tmp_path: Path) -> None:
+        """When instances/ is absent, no error is raised but an info note is added."""
+        bench_dir = tmp_path / "my_benchmark"
+        bench_dir.mkdir()
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+        assert collector.has_info
+        assert "no instances" in " ".join(collector.info)
+
+    def test_empty_instances_folder_produces_info(self, tmp_path: Path) -> None:
+        """When instances/ exists but is empty, no error is raised but an info note is added."""
+        bench_dir = tmp_path / "my_benchmark"
+        instances_dir = bench_dir / "instances"
+        instances_dir.mkdir(parents=True)
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+        assert collector.has_info
+        assert "no instances" in " ".join(collector.info)
+
+    def test_no_instances_info_present_even_on_failed_benchmark(
+        self, tmp_path: Path
+    ) -> None:
+        """Even when a benchmark fails (unexpected file), the no-instances info note still appears."""
+        bench_dir = tmp_path / "my_benchmark"
+        bench_dir.mkdir()
+        (bench_dir / "benchmark.yaml").write_text(self._MINIMAL_BENCHMARK)
+        (bench_dir / "extra_file.txt").write_text("oops")
+        # no instances/ folder
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is None
+        assert collector.has_errors
+        assert "extra_file.txt" in " ".join(collector.errors)
+        assert collector.has_info
+        assert "no instances" in " ".join(collector.info)
+
+
 class TestRankingValidation:
     def test_valid_ranking_asc_passes(self) -> None:
         """A ranking config referencing a known metric with asc order is valid."""

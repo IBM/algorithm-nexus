@@ -1,0 +1,19 @@
+# Benchmark Submission Space Template
+# Place this file at experiments/<experiment-name>/submissions/<submission-name>/space.yaml
+# Replace every <...> placeholder with real values.
+#
+# entitySpace defines the parameter values for this benchmark run.
+# experimentIdentifier must match one of the experiments listed in
+# the sibling experiment_package.yaml.
+
+entitySpace:
+  - identifier: <property-name>  # e.g. "dataset"
+    propertyDomain:
+      values: ["<value>"]  # e.g. ["sen1floods11"]
+  - identifier: <property-name>  # e.g. "split"
+    propertyDomain:
+      values: ["<value>"]  # e.g. ["test"]
+
+experiments:
+  - actuatorIdentifier: custom_experiments
+    experimentIdentifier: <experiment-id>  # must match an id in experiment_package.yaml
