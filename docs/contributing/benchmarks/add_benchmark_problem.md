@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 This guide shows you how to register a benchmark problem in Algorithm Nexus and
 add a concrete instance of that problem.
 
-A **benchmark problem** (also called a *logical benchmark*) is the abstract task
+A **benchmark problem** (also called a _logical benchmark_) is the abstract task
 you want algorithms or models compared on. A **benchmark instance** is one
 concrete realisation of that task — a specific graph, dataset, workload, or
 other input.
@@ -131,10 +131,10 @@ git push origin add-graph-coloring-benchmark
 Open a pull request from your fork to the Algorithm Nexus main branch.
 
 To register an experiment that evaluates this problem, continue with
-[How to add a benchmark experiment](./add_benchmark_experiment.md).
-To bind that experiment to this problem, continue with
-[How to bind an experiment to a problem](./add_instance_binding.md).
-To apply an experiment to this instance, continue with
+[How to add a benchmark experiment](./add_benchmark_experiment.md). To bind that
+experiment to this problem, continue with
+[How to bind an experiment to a problem](./add_instance_binding.md). To apply an
+experiment to this instance, continue with
 [How to add a benchmark submission](./add_benchmark_submission.md).
 
 ---
@@ -150,10 +150,10 @@ that holds those files.
 In `benchmark.yaml`, add the artifact property to the `instance` list:
 
 ```yaml
-        - identifier: graph
-          is_artifact: true
-          metadata:
-              description: Graph input files in various formats.
+- identifier: graph
+  is_artifact: true
+  metadata:
+      description: Graph input files in various formats.
 ```
 
 In the instance directory, create the subfolder and the files, then reference it
@@ -170,7 +170,7 @@ graph_family: erdos_renyi
 num_vertices: 50
 edge_density: 0.2
 graph:
-    artifacts_location: graph_files
+    artifactsLocation: graph_files
 ```
 
 The instance directory then looks like this:
@@ -206,9 +206,9 @@ The walk-through uses a mix of categorical, discrete, and continuous properties.
 To constrain a continuous property to a range, set `domainRange`:
 
 ```yaml
-          propertyDomain:
-              variableType: CONTINUOUS_VARIABLE_TYPE
-              domainRange: [0, 1]
+propertyDomain:
+    variableType: CONTINUOUS_VARIABLE_TYPE
+    domainRange: [0, 1]
 ```
 
 To leave a categorical property open, omit `propertyDomain`. See the

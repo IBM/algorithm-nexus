@@ -31,7 +31,7 @@ nav = [
       "contributing/benchmarks/index.md",
       { "How to Add a Benchmark Problem and Instance" = "contributing/benchmarks/add_benchmark_problem.md" },
       { "How to Add a Benchmark Experiment" = "contributing/benchmarks/add_benchmark_experiment.md" },
-      { "How to Bind an Experiment to a Problem" = "contributing/benchmarks/add_instance_binding.md" },
+      { "How to Bind an Experiment to a Problem Instance" = "contributing/benchmarks/add_instance_binding.md" },
       { "How to Add a Benchmark Submission" = "contributing/benchmarks/add_benchmark_submission.md" },
     ] },
     { "Owner Responsibilities" = "contributing/owner_responsibilities.md" },

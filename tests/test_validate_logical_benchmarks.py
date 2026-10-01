@@ -348,7 +348,7 @@ logicalBenchmark:
 identifier: test_inst_1
 description: A test instance
 dataset:
-  artifacts_location: data
+  artifactsLocation: data
 workload: "steady_state_heavy"
 """
         (inst1_dir / "instance.yaml").write_text(instance_content)
@@ -381,7 +381,7 @@ nonexistent_param: "value"
         assert "nonexistent_param" in " ".join(collector.errors)
 
     def test_instance_with_missing_artifact_fails(self, tmp_path: Path) -> None:
-        """An instance specifying an artifacts_location folder that does not exist fails."""
+        """An instance specifying an artifactsLocation folder that does not exist fails."""
         bench_dir = tmp_path / "test_benchmark"
         inst1_dir = bench_dir / "instances" / "inst_1"
         inst1_dir.mkdir(parents=True)
@@ -399,7 +399,7 @@ logicalBenchmark:
         instance_content = """
 identifier: test_inst_1
 graph:
-  artifacts_location: nonexistent_folder
+  artifactsLocation: nonexistent_folder
 """
         (inst1_dir / "instance.yaml").write_text(instance_content)
 
