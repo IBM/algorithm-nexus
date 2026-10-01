@@ -21,12 +21,14 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import (
+    _LOAD_ERROR,
     output_data,
     try_load_package_config,
     validate_output_format,
 )
 
 console = Console()
+error_console = Console(stderr=True)
 
 
 def list_packages(
@@ -59,7 +61,7 @@ def list_packages(
         bool,
         typer.Option(
             "--strict",
-            help="Warn on stderr when packages fail to load due to invalid YAML or schema errors.",
+            help="Exit with an error if any package fails to load.",
         ),
     ] = False,
 ) -> None:
@@ -72,14 +74,20 @@ def list_packages(
 
     # Collect all nexus packages
     nexus_packages: list[str] = []
+    had_errors = False
 
     for package_dir in packages_root.iterdir():
         if not package_dir.is_dir() or package_dir.name.startswith("."):
             continue
 
-        package_config = try_load_package_config(package_dir, warn_on_error=strict)
-        if package_config:
+        package_config = try_load_package_config(package_dir)
+        if package_config is _LOAD_ERROR:
+            had_errors = True
+        elif package_config is not None:
             nexus_packages.append(package_config.package.name)
+
+    if had_errors and strict:
+        raise typer.Exit(code=1)
 
     if not nexus_packages:
         console.print("\n[yellow]No Nexus packages found[/yellow]\n")
@@ -131,7 +139,7 @@ def list_experiment_packages(
         bool,
         typer.Option(
             "--strict",
-            help="Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.",
+            help="Exit with an error if any experiment package fails to load.",
         ),
     ] = False,
 ) -> None:
@@ -142,7 +150,7 @@ def list_experiment_packages(
     """
     import yaml
 
-    from algorithm_nexus.models import ExperimentConfig
+    from algorithm_nexus.models import BindingFileConfig, ExperimentConfig
 
     validate_output_format(output_format)
 
@@ -151,6 +159,7 @@ def list_experiment_packages(
         raise typer.Exit(code=1)
 
     data: list[dict[str, Any]] = []
+    had_errors = False
 
     for exp_dir in sorted(experiments_root.iterdir()):
         if not exp_dir.is_dir() or exp_dir.name.startswith("."):
@@ -158,12 +167,11 @@ def list_experiment_packages(
 
         exp_yaml = exp_dir / "experiment_package.yaml"
         if not exp_yaml.exists():
-            if strict:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
-                    f"no experiment_package.yaml found"
-                )
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                f"no experiment_package.yaml found"
+            )
+            had_errors = True
             continue
 
         try:
@@ -173,12 +181,11 @@ def list_experiment_packages(
             config = ExperimentConfig.model_validate(config_dict)
             exp_package = config.experiment_package
         except Exception as e:
-            if strict:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
-                    f"Failed to load or validate experiment_package.yaml: {e}"
-                )
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                f"Failed to load or validate experiment_package.yaml: {e}"
+            )
+            had_errors = True
             continue
 
         # Collect all benchmark identifiers referenced in bindings/
@@ -196,18 +203,17 @@ def list_experiment_packages(
                     binding_data = yaml.safe_load(
                         binding_file.read_text(encoding="utf-8")
                     )
-                    if binding_data and "bindings" in binding_data:
-                        for entry in binding_data["bindings"]:
-                            bench_id = entry.get("benchmarkIdentifier")
-                            if bench_id:
-                                all_benchmarks.add(bench_id)
+                    if binding_data:
+                        for binding in BindingFileConfig.model_validate(
+                            binding_data
+                        ).bindings:
+                            all_benchmarks.add(binding.benchmarkIdentifier)
                 except Exception as e:
-                    if strict:
-                        error_console = Console(stderr=True)
-                        error_console.print(
-                            f"[yellow]Warning:[/yellow] Failed to load binding file "
-                            f"{binding_file.name}: {e}"
-                        )
+                    error_console.print(
+                        f"[yellow]Warning:[/yellow] Failed to load binding file "
+                        f"{binding_file.name}: {e}"
+                    )
+                    had_errors = True
 
         data.append(
             {
@@ -219,6 +225,9 @@ def list_experiment_packages(
                 else "None",
             }
         )
+
+    if had_errors and strict:
+        raise typer.Exit(code=1)
 
     if not data:
         console.print(
@@ -270,14 +279,14 @@ def list_benchmark_experiments(
         bool,
         typer.Option(
             "--strict",
-            help="Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.",
+            help="Exit with an error if any experiment package fails to load.",
         ),
     ] = False,
 ) -> None:
     """List all benchmark experiments discovered under experiments/."""
     import yaml
 
-    from algorithm_nexus.models import ExperimentConfig
+    from algorithm_nexus.models import BindingFileConfig, ExperimentConfig
 
     validate_output_format(output_format)
 
@@ -286,6 +295,7 @@ def list_benchmark_experiments(
         raise typer.Exit(code=1)
 
     data: list[dict[str, Any]] = []
+    had_errors = False
 
     # Traverse experiments_root
     for exp_dir in sorted(experiments_root.iterdir()):
@@ -294,12 +304,11 @@ def list_benchmark_experiments(
 
         exp_yaml = exp_dir / "experiment_package.yaml"
         if not exp_yaml.exists():
-            if strict:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
-                    f"no experiment_package.yaml found"
-                )
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                f"no experiment_package.yaml found"
+            )
+            had_errors = True
             continue
 
         try:
@@ -310,12 +319,11 @@ def list_benchmark_experiments(
             config = ExperimentConfig.model_validate(config_dict)
             exp_package = config.experiment_package
         except Exception as e:
-            if strict:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
-                    f"Failed to load or validate experiment_package.yaml: {e}"
-                )
+            error_console.print(
+                f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
+                f"Failed to load or validate experiment_package.yaml: {e}"
+            )
+            had_errors = True
             continue
 
         # Load bindings in experiments/<name>/bindings/
@@ -337,20 +345,20 @@ def list_benchmark_experiments(
                     binding_data = yaml.safe_load(
                         binding_file.read_text(encoding="utf-8")
                     )
-                    if binding_data and "bindings" in binding_data:
-                        for binding_entry in binding_data["bindings"]:
-                            bench_id = binding_entry.get("benchmarkIdentifier")
-                            exp_ref = binding_entry.get("experiment")
-                            if bench_id and exp_ref:
-                                exp_id = exp_ref.get("experimentIdentifier")
-                                if exp_id in exp_id_to_benchmarks:
-                                    exp_id_to_benchmarks[exp_id].add(bench_id)
+                    if binding_data:
+                        for binding in BindingFileConfig.model_validate(
+                            binding_data
+                        ).bindings:
+                            exp_id = binding.experiment.experimentIdentifier
+                            if exp_id in exp_id_to_benchmarks:
+                                exp_id_to_benchmarks[exp_id].add(
+                                    binding.benchmarkIdentifier
+                                )
                 except Exception as e:
-                    if strict:
-                        error_console = Console(stderr=True)
-                        error_console.print(
-                            f"[yellow]Warning:[/yellow] Failed to load binding file {binding_file.name}: {e}"
-                        )
+                    error_console.print(
+                        f"[yellow]Warning:[/yellow] Failed to load binding file {binding_file.name}: {e}"
+                    )
+                    had_errors = True
 
         # For each experiment ID, create an entry
         for exp_id in sorted(exp_package.experiments):
@@ -365,6 +373,9 @@ def list_benchmark_experiments(
                     else "None",
                 }
             )
+
+    if had_errors and strict:
+        raise typer.Exit(code=1)
 
     if not data:
         console.print(

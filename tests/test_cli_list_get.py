@@ -142,6 +142,46 @@ class TestListPackages:
         assert "example-nexus-package" in result.stdout
         assert "test-package-benchmarks" in result.stdout
 
+    def test_list_packages_warns_on_bad_yaml(self, tmp_path: Path) -> None:
+        """Test that a nexus.yaml with invalid content always warns on stderr."""
+        pkg_dir = tmp_path / "bad-pkg"
+        pkg_dir.mkdir()
+        (pkg_dir / "nexus.yaml").write_text("not: valid: yaml: [", encoding="utf-8")
+
+        result = runner.invoke(
+            app, ["list", "packages", str(tmp_path)], catch_exceptions=False
+        )
+
+        assert result.exit_code == 0
+        assert "Warning" in result.output or "Warning" in (result.stderr or "")
+
+    def test_list_packages_strict_exits_on_bad_yaml(self, tmp_path: Path) -> None:
+        """Test that --strict causes exit 1 when a nexus.yaml fails to load."""
+        pkg_dir = tmp_path / "bad-pkg"
+        pkg_dir.mkdir()
+        (pkg_dir / "nexus.yaml").write_text("not: valid: yaml: [", encoding="utf-8")
+
+        result = runner.invoke(
+            app, ["list", "packages", str(tmp_path), "--strict"], catch_exceptions=False
+        )
+
+        assert result.exit_code == 1
+
+    def test_list_packages_strict_passes_when_all_valid(
+        self, fixtures_root: Path
+    ) -> None:
+        """Test that --strict exits 0 when all packages load successfully."""
+        # Use a directory containing only valid packages
+        import shutil
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            valid_src = fixtures_root / "valid-package"
+            shutil.copytree(valid_src, Path(tmpdir) / "valid-package")
+
+            result = runner.invoke(app, ["list", "packages", tmpdir, "--strict"])
+            assert result.exit_code == 0
+
 
 class TestListExperimentPackages:
     """Tests for 'nexus list experiment-packages' command."""
@@ -240,6 +280,7 @@ class TestListExperimentPackages:
             "  - benchmarkIdentifier: my_logical_benchmark\n"
             "    experiment:\n"
             "      experimentIdentifier: exp_id_1\n"
+            "      actuatorIdentifier: my_actuator\n"
             "      experimentVersion: 1.0.0\n",
             encoding="utf-8",
         )
@@ -328,6 +369,7 @@ class TestListBenchmarkExperiments:
             "  - benchmarkIdentifier: my_logical_benchmark\n"
             "    experiment:\n"
             "      experimentIdentifier: exp_id_1\n"
+            "      actuatorIdentifier: my_actuator\n"
             "      experimentVersion: 1.0.0\n",
             encoding="utf-8",
         )

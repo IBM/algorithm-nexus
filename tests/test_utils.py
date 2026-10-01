@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from algorithm_nexus.commands.utils import (
+    _LOAD_ERROR,
     find_package_config,
     output_requirements_txt,
     try_load_package_config,
@@ -45,17 +46,17 @@ package:
         assert config is None
 
     def test_load_package_invalid_yaml(self, tmp_path: Path) -> None:
-        """Test loading package with invalid YAML returns None."""
+        """Test loading package with invalid YAML returns _LOAD_ERROR."""
         package_dir = tmp_path / "test-package"
         package_dir.mkdir()
         nexus_yaml = package_dir / "nexus.yaml"
         nexus_yaml.write_text("invalid: yaml: content:")
 
         config = try_load_package_config(package_dir)
-        assert config is None
+        assert config is _LOAD_ERROR
 
     def test_load_package_invalid_schema(self, tmp_path: Path) -> None:
-        """Test loading package with invalid schema returns None."""
+        """Test loading package with invalid schema returns _LOAD_ERROR."""
         package_dir = tmp_path / "test-package"
         package_dir.mkdir()
         nexus_yaml = package_dir / "nexus.yaml"
@@ -67,7 +68,7 @@ package:
         )
 
         config = try_load_package_config(package_dir)
-        assert config is None
+        assert config is _LOAD_ERROR
 
 
 class TestFindPackageConfig:
