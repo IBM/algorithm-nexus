@@ -21,7 +21,7 @@ except ImportError:
     sys.exit(1)
 
 from algorithm_nexus.commands.utils import (
-    _LOAD_ERROR,
+    PackageLoadError,
     output_data,
     try_load_package_config,
     validate_output_format,
@@ -80,10 +80,13 @@ def list_packages(
         if not package_dir.is_dir() or package_dir.name.startswith("."):
             continue
 
-        package_config = try_load_package_config(package_dir)
-        if package_config is _LOAD_ERROR:
+        try:
+            package_config = try_load_package_config(package_dir)
+        except PackageLoadError:
             had_errors = True
-        elif package_config is not None:
+            continue
+
+        if package_config is not None:
             nexus_packages.append(package_config.package.name)
 
     if had_errors and strict:
