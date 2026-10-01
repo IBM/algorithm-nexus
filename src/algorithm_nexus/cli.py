@@ -9,7 +9,6 @@ import sys
 
 try:
     import typer
-    from rich.console import Console
 except ImportError:
     print(
         "Error: CLI dependencies are not installed.\n"
@@ -21,7 +20,7 @@ except ImportError:
 from algorithm_nexus.commands.get import get_benchmark_requirements
 from algorithm_nexus.commands.list import (
     list_benchmark_experiments,
-    list_benchmark_packages,
+    list_experiment_packages,
     list_packages,
 )
 from algorithm_nexus.commands.run import run_benchmarks
@@ -30,8 +29,6 @@ from algorithm_nexus.commands.validate import (
     validate_logical_benchmarks,
     validate_package,
 )
-
-console = Console()
 
 app = typer.Typer(
     help="Algorithm Nexus CLI - Tools for managing and validating Nexus packages.",
@@ -70,7 +67,7 @@ app.add_typer(validate_app, name="validate")
 
 # Register list commands
 list_app.command(name="packages")(list_packages)
-list_app.command(name="benchmark-packages")(list_benchmark_packages)
+list_app.command(name="experiment-packages")(list_experiment_packages)
 list_app.command(name="benchmark-experiments")(list_benchmark_experiments)
 
 # Register get commands

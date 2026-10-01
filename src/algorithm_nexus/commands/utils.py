@@ -305,19 +305,27 @@ def collect_benchmark_data(
     return benchmark_data
 
 
+class PackageLoadError(Exception):
+    """Raised by try_load_package_config when nexus.yaml exists but fails to load or validate."""
+
+
 def try_load_package_config(
     package_dir: Path,
-    warn_on_error: bool = False,
 ) -> AlgorithmNexusPackageConfig | None:
     """Attempt to load and validate a package configuration.
 
     Args:
         package_dir: Directory containing the nexus.yaml file
-        warn_on_error: If True, print warnings to stderr for failed loads
 
     Returns:
-        Validated AlgorithmNexusPackageConfig if successful, None otherwise
+        - Validated AlgorithmNexusPackageConfig on success
+        - None if nexus.yaml does not exist (directory is not a package)
+
+    Raises:
+        PackageLoadError: if nexus.yaml exists but fails to load or validate
+          (a warning has already been printed to stderr)
     """
+    error_console = Console(stderr=True)
     nexus_yaml_path = package_dir / "nexus.yaml"
     if not nexus_yaml_path.exists():
         return None
@@ -325,24 +333,20 @@ def try_load_package_config(
     collector = ValidationErrorCollector()
     nexus_data = load_yaml_file(nexus_yaml_path, collector)
     if nexus_data is None or collector.has_errors:
-        if warn_on_error:
-            error_console = Console(stderr=True)
-            error_console.print(
-                f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
-                f"Failed to load nexus.yaml"
-            )
-        return None
+        error_console.print(
+            f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+            f"Failed to load nexus.yaml"
+        )
+        raise PackageLoadError(package_dir.name)
 
     try:
         return AlgorithmNexusPackageConfig.model_validate(nexus_data)
     except Exception as e:  # noqa: S112
-        if warn_on_error:
-            error_console = Console(stderr=True)
-            error_console.print(
-                f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
-                f"Invalid package configuration ({type(e).__name__})"
-            )
-        return None
+        error_console.print(
+            f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
+            f"Invalid package configuration ({type(e).__name__})"
+        )
+        raise PackageLoadError(package_dir.name) from e
 
 
 def find_package_config(
@@ -362,8 +366,12 @@ def find_package_config(
         if not pkg_dir.is_dir() or pkg_dir.name.startswith("."):
             continue
 
-        package_config = try_load_package_config(pkg_dir)
-        if package_config and package_config.package.name == nexus_package:
+        try:
+            package_config = try_load_package_config(pkg_dir)
+        except PackageLoadError:
+            continue
+
+        if package_config is not None and package_config.package.name == nexus_package:
             return (pkg_dir, package_config)
 
     return None
