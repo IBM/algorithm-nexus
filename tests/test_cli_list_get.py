@@ -26,6 +26,12 @@ def fixtures_root() -> Path:
     return Path(__file__).parent / "fixtures" / "packages"
 
 
+@pytest.fixture
+def experiments_root() -> Path:
+    """Return the path to the test experiments fixtures directory."""
+    return Path(__file__).parent / "fixtures" / "experiments"
+
+
 class TestListPackages:
     """Tests for 'nexus list packages' command."""
 
@@ -136,74 +142,159 @@ class TestListPackages:
         assert "example-nexus-package" in result.stdout
         assert "test-package-benchmarks" in result.stdout
 
+    def test_list_packages_warns_on_bad_yaml(self, tmp_path: Path) -> None:
+        """Test that a nexus.yaml with invalid content always warns on stderr."""
+        pkg_dir = tmp_path / "bad-pkg"
+        pkg_dir.mkdir()
+        (pkg_dir / "nexus.yaml").write_text("not: valid: yaml: [", encoding="utf-8")
 
-class TestListBenchmarkPackages:
-    """Tests for 'nexus list benchmark-packages' command."""
-
-    def test_list_benchmark_packages_default(self, fixtures_root: Path) -> None:
-        """Test listing benchmark packages with default table output."""
-        result = runner.invoke(app, ["list", "benchmark-packages", str(fixtures_root)])
-
-        assert result.exit_code == 0
-        assert "Discovered Benchmark Packages" in result.stdout
-        assert "Total:" in result.stdout
-
-    def test_list_benchmark_packages_with_filter(self, fixtures_root: Path) -> None:
-        """Test listing benchmark packages filtered by nexus package."""
         result = runner.invoke(
-            app,
-            [
-                "list",
-                "benchmark-packages",
-                str(fixtures_root),
-                "--nexus-package",
-                "test-package-benchmarks",
-            ],
+            app, ["list", "packages", str(tmp_path)], catch_exceptions=False
         )
 
         assert result.exit_code == 0
-        assert (
-            "Benchmark Packages for Nexus Package: test-package-benchmarks"
-            in result.stdout
+        assert "Warning" in result.output or "Warning" in (result.stderr or "")
+
+    def test_list_packages_strict_exits_on_bad_yaml(self, tmp_path: Path) -> None:
+        """Test that --strict causes exit 1 when a nexus.yaml fails to load."""
+        pkg_dir = tmp_path / "bad-pkg"
+        pkg_dir.mkdir()
+        (pkg_dir / "nexus.yaml").write_text("not: valid: yaml: [", encoding="utf-8")
+
+        result = runner.invoke(
+            app, ["list", "packages", str(tmp_path), "--strict"], catch_exceptions=False
         )
 
-    def test_list_benchmark_packages_filter_not_found(
+        assert result.exit_code == 1
+
+    def test_list_packages_strict_passes_when_all_valid(
         self, fixtures_root: Path
     ) -> None:
-        """Test filtering by nonexistent nexus package."""
+        """Test that --strict exits 0 when all packages load successfully."""
+        # Use a directory containing only valid packages
+        import shutil
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            valid_src = fixtures_root / "valid-package"
+            shutil.copytree(valid_src, Path(tmpdir) / "valid-package")
+
+            result = runner.invoke(app, ["list", "packages", tmpdir, "--strict"])
+            assert result.exit_code == 0
+
+
+class TestListExperimentPackages:
+    """Tests for 'nexus list experiment-packages' command."""
+
+    def test_list_experiment_packages_default(self, experiments_root: Path) -> None:
+        """Test listing experiment packages with default table output."""
         result = runner.invoke(
             app,
-            [
-                "list",
-                "benchmark-packages",
-                str(fixtures_root),
-                "--nexus-package",
-                "nonexistent-package",
-            ],
+            ["list", "experiment-packages", str(experiments_root)],
+            env={"COLUMNS": "200"},
         )
 
         assert result.exit_code == 0
-        assert "No benchmark packages found" in result.stdout
+        assert "Discovered Experiment Packages" in result.stdout
+        assert "vllm-performance" in result.stdout
+        assert "ado-vllm-performance" in result.stdout
+        assert "Total:" in result.stdout
 
-    def test_list_benchmark_packages_json_output(self, fixtures_root: Path) -> None:
-        """Test listing benchmark packages with JSON output."""
+    def test_list_experiment_packages_shows_folder(
+        self, experiments_root: Path
+    ) -> None:
+        """Test that the experiment folder is shown in output."""
         result = runner.invoke(
-            app, ["list", "benchmark-packages", str(fixtures_root), "-o", "json"]
+            app,
+            ["list", "experiment-packages", str(experiments_root)],
+            env={"COLUMNS": "200"},
         )
 
         assert result.exit_code == 0
-        # Should be valid JSON (after stripping ANSI codes)
+        assert "Experiment Folder" in result.stdout
+        assert "vllm-performance" in result.stdout
+
+    def test_list_experiment_packages_json_output(self, experiments_root: Path) -> None:
+        """Test listing experiment packages with JSON output."""
+        result = runner.invoke(
+            app,
+            ["list", "experiment-packages", str(experiments_root), "-o", "json"],
+        )
+
+        assert result.exit_code == 0
         clean_output = strip_ansi(result.stdout)
         assert clean_output.startswith("[")
+        assert "vllm-performance" in clean_output
+        assert "Experiment Folder" in clean_output
 
-    def test_list_benchmark_packages_csv_output(self, fixtures_root: Path) -> None:
-        """Test listing benchmark packages with CSV output."""
+    def test_list_experiment_packages_csv_output(self, experiments_root: Path) -> None:
+        """Test listing experiment packages with CSV output."""
         result = runner.invoke(
-            app, ["list", "benchmark-packages", str(fixtures_root), "-o", "csv"]
+            app,
+            ["list", "experiment-packages", str(experiments_root), "-o", "csv"],
         )
 
         assert result.exit_code == 0
-        assert "Benchmark Package" in result.stdout
+        assert "Experiment Folder" in result.stdout
+        assert "Requirement Specifier" in result.stdout
+        assert "Experiments" in result.stdout
+        assert "Bindings" in result.stdout
+
+    def test_list_experiment_packages_nonexistent_directory(self) -> None:
+        """Test listing experiment packages from nonexistent directory."""
+        result = runner.invoke(
+            app, ["list", "experiment-packages", "/nonexistent/path"]
+        )
+
+        assert result.exit_code == 1
+        assert "not a directory" in result.stdout
+
+    def test_list_experiment_packages_empty_directory(self, tmp_path: Path) -> None:
+        """Test listing experiment packages from empty directory."""
+        empty_dir = tmp_path / "experiments"
+        empty_dir.mkdir()
+        result = runner.invoke(app, ["list", "experiment-packages", str(empty_dir)])
+
+        assert result.exit_code == 0
+        assert "No experiment packages found" in result.stdout
+
+    def test_list_experiment_packages_with_bindings(self, tmp_path: Path) -> None:
+        """Test listing experiment packages shows associated bindings."""
+        experiments_root = tmp_path / "experiments"
+        exp_dir = experiments_root / "my-experiment"
+        exp_dir.mkdir(parents=True)
+
+        (exp_dir / "experiment_package.yaml").write_text(
+            "experiment_package:\n"
+            "  requirement_specifier: my-package>=1.0\n"
+            "  experiments:\n"
+            "    - exp_id_1\n"
+            "    - exp_id_2\n",
+            encoding="utf-8",
+        )
+
+        bindings_dir = exp_dir / "bindings"
+        bindings_dir.mkdir()
+        (bindings_dir / "my_binding.yaml").write_text(
+            "bindings:\n"
+            "  - benchmarkIdentifier: my_logical_benchmark\n"
+            "    experiment:\n"
+            "      experimentIdentifier: exp_id_1\n"
+            "      actuatorIdentifier: my_actuator\n"
+            "      experimentVersion: 1.0.0\n",
+            encoding="utf-8",
+        )
+
+        result = runner.invoke(
+            app,
+            ["list", "experiment-packages", str(experiments_root)],
+            env={"COLUMNS": "200"},
+        )
+
+        assert result.exit_code == 0
+        assert "my-experiment" in result.stdout
+        assert "my-package>=1.0" in result.stdout
+        assert "my_logical_benchmark" in result.stdout
 
 
 class TestListBenchmarkExperiments:
@@ -211,72 +302,89 @@ class TestListBenchmarkExperiments:
 
     def test_list_benchmark_experiments_default(self, fixtures_root: Path) -> None:
         """Test listing benchmark experiments with default table output."""
+        experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
-            app, ["list", "benchmark-experiments", str(fixtures_root)]
+            app,
+            ["list", "benchmark-experiments", str(experiments_root)],
+            env={"COLUMNS": "160"},
         )
 
         assert result.exit_code == 0
         assert "Discovered Benchmark Experiments" in result.stdout
+        assert "vllm-bench-deployment" in result.stdout
+        assert "guidellm-bench-deployment" in result.stdout
+        assert "vllm-performance" in result.stdout
+        assert "ado-vllm-performance" in result.stdout
         assert "Total:" in result.stdout
         assert "For further details" in result.stdout
 
-    def test_list_benchmark_experiments_with_filter(self, fixtures_root: Path) -> None:
-        """Test listing benchmark experiments filtered by nexus package."""
-        result = runner.invoke(
-            app,
-            [
-                "list",
-                "benchmark-experiments",
-                str(fixtures_root),
-                "--nexus-package",
-                "test-package-benchmarks",
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert (
-            "Benchmark Experiments for Nexus Package: test-package-benchmarks"
-            in result.stdout
-        )
-
-    def test_list_benchmark_experiments_filter_not_found(
-        self, fixtures_root: Path
-    ) -> None:
-        """Test filtering by nonexistent nexus package."""
-        result = runner.invoke(
-            app,
-            [
-                "list",
-                "benchmark-experiments",
-                str(fixtures_root),
-                "--nexus-package",
-                "nonexistent-package",
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert "No benchmark experiments found" in result.stdout
-
     def test_list_benchmark_experiments_json_output(self, fixtures_root: Path) -> None:
         """Test listing benchmark experiments with JSON output."""
+        experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
-            app, ["list", "benchmark-experiments", str(fixtures_root), "-o", "json"]
+            app, ["list", "benchmark-experiments", str(experiments_root), "-o", "json"]
         )
 
         assert result.exit_code == 0
         # Should be valid JSON (after stripping ANSI codes)
         clean_output = strip_ansi(result.stdout)
         assert clean_output.startswith("[")
+        assert "vllm-bench-deployment" in clean_output
 
     def test_list_benchmark_experiments_csv_output(self, fixtures_root: Path) -> None:
         """Test listing benchmark experiments with CSV output."""
+        experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
-            app, ["list", "benchmark-experiments", str(fixtures_root), "-o", "csv"]
+            app, ["list", "benchmark-experiments", str(experiments_root), "-o", "csv"]
         )
 
         assert result.exit_code == 0
         assert "Experiment ID" in result.stdout
-        assert "Benchmark Package" in result.stdout
+        assert "Experiment Folder" in result.stdout
+        assert "Requirement Specifier" in result.stdout
+        assert "Associated Bindings" in result.stdout
+        assert "vllm-bench-deployment" in result.stdout
+
+    def test_list_benchmark_experiments_with_bindings(self, tmp_path: Path) -> None:
+        """Test listing benchmark experiments with logical benchmark bindings."""
+        experiments_root = tmp_path / "experiments"
+        exp_dir = experiments_root / "my-experiment"
+        exp_dir.mkdir(parents=True)
+
+        # Write experiment_package.yaml
+        (exp_dir / "experiment_package.yaml").write_text(
+            "experiment_package:\n"
+            "  requirement_specifier: my-package\n"
+            "  experiments:\n"
+            "    - exp_id_1\n"
+            "    - exp_id_2\n",
+            encoding="utf-8",
+        )
+
+        # Write binding file under bindings/
+        bindings_dir = exp_dir / "bindings"
+        bindings_dir.mkdir()
+        (bindings_dir / "my_binding.yaml").write_text(
+            "bindings:\n"
+            "  - benchmarkIdentifier: my_logical_benchmark\n"
+            "    experiment:\n"
+            "      experimentIdentifier: exp_id_1\n"
+            "      actuatorIdentifier: my_actuator\n"
+            "      experimentVersion: 1.0.0\n",
+            encoding="utf-8",
+        )
+
+        result = runner.invoke(
+            app,
+            ["list", "benchmark-experiments", str(experiments_root)],
+            env={"COLUMNS": "160"},
+        )
+
+        assert result.exit_code == 0
+        assert "exp_id_1" in result.stdout
+        assert "exp_id_2" in result.stdout
+        assert "my_logical_benchmark" in result.stdout
+        assert "my-experiment" in result.stdout
 
 
 class TestGetBenchmarkRequirements:

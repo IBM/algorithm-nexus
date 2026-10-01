@@ -574,3 +574,14 @@ class LogicalBenchmarkConfig(BaseModel):
         LogicalBenchmarkDefinition,
         Field(description="The logical benchmark definition."),
     ]
+
+
+class BindingFileConfig(BaseModel):
+    """Root model for a binding YAML file (experiments/<name>/bindings/*.yaml)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    bindings: Annotated[
+        list[BenchmarkBinding],
+        Field(description="List of benchmark bindings defined in this file."),
+    ]
