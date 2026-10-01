@@ -9,7 +9,7 @@ benchmark target).
 To register an experiment, see
 [How to add a benchmark experiment](../../contributing/benchmarks/add_benchmark_experiment.md).
 To bind an experiment to a problem, see
-[How to bind an experiment to a problem](../../contributing/benchmarks/add_benchmark_binding.md).
+[How to bind an experiment to a problem](../../contributing/benchmarks/add_instance_binding.md).
 To add a submission, see
 [How to add a benchmark submission](../../contributing/benchmarks/add_benchmark_submission.md).
 

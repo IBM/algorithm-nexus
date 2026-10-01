@@ -86,7 +86,7 @@ git push origin add-rlx-coloring-experiment
 Open a pull request from your fork to the Algorithm Nexus main branch.
 
 To map this experiment onto a problem, continue with
-[How to bind an experiment to a problem](./add_benchmark_binding.md).
+[How to bind an experiment to a problem](./add_instance_binding.md).
 To apply this experiment to a target and instance, continue with
 [How to add a benchmark submission](./add_benchmark_submission.md).
 
@@ -142,7 +142,7 @@ uv run nexus list benchmark-experiments
 
 - [Benchmark Experiments and Submissions](../../design/benchmarking/benchmark_experiments_and_submissions.md)
   — schema and folder layout
-- [How to bind an experiment to a problem](./add_benchmark_binding.md)
+- [How to bind an experiment to a problem](./add_instance_binding.md)
 - [How to add a benchmark submission](./add_benchmark_submission.md)
 - [How to add a benchmark problem and instance](./add_benchmark_problem.md)
 - [`nexus validate experiments`](../../getting-started/cli-reference.md#nexus-validate-experiments)

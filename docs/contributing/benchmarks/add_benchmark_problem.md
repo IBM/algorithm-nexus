@@ -133,7 +133,7 @@ Open a pull request from your fork to the Algorithm Nexus main branch.
 To register an experiment that evaluates this problem, continue with
 [How to add a benchmark experiment](./add_benchmark_experiment.md).
 To bind that experiment to this problem, continue with
-[How to bind an experiment to a problem](./add_benchmark_binding.md).
+[How to bind an experiment to a problem](./add_instance_binding.md).
 To apply an experiment to this instance, continue with
 [How to add a benchmark submission](./add_benchmark_submission.md).
 
@@ -245,6 +245,6 @@ uv run nexus validate logical-benchmarks --file benchmarks/graph_coloring
 - [Logical Benchmarks and Instances](../../design/benchmarking/logical_benchmarks_and_instances.md)
   — schema, bindings, and how results are aggregated
 - [How to add a benchmark experiment](./add_benchmark_experiment.md)
-- [How to bind an experiment to a problem](./add_benchmark_binding.md)
+- [How to bind an experiment to a problem](./add_instance_binding.md)
 - [How to add a benchmark submission](./add_benchmark_submission.md)
 - [`nexus validate logical-benchmarks`](../../getting-started/cli-reference.md#nexus-validate-logical-benchmarks)
