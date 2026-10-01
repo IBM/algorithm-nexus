@@ -688,10 +688,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#nexus-list-benchmark-packages" class="md-nav__link">
+  <a href="#nexus-list-experiment-packages" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        nexus list benchmark-packages
+        nexus list experiment-packages
       </span>
     </span>
   </a>
@@ -1891,6 +1891,7 @@ Nexus packages.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>nexus<span class="w"> </span>validate<span class="w"> </span>--help
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>nexus<span class="w"> </span>list<span class="w"> </span>--help
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>nexus<span class="w"> </span>get<span class="w"> </span>--help
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>nexus<span class="w"> </span>run<span class="w"> </span>--help
 </span></code></pre></div>
 <h3 id="version-information">Version Information<a class="headerlink" href="#version-information" title="Permanent link">&para;</a></h3>
 <p>Check the installed version:</p>
@@ -2026,26 +2027,64 @@ specific package.</p>
 <h4 id="nexus-list-packages">nexus list packages<a class="headerlink" href="#nexus-list-packages" title="Permanent link">&para;</a></h4>
 <p>List all Nexus packages discovered in the packages directory.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages<span class="w"> </span><span class="o">[</span>packages_root<span class="o">]</span>
 </span></code></pre></div>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>packages_root</code> (optional): Path to the packages root directory (default: <code>./packages</code>)</li>
+</ul>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-o, --output-format [csv|json]</code>: Output format. Default is table output.</li>
+<li><code>--output-file PATH</code>: File path to write output to. Only used with <code>-o csv</code> or <code>json</code>.</li>
+<li><code>--strict</code>: Warn on stderr when packages fail to load due to invalid YAML or schema errors.</li>
+</ul>
 <p><strong>Example:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages<span class="w"> </span>path/to/packages
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages<span class="w"> </span>-o<span class="w"> </span>json
 </span></code></pre></div>
-<h4 id="nexus-list-benchmark-packages">nexus list benchmark-packages<a class="headerlink" href="#nexus-list-benchmark-packages" title="Permanent link">&para;</a></h4>
-<p>List all benchmark packages discovered across all Nexus packages.</p>
+<h4 id="nexus-list-experiment-packages">nexus list experiment-packages<a class="headerlink" href="#nexus-list-experiment-packages" title="Permanent link">&para;</a></h4>
+<p>List all experiment packages discovered under the experiments directory. Shows
+a table of experiment packages with their folder, requirement specifier,
+experiment IDs, and logical benchmark bindings.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-packages
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages<span class="w"> </span><span class="o">[</span>experiments_root<span class="o">]</span>
 </span></code></pre></div>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>experiments_root</code> (optional): Path to the experiments root directory (default: <code>./experiments</code>)</li>
+</ul>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-o, --output-format [csv|json]</code>: Output format. Default is table output.</li>
+<li><code>--output-file PATH</code>: File path to write output to. Only used with <code>-o csv</code> or <code>json</code>.</li>
+<li><code>--strict</code>: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.</li>
+</ul>
 <p><strong>Example:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-packages
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages<span class="w"> </span>path/to/experiments
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages<span class="w"> </span>-o<span class="w"> </span>json
 </span></code></pre></div>
 <h4 id="nexus-list-benchmark-experiments">nexus list benchmark-experiments<a class="headerlink" href="#nexus-list-benchmark-experiments" title="Permanent link">&para;</a></h4>
-<p>List all benchmark experiments discovered across all Nexus packages.</p>
+<p>List all benchmark experiments discovered under the experiments directory.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments<span class="w"> </span><span class="o">[</span>experiments_root<span class="o">]</span>
 </span></code></pre></div>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>experiments_root</code> (optional): Path to the experiments root directory (default: <code>./experiments</code>)</li>
+</ul>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>-o, --output-format [csv|json]</code>: Output format. Default is table output.</li>
+<li><code>--output-file PATH</code>: File path to write output to. Only used with <code>-o csv</code> or <code>json</code>.</li>
+<li><code>--strict</code>: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.</li>
+</ul>
 <p><strong>Example:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments<span class="w"> </span>path/to/experiments
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments<span class="w"> </span>-o<span class="w"> </span>json
 </span></code></pre></div>
 <h2 id="nexus-get">nexus get<a class="headerlink" href="#nexus-get" title="Permanent link">&para;</a></h2>
 <p>Get specific information about Nexus packages.</p>
@@ -2255,8 +2294,8 @@ Ray job logs to extract the ADO operation ID once execution completes.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="c1"># List all packages</span>
 </span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>nexus<span class="w"> </span>list<span class="w"> </span>packages
 </span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
-</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="c1"># List all benchmark packages</span>
-</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-packages
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="c1"># List all experiment packages</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages
 </span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>
 </span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="c1"># List all benchmark experiments</span>
 </span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>nexus<span class="w"> </span>list<span class="w"> </span>benchmark-experiments
