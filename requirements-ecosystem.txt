@@ -3393,9 +3393,9 @@ tiledb==0.36.1 \
     # via
     #   tiledb-cloud
     #   tiledb-vector-search
-tiledb-cloud==0.14.3 \
-    --hash=sha256:05d320c3911b84810596041ee59aa6ad331f04c927070c5d93ac3ba109cbc0af \
-    --hash=sha256:3aa192995049c42f4055ea349587dca514baad89d53867993a19c1152fb04858
+tiledb-cloud==0.14.4 \
+    --hash=sha256:00f7433eb1b6b12b62eeb7630021456db9ec05735a2074735fe68be09891d47b \
+    --hash=sha256:6cf6af97bc7850ef293099f307d4212b22d96e7b5c1d6c74ee4a6e51f8e45e73
     # via tiledb-vector-search
 tiledb-vector-search==0.16.0 \
     --hash=sha256:1194b5ec80105ba613af65c4eb85f5d0fd61029d1061294f7533f510966db826 \
