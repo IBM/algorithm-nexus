@@ -179,26 +179,13 @@ property to a constant value implicit in the experiment:
 ```yaml
 # Field mapping: dynamic artifact property mapped to experiment input
 instanceArtifactMapping:
-    - fieldMapping:
-          instance:
-              identifier: graph
-          experiment:
-              identifier: input_graph
+    - instance:
+          identifier: graph
+      instance:
+          identifier: input_graph
+      validValues:
+          - graph.json
 ```
-
-Or when an artifact property is fixed to a static file implicit in the
-experiment:
-
-```yaml
-# Static mapping: pin an artifact property to a constant file
-instanceArtifactMapping:
-    - staticMapping:
-          property:
-              identifier: graph
-          value: graph.json
-```
-
-Every instance artifact must have a valid mapping.
 
 ### Pin a property with static filters
 

@@ -157,7 +157,35 @@ inference workload). Each instance lives in its own folder under
 `instances/<instance-name>/` with an `instance.yaml` file and one or more
 subfolders containing the actual artifact files for that instance.
 
-### 3.2 Instance Artifacts
+### 3.2 Directory Layout
+
+```text
+benchmarks/<benchmark-id>/instances/<instance-name>/
+├── instance.yaml
+└── <artifactsLocation>/ # subfolder name matches `artifactsLocation` in instance.yaml
+    ├── graph.dimacs
+    └── graph.json
+```
+
+### 3.3 Schema
+
+Each `instance.yaml` defines a concrete benchmark instance. Problem properties
+match the problem property identifiers defined under `problemProperties` in
+`benchmark.yaml`, while `problemPropertyValues` holds the values for each
+property and `instanceArtifacts` identifies the artifacts that have been created
+for this instance. Each artifact entry declares a `property` (its identifier
+within the instance) and an `artifactsLocation` (the subfolder, relative to the
+instance folder, that holds the artifact files).
+
+| Field                   | Type                     | Required | Description                                                                           |
+| ----------------------- | ------------------------ | -------- | ------------------------------------------------------------------------------------- |
+| `instanceIdentifier`    | string                   | **Yes**  | Unique identifier for this benchmark instance.                                        |
+| `benchmarkIdentifier`   | string                   | **Yes**  | The `benchmarkIdentifier` of the benchmark this instance maps to.                     |
+| `description`           | string                   | No       | Human-readable description of this specific instance.                                 |
+| `problemPropertyValues` | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                        |
+| `instanceArtifacts`     | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts). |
+
+### 3.4 Instance Artifacts
 
 An **instance artifact** is a file that is derived from the instance's problem
 properties and can be fed directly to algorithms as input. Rather than having
@@ -172,38 +200,22 @@ using a tool such as an MPS converter, and write the resulting graph file (e.g.
 take one of these files as input rather than having to reconstruct the graph
 themselves.
 
-All instance artifacts live in the `artifacts` subfodler within the instance
-folder.
+All instance artifacts live in the subfolder within the instance folder
+specified in `artifactsLocation` and follow the below specification.
 
-### 3.3 Directory Layout
+**instanceArtifact fields:**
 
-```text
-benchmarks/<benchmark-id>/instances/<instance-name>/
-├── instance.yaml
-└── artifacts/ # file names match the values for the instance artifacts in instance.yaml
-    ├── graph.dimacs
-    └── graph.json
+| Field               | Type     | Required | Description                                                    |
+| ------------------- | -------- | -------- | -------------------------------------------------------------- |
+| `property`          | Property | **Yes**  | Identifies this artifact slot within the instance.             |
+| `artifactsLocation` | string   | **Yes**  | Subfolder (relative to the instance folder) holding the files. |
+
+```yaml
+instanceArtifacts:
+    - property:
+          identifier: "<instance-artifact-property-name>"
+      artifactsLocation: "<artifacts-subfolder>"
 ```
-
-### 3.4 Schema
-
-Each `instance.yaml` defines a concrete benchmark instance. Problem properties
-match the problem property identifiers defined under `problemProperties` in
-`benchmark.yaml`, while `problemPropertyValues` holds the values for each
-property and `instanceArtifacts` identifies the artifacts that have been created
-for this instance. Each Artifact is specified as a PropertyValue object where
-`value` is a list of valid file names from the `artifacts` sub-folder. Multiple
-file names can map to the same artifact (e.g., to support the same graph in
-different formats.) and files in the list must exist in the `artifacts`
-subfolder.
-
-| Field                   | Type                  | Required | Description                                                       |
-| ----------------------- | --------------------- | -------- | ----------------------------------------------------------------- |
-| `instanceIdentifier`    | string                | **Yes**  | Unique identifier for this benchmark instance.                    |
-| `benchmarkIdentifier`   | string                | **Yes**  | The `benchmarkIdentifier` of the benchmark this instance maps to. |
-| `description`           | string                | No       | Human-readable description of this specific instance.             |
-| `problemPropertyValues` | list of PropertyValue | No       | Values for all problem properties defined in `benchmark.yaml`.    |
-| `instanceArtifacts`     | list of PropertyValue | No       | All artifacts available for this instance.                        |
 
 ### 3.5 Example
 
@@ -230,10 +242,8 @@ problemPropertyValues:
 # Artifact instance property
 instanceArtifacts:
     - property:
-        identifier: graph
-      value:
-        - graph.json
-        - graph.dimacs
+          identifier: graph
+      artifactsLocation: artifacts
 ```
 
 ---
@@ -249,7 +259,9 @@ An instance binding serves two purposes:
 
 1. **Declaration** — it defines the benchmark instance an experiment maps to
 
-2. **Mapping** — This maps instance property values and/or instance artifacts  to one or more of the  the experiments inputs. It also maps output properties to the metrics the logical benchmark defines. 
+2. **Mapping** — This maps instance property values and/or instance artifacts to
+   one or more of the the experiments inputs. It also maps output properties to
+   the metrics the logical benchmark defines.
 
 The purpose of this approach is provide flexibility in what information
 benchmark experiment need to execute a benchmark instance. As an example, one
@@ -267,16 +279,16 @@ contains one instance binding.
 
 <!-- markdownlint-disable line-length -->
 
-| Field                       | Type                                  | Required | Description                                                                                                                                                                                                                                                                                                                                                        |
-| --------------------------- | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `instanceBindingIdentifier` | string                                | **Yes**  | The unique identifier of this binding.                                                                                                                                                                                                                                                                                                                             |
-| `instanceReference`         | string                                | **Yes**  | It is formed as `benchmarkIdentifier/instanceIdentifier` for the instance it maps to.                                                                                                                                                                                                                                                                              |
-| `experiment`                | ExperimentReference                   | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                                                                                                                                                                                              |
-| `targetMapping`             | **TargetMapping**                     | No       | Identifies the leaderboard target (row key) for this binding. Either a static string label or a reference to an experiment input property resolved at query time. Defaults to the experiment identifier when omitted.                                                                                                                                              |
-| `metricMapping`             | list of **metric mapping**            | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical.benchmark.                                                                                                                                                                  |
-| `problemPropertyMapping`    | list of **problem property mapping**  | No       | Remaps instance problem properties to experiment input properties.                                                                                                                                                                                                                                                                                                 |
-| `instanceArtifactMapping`   | list of **instance artifact mapping** | No       | Remaps benchmark instance artifact properties to experiment input properties. These mappings should be present even if the experiment and instance properties have the same name. Every property omitted here is considered not to be a property of the experiment and will not be used for resolving the mapping between experiment runs and benchmark instances. |
-| `staticFilters`             | list of PropertyValue                 | No       | Sets static experiment properties to values implicit in the instance.                                                                                                                                                                                                                                                                                              |
+| Field                       | Type                                 | Required | Description                                                                                                                                                                                                                                                                                                                                                        |
+| --------------------------- | ------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `instanceBindingIdentifier` | string                               | **Yes**  | The unique identifier of this binding.                                                                                                                                                                                                                                                                                                                             |
+| `instanceReference`         | string                               | **Yes**  | It is formed as `benchmarkIdentifier/instanceIdentifier` for the instance it maps to.                                                                                                                                                                                                                                                                              |
+| `experiment`                | ExperimentReference                  | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                                                                                                                                                                                              |
+| `targetMapping`             | **TargetMapping**                    | No       | Identifies the leaderboard target (row key) for this binding. Either a static string label or a reference to an experiment input property resolved at query time. Defaults to the experiment identifier when omitted.                                                                                                                                              |
+| `metricMapping`             | list of **metric mapping**           | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical.benchmark.                                                                                                                                                                  |
+| `problemPropertyMapping`    | list of **problem property mapping** | No       | Remaps instance problem properties to experiment input properties.                                                                                                                                                                                                                                                                                                 |
+| `instanceArtifactMapping`   | list of **instanceArtifactMapping**  | No       | Remaps benchmark instance artifact properties to experiment input properties. These mappings should be present even if the experiment and instance properties have the same name. Every property omitted here is considered not to be a property of the experiment and will not be used for resolving the mapping between experiment runs and benchmark instances. |
+| `staticFilters`             | list of PropertyValue                | No       | Sets static experiment properties to values implicit in the instance.                                                                                                                                                                                                                                                                                              |
 
 <!-- markdownlint-enable line-length -->
 
@@ -333,8 +345,8 @@ benchmark instance to experiment inputs. types of entry are possible:
       exp_param_1 > X and exp_param_2 = y"
 
 Only benchmark instance problem property or instance artifacts that map to an
-experiment input need to be included here. All the mapped properties are
-used for creating a [routing query](#62-routing-query).
+experiment input need to be included here. All the mapped properties are used
+for creating a [routing query](#62-routing-query).
 
 ##### Field mapping
 
@@ -367,33 +379,33 @@ problemPropertyMapping:
 
 #### Instance artifact mapping
 
-Maps an experiment property to an instance artifact. Two types of entry are
-possible:
+A list that maps experiment properties to instance artifacts. Each entry follows
+the structure in the table below.
 
-- _field mapping_: A 1-to-1 mapping for a benchmark instance property. Follows
-  the same schema used for field mapping in
-  [problem property mapping](#problem-property-mapping).
-- _static value mapping_: An instance artifact property is fixed to a value that
-  is implicit in the experiment. The static value used must be the name of one
-  the files contained in the `artifact_location` folder for that specific
-  artifact property.
+**instanceArtifactMapping fields:**
+
+| Field         | Type           | Required | Description                                         |
+| ------------- | -------------- | -------- | --------------------------------------------------- |
+| `instance`    | Property       | **Yes**  | The property of the instance artifact being mapped. |
+| `experiment`  | Property       | **Yes**  | The property of the experiment being mapped.        |
+| `validValues` | list of string | **Yes**  | The list of valid file names for that binding.      |
 
 ```yaml
 instanceArtifactMapping:
-    - fieldMapping:
-          instance:
-              identifier: "<benchmark-instance-artifact-property-name>"
-          experiment:
-              identifier: "<experiment-property-name>"
-    - staticMapping:
-          property:
-              identifier: "<benchmark-instance-artifact-property-name>"
-          value: "value"
+    - instance:
+          identifier: "<instance-artifact-property-name>"
+      experiment:
+          identifier: "<mapping-experiment-property-name>"
+      validValues:
+          - "filename1.ext"
+          - "filename2.ext"
 ```
 
-Every artifact from the instance with no mapping is considered not to have a
-counterpart input property in the experiment, and will not be used for creating
-a [routing query](#62-routing-query).
+Each filename in `validValues` must exist in the `artifactsLocation` subfolder
+specified for that artifact property in the instance. Every artifact from the
+instance with no mapping is considered not to have a counterpart input property
+in the experiment, and will not be used for creating a
+[routing query](#62-routing-query).
 
 #### Static filters
 
@@ -429,11 +441,12 @@ experiment:
     experimentVersion: 1.0.0
 
 instanceArtifactMapping:
-    - fieldMapping:
-          instance:
-              identifier: graph
-          experiment:
-              identifier: input_graph
+    - instance:
+          identifier: graph
+      experiment:
+          identifier: graph_file
+      validValues:
+          - graph.json
 ```
 
 #### Properties and Static Artifact Binding Example
@@ -462,10 +475,12 @@ problemPropertyMapping:
     experiment:
         identifier: density
 instanceArtifactMapping:
-    - staticMapping:
-        property:
-            identifier: graph
-        value: graph.json
+    - instance:
+          identifier: graph
+      experiment:
+          identifier: graph_file
+      validValues:
+          - graph.json
 ```
 
 ---
