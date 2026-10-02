@@ -5,10 +5,14 @@ SPDX-License-Identifier: Apache-2.0
 
 # How to bind an experiment to a problem instance
 
-This guide shows you how to register a benchmark instance binding in Algorithm Nexus.
+This guide shows you how to register a benchmark instance binding in Algorithm
+Nexus.
 
-An **instance binding** maps an experiment's property and metric names onto a
-benchmark instance and its canonical metric names.
+A **benchmark instance binding** is used to identify the runs of an experiment
+that are on that particular instance. See
+[Routing Query](../../design/benchmarking/logical_benchmarks_and_instances.md#62-routing-query)
+for the details. It also translates the experiment output property/metric names
+to the canonical metric names defined by the logical benchmark.
 
 The steps below bind `rlx_coloring` to the `erdos_renyi_50_02` instance of the
 `graph_coloring` benchmark. After that walk-through,
@@ -45,13 +49,14 @@ mkdir -p experiments/rlx_coloring/bindings
 Create `experiments/rlx_coloring/bindings/graph_coloring_binding.yaml`:
 
 ```yaml
-identifier: coloring_rlx
+instanceBindingIdentifier: coloring_rlx
 instanceReference: erdos_renyi_50_02/graph_coloring
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: rlx_coloring
     experimentVersion: 1.0.0
-targetMapping: rlx # The target (algorithm) of this experiment is always "rlx".
+targetMapping:
+    static: rlx # The target (algorithm) of this experiment is always "rlx".
 problemPropertyMapping:
     - instance: # benchmark's num_vertices is experiment's n_nodes parameter
           identifier: num_vertices
@@ -76,11 +81,11 @@ metricMapping:
           identifier: runtime_ms
 ```
 
-`problemPropertyMapping` pairs a benchmark instance problem property with a corresponding
-experiment input property. `metricMapping` does the same for result
-columns. `targetMapping` is a custom string label or the name of an experiment
-property whose value is resolved at query time; it defaults to the experiment
-identifier when omitted.
+`problemPropertyMapping` pairs a benchmark instance problem property with a
+corresponding experiment input property. `metricMapping` does the same for
+result columns. `targetMapping` is a custom string label or the name of an
+experiment property whose value is resolved at query time; it defaults to the
+experiment identifier when omitted.
 
 The full field list is in
 [Logical Benchmarks and Instances](../../design/benchmarking/logical_benchmarks_and_instances.md#4-benchmark-instance-binding).
@@ -126,17 +131,18 @@ When the experiment takes no problem-property inputs (e.g. it always operates on
 a fixed artifact and needs no per-dimension filtering), both
 `problemPropertyMapping` and `metricMapping` can be omitted. Any problem
 property from the instance that has no entry in `problemPropertyMapping` is
-treated as having no counterpart experiment input, and its value is resolved
-directly from the instance declaration rather than from experiment parameters.
+treated as having no counterpart experiment input and is not used for forming a
+[routing query](../../design/benchmarking/logical_benchmarks_and_instances.md#62-routing-query).
 
-```yaml
-identifier: sorting_bubble
+````yaml
+instanceMappingIdentifier: sorting_bubble
 instanceReference: random_100k/sorting
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: bubble_sort
     experimentVersion: 1.0.0
-targetMapping: algorithm
+targetMapping:
+    experimentProperty: model
 ```
 
 `metricMapping` can still be omitted whenever the experiment already uses the
@@ -161,7 +167,7 @@ problemPropertyMapping:
             propertyDomain:
                 domainRange: [200, 500]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-```
+````
 
 ### Map experiment properties to instance artifacts
 
