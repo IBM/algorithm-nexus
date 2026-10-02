@@ -651,7 +651,7 @@ def validate_logical_benchmark_file(
     return parsed
 
 
-_ALLOWED_BENCHMARK_NAMES: frozenset[str] = frozenset(
+_ALLOWED_FILE_NAMES: frozenset[str] = frozenset(
     {"benchmark.yaml", "README.md", "NOTICE", "instances"}
 )
 
@@ -685,7 +685,7 @@ def validate_logical_benchmark_directory(
     for entry in sorted(benchmark_dir.iterdir()):
         if entry.name.startswith("."):
             continue
-        if entry.name not in _ALLOWED_BENCHMARK_NAMES:
+        if entry.name not in _ALLOWED_FILE_NAMES:
             collector.add(
                 f"{benchmark_dir}: unexpected entry '{entry.name}' — "
                 "a benchmark folder may only contain 'benchmark.yaml', "
