@@ -243,17 +243,13 @@ instanceArtifacts:
 ### 4.1 Concept
 
 A benchmark instance binding defines how a given experiment can execute a
-benchmark instance. property names and values to one or more of the available
-benchmrk instances. This is called an **instance binding**.
+benchmark instance and how to consume the experiments outputs.
 
 An instance binding serves two purposes:
 
 1. **Declaration** — it defines the benchmark instance an experiment maps to
 
-2. **Mapping** — it describes how - the experiment's input property names map to
-   the problemProperties and/or instanceArtifcats of the benchmark instance -
-   the experiments output property names correspond to the metric names defined
-   by the logical benchmark.
+2. **Mapping** — This maps instance property values and/or instance artifacts  to one or more of the  the experiments inputs. It also maps output properties to the metrics the logical benchmark defines. 
 
 The purpose of this approach is provide flexibility in what information
 benchmark experiment need to execute a benchmark instance. As an example, one
@@ -610,12 +606,12 @@ properties. For each property, the name used for querying is the experiment
 property name. For instance artifact properties, the query is executed for the
 mapped experiment property to match any of the values specified in the instance.
 
-Below is an example SQL query:
+Below is an example query:
 
 ```text
 experimentIdentifier=$experimentIdentifier AND
 mappedProblemPropertyIdentifier=instanceValue AND
-mappedInstanceArtifactPropertyIdentifier in [possible Instance values]
+mappedInstanceArtifactPropertyIdentifier in [possible instance values]
 ```
 
 ### 6.3 Dynamic Property Resolution
