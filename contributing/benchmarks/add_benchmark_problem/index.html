@@ -1283,14 +1283,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../add_benchmark_binding/" class="md-nav__link">
+      <a href="../add_instance_binding/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-  How to Bind an Experiment to a Problem
+  How to Bind an Experiment to a Problem Instance
 
     
   </span>
@@ -1807,10 +1807,10 @@ instance are ready to commit.</p>
 </span></code></pre></div>
 <p>Open a pull request from your fork to the Algorithm Nexus main branch.</p>
 <p>To register an experiment that evaluates this problem, continue with
-<a href=".././add_benchmark_experiment/">How to add a benchmark experiment</a>.
-To bind that experiment to this problem, continue with
-<a href=".././add_benchmark_binding/">How to bind an experiment to a problem</a>.
-To apply an experiment to this instance, continue with
+<a href=".././add_benchmark_experiment/">How to add a benchmark experiment</a>. To bind that
+experiment to this problem, continue with
+<a href=".././add_instance_binding/">How to bind an experiment to a benchmark instance</a>. To apply an
+experiment to this instance, continue with
 <a href=".././add_benchmark_submission/">How to add a benchmark submission</a>.</p>
 <hr />
 <h2 id="alternatives">Alternatives<a class="headerlink" href="#alternatives" title="Permanent link">&para;</a></h2>
@@ -1819,10 +1819,10 @@ To apply an experiment to this instance, continue with
 property as an artifact on the problem, then point the instance at a subfolder
 that holds those files.</p>
 <p>In <code>benchmark.yaml</code>, add the artifact property to the <code>instance</code> list:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">          </span><span class="nt">is_artifact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">          </span><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">              </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph input files in various formats.</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">is_artifact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Graph input files in various formats.</span>
 </span></code></pre></div>
 <p>In the instance directory, create the subfolder and the files, then reference it
 from <code>instance.yaml</code>:</p>
@@ -1834,7 +1834,7 @@ from <code>instance.yaml</code>:</p>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nt">num_vertices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nt">edge_density</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nt">graph</span><span class="p">:</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">artifacts_location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_files</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">artifactsLocation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">graph_files</span>
 </span></code></pre></div>
 <p>The instance directory then looks like this:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>benchmarks/graph_coloring/instances/erdos_renyi_50_02/
@@ -1856,9 +1856,9 @@ structure — add <code>benchmarks/&lt;problem-id&gt;/README.md</code> next to <
 <h3 id="use-other-property-domains">Use other property domains<a class="headerlink" href="#use-other-property-domains" title="Permanent link">&para;</a></h3>
 <p>The walk-through uses a mix of categorical, discrete, and continuous properties.
 To constrain a continuous property to a range, set <code>domainRange</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">          </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">              </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">              </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <p>To leave a categorical property open, omit <code>propertyDomain</code>. See the
 <a href="https://ibm.github.io/ado/core-concepts/properties-and-domains/">ado property domain documentation</a>
@@ -1884,7 +1884,7 @@ templates and replace every <code>&lt;...&gt;</code> marker:</p>
 <li><a href="../../../design/benchmarking/logical_benchmarks_and_instances/">Logical Benchmarks and Instances</a>
   — schema, bindings, and how results are aggregated</li>
 <li><a href=".././add_benchmark_experiment/">How to add a benchmark experiment</a></li>
-<li><a href=".././add_benchmark_binding/">How to bind an experiment to a problem</a></li>
+<li><a href=".././add_instance_binding/">How to bind an experiment to a benchmark instance</a></li>
 <li><a href=".././add_benchmark_submission/">How to add a benchmark submission</a></li>
 <li><a href="../../../getting-started/cli-reference/#nexus-validate-logical-benchmarks"><code>nexus validate logical-benchmarks</code></a></li>
 </ul>
