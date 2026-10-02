@@ -43,7 +43,7 @@ When that instance is already registered it lives at
 `benchmarks/graph_coloring/instances/erdos_renyi_50_02/instance.yaml`.
 
 To map this instance's property names onto the experiment's names, see
-[How to bind an experiment to a problem](./add_benchmark_binding.md).
+[How to bind an experiment to a benchmark instance](./add_instance_binding.md).
 
 ## 1. Create the submission from the instance
 
@@ -204,6 +204,6 @@ To validate one experiment folder, use the command in [step 2](#2-validate).
   — schema and folder layout
 - [How to add a benchmark experiment](./add_benchmark_experiment.md)
 - [How to add a benchmark problem and instance](./add_benchmark_problem.md)
-- [How to bind an experiment to a problem](./add_benchmark_binding.md)
+- [How to bind an experiment to a benchmark instance](./add_instance_binding.md)
 - [Benchmark Execution and Operations](../../design/benchmarking/benchmark_execution.md)
 - [`nexus validate experiments`](../../getting-started/cli-reference.md#nexus-validate-experiments)

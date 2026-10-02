@@ -592,13 +592,13 @@ def validate_instance(
 
         is_artifact_prop = instance_props[field_name]
         if is_artifact_prop and field_val is not None:
-            # field_val must be a dict with mandatory key 'artifacts_location'
-            if not isinstance(field_val, dict) or "artifacts_location" not in field_val:
+            # field_val must be a dict with mandatory key 'artifactsLocation'
+            if not isinstance(field_val, dict) or "artifactsLocation" not in field_val:
                 collector.add(
-                    f"{instance_file}: artifact property '{field_name}' must be a map with a mandatory 'artifacts_location' key"
+                    f"{instance_file}: artifact property '{field_name}' must be a map with a mandatory 'artifactsLocation' key"
                 )
             else:
-                folder_name = str(field_val["artifacts_location"])
+                folder_name = str(field_val["artifactsLocation"])
                 folder_path = (
                     instance_target / folder_name
                     if instance_target.is_dir()
@@ -606,7 +606,7 @@ def validate_instance(
                 )
                 if not folder_path.is_dir():
                     collector.add(
-                        f"{instance_file}: artifacts_location folder '{folder_name}' for property '{field_name}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
+                        f"{instance_file}: artifactsLocation folder '{folder_name}' for property '{field_name}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
                     )
 
     return instance
