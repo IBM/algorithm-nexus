@@ -5,12 +5,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # How to bind an experiment to a problem instance
 
-This guide shows you how to register a benchmark binding in Algorithm Nexus.
+This guide shows you how to register a benchmark instance binding in Algorithm Nexus.
 
 An **instance binding** maps an experiment's property and metric names onto a
-benchmark instance and its canonical metric names. A submission's `space.yaml`
-uses the experiment's names; the binding is how those names correspond to the
-instance.
+benchmark instance and its canonical metric names.
 
 The steps below bind `rlx_coloring` to the `erdos_renyi_50_02` instance of the
 `graph_coloring` benchmark. After that walk-through,
@@ -78,8 +76,8 @@ metricMapping:
           identifier: runtime_ms
 ```
 
-`problemPropertyMapping` pairs each benchmark instance problem property with the
-experiment input that carries it. `metricMapping` does the same for result
+`problemPropertyMapping` pairs a benchmark instance problem property with a corresponding
+experiment input property. `metricMapping` does the same for result
 columns. `targetMapping` is a custom string label or the name of an experiment
 property whose value is resolved at query time; it defaults to the experiment
 identifier when omitted.

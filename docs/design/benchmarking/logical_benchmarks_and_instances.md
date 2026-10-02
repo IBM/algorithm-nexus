@@ -13,19 +13,17 @@ experiments can be aggregated in a standardized, domain-agnostic way.
 
 To register a problem and instance, see
 [How to add a benchmark problem and instance](../../contributing/benchmarks/add_benchmark_problem.md).
-To bind an experiment to a problem, see
-[How to bind an experiment to a problem instance](../../contributing/benchmarks/add_instance_binding.md).
+To bind an experiment to a benchmark instance, see
+[How to bind an experiment to a benchmark instance](../../contributing/benchmarks/add_instance_binding.md).
 
 The design rests on three complementary abstractions:
 
 1. **Logical Benchmark Definition** — a declarative description of an abstract
-   benchmark problem: what properties it is evaluated on and what values those
-   properties can take. This is the shared contract that all experiments
-   targeting the same problem must conform to.
+benchmark problem: what properties define it and what values those
+properties can take. 
 
 2. **Benchmark Instance Definition** — a concrete instantiation of a logical
-   benchmark problem specifying specific problem property values and optional
-   input artifact files.
+   benchmark problem. Defines specific values for the problem properties and optionally provides instance specific files generated based on those property values. 
 
 3. **Benchmark Instance Binding** — metadata that maps an `ado` experiment's
    internal properties and metrics to the properties and metric names of a
@@ -151,8 +149,8 @@ for more information about the types of domains that can be specified.
 
 ### 3.1 Concept
 
-A logical benchmark can define concrete **benchmark instances** (e.g. specific
-graphs, routing networks, or datasets). Each instance lives in its own folder
+You can define concrete **benchmark instances**  for a logical benchmark (e.g. specific
+circuit compilation problem, portfolio optimization problem, or genai inference workload). Each instance lives in its own folder
 under `instances/<instance-name>/` with an `instance.yaml` file and one or more
 subfolders containing the actual artifact files for that instance.
 
@@ -167,8 +165,7 @@ For example, for a graph-coloring instance the problem properties might describe
 a graph in terms of its family, number of vertices, and edge density. A
 pre-processing step can consume those properties, generate the actual graph
 using a tool such as an MPS converter, and write the resulting graph file (e.g.
-`graph.dimacs` or `graph.json`) to an artifact folder. Algorithms then receive
-that file directly rather than having to reconstruct the graph themselves.
+`graph.dimacs` or `graph.json`) to an artifact folder. Benchmark experiments can take one of these files as input rather than having to reconstruct the graph themselves.
 
 ### 3.3 Directory Layout
 
@@ -184,8 +181,8 @@ benchmarks/<benchmark-id>/instances/<instance-name>/
 
 Each `instance.yaml` defines a concrete benchmark instance. Problem properties
 match the problem property identifiers defined under `problemProperties:` in
-`benchmark.yaml`, while `instanceArtifacts` identifies the input artifacts
-available for the instance. Artifacts are specified as a map with a mandatory
+`benchmark.yaml`, while `instanceArtifacts` identifies the artifacts that have been created for 
+this instance. Artifacts are specified as a map with a mandatory
 `artifactsLocation` key whose value is a subfolder name within the instance
 directory that contains the valid files for that property. The folder must exist
 inside the instance directory.
@@ -232,7 +229,7 @@ instanceArtifacts:
 
 ### 4.1 Concept
 
-For an experiment to target a logical benchmark it must provide a mapping of its
+A benchmark instance binding defines how a given experiment can execute a benchmark instance.
 property names and values to one or more of the available benchmrk instances.
 This is called an **instance binding**.
 
@@ -240,16 +237,17 @@ An instance binding serves two purposes:
 
 1. **Declaration** — it defines the benchmark instance an experiment maps to
 
-2. **Mapping** — it describes how the experiment's internal property names and
-   metric names correspond to the canonical property and metric names defined by
-   the logical benchmark. This allows the system to extract and consistently
-   label results from this experiment without any domain-specific knowledge.
+2. **Mapping** — it describes how 
+     - the experiment's input property names map to the problemProperties and/or instanceArtifcats of the benchmark instance
+      - the experiments output property names correspond to the metric names defined by
+the logical benchmark. 
 
-The purpose of this approach is that of decoupling experiments engineering from
-the abstract properties of the problem they solve. As an example, an experiment
+The purpose of this approach is provide flexibility in what information
+ benchmark experiment need to execute a benchmark instance. 
+As an example, one experiment
 might have been designed solely for solving one specific instance problem, and
 therefore it requires no input parameters. While others might have a more
-generic implementation and require input data to execute on a specific instance.
+generic implementation and require specific input data (an instance artefact, or the problem property values) to execute that specific instance.
 
 ### 4.2 Schema
 
@@ -263,7 +261,7 @@ contains a `bindings` list, where each entry is one instance binding.
 | Field                     | Type                                  | Required | Description                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------- | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `identifier`              | string                                | **Yes**  | The unique identifier of this binding.                                                                                                                                                                                                                                                                                                                             |
-| `instanceReference`       | string                                | **Yes**  | It is formed as `identifier/benchmarkReference` from the instance it maps to.                                                                                                                                                                                                                                                                                      |
+| `instanceReference`       | string                                | **Yes**  | It is formed as `benchmarkIdentifier/instanceIdentifier` for the instance it maps to.                                                                                                                                                                                                                                                                                      |
 | `experiment`              | ExperimentReference                   | **Yes**  | The `ado` ExperimentReference object.                                                                                                                                                                                                                                                                                                                              |
 | `targetMapping`           | string                                | No       | Identifies the leaderboard target (row key) for this binding. Can be a custom string label, or the name of an experiment property whose value is resolved at query time. Defaults to the experiment identifier when omitted.                                                                                                                                       |
 | `metricMapping`           | list of **metric mapping**            | No       | Translates per-experiment metric names to the canonical metric names defined by the logical benchmark. Required when metric names differ across experiments targeting the same logical.benchmark.                                                                                                                                                                  |
@@ -290,20 +288,17 @@ metric names to the same canonical name defined by the logical benchmark.
 #### Problem property mapping
 
 The `problemPropertyMapping` list maps problem properties/parameters from the
-benchmark instance to experiment inputs. The artifact mapping is implicit — the
-experiment property being bound against determines which artifact is used. Two
+benchmark instance to experiment inputs. 
 types of entry are possible:
 
 - _field mapping_: A 1-to-1 mapping for a benchmark instance property.
-    - Allows translating "WHERE logical_dim = X" to "WHERE experiment_param = X"
+    - Allows translating "WHERE problem_property_Z = X" to "WHERE experiment_param = X"
 - _categorical value mapping_: 1-to-many mapping for the values of a categorical
   benchmark instance property.
     - Allows translating "WHERE logical_dim = CategoryA" to e.g. "WHERE
       exp_param_1 > X and exp_param_2 = y"
 
-Every problem property from the instance with no mapping is considered not to
-have a counterpart input property in the experiment, and will be resolved with
-the value declared in the instance. Each omitted problem property will not be
+Only benchmark instance problem property or instance artifacts that map to an experiment input need to be included here. The others can be ignored.  
 used for creating a [routing key](#62-routing-key).
 
 ##### Field mapping
@@ -524,19 +519,6 @@ problemPropertyMapping:
             propertyDomain:
                 domainRange: [200, 500]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-    - categoricalValue:
-        property:
-            identifier: workload
-        value: poisson_bursty
-    predicate:
-        - identifier: request_rate
-            propertyDomain:
-                domainRange: [1, 20]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-        - identifier: max_concurrency
-            propertyDomain:
-                domainRange: [1, 50]
-                variableType: CONTINUOUS_VARIABLE_TYPE
 metricMapping:
     - benchmark:
         identifier: throughput_tokens_per_second
@@ -636,19 +618,6 @@ problemPropertyMapping:
         - identifier: max_concurrency
             propertyDomain:
                 domainRange: [100, 500]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-    - categoricalValue:
-        property:
-            identifier: workload
-        value: poisson_bursty
-    predicate:
-        - identifier: request_rate
-            propertyDomain:
-                domainRange: [1, 20]
-                variableType: CONTINUOUS_VARIABLE_TYPE
-        - identifier: max_concurrency
-            propertyDomain:
-                domainRange: [1, 50]
                 variableType: CONTINUOUS_VARIABLE_TYPE
 staticFilters:
     - property:

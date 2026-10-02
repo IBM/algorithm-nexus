@@ -30,7 +30,7 @@ submissions as separate artifacts.
 * *I want to add a new submission*
     * The [benchmark problem and instance](add_benchmark_problem.md) must be already defined
     * The [benchmark experiment package with the benchmark experiment must be added](add_benchmark_experiment.md)
-    * There must be a [binding from the benchmark experiment to the benchmark problem](add_instance_binding.md)
+    * There must be a [binding from the benchmark experiment to the benchmark instance](add_instance_binding.md)
     * If all above are in place follow [making a benchmark submission](add_benchmark_submission.md)
 
 ## Details
