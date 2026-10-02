@@ -1,0 +1,13 @@
+# Experiment Template
+# Copy this directory to experiments/<experiment-name>/ and replace every
+# <...> placeholder with real values.
+#
+# requirement_specifier must be a PyPI package name or GitHub URL.
+# Local paths are not allowed.
+
+experiment_package:
+  requirement_specifier: "<benchmark-package-name>"  # e.g. "sorting-benchmarks>=1.0.0"
+  # or "https://github.com/org/repo"
+  experiments:
+    - "<experiment-id>"  # experiment identifier(s) exposed by the package
+    # - "<experiment-id-2>"
