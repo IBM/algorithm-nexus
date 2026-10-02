@@ -1,0 +1,23 @@
+# Benchmark Binding Template (optional)
+# Place this file at experiments/<experiment-name>/bindings/<binding-name>.yaml
+# Only needed when connecting this experiment to a logical benchmark definition.
+# See templates/logical-benchmark/binding.yaml for the full binding schema.
+
+bindings:
+  - benchmarkIdentifier: <benchmark_id>  # must match logicalBenchmark.benchmarkIdentifier in benchmark.yaml
+    experiment:
+      actuatorIdentifier: custom_experiments
+      experimentIdentifier: <experiment-id>  # must match an id in experiment_package.yaml
+      experimentVersion: <major.minor.patch>
+
+    instanceMapping:
+      - benchmark:
+          identifier: <benchmark_instance_property>
+        experiment:
+          identifier: <experiment_property_name>
+
+    metricMapping:
+      - benchmark:
+          identifier: <canonical_metric_name>
+        experiment:
+          identifier: <experiment_metric_name>
