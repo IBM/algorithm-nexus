@@ -680,16 +680,20 @@ def validate_logical_benchmark_directory(
         )
     elif not instances_dir.is_dir():
         collector.add(f"{instances_dir}: 'instances' must be a directory")
+    elif not any(p for p in instances_dir.iterdir() if not p.name.startswith(".")):
+        collector.add_info(
+            f"{benchmark_dir.name}: benchmark has no instances (instances/ folder is empty)"
+        )
 
     # Reject any entries that are not benchmark.yaml, README.md, or instances/
+    allowed_list = ", ".join(f"'{name}'" for name in sorted(_ALLOWED_FILE_NAMES))
     for entry in sorted(benchmark_dir.iterdir()):
         if entry.name.startswith("."):
             continue
         if entry.name not in _ALLOWED_FILE_NAMES:
             collector.add(
                 f"{benchmark_dir}: unexpected entry '{entry.name}' — "
-                "a benchmark folder may only contain 'benchmark.yaml', "
-                "'README.md' (optional), 'NOTICE' (optional), and 'instances/' (optional)"
+                f"a benchmark folder may only contain {allowed_list}"
             )
 
     if collector.has_errors:
@@ -719,18 +723,11 @@ def validate_logical_benchmark_directory(
             for item in sorted(instances_dir.iterdir())
             if not item.name.startswith(".")
         ]
-        if not visible_items:
-            collector.add_info(
-                f"{benchmark_dir.name}: benchmark has no instances (instances/ folder is empty)"
-            )
-        else:
-            for item in visible_items:
-                if item.is_dir() or (
-                    item.is_file() and item.suffix in (".yaml", ".yml")
-                ):
-                    inst = validate_instance(item, instance_props, collector)
-                    if inst is not None:
-                        discovered_instance_ids.add(inst.identifier)
+        for item in visible_items:
+            if item.is_dir() or (item.is_file() and item.suffix in (".yaml", ".yml")):
+                inst = validate_instance(item, instance_props, collector)
+                if inst is not None:
+                    discovered_instance_ids.add(inst.identifier)
 
     # Validate logical benchmark file with collected instance_ids
     return validate_logical_benchmark_file(
