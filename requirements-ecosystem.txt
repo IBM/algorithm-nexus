@@ -810,9 +810,9 @@ gast==0.7.0 \
     --hash=sha256:0bb14cd1b806722e91ddbab6fb86bba148c22b40e7ff11e248974e04c8adfdae \
     --hash=sha256:99cbf1365633a74099f69c59bd650476b96baa5ef196fec88032b00b31ba36f7
     # via tensorflow
-gdown==6.4.0 \
-    --hash=sha256:a0f6dd1d23119e36d594822421d151c832641b92dd32bb8d30e870d24fe55149 \
-    --hash=sha256:e0c901a4d847b3dd482f556e716726fbf6baca1c7b046757d948b247eeb7c822
+gdown==6.4.1 \
+    --hash=sha256:7464d2fdb31bae97caec80fe2b5bc8e88400d88a759fc56ac3721bcad2e529be \
+    --hash=sha256:8c14467f32ddd8591b54ee1eae430d25134e04f0228326ba61e33fd8dee5ac61
     # via gridfm-graphkit
 geographiclib==2.1 \
     --hash=sha256:6a6545e6262d0ed3522e13c515713718797e37ed8c672c31ad7b249f372ef108 \
