@@ -3,14 +3,24 @@
 # and replace every <...> placeholder with real values.
 # The instance directory must also contain any artifact subfolders referenced below.
 
-identifier: <instance_name>  # matches the folder name by convention
+instanceIdentifier: <instance_name>  # matches the folder name by convention
+benchmarkIdentifier: <benchmark_id>  # must match benchmarkIdentifier in benchmark.yaml
 description: >
   <Brief description of what makes this instance specific / interesting.> #magic___^_^___line
-# Scalar properties — one entry per scalar property defined in benchmark.yaml.
-# Use the exact identifier from the benchmark.yaml instance list.
-<scalar_property_name>: <value>
+# Problem property values — one entry per property defined in problemProperties in benchmark.yaml.
+# Use the exact identifier from the benchmark.yaml problemProperties list.
+problemPropertyValues:
+  - property:
+      identifier: <property_name>
+    value: <value>
+  - property:
+      identifier: <another_property_name>
+    value: <value>
 
-# Artifact property — the named subfolder must exist inside this instance directory.
+# Artifact properties — only include when the instance has pre-generated artifact files.
+# The named subfolder must exist inside this instance directory.
 # benchmarks/<benchmark-id>/instances/<instance-name>/<subfolder-name>/
-<artifact_property_name>:
-  artifactsLocation: <subfolder-name>
+instanceArtifacts:
+  - property:
+      identifier: <artifact_property_name>
+    artifactsLocation: <subfolder-name>

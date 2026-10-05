@@ -34,12 +34,12 @@ from algorithm_nexus.commands.utils import (
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
-    BenchmarkBinding,
     BenchmarkInstance,
     CategoricalValueMapping,
     ExperimentConfig,
     FieldMapping,
-    LogicalBenchmarkConfig,
+    InstanceBinding,
+    LogicalBenchmarkDefinition,
 )
 
 console = Console()
@@ -110,7 +110,6 @@ def validate_model_yaml(
 def validate_benchmark_submissions(
     model_dir: Path,
     collector: ValidationErrorCollector,
-    registered_experiments: set[str],
 ) -> None:
     """Validate a model's benchmark_submissions/ folder.
 
@@ -175,7 +174,6 @@ def validate_optional_dir(
 def validate_model_directory(
     model_dir: Path,
     collector: ValidationErrorCollector,
-    registered_experiments: set[str],
 ) -> AlgorithmNexusModelConfig | None:
     """Validate a single model directory structure and contents.
 
@@ -197,7 +195,7 @@ def validate_model_directory(
     model_config = validate_model_yaml(model_dir, collector)
 
     # Validate optional benchmark_submissions/
-    validate_benchmark_submissions(model_dir, collector, registered_experiments)
+    validate_benchmark_submissions(model_dir, collector)
 
     return model_config
 
@@ -232,15 +230,7 @@ def validate_package_directory(
         return
 
     # Validate nexus.yaml
-    package_config = validate_nexus_yaml(package_dir, collector)
-
-    # Collect registered experiments for benchmark_submissions validation
-    # (benchmark_packages in nexus.yaml is deprecated; experiments now live in
-    # experiments/<name>/experiment_package.yaml alongside the repository root)
-    registered_experiments: set[str] = set()
-    if package_config and package_config.package.benchmark_packages:
-        for pkg in package_config.package.benchmark_packages:
-            registered_experiments.update(pkg.experiments)
+    validate_nexus_yaml(package_dir, collector)
 
     # Validate optional skills directory
     skills_dir = package_dir / "skills"
@@ -260,9 +250,7 @@ def validate_package_directory(
 
     # Only validate model directories if models_dir exists
     for model_dir in models_dir.iterdir():
-        model_config = validate_model_directory(
-            model_dir, collector, registered_experiments
-        )
+        model_config = validate_model_directory(model_dir, collector)
 
         # Extract HF ID from validated model config for duplicate checking
         if model_config is not None:
@@ -487,7 +475,7 @@ def validate_experiments(
 
 
 def _check_binding_integrity(
-    binding: BenchmarkBinding,
+    binding: InstanceBinding,
     property_ids: set[str],
     metric_ids: set[str] | None,
     collector: ValidationErrorCollector,
@@ -506,44 +494,29 @@ def _check_binding_integrity(
                     f"{prefix}: metricMapping references unknown benchmark metric '{mid}'"
                 )
 
-    # 2. Property identifiers in instanceMapping must exist in the definition
-    mapped_benchmark_properties: set[str] = set()
-    if binding.instanceMapping:
-        for pm_entry in binding.instanceMapping:
+    # 2. Property identifiers in problemPropertyMapping must exist in the definition
+    mapped_instance_properties: set[str] = set()
+    if binding.problemPropertyMapping:
+        for pm_entry in binding.problemPropertyMapping:
             if isinstance(pm_entry, FieldMapping):
-                pid = pm_entry.benchmark.identifier
-                mapped_benchmark_properties.add(pid)
+                pid = pm_entry.instance.identifier
+                mapped_instance_properties.add(pid)
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: instanceMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: problemPropertyMapping references unknown benchmark property '{pid}'"
                     )
             elif isinstance(pm_entry, CategoricalValueMapping):
                 pid = pm_entry.categoricalValue.property.identifier
-                mapped_benchmark_properties.add(pid)
+                mapped_instance_properties.add(pid)
                 if pid not in property_ids:
                     collector.add(
-                        f"{prefix}: instanceMapping references unknown benchmark property '{pid}'"
+                        f"{prefix}: problemPropertyMapping references unknown benchmark property '{pid}'"
                     )
-
-    # 3. benchmarkFilters property identifiers must exist in the definition and
-    #    must not duplicate a property already covered by instanceMapping.
-    if binding.staticFilters and binding.staticFilters.benchmarkFilters:
-        for pv in binding.staticFilters.benchmarkFilters:
-            pid = pv.property.identifier
-            if pid not in property_ids:
-                collector.add(
-                    f"{prefix}: staticFilters.benchmarkFilters references unknown benchmark property '{pid}'"
-                )
-            elif pid in mapped_benchmark_properties:
-                collector.add(
-                    f"{prefix}: staticFilters.benchmarkFilters property '{pid}' is already "
-                    f"covered by instanceMapping and must not be statically set"
-                )
 
 
 def validate_instance(
     instance_target: Path,
-    instance_props: dict[str, bool],
+    problem_property_ids: set[str],
     collector: ValidationErrorCollector,
 ) -> BenchmarkInstance | None:
     """Validate a benchmark instance (either an instance directory containing instance.yaml or a standalone instance YAML)."""
@@ -577,37 +550,33 @@ def validate_instance(
             collector.add(format_pydantic_error(error, instance_file))
         return None
 
-    # Validate top-level instance properties against benchmark instance definitions
-    standard_fields = {"identifier", "description"}
-    extra_fields = instance.model_extra if instance.model_extra is not None else {}
+    # Validate that the instance's benchmarkIdentifier matches the parent benchmark
+    # (informational cross-check — the parent benchmark id is not available here,
+    #  so we only verify that required structured fields are present via model validation above)
 
-    for field_name, field_val in extra_fields.items():
-        if field_name in standard_fields:
-            continue
-        if field_name not in instance_props:
-            collector.add(
-                f"{instance_file}: property '{field_name}' is not declared as an instance property in the logical benchmark"
-            )
-            continue
-
-        is_artifact_prop = instance_props[field_name]
-        if is_artifact_prop and field_val is not None:
-            # field_val must be a dict with mandatory key 'artifactsLocation'
-            if not isinstance(field_val, dict) or "artifactsLocation" not in field_val:
+    # Validate problemPropertyValues identifiers against the benchmark's problemProperties
+    if instance.problemPropertyValues:
+        for pv in instance.problemPropertyValues:
+            pid = pv.property.identifier
+            if pid not in problem_property_ids:
                 collector.add(
-                    f"{instance_file}: artifact property '{field_name}' must be a map with a mandatory 'artifactsLocation' key"
+                    f"{instance_file}: problemPropertyValues references unknown problem property '{pid}'"
                 )
-            else:
-                folder_name = str(field_val["artifactsLocation"])
-                folder_path = (
-                    instance_target / folder_name
-                    if instance_target.is_dir()
-                    else instance_target.parent / folder_name
+
+    # Validate instanceArtifacts — each artifactsLocation subfolder must exist
+    if instance.instanceArtifacts:
+        for artifact in instance.instanceArtifacts:
+            folder_name = artifact.artifactsLocation
+            folder_path = (
+                instance_target / folder_name
+                if instance_target.is_dir()
+                else instance_target.parent / folder_name
+            )
+            if not folder_path.is_dir():
+                prop_id = artifact.property.identifier
+                collector.add(
+                    f"{instance_file}: artifactsLocation folder '{folder_name}' for artifact '{prop_id}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
                 )
-                if not folder_path.is_dir():
-                    collector.add(
-                        f"{instance_file}: artifactsLocation folder '{folder_name}' for property '{field_name}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
-                    )
 
     return instance
 
@@ -616,10 +585,10 @@ def validate_logical_benchmark_file(
     file: Path,
     collector: ValidationErrorCollector,
     instance_ids: set[str] | None = None,
-) -> LogicalBenchmarkConfig | None:
+) -> LogicalBenchmarkDefinition | None:
     """Validate a logical benchmark YAML file against the schema and referential integrity rules.
 
-    Returns the parsed LogicalBenchmarkConfig if schema validation passes, None otherwise.
+    Returns the parsed LogicalBenchmarkDefinition if schema validation passes, None otherwise.
     Integrity errors are collected but do not prevent returning the parsed object.
     """
     data = load_yaml_file(file, collector)
@@ -627,24 +596,25 @@ def validate_logical_benchmark_file(
         return None
 
     try:
-        parsed = LogicalBenchmarkConfig.model_validate(data)
+        parsed = LogicalBenchmarkDefinition.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, file))
         return None
 
     # Referential integrity checks
-    defn = parsed.logicalBenchmark
-    metric_ids = set(defn.metrics) if defn.metrics is not None else None
+    metric_ids = (
+        {m.identifier for m in parsed.metrics} if parsed.metrics is not None else None
+    )
 
     # Ranking integrity: ranking.metric must exist in the defined metrics
     if (
-        defn.ranking is not None
+        parsed.ranking is not None
         and metric_ids is not None
-        and defn.ranking.metric not in metric_ids
+        and parsed.ranking.metric not in metric_ids
     ):
         collector.add(
-            f"[bold]{file}[/bold]\n  ranking.metric '{defn.ranking.metric}' "
+            f"[bold]{file}[/bold]\n  ranking.metric '{parsed.ranking.metric}' "
             f"is not defined in metrics"
         )
 
@@ -659,7 +629,7 @@ _ALLOWED_FILE_NAMES: frozenset[str] = frozenset(
 def validate_logical_benchmark_directory(
     benchmark_dir: Path,
     collector: ValidationErrorCollector,
-) -> LogicalBenchmarkConfig | None:
+) -> LogicalBenchmarkDefinition | None:
     """Validate a benchmark directory (benchmark.yaml, instances/, artifacts/)."""
     problem_file = benchmark_dir / "benchmark.yaml"
     if not problem_file.is_file():
@@ -705,15 +675,13 @@ def validate_logical_benchmark_directory(
         return None
 
     try:
-        config = LogicalBenchmarkConfig.model_validate(data)
+        config = LogicalBenchmarkDefinition.model_validate(data)
     except ValidationError as exc:
         for error in exc.errors():
             collector.add(format_pydantic_error(error, problem_file))
         return None
 
-    instance_props = {
-        p.identifier: p.is_artifact for p in config.logicalBenchmark.instance
-    }
+    problem_property_ids = {p.identifier for p in config.problemProperties}
 
     # Validate instances folder contents (already confirmed it exists and is a dir above)
     discovered_instance_ids: set[str] = set()
@@ -725,9 +693,9 @@ def validate_logical_benchmark_directory(
         ]
         for item in visible_items:
             if item.is_dir() or (item.is_file() and item.suffix in (".yaml", ".yml")):
-                inst = validate_instance(item, instance_props, collector)
+                inst = validate_instance(item, problem_property_ids, collector)
                 if inst is not None:
-                    discovered_instance_ids.add(inst.identifier)
+                    discovered_instance_ids.add(inst.instanceIdentifier)
 
     # Validate logical benchmark file with collected instance_ids
     return validate_logical_benchmark_file(

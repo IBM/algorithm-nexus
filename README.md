@@ -212,7 +212,7 @@ nexus list benchmark-packages ./packages --nexus-package terratorch
 #### List benchmark experiments
 
 ```bash
-nexus list benchmark-experiments [PACKAGES_ROOT]
+nexus list experiments [PACKAGES_ROOT]
 ```
 
 Lists all benchmark experiments with their associated benchmark packages and
@@ -221,22 +221,7 @@ Nexus packages. Filter by a specific Nexus package with `--nexus-package`.
 **Example:**
 
 ```bash
-nexus list benchmark-experiments ./packages -o json
-```
-
-#### Get benchmark requirements
-
-```bash
-nexus get benchmark-requirements NEXUS_PACKAGE [PACKAGES_ROOT]
-```
-
-Retrieves the benchmark requirement specifiers for a specific Nexus package.
-Output in requirements.txt format with `-o txt` for use with pip.
-
-**Example:**
-
-```bash
-nexus get benchmark-requirements terratorch ./packages -o txt --output-file requirements.txt
+nexus list experiments ./packages -o json
 ```
 
 ### Output formats
@@ -246,7 +231,6 @@ Most list commands support multiple output formats:
 - **Table** (default): Human-readable table output
 - **JSON** (`-o json`): Machine-readable JSON format
 - **CSV** (`-o csv`): Comma-separated values for spreadsheets
-- **TXT** (`-o txt`): Requirements file format (get commands only)
 
 Use `--output-file` to write output to a file instead of stdout.
 

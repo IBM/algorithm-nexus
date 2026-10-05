@@ -157,22 +157,6 @@ def validate_output_format(
         raise typer.Exit(code=1)
 
 
-def validate_txt_only_format(output_format: str | None) -> None:
-    """Validate that output format is 'txt' if specified.
-
-    Args:
-        output_format: The output format to validate
-
-    Raises:
-        typer.Exit: If the format is not 'txt'
-    """
-    if output_format is not None and output_format != "txt":
-        console.print(
-            f"[red]Error:[/red] Invalid output format '{output_format}'. Must be 'txt'."
-        )
-        raise typer.Exit(code=1)
-
-
 def output_data(
     data: list[dict[str, Any]],
     headers: list[str],
@@ -244,67 +228,6 @@ def output_data(
         console.print(table)
 
 
-def collect_benchmark_data(
-    packages_root: Path,
-    warn_on_error: bool = False,
-) -> dict[str, dict[str, list[str]]]:
-    """Collect benchmark package data from all nexus packages.
-
-    Args:
-        packages_root: Root directory containing package directories
-        warn_on_error: If True, print warnings to stderr for failed loads
-
-    Returns:
-        Dictionary mapping benchmark_package -> experiment_id -> [nexus_package_names]
-    """
-    # Structure: benchmark_package -> experiment_id -> list of nexus packages
-    benchmark_data: dict[str, dict[str, list[str]]] = {}
-
-    for package_dir in packages_root.iterdir():
-        if not package_dir.is_dir() or package_dir.name.startswith("."):
-            continue
-
-        nexus_yaml_path = package_dir / "nexus.yaml"
-        if not nexus_yaml_path.exists():
-            continue
-
-        collector = ValidationErrorCollector()
-        nexus_data = load_yaml_file(nexus_yaml_path, collector)
-        if nexus_data is None or collector.has_errors:
-            if warn_on_error:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
-                    f"Failed to load nexus.yaml"
-                )
-            continue
-
-        try:
-            package_config = AlgorithmNexusPackageConfig.model_validate(nexus_data)
-            package_name = package_config.package.name
-
-            if package_config.package.benchmark_packages:
-                for bench_pkg in package_config.package.benchmark_packages:
-                    req_spec = bench_pkg.requirement_specifier
-                    if req_spec not in benchmark_data:
-                        benchmark_data[req_spec] = {}
-
-                    for exp_id in bench_pkg.experiments:
-                        if exp_id not in benchmark_data[req_spec]:
-                            benchmark_data[req_spec][exp_id] = []
-                        benchmark_data[req_spec][exp_id].append(package_name)
-        except Exception as e:  # noqa: S112
-            if warn_on_error:
-                error_console = Console(stderr=True)
-                error_console.print(
-                    f"[yellow]Warning:[/yellow] Skipping {package_dir.name}: "
-                    f"Invalid package configuration ({type(e).__name__})"
-                )
-            continue
-
-    return benchmark_data
-
-
 class PackageLoadError(Exception):
     """Raised by try_load_package_config when nexus.yaml exists but fails to load or validate."""
 
@@ -347,83 +270,6 @@ def try_load_package_config(
             f"Invalid package configuration ({type(e).__name__})"
         )
         raise PackageLoadError(package_dir.name) from e
-
-
-def find_package_config(
-    nexus_package: str,
-    packages_root: Path,
-) -> tuple[Path, AlgorithmNexusPackageConfig] | None:
-    """Find and load a package configuration by name.
-
-    Args:
-        nexus_package: Name of the Nexus package to find
-        packages_root: Root directory containing package directories
-
-    Returns:
-        Tuple of (package_dir, package_config) if found, None otherwise
-    """
-    for pkg_dir in packages_root.iterdir():
-        if not pkg_dir.is_dir() or pkg_dir.name.startswith("."):
-            continue
-
-        try:
-            package_config = try_load_package_config(pkg_dir)
-        except PackageLoadError:
-            continue
-
-        if package_config is not None and package_config.package.name == nexus_package:
-            return (pkg_dir, package_config)
-
-    return None
-
-
-def output_requirements_txt(
-    requirements: list[str],
-    output_file: Path | None,
-) -> None:
-    """Output requirements in txt format.
-
-    Args:
-        requirements: List of requirement specifiers
-        output_file: Optional file path to write output to
-    """
-    txt_output = "\n".join(requirements) + "\n"
-
-    if output_file:
-        output_file.write_text(txt_output)
-        console.print(f"[green]Requirements written to {output_file}[/green]")
-    else:
-        console.print(txt_output, end="")
-
-
-def output_benchmark_requirements_table(
-    benchmark_packages: list[Any],
-    nexus_package: str,
-    output_format: str | None,
-    output_file: Path | None,
-) -> None:
-    """Output benchmark requirements in table format.
-
-    Args:
-        benchmark_packages: List of BenchmarkPackage objects
-        nexus_package: Name of the Nexus package
-        output_format: Output format (csv, json, or None for table)
-        output_file: Optional file path to write output to
-    """
-    headers = ["Requirement Specifier"]
-
-    data = [
-        {"Requirement Specifier": bench_pkg.requirement_specifier}
-        for bench_pkg in benchmark_packages
-    ]
-
-    output_data(
-        data=data,
-        headers=headers,
-        output_format=output_format,
-        output_file=output_file,
-        table_title=f"Benchmark Requirements for Nexus Package: {nexus_package}",
-    )
 
 
 def format_results(results: dict[str, Any], fmt: str) -> str:

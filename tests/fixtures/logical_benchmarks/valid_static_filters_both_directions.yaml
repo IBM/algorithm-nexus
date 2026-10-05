@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Definition-only file used as the benchmark context for binding integrity tests.
 
-logicalBenchmark:
-  benchmarkIdentifier: graph_coloring
-  description: "Graph coloring benchmark"
-  instance:
-    - identifier: num_vertices
-    - identifier: graph_family
+benchmarkIdentifier: graph_coloring
+description: "Graph coloring benchmark"
+problemProperties:
+  - identifier: num_vertices
+  - identifier: graph_family

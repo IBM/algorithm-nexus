@@ -1,7 +1,7 @@
 # Copyright IBM Corp. 2026
 # SPDX-License-Identifier: Apache-2.0
 
-"""Integration tests for CLI list and get commands."""
+"""Integration tests for CLI list commands."""
 
 import re
 from pathlib import Path
@@ -276,12 +276,12 @@ class TestListExperimentPackages:
         bindings_dir = exp_dir / "bindings"
         bindings_dir.mkdir()
         (bindings_dir / "my_binding.yaml").write_text(
-            "bindings:\n"
-            "  - benchmarkIdentifier: my_logical_benchmark\n"
-            "    experiment:\n"
-            "      experimentIdentifier: exp_id_1\n"
-            "      actuatorIdentifier: my_actuator\n"
-            "      experimentVersion: 1.0.0\n",
+            "instanceBindingIdentifier: my_binding\n"
+            "instanceReference: my_logical_benchmark/instance_1\n"
+            "experiment:\n"
+            "  experimentIdentifier: exp_id_1\n"
+            "  actuatorIdentifier: my_actuator\n"
+            "  experimentVersion: 1.0.0\n",
             encoding="utf-8",
         )
 
@@ -298,14 +298,14 @@ class TestListExperimentPackages:
 
 
 class TestListBenchmarkExperiments:
-    """Tests for 'nexus list benchmark-experiments' command."""
+    """Tests for 'nexus list experiments' command."""
 
     def test_list_benchmark_experiments_default(self, fixtures_root: Path) -> None:
         """Test listing benchmark experiments with default table output."""
         experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
             app,
-            ["list", "benchmark-experiments", str(experiments_root)],
+            ["list", "experiments", str(experiments_root)],
             env={"COLUMNS": "160"},
         )
 
@@ -322,7 +322,7 @@ class TestListBenchmarkExperiments:
         """Test listing benchmark experiments with JSON output."""
         experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
-            app, ["list", "benchmark-experiments", str(experiments_root), "-o", "json"]
+            app, ["list", "experiments", str(experiments_root), "-o", "json"]
         )
 
         assert result.exit_code == 0
@@ -335,14 +335,13 @@ class TestListBenchmarkExperiments:
         """Test listing benchmark experiments with CSV output."""
         experiments_root = fixtures_root.parent / "experiments"
         result = runner.invoke(
-            app, ["list", "benchmark-experiments", str(experiments_root), "-o", "csv"]
+            app, ["list", "experiments", str(experiments_root), "-o", "csv"]
         )
 
         assert result.exit_code == 0
         assert "Experiment ID" in result.stdout
         assert "Experiment Folder" in result.stdout
         assert "Requirement Specifier" in result.stdout
-        assert "Associated Bindings" in result.stdout
         assert "vllm-bench-deployment" in result.stdout
 
     def test_list_benchmark_experiments_with_bindings(self, tmp_path: Path) -> None:
@@ -365,145 +364,25 @@ class TestListBenchmarkExperiments:
         bindings_dir = exp_dir / "bindings"
         bindings_dir.mkdir()
         (bindings_dir / "my_binding.yaml").write_text(
-            "bindings:\n"
-            "  - benchmarkIdentifier: my_logical_benchmark\n"
-            "    experiment:\n"
-            "      experimentIdentifier: exp_id_1\n"
-            "      actuatorIdentifier: my_actuator\n"
-            "      experimentVersion: 1.0.0\n",
+            "instanceBindingIdentifier: my_binding\n"
+            "instanceReference: my_logical_benchmark/instance_1\n"
+            "experiment:\n"
+            "  experimentIdentifier: exp_id_1\n"
+            "  actuatorIdentifier: my_actuator\n"
+            "  experimentVersion: 1.0.0\n",
             encoding="utf-8",
         )
 
         result = runner.invoke(
             app,
-            ["list", "benchmark-experiments", str(experiments_root)],
+            ["list", "experiments", str(experiments_root)],
             env={"COLUMNS": "160"},
         )
 
         assert result.exit_code == 0
         assert "exp_id_1" in result.stdout
         assert "exp_id_2" in result.stdout
-        assert "my_logical_benchmark" in result.stdout
         assert "my-experiment" in result.stdout
-
-
-class TestGetBenchmarkRequirements:
-    """Tests for 'nexus get benchmark-requirements' command."""
-
-    def test_get_benchmark_requirements_default(self, fixtures_root: Path) -> None:
-        """Test getting benchmark requirements with default table output."""
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "test-package-benchmarks",
-                str(fixtures_root),
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert (
-            "Benchmark Requirements for Nexus Package: test-package-benchmarks"
-            in result.stdout
-        )
-        assert "Total:" in result.stdout
-
-    def test_get_benchmark_requirements_txt_output(self, fixtures_root: Path) -> None:
-        """Test getting benchmark requirements with txt output."""
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "test-package-benchmarks",
-                str(fixtures_root),
-                "-o",
-                "txt",
-            ],
-        )
-
-        assert result.exit_code == 0
-        # Should output requirements in txt format (one per line)
-        lines = result.stdout.strip().split("\n")
-        assert len(lines) > 0
-
-    def test_get_benchmark_requirements_txt_to_file(
-        self, fixtures_root: Path, tmp_path: Path
-    ) -> None:
-        """Test getting benchmark requirements with txt output to file."""
-        output_file = tmp_path / "requirements.txt"
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "test-package-benchmarks",
-                str(fixtures_root),
-                "-o",
-                "txt",
-                "--output-file",
-                str(output_file),
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert output_file.exists()
-        content = output_file.read_text()
-        assert len(content.strip()) > 0
-
-    def test_get_benchmark_requirements_package_not_found(
-        self, fixtures_root: Path
-    ) -> None:
-        """Test getting requirements for nonexistent package."""
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "nonexistent-package",
-                str(fixtures_root),
-            ],
-        )
-
-        assert result.exit_code == 1
-        assert "not found" in result.stdout
-
-    def test_get_benchmark_requirements_no_benchmarks(
-        self, fixtures_root: Path
-    ) -> None:
-        """Test getting requirements for package without benchmarks."""
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "example-nexus-package",
-                str(fixtures_root),
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert "No benchmark packages found" in result.stdout
-
-    def test_get_benchmark_requirements_invalid_format(
-        self, fixtures_root: Path
-    ) -> None:
-        """Test getting requirements with invalid output format."""
-        result = runner.invoke(
-            app,
-            [
-                "get",
-                "benchmark-requirements",
-                "test-package-benchmarks",
-                str(fixtures_root),
-                "-o",
-                "json",
-            ],
-        )
-
-        assert result.exit_code == 1
-        assert "Invalid output format" in result.stdout
 
 
 class TestEdgeCases:
