@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Missing: description
 
-logicalBenchmark:
-  benchmarkIdentifier: inference_serving
-  instance:
-    - identifier: dataset
+benchmarkIdentifier: inference_serving
+problemProperties:
+  - identifier: dataset

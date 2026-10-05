@@ -3,14 +3,13 @@
 #
 # Fixture: logicalBenchmark with a `ranking` config that references an unknown metric.
 
-logicalBenchmark:
-  benchmarkIdentifier: sorting
-  description: Evaluates sorting algorithm performance.
-  instance:
-    - identifier: list_size
-  metrics:
-    - comparisons
-    - elapsed_ms
-  ranking:
-    metric: nonexistent_metric
-    order: asc
+benchmarkIdentifier: sorting
+description: Evaluates sorting algorithm performance.
+problemProperties:
+  - identifier: list_size
+metrics:
+  - identifier: comparisons
+  - identifier: elapsed_ms
+ranking:
+  metric: nonexistent_metric
+  order: asc

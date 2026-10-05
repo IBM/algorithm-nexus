@@ -207,10 +207,11 @@ def list_experiment_packages(
                         binding_file.read_text(encoding="utf-8")
                     )
                     if binding_data:
-                        for binding in BindingFileConfig.model_validate(
-                            binding_data
-                        ).bindings:
-                            all_benchmarks.add(binding.benchmarkIdentifier)
+                        binding = BindingFileConfig.model_validate(binding_data)
+                        # Extract the benchmark identifier from instanceReference
+                        # (format: "benchmarkIdentifier/instanceIdentifier")
+                        benchmark_id = binding.instanceReference.split("/")[0]
+                        all_benchmarks.add(benchmark_id)
                 except Exception as e:
                     error_console.print(
                         f"[yellow]Warning:[/yellow] Failed to load binding file "
@@ -289,7 +290,7 @@ def list_benchmark_experiments(
     """List all benchmark experiments discovered under experiments/."""
     import yaml
 
-    from algorithm_nexus.models import BindingFileConfig, ExperimentConfig
+    from algorithm_nexus.models import ExperimentConfig
 
     validate_output_format(output_format)
 
@@ -329,53 +330,15 @@ def list_benchmark_experiments(
             had_errors = True
             continue
 
-        # Load bindings in experiments/<name>/bindings/
-        bindings_dir = exp_dir / "bindings"
-        exp_id_to_benchmarks: dict[str, set[str]] = {
-            exp_id: set() for exp_id in exp_package.experiments
-        }
-
-        if bindings_dir.is_dir():
-            for binding_file in sorted(bindings_dir.iterdir()):
-                if (
-                    not binding_file.is_file()
-                    or binding_file.name.startswith(".")
-                    or binding_file.suffix not in (".yaml", ".yml")
-                ):
-                    continue
-
-                try:
-                    binding_data = yaml.safe_load(
-                        binding_file.read_text(encoding="utf-8")
-                    )
-                    if binding_data:
-                        for binding in BindingFileConfig.model_validate(
-                            binding_data
-                        ).bindings:
-                            exp_id = binding.experiment.experimentIdentifier
-                            if exp_id in exp_id_to_benchmarks:
-                                exp_id_to_benchmarks[exp_id].add(
-                                    binding.benchmarkIdentifier
-                                )
-                except Exception as e:
-                    error_console.print(
-                        f"[yellow]Warning:[/yellow] Failed to load binding file {binding_file.name}: {e}"
-                    )
-                    had_errors = True
-
         # For each experiment ID, create an entry
-        for exp_id in sorted(exp_package.experiments):
-            associated_benchmarks = sorted(list(exp_id_to_benchmarks[exp_id]))
-            data.append(
-                {
-                    "Experiment ID": exp_id,
-                    "Experiment Folder": exp_dir.name,
-                    "Requirement Specifier": exp_package.requirement_specifier,
-                    "Associated Bindings": ", ".join(associated_benchmarks)
-                    if associated_benchmarks
-                    else "None",
-                }
-            )
+        data.extend(
+            {
+                "Experiment ID": exp_id,
+                "Experiment Folder": exp_dir.name,
+                "Requirement Specifier": exp_package.requirement_specifier,
+            }
+            for exp_id in sorted(exp_package.experiments)
+        )
 
     if had_errors and strict:
         raise typer.Exit(code=1)
@@ -390,7 +353,6 @@ def list_benchmark_experiments(
         "Experiment ID",
         "Experiment Folder",
         "Requirement Specifier",
-        "Associated Bindings",
     ]
 
     output_data(

@@ -17,7 +17,6 @@ except ImportError:
     )
     sys.exit(1)
 
-from algorithm_nexus.commands.get import get_benchmark_requirements
 from algorithm_nexus.commands.list import (
     list_benchmark_experiments,
     list_experiment_packages,
@@ -43,13 +42,6 @@ list_app = typer.Typer(
 )
 app.add_typer(list_app, name="list")
 
-# Create subcommand group for 'get'
-get_app = typer.Typer(
-    help="Get specific information about Nexus packages.",
-    no_args_is_help=True,
-)
-app.add_typer(get_app, name="get")
-
 # Create subcommand group for 'run'
 run_app = typer.Typer(
     help="Execute benchmarks and operations.",
@@ -68,10 +60,7 @@ app.add_typer(validate_app, name="validate")
 # Register list commands
 list_app.command(name="packages")(list_packages)
 list_app.command(name="experiment-packages")(list_experiment_packages)
-list_app.command(name="benchmark-experiments")(list_benchmark_experiments)
-
-# Register get commands
-get_app.command(name="benchmark-requirements")(get_benchmark_requirements)
+list_app.command(name="experiments")(list_benchmark_experiments)
 
 # Register run commands
 run_app.command(name="benchmarks")(run_benchmarks)

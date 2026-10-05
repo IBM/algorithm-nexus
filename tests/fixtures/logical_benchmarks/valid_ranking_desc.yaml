@@ -3,14 +3,13 @@
 #
 # Fixture: logicalBenchmark with a valid `ranking` config using desc order.
 
-logicalBenchmark:
-  benchmarkIdentifier: inference
-  description: Evaluates inference throughput.
-  instance:
-    - identifier: batch_size
-  metrics:
-    - throughput
-    - latency_ms
-  ranking:
-    metric: throughput
-    order: desc
+benchmarkIdentifier: inference
+description: Evaluates inference throughput.
+problemProperties:
+  - identifier: batch_size
+metrics:
+  - identifier: throughput
+  - identifier: latency_ms
+ranking:
+  metric: throughput
+  order: desc

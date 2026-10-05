@@ -20,7 +20,6 @@ Get help for any command:
 nexus --help
 nexus validate --help
 nexus list --help
-nexus get --help
 nexus run --help
 ```
 
@@ -183,7 +182,7 @@ nexus validate logical-benchmarks --file <path> [OPTIONS]
 **Options:**
 
 - `--benchmarks-root PATH`: Path to the directory containing logical benchmark YAML files (default: `./benchmarks`)
-- `--file FILE`: Validate a single logical benchmark YAML file instead of the whole directory
+- `--file PATH`: Validate a single logical benchmark YAML file or benchmark folder instead of the whole directory
 - `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
 - `--output-file PATH`: Write results to a file. Format is inferred from the file extension
   (`.json`/`.yaml`) unless `--output-format` is also set
@@ -238,7 +237,7 @@ nexus list packages [packages_root]
 
 - `-o, --output-format [csv|json]`: Output format. Default is table output.
 - `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
-- `--strict`: Warn on stderr when packages fail to load due to invalid YAML or schema errors.
+- `--strict`: Exit with code 1 if any package fails to load due to invalid YAML or schema errors.
 
 **Example:**
 
@@ -268,7 +267,7 @@ nexus list experiment-packages [experiments_root]
 
 - `-o, --output-format [csv|json]`: Output format. Default is table output.
 - `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
-- `--strict`: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.
+- `--strict`: Exit with code 1 if any experiment package fails to load due to invalid YAML or schema errors.
 
 **Example:**
 
@@ -278,14 +277,14 @@ nexus list experiment-packages path/to/experiments
 nexus list experiment-packages -o json
 ```
 
-#### nexus list benchmark-experiments
+#### nexus list experiments
 
 List all benchmark experiments discovered under the experiments directory.
 
 **Usage:**
 
 ```bash
-nexus list benchmark-experiments [experiments_root]
+nexus list experiments [experiments_root]
 ```
 
 **Arguments:**
@@ -296,40 +295,14 @@ nexus list benchmark-experiments [experiments_root]
 
 - `-o, --output-format [csv|json]`: Output format. Default is table output.
 - `--output-file PATH`: File path to write output to. Only used with `-o csv` or `json`.
-- `--strict`: Warn on stderr when experiment packages fail to load due to invalid YAML or schema errors.
+- `--strict`: Exit with code 1 if any experiment package fails to load due to invalid YAML or schema errors.
 
 **Example:**
 
 ```bash
-nexus list benchmark-experiments
-nexus list benchmark-experiments path/to/experiments
-nexus list benchmark-experiments -o json
-```
-
-## nexus get
-
-Get specific information about Nexus packages.
-
-### Subcommands
-
-#### nexus get benchmark-requirements
-
-Get the list of benchmark requirement specifiers for a specific Nexus package.
-
-**Usage:**
-
-```bash
-nexus get benchmark-requirements <package_name>
-```
-
-**Arguments:**
-
-- `package_name` (required): Name of the Nexus package
-
-**Example:**
-
-```bash
-nexus get benchmark-requirements terratorch
+nexus list experiments
+nexus list experiments path/to/experiments
+nexus list experiments -o json
 ```
 
 ## nexus run
@@ -474,11 +447,11 @@ To get structured output (JSON or YAML), use the `--output-format` option:
 
 ```bash
 # Print JSON to console
-algorithm-nexus run experiments/<experiment>/submissions/flood-test \
+nexus run benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 \
   --output-format json
 
 # Print YAML to console
-algorithm-nexus run experiments/<experiment>/submissions/flood-test \
+nexus run benchmarks --pr https://github.com/IBM/algorithm-nexus/pull/123 \
   --output-format yaml
 ```
 
@@ -553,16 +526,7 @@ nexus list packages
 nexus list experiment-packages
 
 # List all benchmark experiments
-nexus list benchmark-experiments
-```
-
-### Getting Package Information
-
-Retrieve specific information about a package:
-
-```bash
-# Get benchmark requirements for a package
-nexus get benchmark-requirements my-package
+nexus list experiments
 ```
 
 ### Running Benchmarks from a Pull Request

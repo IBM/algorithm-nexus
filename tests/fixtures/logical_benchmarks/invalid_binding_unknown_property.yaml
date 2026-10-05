@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Definition-only file used as the benchmark context for binding integrity tests.
 
-logicalBenchmark:
-  benchmarkIdentifier: inference_serving
-  description: "Test benchmark"
-  instance:
-    - identifier: dataset
+benchmarkIdentifier: inference_serving
+description: "Test benchmark"
+problemProperties:
+  - identifier: dataset

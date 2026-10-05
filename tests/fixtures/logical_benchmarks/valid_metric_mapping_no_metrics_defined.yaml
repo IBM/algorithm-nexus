@@ -4,8 +4,7 @@
 # Fixture: definition with no metrics defined in the logical benchmark.
 # Used to validate that the integrity check is skipped when metric_ids is None.
 
-logicalBenchmark:
-  benchmarkIdentifier: my_bench
-  description: test
-  instance:
-    - identifier: dataset
+benchmarkIdentifier: my_bench
+description: test
+problemProperties:
+  - identifier: dataset
