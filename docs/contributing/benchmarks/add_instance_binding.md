@@ -134,7 +134,7 @@ property from the instance that has no entry in `problemPropertyMapping` is
 treated as having no counterpart experiment input and is not used for forming a
 [routing query](../../design/benchmarking/logical_benchmarks_and_instances.md#62-routing-query).
 
-````yaml
+```yaml
 instanceMappingIdentifier: sorting_bubble
 instanceReference: random_100k/sorting
 experiment:
@@ -167,7 +167,7 @@ problemPropertyMapping:
             propertyDomain:
                 domainRange: [200, 500]
                 variableType: CONTINUOUS_VARIABLE_TYPE
-````
+```
 
 ### Map experiment properties to instance artifacts
 

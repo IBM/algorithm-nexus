@@ -135,7 +135,7 @@ publish the package on PyPI or GitHub, then continue from
 To see which experiments Algorithm Nexus already registers:
 
 ```bash
-uv run nexus list benchmark-experiments
+uv run nexus list experiments
 ```
 
 ## See also
