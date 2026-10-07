@@ -4333,9 +4333,9 @@ torch-c-dlpack-ext==0.1.5 \
     # via
     #   quack-kernels
     #   tilelang
-torch-einops-utils==0.1.35 \
-    --hash=sha256:202f8f73d4b5350f806c66046cb8578693acae33158f890c831061cc50c39023 \
-    --hash=sha256:f12da08f793bb670c1a3989e085bb7dde8a13b4c7cc7e37525afe0d3f2a0e95b
+torch-einops-utils==0.1.36 \
+    --hash=sha256:106ae495450e0a9ec3fb150a2f1d1d36628f1a5884abad2bf63fce240551ff14 \
+    --hash=sha256:1806455c4c76318cf11e604fa9501187be32eebce8ffd6973e1c52336f34f4cb
     # via x-transformers
 torchaudio==2.11.0 \
     --hash=sha256:13cff988697ccbad539987599f9dc672f40c417bed67570b365e4e5002bbd096 \
