@@ -50,7 +50,7 @@ Create `experiments/rlx_coloring/bindings/graph_coloring_binding.yaml`:
 
 ```yaml
 instanceBindingIdentifier: coloring_rlx
-instanceReference: erdos_renyi_50_02/graph_coloring
+instanceReference: graph_coloring/erdos_renyi_50_02
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: rlx_coloring
@@ -135,8 +135,8 @@ treated as having no counterpart experiment input and is not used for forming a
 [routing query](../../design/benchmarking/logical_benchmarks_and_instances.md#62-routing-query).
 
 ```yaml
-instanceMappingIdentifier: sorting_bubble
-instanceReference: random_100k/sorting
+instanceBindingIdentifier: sorting_bubble
+instanceReference: sorting/random_100k
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: bubble_sort
@@ -172,16 +172,14 @@ problemPropertyMapping:
 ### Map experiment properties to instance artifacts
 
 When the experiment takes instance artifact files as inputs, use
-`instanceArtifactMapping`. A `fieldMapping` entry renames the instance artifact
-property to the experiment input; a `staticMapping` entry pins an artifact
-property to a constant value implicit in the experiment:
+`instanceArtifactMapping`. Each entry maps the instance artifact property to the
+experiment input property and lists the valid file names:
 
 ```yaml
-# Field mapping: dynamic artifact property mapped to experiment input
 instanceArtifactMapping:
     - instance:
           identifier: graph
-      instance:
+      experiment:
           identifier: input_graph
       validValues:
           - graph.json

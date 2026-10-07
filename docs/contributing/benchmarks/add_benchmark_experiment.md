@@ -146,4 +146,4 @@ uv run nexus list experiments
 - [How to add a benchmark submission](./add_benchmark_submission.md)
 - [How to add a benchmark problem and instance](./add_benchmark_problem.md)
 - [`nexus validate experiments`](../../getting-started/cli-reference.md#nexus-validate-experiments)
-- [`nexus list benchmark-experiments`](../../getting-started/cli-reference.md#nexus-list-benchmark-experiments)
+- [`nexus list experiments`](../../getting-started/cli-reference.md#nexus-list-experiments)

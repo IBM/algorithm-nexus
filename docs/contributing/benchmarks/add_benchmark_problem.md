@@ -41,42 +41,41 @@ mkdir -p benchmarks/graph_coloring
 Create `benchmarks/graph_coloring/benchmark.yaml`:
 
 ```yaml
-logicalBenchmark:
-    benchmarkIdentifier: graph_coloring
-    title: Graph Coloring
-    description: >
-        Evaluates graph-coloring algorithms on their ability to produce valid
-        k-colorings with a small chromatic number. Instances span random
-        Erdős–Rényi graphs and structured benchmark graphs at varying densities.
-    instance:
-        - identifier: graph_family
-          metadata:
-              description: Graph family (erdos_renyi, planar, random_regular).
-          propertyDomain:
-              variableType: CATEGORICAL_VARIABLE_TYPE
-              values: [erdos_renyi, planar, random_regular]
-        - identifier: num_vertices
-          metadata:
-              description: Number of vertices in the graph.
-          propertyDomain:
-              variableType: DISCRETE_VARIABLE_TYPE
-              values: [50, 100, 250, 500]
-        - identifier: edge_density
-          metadata:
-              description: Edge probability / density parameter.
-          propertyDomain:
-              variableType: CONTINUOUS_VARIABLE_TYPE
-    metrics:
-        - num_colors_used
-        - is_valid_coloring
-        - elapsed_ms
-    ranking:
-        metric: num_colors_used
-        order: asc
-    owner: "@graph-team"
+benchmarkIdentifier: graph_coloring
+title: Graph Coloring
+description: >
+    Evaluates graph-coloring algorithms on their ability to produce valid
+    k-colorings with a small chromatic number. Instances span random
+    Erdős–Rényi graphs and structured benchmark graphs at varying densities.
+problemProperties:
+    - identifier: graph_family
+      metadata:
+          description: Graph family (erdos_renyi, planar, random_regular).
+      propertyDomain:
+          variableType: CATEGORICAL_VARIABLE_TYPE
+          values: [erdos_renyi, planar, random_regular]
+    - identifier: num_vertices
+      metadata:
+          description: Number of vertices in the graph.
+      propertyDomain:
+          variableType: DISCRETE_VARIABLE_TYPE
+          values: [50, 100, 250, 500]
+    - identifier: edge_density
+      metadata:
+          description: Edge probability / density parameter.
+      propertyDomain:
+          variableType: CONTINUOUS_VARIABLE_TYPE
+metrics:
+    - identifier: num_colors_used
+    - identifier: is_valid_coloring
+    - identifier: elapsed_ms
+ranking:
+    metric: num_colors_used
+    order: asc
+owner: "@graph-team"
 ```
 
-The `instance` list is the vocabulary for every instance of this problem.
+The `problemProperties` list is the vocabulary for every instance of this problem.
 `metrics` and `ranking` are the vocabulary for results and leaderboard order.
 
 The full field list is in
@@ -94,12 +93,23 @@ mkdir -p benchmarks/graph_coloring/instances/erdos_renyi_50_02
 Create `benchmarks/graph_coloring/instances/erdos_renyi_50_02/instance.yaml`:
 
 ```yaml
-identifier: erdos_renyi_50_02
+instanceIdentifier: erdos_renyi_50_02
+benchmarkIdentifier: graph_coloring
 description: 50-node Erdos-Renyi graph with edge density 0.2
-graph_family: erdos_renyi
-num_vertices: 50
-edge_density: 0.2
+problemPropertyValues:
+    - property:
+          identifier: graph_family
+      value: erdos_renyi
+    - property:
+          identifier: num_vertices
+      value: 50
+    - property:
+          identifier: edge_density
+      value: 0.2
 ```
+
+The full field list is in
+[Logical Benchmarks and Instances](../../design/benchmarking/logical_benchmarks_and_instances.md#3-benchmark-instance-definition).
 
 You now have:
 
@@ -143,18 +153,11 @@ experiment to this instance, continue with
 
 ### Add an instance that includes artifact files
 
-To ship input files with an instance (graphs, datasets, prompts), declare the
-property as an artifact on the problem, then point the instance at a subfolder
-that holds those files.
-
-In `benchmark.yaml`, add the artifact property to the `instance` list:
-
-```yaml
-- identifier: graph
-  is_artifact: true
-  metadata:
-      description: Graph input files in various formats.
-```
+To ship input files with an instance (graphs, datasets, prompts), create a
+subfolder inside the instance directory that holds those files, then declare
+`instanceArtifacts` in `instance.yaml` pointing to that subfolder. Artifacts
+are defined on the instance itself and do not need to be listed in the
+benchmark's `problemProperties`.
 
 In the instance directory, create the subfolder and the files, then reference it
 from `instance.yaml`:
@@ -164,13 +167,23 @@ mkdir -p benchmarks/graph_coloring/instances/erdos_renyi_50_02/graph_files
 ```
 
 ```yaml
-identifier: erdos_renyi_50_02
+instanceIdentifier: erdos_renyi_50_02
+benchmarkIdentifier: graph_coloring
 description: 50-node Erdos-Renyi graph with edge density 0.2
-graph_family: erdos_renyi
-num_vertices: 50
-edge_density: 0.2
-graph:
-    artifactsLocation: graph_files
+problemPropertyValues:
+    - property:
+          identifier: graph_family
+      value: erdos_renyi
+    - property:
+          identifier: num_vertices
+      value: 50
+    - property:
+          identifier: edge_density
+      value: 0.2
+instanceArtifacts:
+    - property:
+          identifier: graph
+      artifactsLocation: graph_files
 ```
 
 The instance directory then looks like this:

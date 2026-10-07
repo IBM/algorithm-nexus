@@ -110,7 +110,7 @@ or evaluation task (the benchmark problem). It defines:
 
 ### 2.3 Example
 
-The logical benchmark definition lives under the `logicalBenchmark` key inside
+The logical benchmark definition lives inside
 `benchmarks/<benchmark-id>/benchmark.yaml`. Bindings live separately in
 `experiments/<experiment-name>/bindings/` (see
 [Section 4](#4-benchmark-instance-binding)).
@@ -124,14 +124,14 @@ description: >
     Erdős–Rényi graphs and structured benchmark graphs at varying densities.
 problemProperties:
     - identifier: graph_family
-        metadata:
-            description: Graph family (erdos_renyi, planar, random_regular).
+      metadata:
+          description: Graph family (erdos_renyi, planar, random_regular).
     - identifier: num_vertices
-        metadata:
-            description: Number of vertices in the graph.
+      metadata:
+          description: Number of vertices in the graph.
     - identifier: edge_density
-        metadata:
-            description: Edge probability / density parameter.
+      metadata:
+          description: Edge probability / density parameter.
 metrics:
     - identifier: num_colors_used
     - identifier: is_valid_coloring
@@ -434,7 +434,7 @@ parameters that match the problem properties.
 
 ```yaml
 instanceBindingIdentifier: coloring_rlx
-instanceReference: gaph_coloring/erdos_renyi_50_02
+instanceReference: graph_coloring/erdos_renyi_50_02
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: rlx_coloring
@@ -456,24 +456,24 @@ inputs to the experiment, while it does not use any of the available artifacts.
 
 ```yaml
 instanceBindingIdentifier: coloring_rlx
-instanceReference: gaph_coloring/erdos_renyi_50_02
+instanceReference: graph_coloring/erdos_renyi_50_02
 experiment:
     actuatorIdentifier: custom_experiments
     experimentIdentifier: rlx_coloring
     experimentVersion: 1.0.1
 problemPropertyMapping:
     - instance:
-        identifier: graph_family
-    experiment:
-        identifier: family
+          identifier: graph_family
+      experiment:
+          identifier: family
     - instance:
-        identifier: num_vertices
-    experiment:
-        identifier: n_vertices
+          identifier: num_vertices
+      experiment:
+          identifier: n_vertices
     - instance:
-        identifier: edge_density
-    experiment:
-        identifier: density
+          identifier: edge_density
+      experiment:
+          identifier: density
 instanceArtifactMapping:
     - instance:
           identifier: graph
