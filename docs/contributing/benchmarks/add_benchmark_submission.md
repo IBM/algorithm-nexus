@@ -50,11 +50,19 @@ To map this instance's property names onto the experiment's names, see
 The instance file `benchmarks/graph_coloring/instances/erdos_renyi_50_02/instance.yaml` contains:
 
 ```yaml
-identifier: erdos_renyi_50_02
+instanceIdentifier: erdos_renyi_50_02
+benchmarkIdentifier: graph_coloring
 description: 50-node Erdos-Renyi graph with edge density 0.2
-graph_family: erdos_renyi
-num_vertices: 50
-edge_density: 0.2
+problemPropertyValues:
+    - property:
+          identifier: graph_family
+      value: erdos_renyi
+    - property:
+          identifier: num_vertices
+      value: 50
+    - property:
+          identifier: edge_density
+      value: 0.2
 ```
 
 Create a submission folder under `rlx_coloring` named after that instance:
