@@ -285,14 +285,6 @@ class ValidationReport(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class ProblemProperty(Property):
-    """A problem property definition for a logical benchmark.
-
-    Inherits ``identifier`` and optional ``metadata`` / ``propertyDomain``
-    from ``ado.schema.property.Property``.
-    """
-
-
 class FieldMapping(BaseModel):
     """1-to-1 mapping of a benchmark instance problem property to an experiment property."""
 
@@ -578,14 +570,14 @@ class LogicalBenchmarkDefinition(BaseModel):
         ),
     ]
     problemProperties: Annotated[
-        list[ProblemProperty],
+        list[Property],
         Field(
             min_length=1,
             description="The properties defining a benchmark problem instance.",
         ),
     ]
     metrics: Annotated[
-        list[MetricIdentifier] | None,
+        list[Property] | None,
         Field(description="Canonical metric names for this logical benchmark."),
     ] = None
     owner: Annotated[

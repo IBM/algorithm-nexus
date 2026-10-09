@@ -81,6 +81,9 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
+[tool.hatch.build.targets.wheel.force-include]
+".agents/skills" = "algorithm_nexus/.agents/skills"
+
 [tool.uv]
 package = true
 conflicts = [
