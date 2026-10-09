@@ -21,7 +21,7 @@ from algorithm_nexus.models import (
     LogicalBenchmarkDefinition,
     ModelInfo,
     NexusPackageInfo,
-    ProblemProperty,
+    Property,
     VLLMConfig,
 )
 
@@ -338,7 +338,7 @@ class TestLogicalBenchmarkProperties:
         config = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="A test benchmark",
-            problemProperties=[ProblemProperty(identifier="num_nodes")],
+            problemProperties=[Property(identifier="num_nodes")],
             metadata={
                 "data_source_version": "v2.1.0",
                 "owning_team": "platform-perf",
@@ -356,7 +356,7 @@ class TestLogicalBenchmarkProperties:
         config = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="A test benchmark",
-            problemProperties=[ProblemProperty(identifier="num_nodes")],
+            problemProperties=[Property(identifier="num_nodes")],
             metadata={long_key: long_val},
         )
         assert config.metadata is not None
@@ -368,7 +368,7 @@ class TestLogicalBenchmarkProperties:
             LogicalBenchmarkDefinition(
                 benchmarkIdentifier="test_bench",
                 description="A test benchmark",
-                problemProperties=[ProblemProperty(identifier="num_nodes")],
+                problemProperties=[Property(identifier="num_nodes")],
                 metadata={"k" * 4097: "valid_value"},
             )
 
@@ -378,7 +378,7 @@ class TestLogicalBenchmarkProperties:
             LogicalBenchmarkDefinition(
                 benchmarkIdentifier="test_bench",
                 description="A test benchmark",
-                problemProperties=[ProblemProperty(identifier="num_nodes")],
+                problemProperties=[Property(identifier="num_nodes")],
                 metadata={"valid_key": "v" * 4097},
             )
 
@@ -388,7 +388,7 @@ class TestLogicalBenchmarkProperties:
             LogicalBenchmarkDefinition(
                 benchmarkIdentifier="test_bench",
                 description="A test benchmark",
-                problemProperties=[ProblemProperty(identifier="num_nodes")],
+                problemProperties=[Property(identifier="num_nodes")],
                 metadata={"nested": {"key": "val"}},  # type: ignore[dict-item]
             )
 
