@@ -333,9 +333,9 @@ requires-dist = [
     { name = "pydantic", marker = "extra == 'cli'", specifier = ">=2.13.3" },
     { name = "pyyaml", marker = "extra == 'cli'", specifier = ">=6.0.3" },
     { name = "rich", marker = "extra == 'cli'", specifier = ">=15.0.0" },
-    { name = "terrakit", marker = "extra == 'candidate'", specifier = "==0.2.0" },
+    { name = "terrakit", marker = "extra == 'candidate'", specifier = "==0.2.2" },
     { name = "terrakit", marker = "extra == 'ecosystem'", specifier = ">=0.2.0" },
-    { name = "terrakit", marker = "extra == 'product'", specifier = "==0.2.0" },
+    { name = "terrakit", marker = "extra == 'product'", specifier = "==0.2.2" },
     { name = "terratorch", marker = "extra == 'ecosystem'", specifier = ">=1.2.7" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'candidate'", specifier = "==1.2.13" },
     { name = "terratorch", extras = ["vllm"], marker = "extra == 'product'", specifier = "==1.2.13" },
@@ -7614,7 +7614,7 @@ wheels = [
 
 [[package]]
 name = "terrakit"
-version = "0.2.0"
+version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -7654,9 +7654,9 @@ dependencies = [
     { name = "zarr", version = "2.18.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-candidate' or extra == 'extra-15-algorithm-nexus-product'" },
     { name = "zarr", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-algorithm-nexus-ecosystem' or (extra == 'extra-15-algorithm-nexus-candidate' and extra == 'extra-15-algorithm-nexus-product')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/49/f9/80cfc56754d7ac532438cec1947dc3779bee4e5fa743a6b54a704698a58d/terrakit-0.2.0.tar.gz", hash = "sha256:e72951ceb6f4745554c47a633373de702caafde13690c440fbf8a16301b3508d", size = 353638, upload-time = "2026-07-13T10:53:06.784Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/76/938d78a77f4daf696464f7858bc81de9716f64493c150891abfb90e69eb3/terrakit-0.2.2.tar.gz", hash = "sha256:5436f6d0d10b2750d1fd470e6f6ae61f796c7226e4d6d87add773face4228696", size = 354247, upload-time = "2026-09-22T10:23:44.4Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/8a/aba81019c9cb0ddb6e5fc252cfc2af157a42a32b9b9a1e391d2cfe224a62/terrakit-0.2.0-py3-none-any.whl", hash = "sha256:683587a1f630ccbab5e345fdb2c8c0ee393aa450f0523b30ab1004aba1ca26a7", size = 379150, upload-time = "2026-07-13T10:53:05.45Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/31/832239fb0234f5c058b11d846fce497b3778f0a479fdc918c0c869ef6340/terrakit-0.2.2-py3-none-any.whl", hash = "sha256:a80a52b7e7ae078f51c4329c3725a456326df50b1dace95be8819413e308f833", size = 379790, upload-time = "2026-09-22T10:23:42.872Z" },
 ]
 
 [[package]]
