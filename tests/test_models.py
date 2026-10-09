@@ -7,9 +7,9 @@ from textwrap import dedent
 
 import pytest
 import yaml
+from ado.schema.reference import ExperimentReference
 from pydantic import ValidationError
 
-from ado.schema.reference import ExperimentReference
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
