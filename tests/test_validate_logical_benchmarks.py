@@ -5,12 +5,21 @@
 
 from pathlib import Path
 
+from ado.schema.property import PropertyDescriptor
 import pytest
+import json
 
 from algorithm_nexus.commands.utils import ValidationErrorCollector
 from algorithm_nexus.commands.validate import (
     validate_logical_benchmark_directory,
     validate_logical_benchmark_file,
+)
+
+from algorithm_nexus.models import (
+    BenchmarkInstance,
+    LogicalBenchmarkDefinition,
+    ProblemProperty,
+    PropertyValue,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures" / "logical_benchmarks"
@@ -372,19 +381,22 @@ problemPropertyValues:
         inst_dir = bench_dir / "instances" / "should_fail"
         inst_dir.mkdir(parents=True)
 
-        benchmark_content = """
-benchmarkIdentifier: test_bench
-description: Test description
-problemProperties:
-  - identifier: graph
-"""
-        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="Test description",
+            problemProperties=[ProblemProperty(identifier="graph")],
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            json.dumps(benchmark.model_dump(mode="json", exclude_none=True))
+        )
 
-        instance_content = """
-instanceIdentifier: test_inst_1
-benchmarkIdentifier: test_bench
-"""
-        (inst_dir / "instance.yaml").write_text(instance_content)
+        instance = BenchmarkInstance(
+            instanceIdentifier="test_inst_1",
+            benchmarkIdentifier="test_bench",
+        )
+        (inst_dir / "instance.yaml").write_text(
+            json.dumps(instance.model_dump(mode="json", exclude_none=True))
+        )
 
         collector = ValidationErrorCollector()
         validate_logical_benchmark_directory(bench_dir, collector)
@@ -400,26 +412,27 @@ benchmarkIdentifier: test_bench
         inst_dir = bench_dir / "instances" / "should_fail"
         inst_dir.mkdir(parents=True)
 
-        benchmark_content = """
-benchmarkIdentifier: test_bench
-description: Test description
-problemProperties:
-  - identifier: graph
-"""
-        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="Test description",
+            problemProperties=[ProblemProperty(identifier="graph")],
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            json.dumps(benchmark.model_dump(mode="json", exclude_none=True))
+        )
 
-        instance_content = """
-instanceIdentifier: test_inst_1
-benchmarkIdentifier: test_bench
-problemPropertyValues:
-  - property:
-        identifier: graph
-    value: graph1
-  - property:
-        identifier: graph
-    value: graph2
-"""
-        (inst_dir / "instance.yaml").write_text(instance_content)
+        property = PropertyDescriptor(identifier="graph")
+        instance = BenchmarkInstance(
+            instanceIdentifier="test_inst_1",
+            benchmarkIdentifier="test_bench",
+            problemPropertyValues=[
+                PropertyValue(value=1, property=property),
+                PropertyValue(value=1, property=property),
+            ],
+        )
+        (inst_dir / "instance.yaml").write_text(
+            json.dumps(instance.model_dump(mode="json", exclude_none=True))
+        )
 
         collector = ValidationErrorCollector()
         validate_logical_benchmark_directory(bench_dir, collector)
