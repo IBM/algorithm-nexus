@@ -518,8 +518,25 @@ def validate_instance(
     instance_target: Path,
     problem_property_ids: set[str],
     collector: ValidationErrorCollector,
+    parent_benchmark_identifier: str | None,
 ) -> BenchmarkInstance | None:
-    """Validate a benchmark instance (either an instance directory containing instance.yaml or a standalone instance YAML)."""
+    """Validate a benchmark instance (either an instance directory containing instance.yaml or a standalone instance YAML).
+
+    Args:
+        instance_target:
+            Path to the instance directory or a standalone instance YAML file.
+        problem_property_ids:
+            Set of valid problem property identifiers from the parent benchmark.
+        collector:
+            Collects validation errors and informational messages.
+        parent_benchmark_identifier:
+            The ``benchmarkIdentifier`` of the parent benchmark.
+            When ``None``, the cross-check between the instance's ``benchmarkIdentifier``
+            and the parent benchmark is skipped.
+
+    Returns:
+        The parsed ``BenchmarkInstance`` if schema validation passes, ``None`` otherwise.
+    """
     if instance_target.is_dir():
         instance_file = instance_target / "instance.yaml"
         if not instance_file.is_file():
@@ -551,8 +568,14 @@ def validate_instance(
         return None
 
     # Validate that the instance's benchmarkIdentifier matches the parent benchmark
-    # (informational cross-check — the parent benchmark id is not available here,
-    #  so we only verify that required structured fields are present via model validation above)
+    if (
+        parent_benchmark_identifier
+        and instance.benchmarkIdentifier != parent_benchmark_identifier
+    ):
+        collector.add(
+            f"{instance_file}: benchmarkIdentifier '{instance.benchmarkIdentifier}' "
+            f"does not match parent benchmark identifier '{parent_benchmark_identifier}'"
+        )
 
     # Validate problemPropertyValues identifiers against the benchmark's problemProperties
     covered_ids: set[str] = set()
@@ -705,7 +728,9 @@ def validate_logical_benchmark_directory(
         ]
         for item in visible_items:
             if item.is_dir() or (item.is_file() and item.suffix in (".yaml", ".yml")):
-                inst = validate_instance(item, problem_property_ids, collector)
+                inst = validate_instance(
+                    item, problem_property_ids, collector, config.benchmarkIdentifier
+                )
                 if inst is not None:
                     discovered_instance_ids.add(inst.instanceIdentifier)
 

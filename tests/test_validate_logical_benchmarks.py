@@ -497,6 +497,27 @@ problemProperties:
         assert config is not None
         assert not collector.has_errors
 
+    def test_instance_with_mismatched_benchmark_identifier_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """An instance whose benchmarkIdentifier differs from the parent benchmark's benchmarkIdentifier fails."""
+        bench_dir = tmp_path / "test_benchmark"
+        inst1_dir = bench_dir / "instances" / "inst_1"
+        inst1_dir.mkdir(parents=True)
+
+        (bench_dir / "benchmark.yaml").write_text(
+            "benchmarkIdentifier: foo\ndescription: Test\nproblemProperties:\n  - identifier: size\n"
+        )
+        (inst1_dir / "instance.yaml").write_text(
+            "instanceIdentifier: inst_1\nbenchmarkIdentifier: not-foo\n"
+        )
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "not-foo" in " ".join(collector.errors)
+
 
 class TestBenchmarkDirectoryContents:
     """Checks that a benchmark folder rejects unexpected entries and warns about missing instances."""
