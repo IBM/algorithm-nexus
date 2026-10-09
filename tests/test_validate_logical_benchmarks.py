@@ -323,6 +323,9 @@ problemPropertyValues:
   - property:
         identifier: workload
     value: "steady_state_heavy"
+  - property:
+        identifier: dataset
+    value: data/data.csv
 instanceArtifacts:
   - property:
         identifier: dataset
@@ -360,6 +363,69 @@ problemPropertyValues:
 
         assert collector.has_errors
         assert "nonexistent_param" in " ".join(collector.errors)
+
+    def test_instance_missing_problem_property_value_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """An instance that does not define a value for every benchmark problemProperty fails."""
+        bench_dir = tmp_path / "foo"
+        inst_dir = bench_dir / "instances" / "should_fail"
+        inst_dir.mkdir(parents=True)
+
+        benchmark_content = """
+benchmarkIdentifier: test_bench
+description: Test description
+problemProperties:
+  - identifier: graph
+"""
+        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
+
+        instance_content = """
+instanceIdentifier: test_inst_1
+benchmarkIdentifier: test_bench
+"""
+        (inst_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "graph" in " ".join(collector.errors)
+
+    def test_instance_duplicate_problem_property_value_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """An instance that defines multiple values for the same benchmark problemProperty fails."""
+        bench_dir = tmp_path / "foo"
+        inst_dir = bench_dir / "instances" / "should_fail"
+        inst_dir.mkdir(parents=True)
+
+        benchmark_content = """
+benchmarkIdentifier: test_bench
+description: Test description
+problemProperties:
+  - identifier: graph
+"""
+        (bench_dir / "benchmark.yaml").write_text(benchmark_content)
+
+        instance_content = """
+instanceIdentifier: test_inst_1
+benchmarkIdentifier: test_bench
+problemPropertyValues:
+  - property:
+        identifier: graph
+    value: graph1
+  - property:
+        identifier: graph
+    value: graph2
+"""
+        (inst_dir / "instance.yaml").write_text(instance_content)
+
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert collector.has_errors
+        assert "graph" in " ".join(collector.errors)
 
     def test_instance_with_missing_artifact_fails(self, tmp_path: Path) -> None:
         """An instance specifying an artifactsLocation folder that does not exist fails."""
@@ -488,6 +554,7 @@ class TestBenchmarkDirectoryContents:
         (bench_dir / "README.md").write_text("# Benchmark")
         (inst_dir / "instance.yaml").write_text(
             "instanceIdentifier: inst_1\nbenchmarkIdentifier: test_bench\n"
+            "problemPropertyValues:\n  - property:\n        identifier: size\n    value: 10\n"
         )
 
         collector = ValidationErrorCollector()
