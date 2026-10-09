@@ -18,7 +18,9 @@ nexus = "algorithm_nexus.cli:main"
 
 [project.optional-dependencies]
 candidate = [
-  "biomed-multi-alignment[vllm]",
+  # Temporarily removing biomed-multi-alignment due
+  # to potentially malitcous version of nibabel being imported.
+  # "biomed-multi-alignment[vllm]",
   "bmfm-targets[vllm]>=0.20.0",
   # CP 02/07/2026
   # Scanners are flagging opencv-python-headless==5.0.0.93 as
@@ -38,7 +40,9 @@ cli = [
   "typer>=0.25.0",
 ]
 ecosystem = [
-  "biomed-multi-alignment",
+  # Temporarily removing biomed-multi-alignment due
+  # to potentially malitcous version of nibabel being imported.
+  # "biomed-multi-alignment",
   "bmfm-targets",
   "gridfm-graphkit==0.8.1",
   "terrakit>=0.2.0",
