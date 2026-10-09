@@ -555,6 +555,7 @@ def validate_instance(
     #  so we only verify that required structured fields are present via model validation above)
 
     # Validate problemPropertyValues identifiers against the benchmark's problemProperties
+    covered_ids: set[str] = set()
     if instance.problemPropertyValues:
         for pv in instance.problemPropertyValues:
             pid = pv.property.identifier
@@ -562,6 +563,17 @@ def validate_instance(
                 collector.add(
                     f"{instance_file}: problemPropertyValues references unknown problem property '{pid}'"
                 )
+            elif pid in covered_ids:
+                collector.add(
+                    f"{instance_file}: problemPropertyValues defines a duplicate value for problem property '{pid}'"
+                )
+            else:
+                covered_ids.add(pid)
+
+    for pid in problem_property_ids - covered_ids:
+        collector.add(
+            f"{instance_file}: instance is missing a value for problem property '{pid}'"
+        )
 
     # Validate instanceArtifacts — each artifactsLocation subfolder must exist
     if instance.instanceArtifacts:
