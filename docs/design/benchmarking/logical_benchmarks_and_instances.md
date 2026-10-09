@@ -98,6 +98,7 @@ or evaluation task (the benchmark problem). It defines:
 | `metrics`             | list of Property | No       | Canonical metric names for this logical. Each entry specifies the metric name and an optional human-readable description.       |
 | `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                           |
 | `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                 |
+| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                 |
 
 **Ranking fields:**
 
@@ -184,6 +185,7 @@ instance folder, that holds the artifact files).
 | `description`           | string                   | No       | Human-readable description of this specific instance.                                 |
 | `problemPropertyValues` | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                        |
 | `instanceArtifacts`     | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts). |
+| `metadata`              | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
 ### 3.4 Instance Artifacts
 
@@ -289,6 +291,7 @@ contains one instance binding.
 | `problemPropertyMapping`    | list of **problem property mapping** | No       | Remaps instance problem properties to experiment input properties.                                                                                                                                                                                                                                                                                                 |
 | `instanceArtifactMapping`   | list of **instanceArtifactMapping**  | No       | Remaps benchmark instance artifact properties to experiment input properties. These mappings should be present even if the experiment and instance properties have the same name. Every property omitted here is considered not to be a property of the experiment and will not be used for resolving the mapping between experiment runs and benchmark instances. |
 | `staticFilters`             | list of PropertyValue                | No       | Sets static experiment properties to values implicit in the instance.                                                                                                                                                                                                                                                                                              |
+| `metadata`                  | map of string to string              | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                                                                                                                                                                                                                                                   |
 
 <!-- markdownlint-enable line-length -->
 

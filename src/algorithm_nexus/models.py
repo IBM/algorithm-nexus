@@ -25,6 +25,15 @@ except ImportError:
     sys.exit(1)
 
 
+MetadataKey = Annotated[
+    str, Field(max_length=4096, description="Metadata dictionary key.")
+]
+MetadataValue = Annotated[
+    str, Field(max_length=4096, description="Metadata dictionary value.")
+]
+MetadataDict = dict[MetadataKey, MetadataValue]
+
+
 def validate_hf_model_id(v: str) -> str:
     """Validate HuggingFace model ID format and constraints.
     https://huggingface.co/docs/hub/en/security-sso-okta-scim#step-5-assign-users-or-groups
@@ -121,6 +130,12 @@ class ExperimentConfig(BaseModel):
         ExperimentSpecifier,
         Field(description="Experiment package specifier and experiment list."),
     ]
+    metadata: Annotated[
+        MetadataDict | None,
+        Field(
+            description="Arbitrary key-value annotations as a flat string-to-string dictionary."
+        ),
+    ] = None
 
 
 class NexusPackageInfo(BaseModel):
@@ -462,6 +477,12 @@ class BenchmarkInstance(BaseModel):
         list[InstanceArtifact] | None,
         Field(description="All artifacts available for this instance."),
     ] = None
+    metadata: Annotated[
+        MetadataDict | None,
+        Field(
+            description="Arbitrary key-value annotations as a flat string-to-string dictionary."
+        ),
+    ] = None
 
 
 class InstanceBinding(BaseModel):
@@ -533,6 +554,12 @@ class InstanceBinding(BaseModel):
             ),
         ),
     ] = None
+    metadata: Annotated[
+        MetadataDict | None,
+        Field(
+            description="Arbitrary key-value annotations as a flat string-to-string dictionary."
+        ),
+    ] = None
 
     @model_validator(mode="after")
     def default_target_mapping(self) -> InstanceBinding:
@@ -590,6 +617,12 @@ class LogicalBenchmarkDefinition(BaseModel):
         BenchmarkRanking | None,
         Field(description="Optional ranking configuration for this benchmark."),
     ] = None
+    metadata: Annotated[
+        MetadataDict | None,
+        Field(
+            description="Arbitrary key-value annotations as a flat string-to-string dictionary."
+        ),
+    ] = None
 
 
 class BindingFileConfig(BaseModel):
@@ -635,4 +668,10 @@ class BindingFileConfig(BaseModel):
     staticFilters: Annotated[
         list[PropertyValue] | None,
         Field(description="Static experiment property filters."),
+    ] = None
+    metadata: Annotated[
+        MetadataDict | None,
+        Field(
+            description="Arbitrary key-value annotations as a flat string-to-string dictionary."
+        ),
     ] = None
