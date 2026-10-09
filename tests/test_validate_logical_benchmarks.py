@@ -5,19 +5,17 @@
 
 from pathlib import Path
 
-from ado.schema.property import PropertyDescriptor
 import pytest
+from ado.schema.property import Property, PropertyDescriptor
 
 from algorithm_nexus.commands.utils import ValidationErrorCollector
 from algorithm_nexus.commands.validate import (
     validate_logical_benchmark_directory,
     validate_logical_benchmark_file,
 )
-
 from algorithm_nexus.models import (
     BenchmarkInstance,
     LogicalBenchmarkDefinition,
-    ProblemProperty,
     PropertyValue,
 )
 
@@ -383,7 +381,7 @@ problemPropertyValues:
         benchmark = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="Test description",
-            problemProperties=[ProblemProperty(identifier="graph")],
+            problemProperties=[Property(identifier="graph")],
         )
         (bench_dir / "benchmark.yaml").write_text(
             benchmark.model_dump_json(exclude_none=True)
@@ -414,7 +412,7 @@ problemPropertyValues:
         benchmark = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="Test description",
-            problemProperties=[ProblemProperty(identifier="graph")],
+            problemProperties=[Property(identifier="graph")],
         )
         (bench_dir / "benchmark.yaml").write_text(
             benchmark.model_dump_json(exclude_none=True)
