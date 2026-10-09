@@ -428,16 +428,14 @@ class TestBenchmarkDirectoryContents:
     @pytest.fixture
     def minimal_benchmark_yaml(self) -> str:
         import yaml
+        from ado.schema.property import Property
 
-        from algorithm_nexus.models import (
-            LogicalBenchmarkDefinition,
-            ProblemProperty,
-        )
+        from algorithm_nexus.models import LogicalBenchmarkDefinition
 
         model = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="Test description",
-            problemProperties=[ProblemProperty(identifier="size")],
+            problemProperties=[Property(identifier="size")],
         )
         return yaml.dump(
             model.model_dump(mode="json", exclude_none=True, exclude_defaults=True),
