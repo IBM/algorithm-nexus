@@ -4212,9 +4212,9 @@ z3-solver==4.15.4.0 \
     --hash=sha256:928c29b58c4eb62106da51c1914f6a4a55d0441f8f48a81b9da07950434a8946 \
     --hash=sha256:be3bc916545c96ffbf89e00d07104ff14f78336e55db069177a1bfbcc01b269d
     # via tilelang
-zarr==2.18.0 \
-    --hash=sha256:7f8532b6a3f50f22e809e130e09353637ec8b5bb5e95a5a0bfaae91f63978b5d \
-    --hash=sha256:c3b7d2c85b8a42b0ad0ad268a36fb6886ca852098358c125c6b126a417e0a598
+zarr==2.18.7 \
+    --hash=sha256:ac3dc4033e9ae4e9d7b5e27c97ea3eaf1003cc0a07f010bd83d5134bf8c4b223 \
+    --hash=sha256:b2b8f66f14dac4af66b180d2338819981b981f70e196c9a66e6bfaa9e59572f5
     # via
     #   impactmesh
     #   terrakit
