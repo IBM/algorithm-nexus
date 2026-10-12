@@ -7,14 +7,21 @@ from textwrap import dedent
 
 import pytest
 import yaml
+from ado.schema.reference import ExperimentReference
 from pydantic import ValidationError
 
 from algorithm_nexus.models import (
     AlgorithmNexusModelConfig,
     AlgorithmNexusPackageConfig,
+    BenchmarkInstance,
+    BindingFileConfig,
     ExperimentConfig,
+    ExperimentSpecifier,
+    InstanceBinding,
+    LogicalBenchmarkDefinition,
     ModelInfo,
     NexusPackageInfo,
+    Property,
     VLLMConfig,
 )
 
@@ -326,6 +333,65 @@ class TestLogicalBenchmarkProperties:
         assert props[1].identifier == "num_nodes"
         assert props[2].identifier == "density"
 
+    def test_logical_benchmark_metadata_valid(self) -> None:
+        """Test LogicalBenchmarkDefinition with valid metadata."""
+        config = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="A test benchmark",
+            problemProperties=[Property(identifier="num_nodes")],
+            metadata={
+                "data_source_version": "v2.1.0",
+                "owning_team": "platform-perf",
+            },
+        )
+        assert config.metadata == {
+            "data_source_version": "v2.1.0",
+            "owning_team": "platform-perf",
+        }
+
+    def test_logical_benchmark_metadata_max_length(self) -> None:
+        """Test LogicalBenchmarkDefinition metadata allows 4096 character keys and values."""
+        long_key = "k" * 4096
+        long_val = "v" * 4096
+        config = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="A test benchmark",
+            problemProperties=[Property(identifier="num_nodes")],
+            metadata={long_key: long_val},
+        )
+        assert config.metadata is not None
+        assert config.metadata[long_key] == long_val
+
+    def test_logical_benchmark_metadata_key_too_long(self) -> None:
+        """Test LogicalBenchmarkDefinition rejects metadata key longer than 4096 characters."""
+        with pytest.raises(ValidationError):
+            LogicalBenchmarkDefinition(
+                benchmarkIdentifier="test_bench",
+                description="A test benchmark",
+                problemProperties=[Property(identifier="num_nodes")],
+                metadata={"k" * 4097: "valid_value"},
+            )
+
+    def test_logical_benchmark_metadata_value_too_long(self) -> None:
+        """Test LogicalBenchmarkDefinition rejects metadata value longer than 4096 characters."""
+        with pytest.raises(ValidationError):
+            LogicalBenchmarkDefinition(
+                benchmarkIdentifier="test_bench",
+                description="A test benchmark",
+                problemProperties=[Property(identifier="num_nodes")],
+                metadata={"valid_key": "v" * 4097},
+            )
+
+    def test_logical_benchmark_metadata_non_string_value_rejected(self) -> None:
+        """Test LogicalBenchmarkDefinition rejects non-string metadata values."""
+        with pytest.raises(ValidationError):
+            LogicalBenchmarkDefinition(
+                benchmarkIdentifier="test_bench",
+                description="A test benchmark",
+                problemProperties=[Property(identifier="num_nodes")],
+                metadata={"nested": {"key": "val"}},  # type: ignore[dict-item]
+            )
+
 
 # Made with Bob
 
@@ -460,3 +526,102 @@ class TestExperimentConfig:
         with pytest.raises(ValidationError) as exc_info:
             ExperimentConfig.model_validate(data)
         assert "unexpected" in str(exc_info.value).lower()
+
+    def test_valid_metadata(self) -> None:
+        """Test valid experiment config with metadata."""
+        config = ExperimentConfig(
+            experiment_package=ExperimentSpecifier(
+                requirement_specifier="my-package",
+                experiments=["exp_one"],
+            ),
+            metadata={
+                "author": "IBM",
+                "tier": "production",
+            },
+        )
+        assert config.metadata == {"author": "IBM", "tier": "production"}
+
+    def test_metadata_value_too_long_rejected(self) -> None:
+        """Test that metadata value exceeding 4096 chars is rejected."""
+        with pytest.raises(ValidationError):
+            ExperimentConfig(
+                experiment_package=ExperimentSpecifier(
+                    requirement_specifier="my-package",
+                    experiments=["exp_one"],
+                ),
+                metadata={
+                    "author": "a" * 4097,
+                },
+            )
+
+
+class TestBenchmarkInstanceMetadata:
+    """Tests for BenchmarkInstance metadata validation."""
+
+    def test_valid_metadata(self) -> None:
+        instance = BenchmarkInstance(
+            instanceIdentifier="small_model_8b",
+            benchmarkIdentifier="inference_serving",
+            metadata={
+                "region": "us-south",
+                "endpoint-url": "http://ibm.com/my-endpoint/",
+            },
+        )
+        assert instance.metadata == {
+            "region": "us-south",
+            "endpoint-url": "http://ibm.com/my-endpoint/",
+        }
+
+    def test_metadata_optional(self) -> None:
+        instance = BenchmarkInstance(
+            instanceIdentifier="small_model_8b",
+            benchmarkIdentifier="inference_serving",
+        )
+        assert instance.metadata is None
+
+    def test_metadata_non_string_value_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            BenchmarkInstance(
+                instanceIdentifier="small_model_8b",
+                benchmarkIdentifier="inference_serving",
+                metadata={"tags": ["a", "b"]},  # type: ignore[dict-item]
+            )
+
+
+class TestInstanceBindingMetadata:
+    """Tests for InstanceBinding and BindingFileConfig metadata validation."""
+
+    def test_instance_binding_valid_metadata(self) -> None:
+        binding = InstanceBinding(
+            instanceBindingIdentifier="my_binding",
+            instanceReference="inference_serving/small_model_8b",
+            experiment=ExperimentReference(
+                actuatorIdentifier="my_actuator", experimentIdentifier="exp1"
+            ),
+            metadata={"run_label": "nightly-2025-07-01"},
+        )
+        assert binding.metadata == {"run_label": "nightly-2025-07-01"}
+
+    def test_binding_file_config_valid_metadata(self) -> None:
+        config = BindingFileConfig(
+            instanceBindingIdentifier="my_binding",
+            instanceReference="inference_serving/small_model_8b",
+            experiment=ExperimentReference(
+                actuatorIdentifier="my_actuator",
+                experimentIdentifier="exp1",
+            ),
+            metadata={"run_label": "nightly-2025-07-01"},
+        )
+        assert config.metadata == {"run_label": "nightly-2025-07-01"}
+
+    def test_binding_metadata_key_too_long_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            BindingFileConfig(
+                instanceBindingIdentifier="my_binding",
+                instanceReference="inference_serving/small_model_8b",
+                experiment=ExperimentReference(
+                    actuatorIdentifier="my_actuator",
+                    experimentIdentifier="exp1",
+                ),
+                metadata={"k" * 4097: "val"},
+            )

@@ -192,6 +192,7 @@ experiment_package:
   GitHub URL (local paths are rejected by schema validation)
 - `experiment_package.experiments` — required; non-empty list of experiment
   identifiers exposed by the package
+- `metadata` — optional; flat string-to-string dictionary for arbitrary key-value annotations (keys and values up to 4,096 characters)
 
 ### 3.2 Benchmark Submissions in `submissions/`
 

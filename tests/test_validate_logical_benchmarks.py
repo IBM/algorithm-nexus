@@ -10,11 +10,15 @@ from ado.schema.property import Property, PropertyDescriptor
 
 from algorithm_nexus.commands.utils import ValidationErrorCollector
 from algorithm_nexus.commands.validate import (
+    validate_experiment_yaml,
+    validate_instance,
     validate_logical_benchmark_directory,
     validate_logical_benchmark_file,
 )
 from algorithm_nexus.models import (
     BenchmarkInstance,
+    ExperimentConfig,
+    ExperimentSpecifier,
     LogicalBenchmarkDefinition,
     PropertyValue,
 )
@@ -525,9 +529,6 @@ class TestBenchmarkDirectoryContents:
     @pytest.fixture
     def minimal_benchmark_yaml(self) -> str:
         import yaml
-        from ado.schema.property import Property
-
-        from algorithm_nexus.models import LogicalBenchmarkDefinition
 
         model = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
@@ -658,6 +659,167 @@ class TestBenchmarkDirectoryContents:
         assert "extra_file.txt" in " ".join(collector.errors)
         assert collector.has_info
         assert "no instances" in " ".join(collector.info)
+
+
+class TestManifestMetadataValidation:
+    """Tests that all Nexus manifests accept valid metadata and that validation succeeds."""
+
+    def test_benchmark_with_metadata_passes_validation(self, tmp_path: Path) -> None:
+        """A benchmark.yaml with metadata passes validate_logical_benchmark_file."""
+        bench_file = tmp_path / "benchmark.yaml"
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="inference_serving",
+            title="Inference Serving Benchmark",
+            description="Evaluates inference serving performance",
+            problemProperties=[Property(identifier="model_size")],
+            metadata={
+                "data_source_version": "v2.1.0",
+                "owning_team": "platform-perf",
+            },
+        )
+        bench_file.write_text(benchmark.model_dump_json(exclude_none=True))
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_file(bench_file, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.metadata == {
+            "data_source_version": "v2.1.0",
+            "owning_team": "platform-perf",
+        }
+
+    def test_instance_with_metadata_passes_validation(self, tmp_path: Path) -> None:
+        """An instance.yaml with metadata passes validate_instance."""
+        inst_dir = tmp_path / "instances" / "small_model_8b"
+        inst_dir.mkdir(parents=True)
+        instance_file = inst_dir / "instance.yaml"
+
+        instance = BenchmarkInstance(
+            instanceIdentifier="small_model_8b",
+            benchmarkIdentifier="inference_serving",
+            problemPropertyValues=[
+                PropertyValue(
+                    property=PropertyDescriptor(identifier="model_size"),
+                    value="8B",
+                )
+            ],
+            metadata={
+                "region": "us-south",
+                "endpoint-url": "http://ibm.com/my-endpoint/",
+            },
+        )
+        instance_file.write_text(instance.model_dump_json(exclude_none=True))
+
+        collector = ValidationErrorCollector()
+        result = validate_instance(
+            inst_dir, {"model_size"}, collector, "inference_serving"
+        )
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.metadata == {
+            "region": "us-south",
+            "endpoint-url": "http://ibm.com/my-endpoint/",
+        }
+
+    def test_benchmark_directory_with_metadata_passes_validation(
+        self, tmp_path: Path
+    ) -> None:
+        """A benchmark directory with metadata in both benchmark.yaml and instance.yaml passes validation."""
+        bench_dir = tmp_path / "inference_serving"
+        inst_dir = bench_dir / "instances" / "small_model_8b"
+        inst_dir.mkdir(parents=True)
+
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="inference_serving",
+            title="Inference Serving Benchmark",
+            description="Evaluates inference serving performance",
+            problemProperties=[Property(identifier="model_size")],
+            metadata={
+                "data_source_version": "v2.1.0",
+                "owning_team": "platform-perf",
+            },
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            benchmark.model_dump_json(exclude_none=True)
+        )
+
+        instance = BenchmarkInstance(
+            instanceIdentifier="small_model_8b",
+            benchmarkIdentifier="inference_serving",
+            problemPropertyValues=[
+                PropertyValue(
+                    property=PropertyDescriptor(identifier="model_size"),
+                    value="8B",
+                )
+            ],
+            metadata={
+                "region": "us-south",
+                "endpoint-url": "http://ibm.com/my-endpoint/",
+            },
+        )
+        (inst_dir / "instance.yaml").write_text(
+            instance.model_dump_json(exclude_none=True)
+        )
+
+        collector = ValidationErrorCollector()
+        result = validate_logical_benchmark_directory(bench_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.metadata == {
+            "data_source_version": "v2.1.0",
+            "owning_team": "platform-perf",
+        }
+
+    def test_experiment_package_yaml_with_metadata_passes_validation(
+        self, tmp_path: Path
+    ) -> None:
+        """An experiment_package.yaml with metadata passes validate_experiment_yaml."""
+        exp_dir = tmp_path / "my_experiment"
+        exp_dir.mkdir(parents=True)
+
+        exp_config = ExperimentConfig(
+            experiment_package=ExperimentSpecifier(
+                requirement_specifier="https://github.com/IBM/my-experiment.git",
+                experiments=["my_experiment"],
+            ),
+            metadata={"author": "IBM"},
+        )
+        (exp_dir / "experiment_package.yaml").write_text(
+            exp_config.model_dump_json(exclude_none=True)
+        )
+
+        collector = ValidationErrorCollector()
+        result = validate_experiment_yaml(exp_dir, collector)
+
+        assert result is not None
+        assert not collector.has_errors
+        assert result.metadata == {"author": "IBM"}
+
+    def test_binding_yaml_with_metadata_roundtrip(self, tmp_path: Path) -> None:
+        """A binding file with metadata created via BindingFileConfig passes validation and checks."""
+        import yaml
+        from ado.schema.reference import ExperimentReference
+
+        from algorithm_nexus.models import BindingFileConfig
+
+        binding = BindingFileConfig(
+            instanceBindingIdentifier="my_binding",
+            instanceReference="inference_serving/small_model_8b",
+            experiment=ExperimentReference(
+                actuatorIdentifier="my_actuator",
+                experimentIdentifier="solve_mip",
+            ),
+            metadata={"run_label": "nightly-2025-07-01"},
+        )
+        binding_file = tmp_path / "binding.yaml"
+        binding_file.write_text(binding.model_dump_json(exclude_none=True))
+
+        loaded = yaml.safe_load(binding_file.read_text())
+        parsed = BindingFileConfig.model_validate(loaded)
+        assert parsed.metadata == {"run_label": "nightly-2025-07-01"}
 
 
 class TestRankingValidation:
