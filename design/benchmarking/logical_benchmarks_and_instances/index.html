@@ -2245,6 +2245,12 @@ or evaluation task (the benchmark problem). It defines:</p>
 <td>No</td>
 <td>Team or individual responsible for maintaining this definition.</td>
 </tr>
+<tr>
+<td><code>metadata</code></td>
+<td>map of string to string</td>
+<td>No</td>
+<td>Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Ranking fields:</strong></p>
@@ -2368,6 +2374,12 @@ instance folder, that holds the artifact files).</p>
 <td>list of InstanceArtifact</td>
 <td>No</td>
 <td>All artifacts available for this instance. See <a href="#34-instance-artifacts">Section 3.4</a>.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>map of string to string</td>
+<td>No</td>
+<td>Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).</td>
 </tr>
 </tbody>
 </table>
@@ -2525,6 +2537,12 @@ contains one instance binding.</p>
 <td>list of PropertyValue</td>
 <td>No</td>
 <td>Sets static experiment properties to values implicit in the instance.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>map of string to string</td>
+<td>No</td>
+<td>Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).</td>
 </tr>
 </tbody>
 </table>
