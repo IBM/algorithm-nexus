@@ -98,7 +98,7 @@ or evaluation task (the benchmark problem). It defines:
 | `metrics`             | list of Property | No       | Canonical metric names for this logical. Each entry specifies the metric name and an optional human-readable description.       |
 | `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                           |
 | `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                 |
-| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). See [Benchmark source metadata](#benchmark-source-metadata) for conventional keys. |
+| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
 **Ranking fields:**
 
@@ -220,7 +220,7 @@ instance folder, that holds the artifact files).
 | `description`           | string                   | No       | Human-readable description of this specific instance.                                 |
 | `problemPropertyValues` | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                        |
 | `instanceArtifacts`     | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts). |
-| `metadata`              | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). See [Benchmark source metadata](#benchmark-source-metadata) for conventional keys. |
+| `metadata`              | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
 An instance can point to its counterpart in the benchmark's source with the
 `benchmark-instance-source-name` and `benchmark-instance-source-url` keys, set
