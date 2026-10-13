@@ -1219,6 +1219,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#65-displaying-source-metadata-on-leaderboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        6.5 Displaying Source Metadata on Leaderboards
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1271,6 +1282,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-benchmark-source-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        9. Benchmark Source Metadata
+      </span>
+    </span>
+  </a>
   
 </li>
       
@@ -2919,6 +2941,20 @@ constitutes "steady-state heavy":</p>
 <li>Merge both dataframes. Both now share the same canonical column names and can
    be displayed in a single leaderboard.</li>
 </ol>
+<h3 id="65-displaying-source-metadata-on-leaderboards">6.5 Displaying Source Metadata on Leaderboards<a class="headerlink" href="#65-displaying-source-metadata-on-leaderboards" title="Permanent link">&para;</a></h3>
+<p>While Nexus does not interpret the custom keys inside a <code>metadata</code> block, leaderboards or other visualization tools can use these conventions to link benchmarks and instances back to their original sources (such as public libraries like QOBLIB).</p>
+<p>For example, a leaderboard query could read the following metadata definitions from <code>benchmark.yaml</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="nt">benchmark-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QOBLIB</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nt">benchmark-source-url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://zib-aopt.github.io/QOBLIB/problem/07/</span>
+</span></code></pre></div>
+<p>And the corresponding metadata from <code>instance.yaml</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="nt">benchmark-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QOBLIB</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">benchmark-instance-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ibm32</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">benchmark-instance-source-url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&amp;name=ibm32</span>
+</span></code></pre></div>
+<p>Using these fields, the leaderboard can render clickable links to the original QOBLIB pages for the problem and the specific instance.</p>
 <hr />
 <h2 id="7-instance-binding-versioning">7. Instance Binding Versioning<a class="headerlink" href="#7-instance-binding-versioning" title="Permanent link">&para;</a></h2>
 <p>An instance binding may only change if:</p>
@@ -2965,6 +3001,38 @@ whose entries reference the target logical benchmark and instance via
 <code>instanceReference</code> field, and describe the mapping via
 <code>problemPropertyMapping</code>, <code>metricMapping</code>, <code>instanceArtifactMapping</code>, and
 <code>staticFilters</code> as defined in <a href="#42-schema">Section 4.2</a>.</p>
+<hr />
+<h2 id="9-benchmark-source-metadata">9. Benchmark Source Metadata<a class="headerlink" href="#9-benchmark-source-metadata" title="Permanent link">&para;</a></h2>
+<p>The optional <code>metadata</code> block of <code>benchmark.yaml</code> and <code>instance.yaml</code> can record where a benchmark, or one of its instances, comes from. This is useful for public benchmark libraries such as <a href="https://zib-aopt.github.io/QOBLIB">QOBLIB</a>.</p>
+<p>Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>benchmark-source-name</code></td>
+<td>Name of the source of the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark-source-url</code></td>
+<td>URL of the source of the benchmark.</td>
+</tr>
+<tr>
+<td><code>benchmark-instance-source-name</code></td>
+<td>Name of the matching instance in the source.</td>
+</tr>
+<tr>
+<td><code>benchmark-instance-source-url</code></td>
+<td>URL of the matching instance in the source.</td>
+</tr>
+</tbody>
+</table>
+<p><code>benchmark-source-name</code> names the source and the other keys qualify it, so set it whenever any of the other keys is present. A logical benchmark typically sets only the two source-level keys (<code>benchmark-source-name</code> and <code>benchmark-source-url</code>). An instance typically sets <code>benchmark-source-name</code> together with the two instance-level keys.</p>
+<p>An instance does not inherit the <code>metadata</code> of its benchmark, so repeat the source keys in every file that should carry them.</p>
 
 
 

@@ -1029,8 +1029,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#54-leaderboard-and-discovery-filtering-by-compute-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        5.4 Leaderboard and Discovery Filtering by Compute Type
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-compute-type-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        6. Compute Type Metadata
+      </span>
+    </span>
+  </a>
   
 </li>
       
@@ -2031,6 +2053,11 @@ format and the standardized benchmark packaging protocol.</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bubble_sort</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_sort</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">compute-type-merge_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">compute-type-quick_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span></code></pre></div>
 <p>GitHub URL example:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
@@ -2044,7 +2071,8 @@ format and the standardized benchmark packaging protocol.</p>
   GitHub URL (local paths are rejected by schema validation)</li>
 <li><code>experiment_package.experiments</code> — required; non-empty list of experiment
   identifiers exposed by the package</li>
-<li><code>metadata</code> — optional; flat string-to-string dictionary for arbitrary key-value annotations (keys and values up to 4,096 characters)</li>
+<li><code>metadata</code> — optional; flat string-to-string dictionary for arbitrary
+  key-value annotations (keys and values up to 4,096 characters).</li>
 </ul>
 <h3 id="32-benchmark-submissions-in-submissions">3.2 Benchmark Submissions in <code>submissions/</code><a class="headerlink" href="#32-benchmark-submissions-in-submissions" title="Permanent link">&para;</a></h3>
 <p>An experiment folder may define a <code>submissions/</code> directory. That folder contains
@@ -2118,6 +2146,36 @@ without requiring a separate index.</p>
 metrics exported, etc. — can be obtained with a combination of the <code>nexus</code> CLI
 for listing and the <code>ado</code> CLI for full experiment details after installing the
 relevant experiment package.</p>
+<h3 id="54-leaderboard-and-discovery-filtering-by-compute-type">5.4 Leaderboard and Discovery Filtering by Compute Type<a class="headerlink" href="#54-leaderboard-and-discovery-filtering-by-compute-type" title="Permanent link">&para;</a></h3>
+<p>Leaderboards and experiment discovery interfaces can use the optional <code>metadata</code> in <code>experiment_package.yaml</code> to filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by, experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).</p>
+<p>Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to automatically tag and filter results:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">compute-type-neural_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">compute-type-merge_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI-Classical</span>
+</span></code></pre></div>
+<hr />
+<h2 id="6-compute-type-metadata">6. Compute Type Metadata<a class="headerlink" href="#6-compute-type-metadata" title="Permanent link">&para;</a></h2>
+<p>The optional <code>metadata</code> block of <code>experiment_package.yaml</code> can label the compute type of each experiment the package lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.</p>
+<!-- markdownlint-disable line-length -->
+
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>compute-type-&lt;experiment&gt;</code></td>
+<td>Compute type of <code>&lt;experiment&gt;</code>, which is one of the identifiers listed under <code>experiment_package.experiments</code> in the same file.</td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-enable line-length -->
+
+<p>The value is a free-form string. Suggested values are <code>Quantum</code>, <code>AI</code>, and <code>Classical</code>. For a hybrid, join two of them with a hyphen, for example <code>Quantum-Classical</code>, <code>Quantum-AI</code>, or <code>AI-Classical</code>.</p>
 
 
 

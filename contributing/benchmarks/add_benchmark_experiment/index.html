@@ -1197,6 +1197,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#label-an-experiments-compute-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Label an experiment's compute type
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#author-a-new-experiment-package" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1759,6 +1770,20 @@ repository URL:</p>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
 </span></code></pre></div>
 <p>Each id in the list is available to submissions under this experiment folder.</p>
+<h3 id="label-an-experiments-compute-type">Label an experiment's compute type<a class="headerlink" href="#label-an-experiments-compute-type" title="Permanent link">&para;</a></h3>
+<p>To label the compute type of an experiment, add a <code>compute-type-&lt;experiment&gt;</code>
+key to the <code>metadata</code> block of <code>experiment_package.yaml</code>. The <code>&lt;experiment&gt;</code>
+part must be one of the ids in the <code>experiments</code> list:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"rlx-coloring"</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">compute-type-rlx_coloring</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+</span></code></pre></div>
+<p>See <a href="../../../design/benchmarking/benchmark_experiments_and_submissions/#6-compute-type-metadata">Compute type metadata</a>
+for suggested values.</p>
 <h3 id="author-a-new-experiment-package">Author a new experiment package<a class="headerlink" href="#author-a-new-experiment-package" title="Permanent link">&para;</a></h3>
 <p>To create the Python package itself, follow the
 <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/">ado custom experiment template</a>,
@@ -1766,7 +1791,7 @@ publish the package on PyPI or GitHub, then continue from
 <a href="#1-create-the-experiment-folder">step 1</a>.</p>
 <h3 id="list-registered-experiments">List registered experiments<a class="headerlink" href="#list-registered-experiments" title="Permanent link">&para;</a></h3>
 <p>To see which experiments Algorithm Nexus already registers:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>list<span class="w"> </span>experiments
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>list<span class="w"> </span>experiments
 </span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

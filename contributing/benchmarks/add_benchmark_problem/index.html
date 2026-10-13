@@ -1170,6 +1170,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#record-where-a-benchmark-comes-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Record where a benchmark comes from
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#add-an-instance-to-an-existing-problem" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1859,11 +1870,28 @@ from <code>instance.yaml</code>:</p>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    ├── graph.dimacs
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    └── graph.json
 </span></code></pre></div>
+<h3 id="record-where-a-benchmark-comes-from">Record where a benchmark comes from<a class="headerlink" href="#record-where-a-benchmark-comes-from" title="Permanent link">&para;</a></h3>
+<p>To record the source of a problem that comes from a public benchmark library,
+add the source keys to the <code>metadata</code> block of <code>benchmark.yaml</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="nt">benchmark-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QOBLIB</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nt">benchmark-source-url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://zib-aopt.github.io/QOBLIB/problem/07/</span>
+</span></code></pre></div>
+<p>To also point to the matching instance in that source, set the instance keys
+in the <code>metadata</code> block of <code>instance.yaml</code>. Repeat <code>benchmark-source-name</code>,
+since an instance does not inherit the metadata of its benchmark:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="nt">benchmark-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QOBLIB</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">benchmark-instance-source-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ibm32</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">benchmark-instance-source-url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&amp;name=ibm32</span>
+</span></code></pre></div>
+<p>See <a href="../../../design/benchmarking/logical_benchmarks_and_instances/#9-benchmark-source-metadata">Benchmark source metadata</a>
+for the list of keys.</p>
 <h3 id="add-an-instance-to-an-existing-problem">Add an instance to an existing problem<a class="headerlink" href="#add-an-instance-to-an-existing-problem" title="Permanent link">&para;</a></h3>
 <p>To add another instance of a problem that is already registered, create a new
 folder under that problem's <code>instances/</code> directory and write an <code>instance.yaml</code>
 that uses the same property identifiers.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>benchmarks/&lt;problem-id&gt;/instances/&lt;instance-name&gt;
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>benchmarks/&lt;problem-id&gt;/instances/&lt;instance-name&gt;
 </span></code></pre></div>
 <p>Then validate as in <a href="#3-validate">step 3</a>.</p>
 <h3 id="describe-the-problem-in-a-readme">Describe the problem in a README<a class="headerlink" href="#describe-the-problem-in-a-readme" title="Permanent link">&para;</a></h3>
@@ -1872,9 +1900,9 @@ structure — add <code>benchmarks/&lt;problem-id&gt;/README.md</code> next to <
 <h3 id="use-other-property-domains">Use other property domains<a class="headerlink" href="#use-other-property-domains" title="Permanent link">&para;</a></h3>
 <p>The walk-through uses a mix of categorical, discrete, and continuous properties.
 To constrain a continuous property to a range, set <code>domainRange</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="nt">variableType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CONTINUOUS_VARIABLE_TYPE</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">domainRange</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <p>To leave a categorical property open, omit <code>propertyDomain</code>. See the
 <a href="https://ibm.github.io/ado/core-concepts/properties-and-domains/">ado property domain documentation</a>
@@ -1883,17 +1911,17 @@ and
 <h3 id="start-from-the-repository-templates">Start from the repository templates<a class="headerlink" href="#start-from-the-repository-templates" title="Permanent link">&para;</a></h3>
 <p>To begin from placeholders instead of the graph-coloring example, copy the
 templates and replace every <code>&lt;...&gt;</code> marker:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>benchmarks/&lt;problem-id&gt;
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>cp<span class="w"> </span>templates/logical-benchmark/benchmark.yaml<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span>benchmarks/&lt;problem-id&gt;/benchmark.yaml
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>cp<span class="w"> </span>-R<span class="w"> </span>templates/logical-benchmark/instances<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span>benchmarks/&lt;problem-id&gt;/instances
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>benchmarks/&lt;problem-id&gt;
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>cp<span class="w"> </span>templates/logical-benchmark/benchmark.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>benchmarks/&lt;problem-id&gt;/benchmark.yaml
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>cp<span class="w"> </span>-R<span class="w"> </span>templates/logical-benchmark/instances<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span>benchmarks/&lt;problem-id&gt;/instances
 </span></code></pre></div>
 <p>Rename <code>instances/instance-name/</code> to your instance id, then continue from
 <a href="#3-validate">step 3</a>.</p>
 <h3 id="validate-a-single-problem-folder">Validate a single problem folder<a class="headerlink" href="#validate-a-single-problem-folder" title="Permanent link">&para;</a></h3>
 <p>To validate one problem:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks<span class="w"> </span>--file<span class="w"> </span>benchmarks/graph_coloring
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks<span class="w"> </span>--file<span class="w"> </span>benchmarks/graph_coloring
 </span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
