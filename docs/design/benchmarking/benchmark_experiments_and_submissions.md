@@ -175,6 +175,11 @@ experiment_package:
         - bubble_sort
         - merge_sort
         - quick_sort
+
+metadata:
+    compute-type-bubble_sort: Classical
+    compute-type-merge_sort: Classical
+    compute-type-quick_sort: Classical
 ```
 
 GitHub URL example:
@@ -192,7 +197,35 @@ experiment_package:
   GitHub URL (local paths are rejected by schema validation)
 - `experiment_package.experiments` — required; non-empty list of experiment
   identifiers exposed by the package
-- `metadata` — optional; flat string-to-string dictionary for arbitrary key-value annotations (keys and values up to 4,096 characters)
+- `metadata` — optional; flat string-to-string dictionary for arbitrary
+  key-value annotations (keys and values up to 4,096 characters).
+  See [Compute type metadata](#compute-type-metadata) for conventional keys.
+
+#### Compute type metadata
+
+The `metadata` block of `experiment_package.yaml` can label the compute type of
+each experiment the package lists. Nexus does not interpret these keys. They are
+conventions that tools reading Nexus manifests can rely on.
+
+<!-- markdownlint-disable line-length -->
+
+| Key                         | Description                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `compute-type-<experiment>` | Compute type of `<experiment>`, which is one of the identifiers listed under `experiment_package.experiments` in the same file. |
+
+<!-- markdownlint-enable line-length -->
+
+The value is a free-form string. Suggested values are `Quantum`, `AI`, and
+`Classical`. For a hybrid, join two of them with a hyphen, for example
+`Quantum-Classical`, `Quantum-AI`, or `AI-Classical`.
+
+In the `sorting-benchmarks` example above, every experiment is labelled
+`Classical`. A hybrid experiment would use a hyphenated value instead:
+
+```yaml
+metadata:
+    compute-type-merge_sort: AI-Classical
+```
 
 ### 3.2 Benchmark Submissions in `submissions/`
 

@@ -123,6 +123,25 @@ experiment_package:
 
 Each id in the list is available to submissions under this experiment folder.
 
+### Label an experiment's compute type
+
+To label the compute type of an experiment, add a `compute-type-<experiment>`
+key to the `metadata` block of `experiment_package.yaml`. The `<experiment>`
+part must be one of the ids in the `experiments` list:
+
+```yaml
+experiment_package:
+    requirement_specifier: "rlx-coloring"
+    experiments:
+        - rlx_coloring
+
+metadata:
+    compute-type-rlx_coloring: Classical
+```
+
+See [Compute type metadata](../../design/benchmarking/benchmark_experiments_and_submissions.md#compute-type-metadata)
+for suggested values.
+
 ### Author a new experiment package
 
 To create the Python package itself, follow the
