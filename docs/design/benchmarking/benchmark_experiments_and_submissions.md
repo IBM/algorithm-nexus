@@ -175,6 +175,11 @@ experiment_package:
         - bubble_sort
         - merge_sort
         - quick_sort
+
+metadata:
+    compute-type-bubble_sort: Classical
+    compute-type-merge_sort: Classical
+    compute-type-quick_sort: Classical
 ```
 
 GitHub URL example:
@@ -192,7 +197,8 @@ experiment_package:
   GitHub URL (local paths are rejected by schema validation)
 - `experiment_package.experiments` — required; non-empty list of experiment
   identifiers exposed by the package
-- `metadata` — optional; flat string-to-string dictionary for arbitrary key-value annotations (keys and values up to 4,096 characters)
+- `metadata` — optional; flat string-to-string dictionary for arbitrary
+  key-value annotations (keys and values up to 4,096 characters).
 
 ### 3.2 Benchmark Submissions in `submissions/`
 
@@ -286,3 +292,32 @@ Fetching details on experiments and submissions — such as expected input,
 metrics exported, etc. — can be obtained with a combination of the `nexus` CLI
 for listing and the `ado` CLI for full experiment details after installing the
 relevant experiment package.
+
+### 5.4 Leaderboard and Discovery Filtering by Compute Type
+
+Leaderboards and experiment discovery interfaces can use the optional `metadata` in `experiment_package.yaml` to filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by, experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).
+
+Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to automatically tag and filter results:
+
+```yaml
+metadata:
+    compute-type-bubble_sort: Classical
+    compute-type-neural_sort: AI
+    compute-type-merge_sort: AI-Classical
+```
+
+---
+
+## 6. Compute Type Metadata
+
+The optional `metadata` block of `experiment_package.yaml` can label the compute type of each experiment the package lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.
+
+<!-- markdownlint-disable line-length -->
+
+| Key                         | Description                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `compute-type-<experiment>` | Compute type of `<experiment>`, which is one of the identifiers listed under `experiment_package.experiments` in the same file. |
+
+<!-- markdownlint-enable line-length -->
+
+The value is a free-form string. Suggested values are `Quantum`, `AI`, and `Classical`. For a hybrid, join two of them with a hyphen, for example `Quantum-Classical`, `Quantum-AI`, or `AI-Classical`.

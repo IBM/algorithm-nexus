@@ -98,7 +98,7 @@ or evaluation task (the benchmark problem). It defines:
 | `metrics`             | list of Property | No       | Canonical metric names for this logical. Each entry specifies the metric name and an optional human-readable description.       |
 | `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                           |
 | `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                 |
-| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                 |
+| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
 **Ranking fields:**
 
@@ -706,6 +706,29 @@ A leaderboard query for
 5. Merge both dataframes. Both now share the same canonical column names and can
    be displayed in a single leaderboard.
 
+### 6.5 Displaying Source Metadata on Leaderboards
+
+While Nexus does not interpret the custom keys inside a `metadata` block, leaderboards or other visualization tools can use these conventions to link benchmarks and instances back to their original sources (such as public libraries like QOBLIB).
+
+For example, a leaderboard query could read the following metadata definitions from `benchmark.yaml`:
+
+```yaml
+metadata:
+    benchmark-source-name: QOBLIB
+    benchmark-source-url: https://zib-aopt.github.io/QOBLIB/problem/07/
+```
+
+And the corresponding metadata from `instance.yaml`:
+
+```yaml
+metadata:
+    benchmark-source-name: QOBLIB
+    benchmark-instance-source-name: ibm32
+    benchmark-instance-source-url: https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&name=ibm32
+```
+
+Using these fields, the leaderboard can render clickable links to the original QOBLIB pages for the problem and the specific instance.
+
 ---
 
 ## 7. Instance Binding Versioning
@@ -753,3 +776,22 @@ whose entries reference the target logical benchmark and instance via
 `instanceReference` field, and describe the mapping via
 `problemPropertyMapping`, `metricMapping`, `instanceArtifactMapping`, and
 `staticFilters` as defined in [Section 4.2](#42-schema).
+
+---
+
+## 9. Benchmark Source Metadata
+
+The optional `metadata` block of `benchmark.yaml` and `instance.yaml` can record where a benchmark, or one of its instances, comes from. This is useful for public benchmark libraries such as [QOBLIB](https://zib-aopt.github.io/QOBLIB).
+
+Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.
+
+| Key                              | Description                                  |
+| -------------------------------- | -------------------------------------------- |
+| `benchmark-source-name`          | Name of the source of the benchmark.         |
+| `benchmark-source-url`           | URL of the source of the benchmark.          |
+| `benchmark-instance-source-name` | Name of the matching instance in the source. |
+| `benchmark-instance-source-url`  | URL of the matching instance in the source.  |
+
+`benchmark-source-name` names the source and the other keys qualify it, so set it whenever any of the other keys is present. A logical benchmark typically sets only the two source-level keys (`benchmark-source-name` and `benchmark-source-url`). An instance typically sets `benchmark-source-name` together with the two instance-level keys.
+
+An instance does not inherit the `metadata` of its benchmark, so repeat the source keys in every file that should carry them.

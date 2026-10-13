@@ -196,6 +196,31 @@ benchmarks/graph_coloring/instances/erdos_renyi_50_02/
     └── graph.json
 ```
 
+### Record where a benchmark comes from
+
+To record the source of a problem that comes from a public benchmark library,
+add the source keys to the `metadata` block of `benchmark.yaml`:
+
+```yaml
+metadata:
+    benchmark-source-name: QOBLIB
+    benchmark-source-url: https://zib-aopt.github.io/QOBLIB/problem/07/
+```
+
+To also point to the matching instance in that source, set the instance keys
+in the `metadata` block of `instance.yaml`. Repeat `benchmark-source-name`,
+since an instance does not inherit the metadata of its benchmark:
+
+```yaml
+metadata:
+    benchmark-source-name: QOBLIB
+    benchmark-instance-source-name: ibm32
+    benchmark-instance-source-url: https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&name=ibm32
+```
+
+See [Benchmark source metadata](../../design/benchmarking/logical_benchmarks_and_instances.md#9-benchmark-source-metadata)
+for the list of keys.
+
 ### Add an instance to an existing problem
 
 To add another instance of a problem that is already registered, create a new
