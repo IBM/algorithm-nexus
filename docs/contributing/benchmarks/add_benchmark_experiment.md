@@ -139,7 +139,7 @@ metadata:
     compute-type-rlx_coloring: Classical
 ```
 
-See [Compute type metadata](../../design/benchmarking/benchmark_experiments_and_submissions.md#compute-type-metadata)
+See [Compute type metadata](../../design/benchmarking/benchmark_experiments_and_submissions.md#6-compute-type-metadata)
 for suggested values.
 
 ### Author a new experiment package

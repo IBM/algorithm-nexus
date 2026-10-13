@@ -218,7 +218,7 @@ metadata:
     benchmark-instance-source-url: https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&name=ibm32
 ```
 
-See [Benchmark source metadata](../../design/benchmarking/logical_benchmarks_and_instances.md#benchmark-source-metadata)
+See [Benchmark source metadata](../../design/benchmarking/logical_benchmarks_and_instances.md#9-benchmark-source-metadata)
 for the list of keys.
 
 ### Add an instance to an existing problem
