@@ -1,3 +1,27 @@
+## [1.1.0](https://github.com/ibm/algorithm-nexus/compare/995ebfa4cccd7d6237dbbeda53ec151ab7fa1743..1.1.0) - 2026-10-13
+#### Features
+- (**Schema**) Updated models and cli to the latest schema for logical benchmarks and experiments (#295) - ([cc441c1](https://github.com/ibm/algorithm-nexus/commit/cc441c18922327912a932d343c2e80b66d3a7d0e)) - Christian Pinto
+- (**benchmarks**) validate instance benchmarkIdentifier matches parent benchmarkIdentifier (#302) - ([33be13b](https://github.com/ibm/algorithm-nexus/commit/33be13b034e34bc78074a94213bcf82b8340b706)) - Vassilis Vassiliadis
+- (**benchmarks**) require exactly one value for each problem property (#305) - ([c2fbd74](https://github.com/ibm/algorithm-nexus/commit/c2fbd74ccac5a49525b38767951c582c31241524)) - Vassilis Vassiliadis
+- (**dependencies**) Removed terrakit from candidate and product dependency groups (#315) - ([3b04e46](https://github.com/ibm/algorithm-nexus/commit/3b04e46b518f56d5c65b03860f6233e20057e58d)) - Christian Pinto
+- (**dependencies**) Updated vllm to version 0.31.0 for candidate and product dependency groups (#313) - ([4111b9b](https://github.com/ibm/algorithm-nexus/commit/4111b9b0f12dbe9f0aa4176982e77db21dbfa7fc)) - Christian Pinto
+- (**design**) support optional metadata in Nexus manifests (#310) - ([f438b6b](https://github.com/ibm/algorithm-nexus/commit/f438b6b7e8e4f20b741958ecd17e2cc18f454541)) - Vassilis Vassiliadis
+- (**design**) Updated logical benchmarks, instances and bindings (#290) - ([574f009](https://github.com/ibm/algorithm-nexus/commit/574f009ecad098f6485d1002cb2a98962c5df98c)) - Christian Pinto
+- (**docs**) Aligned contributing docs to latest schema (#299) - ([7693ef3](https://github.com/ibm/algorithm-nexus/commit/7693ef33764f41054d218b5a7c9773a530dbf76b)) - Christian Pinto
+- (**packages**) Temporarily removing biomed-multi-alignment (#308) - ([8e435f3](https://github.com/ibm/algorithm-nexus/commit/8e435f3287fb3238964a1459007d47f02f1a7fcc)) - Christian Pinto
+- (**skills**) Added skills for creation of logical-benchmark and instance (#303) - ([d488d65](https://github.com/ibm/algorithm-nexus/commit/d488d65eab10ac0f4b9b86aba3c52dc3364aa3f9)) - Christian Pinto
+#### Bug Fixes
+- (**cli**) Solved bug in validate logical-benchmarks that allowed any folder or file to be in a benchmark (#289) - ([c72e1c3](https://github.com/ibm/algorithm-nexus/commit/c72e1c3a49796c5fbc474d6138e040577d810ae5)) - Christian Pinto
+- (**cli**) Updated cli commands to use the new benchmarks/experiments folders structure (#285) - ([daff761](https://github.com/ibm/algorithm-nexus/commit/daff761e16f504668ff45bf6f63d76d78a49a226)) - Christian Pinto
+#### Documentation
+- (**benchmarks**) fix typo (#281) - ([bd6f5c4](https://github.com/ibm/algorithm-nexus/commit/bd6f5c46d578a1f5c33277ccedc1450eb582ca34)) - Vassilis Vassiliadis
+- (**changelog**) add release notes for 1.0.0 (#283) - ([995ebfa](https://github.com/ibm/algorithm-nexus/commit/995ebfa4cccd7d6237dbbeda53ec151ab7fa1743)) - DRL-NextGen
+#### Build system
+- (**deps**) update dependencies (#291) - ([2e16af8](https://github.com/ibm/algorithm-nexus/commit/2e16af88b97319d67ed61be171180fc1ffce749d)) - DRL-NextGen
+- (**hooks**) update pre-commit hooks (#292) - ([5960bec](https://github.com/ibm/algorithm-nexus/commit/5960becdbceb52dcf35d305cffeda55bc34109ff)) - DRL-NextGen
+
+- - -
+
 ## [1.0.0](https://github.com/ibm/algorithm-nexus/compare/f3f8054bba7a0ac14581b1d45e9c655cba984266..1.0.0) - 2026-09-29
 #### Documentation
 - (**benchmarks**) Improved benchmarks terminology and adapted schema accordingly (#250) - ([57fcfa7](https://github.com/ibm/algorithm-nexus/commit/57fcfa75960716c1adadadb5ad8ff819f839f385)) - Christian Pinto
