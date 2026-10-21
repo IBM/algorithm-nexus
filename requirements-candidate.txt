@@ -223,9 +223,9 @@ braceexpand==0.1.7 \
     --hash=sha256:91332d53de7828103dcae5773fb43bc34950b0c8160e35e0f44c4427a3b85014 \
     --hash=sha256:e6e539bd20eaea53547472ff94f4fb5c3d3bf9d0a89388c4b56663aba765f705
     # via webdataset
-cachetools==7.2.3 \
-    --hash=sha256:85ef9d2703918bedf7f88caa0b06bb3bb7a71360eb0b05c20796b89fede6e30c \
-    --hash=sha256:e6fafd06de4a5bd915ff7d247588ea497e28c9a568c62db8678d9a5f11515a9a
+cachetools==7.2.4 \
+    --hash=sha256:4cfbebf3eec4040d2073b19c460511ad47eef7b852dbf9a0d385099b4dafa31e \
+    --hash=sha256:e0203b04b75fe13e62098eeb5b2018c4eb1a14c04e2b5b450e70db3ee7e92ec5
     # via vllm
 captum==0.9.0 \
     --hash=sha256:cda38e1d42c37591d71560bb2f5813ac4cae8d8543afac45279c7efd5945997e \
