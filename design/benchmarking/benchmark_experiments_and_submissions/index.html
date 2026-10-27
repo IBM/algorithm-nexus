@@ -1893,7 +1893,7 @@ submissions. Logical benchmarks, instances, and results are specified in
 <li>in this design, experiments are declared in
   <code>experiments/&lt;name&gt;/experiment_package.yaml</code></li>
 <li>All benchmark experiments follow the
-  <a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/">ADO custom experiment template</a></li>
+  <a href="https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/">ADO custom experiment template</a></li>
 </ul>
 </li>
 <li>
@@ -2108,7 +2108,7 @@ contain a file named <code>space.yaml</code>.</p>
   identifiers declared in the sibling <code>experiment_package.yaml</code></li>
 </ul>
 <p>For reference on the expected discoveryspace structure, see
-<a href="https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace">Using your custom experiment in a discoveryspace</a>.</p>
+<a href="https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace">Using your custom experiment in a discoveryspace</a>.</p>
 <hr />
 <h2 id="4-validation-considerations">4. Validation Considerations<a class="headerlink" href="#4-validation-considerations" title="Permanent link">&para;</a></h2>
 <h3 id="41-experiment-level-validation">4.1 Experiment-Level Validation<a class="headerlink" href="#41-experiment-level-validation" title="Permanent link">&para;</a></h3>
@@ -2148,8 +2148,11 @@ metrics exported, etc. — can be obtained with a combination of the <code>nexus
 for listing and the <code>ado</code> CLI for full experiment details after installing the
 relevant experiment package.</p>
 <h3 id="54-leaderboard-and-discovery-filtering-by-compute-type">5.4 Leaderboard and Discovery Filtering by Compute Type<a class="headerlink" href="#54-leaderboard-and-discovery-filtering-by-compute-type" title="Permanent link">&para;</a></h3>
-<p>Leaderboards and experiment discovery interfaces can use the optional <code>metadata</code> in <code>experiment_package.yaml</code> to filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by, experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).</p>
-<p>Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to automatically tag and filter results:</p>
+<p>Leaderboards and experiment discovery interfaces can use the optional <code>metadata</code> in <code>experiment_package.yaml</code> to
+filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by,
+experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).</p>
+<p>Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to
+automatically tag and filter results:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">metadata</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">compute-type-neural_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI</span>
@@ -2157,7 +2160,9 @@ relevant experiment package.</p>
 </span></code></pre></div>
 <hr />
 <h2 id="6-compute-type-metadata">6. Compute Type Metadata<a class="headerlink" href="#6-compute-type-metadata" title="Permanent link">&para;</a></h2>
-<p>The optional <code>metadata</code> block of <code>experiment_package.yaml</code> can label the compute type of each experiment the package lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.</p>
+<p>The optional <code>metadata</code> block of <code>experiment_package.yaml</code> can label the compute type of each experiment the package
+lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely
+on.</p>
 <!-- markdownlint-disable line-length -->
 
 <table>
@@ -2176,7 +2181,8 @@ relevant experiment package.</p>
 </table>
 <!-- markdownlint-enable line-length -->
 
-<p>The value is a free-form string. Suggested values are <code>Quantum</code>, <code>AI</code>, and <code>Classical</code>. For a hybrid, join two of them with a hyphen, for example <code>Quantum-Classical</code>, <code>Quantum-AI</code>, or <code>AI-Classical</code>.</p>
+<p>The value is a free-form string. Suggested values are <code>Quantum</code>, <code>AI</code>, and <code>Classical</code>. For a hybrid, join two of them
+with a hyphen, for example <code>Quantum-Classical</code>, <code>Quantum-AI</code>, or <code>AI-Classical</code>.</p>
 
 
 
