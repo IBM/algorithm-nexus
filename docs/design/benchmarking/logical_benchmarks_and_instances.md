@@ -143,7 +143,7 @@ ranking:
 ```
 
 See
-[the ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/)
+[the ado property domain documentation](https://ibm.github.io/ado/latest/concepts/properties-and-domains/)
 for more information about the types of domains that can be specified.
 
 ---

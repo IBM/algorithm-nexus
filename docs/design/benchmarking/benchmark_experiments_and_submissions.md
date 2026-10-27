@@ -67,7 +67,7 @@ submissions. Logical benchmarks, instances, and results are specified in
     - in this design, experiments are declared in
       `experiments/<name>/experiment_package.yaml`
     - All benchmark experiments follow the
-      [ADO custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/)
+      [ADO custom experiment template](https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/)
 
 - **Benchmark submission**
     - one registered use of a benchmark experiment on a benchmark instance for a
@@ -241,7 +241,7 @@ experiments:
   identifiers declared in the sibling `experiment_package.yaml`
 
 For reference on the expected discoveryspace structure, see
-[Using your custom experiment in a discoveryspace](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace).
+[Using your custom experiment in a discoveryspace](https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace).
 
 ---
 
@@ -295,9 +295,12 @@ relevant experiment package.
 
 ### 5.4 Leaderboard and Discovery Filtering by Compute Type
 
-Leaderboards and experiment discovery interfaces can use the optional `metadata` in `experiment_package.yaml` to filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by, experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).
+Leaderboards and experiment discovery interfaces can use the optional `metadata` in `experiment_package.yaml` to
+filter and categorize experiments. For example, a user might want to search for, or filter a leaderboard by,
+experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).
 
-Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to automatically tag and filter results:
+Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to
+automatically tag and filter results:
 
 ```yaml
 metadata:
@@ -310,7 +313,9 @@ metadata:
 
 ## 6. Compute Type Metadata
 
-The optional `metadata` block of `experiment_package.yaml` can label the compute type of each experiment the package lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.
+The optional `metadata` block of `experiment_package.yaml` can label the compute type of each experiment the package
+lists. Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely
+on.
 
 <!-- markdownlint-disable line-length -->
 
@@ -320,4 +325,5 @@ The optional `metadata` block of `experiment_package.yaml` can label the compute
 
 <!-- markdownlint-enable line-length -->
 
-The value is a free-form string. Suggested values are `Quantum`, `AI`, and `Classical`. For a hybrid, join two of them with a hyphen, for example `Quantum-Classical`, `Quantum-AI`, or `AI-Classical`.
+The value is a free-form string. Suggested values are `Quantum`, `AI`, and `Classical`. For a hybrid, join two of them
+with a hyphen, for example `Quantum-Classical`, `Quantum-AI`, or `AI-Classical`.

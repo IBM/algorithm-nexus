@@ -250,7 +250,7 @@ propertyDomain:
 ```
 
 To leave a categorical property open, omit `propertyDomain`. See the
-[ado property domain documentation](https://ibm.github.io/ado/core-concepts/properties-and-domains/)
+[ado property domain documentation](https://ibm.github.io/ado/latest/concepts/properties-and-domains/)
 and
 [section 2 of Logical Benchmarks and Instances](../../design/benchmarking/logical_benchmarks_and_instances.md#2-logical-benchmark-definition).
 
