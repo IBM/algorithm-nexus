@@ -145,7 +145,7 @@ for suggested values.
 ### Author a new experiment package
 
 To create the Python package itself, follow the
-[ado custom experiment template](https://ibm.github.io/ado/actuators/creating-custom-experiments/),
+[ado custom experiment template](https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/),
 publish the package on PyPI or GitHub, then continue from
 [step 1](#1-create-the-experiment-folder).
 

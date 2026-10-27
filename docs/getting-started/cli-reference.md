@@ -338,10 +338,10 @@ nexus run benchmarks --pr <pr_url> [OPTIONS]
 - `--remote <path>`: Execute operations on a remote Ray cluster using the
   specified configuration file. When provided, the command automatically
   installs the required benchmark packages in the Ray environment. Read
-  [`Running ado on remote Ray clusters`](https://ibm.github.io/ado/getting-started/remote_run/)
+  [`Running ado on remote Ray clusters`](https://ibm.github.io/ado/latest/user-guide/advanced/remote-execution/)
   to discover the remote context configuration format.
 - `--context <path>`: Path to ADO context YAML file (samplestore context). Read
-  [`Working with Contexts`](https://ibm.github.io/ado/resources/metastore/#working-with-contexts)
+  [`Working with Contexts`](https://ibm.github.io/ado/latest/resources/metastore/#working-with-contexts)
   to discover how to manage contexts.
 - `--use-actuator-configuration <mapping>`: Map an `actuatorIdentifier` to an
   `actuatorConfigurationId` using `actuator-id=config-id`. Pass multiple

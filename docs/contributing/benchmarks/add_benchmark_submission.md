@@ -101,7 +101,7 @@ Here `n_nodes`, `density`, and `graph_type` carry `num_vertices`,
 target.
 
 See
-[Using your custom experiment in a discoveryspace](https://ibm.github.io/ado/actuators/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace)
+[Using your custom experiment in a discoveryspace](https://ibm.github.io/ado/latest/developer-guide/creating-custom-experiments/#using-your-custom-experiment-in-a-discoveryspace)
 for the `space.yaml` syntax.
 
 You now have:
