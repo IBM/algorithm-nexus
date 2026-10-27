@@ -17,6 +17,14 @@ problemPropertyValues:
       identifier: <another_property_name>
     value: <value>
 
+# Instance property values — OPTIONAL. Generative properties used to create this instance
+# (e.g. random seed, generator parameters). They are not declared in benchmark.yaml.
+# Identifiers must be unique and must not reuse a problem property identifier.
+instancePropertyValues:
+  - property:
+      identifier: <generator_property_name>
+    value: <value>
+
 # Artifact properties — only include when the instance has pre-generated artifact files.
 # The named subfolder must exist inside this instance directory.
 # benchmarks/<benchmark-id>/instances/<instance-name>/<subfolder-name>/

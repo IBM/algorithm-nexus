@@ -374,6 +374,53 @@ problemPropertyValues:
         assert collector.has_errors
         assert "nonexistent_param" in " ".join(collector.errors)
 
+    def test_instance_property_values_optional_and_valid(self, tmp_path: Path) -> None:
+        """instancePropertyValues are optional; unique non-colliding ids validate."""
+        bench_dir = tmp_path / "foo"
+        inst_dir = bench_dir / "instances" / "ok"
+        inst_dir.mkdir(parents=True)
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="Test description",
+            problemProperties=[Property(identifier="graph")],
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            benchmark.model_dump_json(exclude_none=True)
+        )
+        (inst_dir / "instance.yaml").write_text(
+            "instanceIdentifier: i1\nbenchmarkIdentifier: test_bench\n"
+            "problemPropertyValues:\n  - property:\n      identifier: graph\n    value: g\n"
+            "instancePropertyValues:\n  - property:\n      identifier: seed\n    value: 42\n"
+        )
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+        assert not collector.has_errors, collector.errors
+
+    def test_instance_property_value_collides_with_problem_property(
+        self, tmp_path: Path
+    ) -> None:
+        """An instance property reusing a problem property identifier fails."""
+        bench_dir = tmp_path / "foo"
+        inst_dir = bench_dir / "instances" / "bad"
+        inst_dir.mkdir(parents=True)
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="Test description",
+            problemProperties=[Property(identifier="graph")],
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            benchmark.model_dump_json(exclude_none=True)
+        )
+        (inst_dir / "instance.yaml").write_text(
+            "instanceIdentifier: i1\nbenchmarkIdentifier: test_bench\n"
+            "problemPropertyValues:\n  - property:\n      identifier: graph\n    value: g\n"
+            "instancePropertyValues:\n  - property:\n      identifier: graph\n    value: x\n"
+        )
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+        assert collector.has_errors
+        assert "conflicts with a problem property" in " ".join(collector.errors)
+
     def test_instance_missing_problem_property_value_fails(
         self, tmp_path: Path
     ) -> None:

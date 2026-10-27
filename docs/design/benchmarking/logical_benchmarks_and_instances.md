@@ -89,16 +89,16 @@ or evaluation task (the benchmark problem). It defines:
 
 <!-- markdownlint-disable line-length -->
 
-| Field                 | Type             | Required | Description                                                                                                                     |
-| --------------------- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `benchmarkidentifier` | string           | Yes      | Unique identifier for this benchmark.                                                                                           |
-| `title`               | string           | No       | Short human-readable display name for this logical benchmark.                                                                   |
-| `description`         | string           | Yes      | Human-readable description of the abstract problem being evaluated.                                                             |
-| `problemProperties`   | list of Property | Yes      | The properties defining a benchmark problem. Each entry specifies the property name and an optional human-readable description. |
-| `metrics`             | list of Property | No       | Canonical metric names for this logical. Each entry specifies the metric name and an optional human-readable description.       |
-| `ranking`             | Ranking          | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                           |
-| `owner`               | string           | No       | Team or individual responsible for maintaining this definition.                                                                 |
-| `metadata`            | map of string to string | No | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
+| Field                 | Type                    | Required | Description                                                                                                                     |
+| --------------------- | ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `benchmarkidentifier` | string                  | Yes      | Unique identifier for this benchmark.                                                                                           |
+| `title`               | string                  | No       | Short human-readable display name for this logical benchmark.                                                                   |
+| `description`         | string                  | Yes      | Human-readable description of the abstract problem being evaluated.                                                             |
+| `problemProperties`   | list of Property        | Yes      | The properties defining a benchmark problem. Each entry specifies the property name and an optional human-readable description. |
+| `metrics`             | list of Property        | No       | Canonical metric names for this logical. Each entry specifies the metric name and an optional human-readable description.       |
+| `ranking`             | Ranking                 | No       | Defines how benchmark results are ordered on a leaderboard. See Ranking fields below.                                           |
+| `owner`               | string                  | No       | Team or individual responsible for maintaining this definition.                                                                 |
+| `metadata`            | map of string to string | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                 |
 
 **Ranking fields:**
 
@@ -178,14 +178,15 @@ for this instance. Each artifact entry declares a `property` (its identifier
 within the instance) and an `artifactsLocation` (the subfolder, relative to the
 instance folder, that holds the artifact files).
 
-| Field                   | Type                     | Required | Description                                                                           |
-| ----------------------- | ------------------------ | -------- | ------------------------------------------------------------------------------------- |
-| `instanceIdentifier`    | string                   | **Yes**  | Unique identifier for this benchmark instance.                                        |
-| `benchmarkIdentifier`   | string                   | **Yes**  | The `benchmarkIdentifier` of the benchmark this instance maps to.                     |
-| `description`           | string                   | No       | Human-readable description of this specific instance.                                 |
-| `problemPropertyValues` | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                        |
-| `instanceArtifacts`     | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts). |
-| `metadata`              | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
+| Field                    | Type                     | Required | Description                                                                                                     |
+| ------------------------ | ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `instanceIdentifier`     | string                   | **Yes**  | Unique identifier for this benchmark instance.                                                                  |
+| `benchmarkIdentifier`    | string                   | **Yes**  | The `benchmarkIdentifier` of the benchmark this instance maps to.                                               |
+| `description`            | string                   | No       | Human-readable description of this specific instance.                                                           |
+| `problemPropertyValues`  | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                                                  |
+| `instancePropertyValues` | list of PropertyValue    | No       | Optional generative properties used to produce the instance (e.g. seed). Not declared in `benchmark.yaml`.      |
+| `instanceArtifacts`      | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts).                           |
+| `metadata`               | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
 ### 3.4 Instance Artifacts
 
@@ -291,7 +292,7 @@ contains one instance binding.
 | `problemPropertyMapping`    | list of **problem property mapping** | No       | Remaps instance problem properties to experiment input properties.                                                                                                                                                                                                                                                                                                 |
 | `instanceArtifactMapping`   | list of **instanceArtifactMapping**  | No       | Remaps benchmark instance artifact properties to experiment input properties. These mappings should be present even if the experiment and instance properties have the same name. Every property omitted here is considered not to be a property of the experiment and will not be used for resolving the mapping between experiment runs and benchmark instances. |
 | `staticFilters`             | list of PropertyValue                | No       | Sets static experiment properties to values implicit in the instance.                                                                                                                                                                                                                                                                                              |
-| `metadata`                  | map of string to string              | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                                                                                                                                                                                                                                                   |
+| `metadata`                  | map of string to string              | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value).                                                                                                                                                                                                                                                    |
 
 <!-- markdownlint-enable line-length -->
 
@@ -708,7 +709,9 @@ A leaderboard query for
 
 ### 6.5 Displaying Source Metadata on Leaderboards
 
-While Nexus does not interpret the custom keys inside a `metadata` block, leaderboards or other visualization tools can use these conventions to link benchmarks and instances back to their original sources (such as public libraries like QOBLIB).
+While Nexus does not interpret the custom keys inside a `metadata` block, leaderboards or other visualization tools can
+use these conventions to link benchmarks and instances back to their original sources (such as public libraries like
+QOBLIB).
 
 For example, a leaderboard query could read the following metadata definitions from `benchmark.yaml`:
 
@@ -727,7 +730,8 @@ metadata:
     benchmark-instance-source-url: https://zib-aopt.github.io/QOBLIB/instance.html?problem=07&name=ibm32
 ```
 
-Using these fields, the leaderboard can render clickable links to the original QOBLIB pages for the problem and the specific instance.
+Using these fields, the leaderboard can render clickable links to the original QOBLIB pages for the problem and the
+specific instance.
 
 ---
 
@@ -781,7 +785,9 @@ whose entries reference the target logical benchmark and instance via
 
 ## 9. Benchmark Source Metadata
 
-The optional `metadata` block of `benchmark.yaml` and `instance.yaml` can record where a benchmark, or one of its instances, comes from. This is useful for public benchmark libraries such as [QOBLIB](https://zib-aopt.github.io/QOBLIB).
+The optional `metadata` block of `benchmark.yaml` and `instance.yaml` can record where a benchmark, or one of its
+instances, comes from. This is useful for public benchmark libraries such as
+[QOBLIB](https://zib-aopt.github.io/QOBLIB).
 
 Nexus does not interpret these keys directly. They are conventions that tools reading Nexus manifests can rely on.
 
@@ -792,6 +798,9 @@ Nexus does not interpret these keys directly. They are conventions that tools re
 | `benchmark-instance-source-name` | Name of the matching instance in the source. |
 | `benchmark-instance-source-url`  | URL of the matching instance in the source.  |
 
-`benchmark-source-name` names the source and the other keys qualify it, so set it whenever any of the other keys is present. A logical benchmark typically sets only the two source-level keys (`benchmark-source-name` and `benchmark-source-url`). An instance typically sets `benchmark-source-name` together with the two instance-level keys.
+`benchmark-source-name` names the source and the other keys qualify it, so set it whenever any of the other keys is
+present. A logical benchmark typically sets only the two source-level keys (`benchmark-source-name` and
+`benchmark-source-url`). An instance typically sets `benchmark-source-name` together with the two instance-level keys.
 
-An instance does not inherit the `metadata` of its benchmark, so repeat the source keys in every file that should carry them.
+An instance does not inherit the `metadata` of its benchmark, so repeat the source keys in every file that should carry
+them.

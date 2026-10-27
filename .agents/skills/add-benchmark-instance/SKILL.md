@@ -91,6 +91,13 @@ problemPropertyValues:
       identifier: <property_id_2>
     value: <value_2>
 
+# (Optional) Generative properties used to create the instance (e.g. seed).
+# Not declared in benchmark.yaml; must not reuse a problem property identifier.
+instancePropertyValues:
+  - property:
+      identifier: <generator_property_name>
+    value: <value>
+
 # (Optional) Include instanceArtifacts if the instance ships with input files
 instanceArtifacts:
   - property:
