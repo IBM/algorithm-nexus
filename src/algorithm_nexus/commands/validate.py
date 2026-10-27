@@ -598,6 +598,22 @@ def validate_instance(
             f"{instance_file}: instance is missing a value for problem property '{pid}'"
         )
 
+    # Validate instancePropertyValues (optional, free-form generative properties)
+    if instance.instancePropertyValues:
+        seen_instance_ids: set[str] = set()
+        for ipv in instance.instancePropertyValues:
+            iid = ipv.property.identifier
+            if iid in problem_property_ids:
+                collector.add(
+                    f"{instance_file}: instancePropertyValues identifier '{iid}' conflicts with a problem property of the same name"
+                )
+            elif iid in seen_instance_ids:
+                collector.add(
+                    f"{instance_file}: instancePropertyValues defines a duplicate value for instance property '{iid}'"
+                )
+            else:
+                seen_instance_ids.add(iid)
+
     # Validate instanceArtifacts — each artifactsLocation subfolder must exist
     if instance.instanceArtifacts:
         for artifact in instance.instanceArtifacts:

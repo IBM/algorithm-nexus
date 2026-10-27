@@ -473,6 +473,15 @@ class BenchmarkInstance(BaseModel):
             description="Values for all problem properties defined in benchmark.yaml."
         ),
     ] = None
+    instancePropertyValues: Annotated[
+        list[PropertyValue] | None,
+        Field(
+            description=(
+                "Optional generative properties used to produce this instance "
+                "(e.g. random seed, generator parameters). Not declared in benchmark.yaml."
+            )
+        ),
+    ] = None
     instanceArtifacts: Annotated[
         list[InstanceArtifact] | None,
         Field(description="All artifacts available for this instance."),
