@@ -105,8 +105,17 @@ experiments/rlx_coloring/
 uv run nexus validate experiments --experiment rlx_coloring
 ```
 
-A successful run lists the experiment with status `success`. The binding is
-ready to commit.
+A successful run lists the binding file with status `success`. Besides the
+experiment package, the command checks that:
+
+- the binding matches the schema and its `instanceBindingIdentifier` is unique
+- `experimentIdentifier` is listed in the experiment's `experiment_package.yaml`
+- `instanceReference` points to an existing benchmark and instance
+- every mapped metric and problem property exists in the benchmark
+- every `instanceArtifactMapping` names an artifact declared by the instance,
+  and each file in `validValues` exists in that artifact's `artifactsLocation`
+
+The binding is ready to commit.
 
 ## 3. Open a pull request
 

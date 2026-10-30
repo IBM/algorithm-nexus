@@ -185,6 +185,7 @@ instance folder, that holds the artifact files).
 | `description`            | string                   | No       | Human-readable description of this specific instance.                                                           |
 | `problemPropertyValues`  | list of PropertyValue    | No       | Values for all problem properties defined in `benchmark.yaml`.                                                  |
 | `instancePropertyValues` | list of PropertyValue    | No       | Optional generative properties used to produce the instance (e.g. seed). Not declared in `benchmark.yaml`.      |
+| `variants`               | list of InstanceVariant  | No       | Problem property value combinations under this instance. See [Section 3.5](#35-instance-variants).              |
 | `instanceArtifacts`      | list of InstanceArtifact | No       | All artifacts available for this instance. See [Section 3.4](#34-instance-artifacts).                           |
 | `metadata`               | map of string to string  | No       | Optional arbitrary key-value annotations (flat string-to-string dictionary, max 4,096 chars per key and value). |
 
@@ -220,7 +221,77 @@ instanceArtifacts:
       artifactsLocation: "<artifacts-subfolder>"
 ```
 
-### 3.5 Example
+### 3.5 Instance Variants
+
+A single instance can cover a sweep over the values of one or more problem
+properties (e.g. the same graph generated for several `edge_density` values).
+Instead of creating one instance per value, list the values under `variants`.
+
+A problem property gets its value **either** in `problemPropertyValues` **or**
+in every entry of `variants`, never both. Properties that vary are therefore
+omitted from the top-level `problemPropertyValues`.
+
+**variant fields:**
+
+| Field                    | Type                         | Required | Description                                                                                     |
+| ------------------------ | ---------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `problemPropertyValues`  | list of PropertyValue        | **Yes**  | Values of the varying problem properties for this variant.                                      |
+| `instanceArtifactValues` | list of artifact value lists | No       | Per artifact (`property`), the `values` (files in its `artifactsLocation`) used by the variant. |
+
+```yaml
+instanceIdentifier: erdos_renyi_50
+benchmarkIdentifier: graph_coloring
+description: 50-node Erdos-Renyi graphs with different edge densities
+
+# edge_density varies, so it is given in the variants instead of here
+problemPropertyValues:
+    - property:
+          identifier: graph_family
+      value: erdos_renyi
+    - property:
+          identifier: num_vertices
+      value: 50
+
+instanceArtifacts:
+    - property:
+          identifier: graph
+      artifactsLocation: artifacts
+
+variants:
+    - problemPropertyValues:
+          - property:
+                identifier: edge_density
+            value: 0.2
+      instanceArtifactValues:
+          - property:
+                identifier: graph
+            values:
+                - graph_02.dimacs
+                - graph_02.json
+    - problemPropertyValues:
+          - property:
+                identifier: edge_density
+            value: 0.5
+      instanceArtifactValues:
+          - property:
+                identifier: graph
+            values:
+                - graph_05.dimacs
+                - graph_05.json
+
+```
+
+Runs still map to the one instance; filtering per variant is done through the
+artifact file names listed in the variant.
+
+Please note that:
+
+- Problem properties that can match the same instance with different values
+  must have each of those values declared in `variants`.
+- For artifacts that change with the variant, users must define all
+  combinations of interest for each property that has variants.
+
+### 3.6 Example
 
 The following is an example instance definition at
 `benchmarks/graph-coloring/instances/erdos_renyi_50_02/instance.yaml`:
@@ -428,6 +499,24 @@ staticFilters:
           identifier: "<experiment-property-name>"
       value: "<experiment-property-value>"
 ```
+
+#### Instances with variants
+
+Bindings need no extra fields for [instance variants](#35-instance-variants).
+`instanceReference` always names the one instance, and `validValues` lists the
+files of any variant the experiment can run, so the routing query matches runs
+of all of them. Which variant a run belongs to is resolved from the variant
+property values, or from the artifact file name via `instanceArtifactValues`.
+
+#### Validation
+
+`nexus validate experiments` checks every binding in
+`experiments/<name>/bindings` against the benchmarks:
+schema, unique `instanceBindingIdentifier`, `experimentIdentifier` listed in
+`experiment_package.yaml`, `instanceReference` pointing to an existing instance,
+mapped metrics and problem properties defined in the benchmark, and
+`instanceArtifactMapping` entries naming declared artifacts whose `validValues`
+files exist in the `artifactsLocation` folder.
 
 ### 4.3 Examples
 

@@ -98,6 +98,20 @@ instancePropertyValues:
       identifier: <generator_property_name>
     value: <value>
 
+# (Optional) variants: use when one instance covers several values of a problem property.
+# A property that varies is omitted from problemPropertyValues and given a value in EVERY variant.
+# List every combination of interest; files must exist in the artifact's artifactsLocation.
+variants:
+  - problemPropertyValues:
+      - property:
+          identifier: <varying_property_id>
+        value: <value>
+    instanceArtifactValues:
+      - property:
+          identifier: <artifact_property_id>
+        values:
+          - <file-name>
+
 # (Optional) Include instanceArtifacts if the instance ships with input files
 instanceArtifacts:
   - property:

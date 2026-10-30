@@ -196,6 +196,75 @@ benchmarks/graph_coloring/instances/erdos_renyi_50_02/
     └── graph.json
 ```
 
+### Cover several values of a property with variants
+
+When the files of one instance differ by the value of a problem property (e.g. a
+sweep over `edge_density`), define a single instance with `variants` instead of
+one instance per value. A property that varies is omitted from
+`problemPropertyValues` and given a value in **every** variant. Each variant
+lists the artifact files, in the artifact's `artifactsLocation`, that belong to
+it:
+
+```yaml
+instanceIdentifier: erdos_renyi_50
+benchmarkIdentifier: graph_coloring
+description: 50-node Erdos-Renyi graphs with different edge densities
+problemPropertyValues:
+    - property:
+          identifier: graph_family
+      value: erdos_renyi
+    - property:
+          identifier: num_vertices
+      value: 50
+instanceArtifacts:
+    - property:
+          identifier: graph
+      artifactsLocation: graph_files
+variants:
+    - problemPropertyValues:
+          - property:
+                identifier: edge_density
+            value: 0.2
+      instanceArtifactValues:
+          - property:
+                identifier: graph
+            values:
+                - graph_02.dimacs
+                - graph_02.json
+    - problemPropertyValues:
+          - property:
+                identifier: edge_density
+            value: 0.5
+      instanceArtifactValues:
+          - property:
+                identifier: graph
+            values:
+                - graph_05.dimacs
+                - graph_05.json
+```
+
+The instance directory then looks like this:
+
+```text
+benchmarks/graph_coloring/instances/erdos_renyi_50/
+├── instance.yaml
+└── graph_files/
+    ├── graph_02.dimacs
+    ├── graph_02.json
+    ├── graph_05.dimacs
+    └── graph_05.json
+```
+
+- Every value a property can take for this instance must be declared in a
+  variant.
+- For artifacts that change with the variant, list all combinations of interest
+  for each property that has variants.
+
+Validation fails if a variant is missing a value, redefines a property that has
+a top-level value, duplicates another variant, or lists a file that does not
+exist. Bindings need no changes; see
+[Instances with variants](../../design/benchmarking/logical_benchmarks_and_instances.md#instances-with-variants).
+
 ### Record where a benchmark comes from
 
 To record the source of a problem that comes from a public benchmark library,

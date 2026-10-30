@@ -445,6 +445,42 @@ class InstanceArtifact(BaseModel):
     ]
 
 
+class InstanceVariantArtifactValues(BaseModel):
+    """The files of an instance artifact that belong to a given instance variant."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    property: Annotated[
+        Property,
+        Field(description="The instance artifact property these files belong to."),
+    ]
+    values: Annotated[
+        list[str],
+        Field(
+            min_length=1,
+            description="Files in the artifact's artifactsLocation for this variant.",
+        ),
+    ]
+
+
+class InstanceVariant(BaseModel):
+    """A combination of problem property values that falls under a single instance."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    problemPropertyValues: Annotated[
+        list[PropertyValue],
+        Field(
+            min_length=1,
+            description="Values of the problem properties that vary across variants.",
+        ),
+    ]
+    instanceArtifactValues: Annotated[
+        list[InstanceVariantArtifactValues] | None,
+        Field(description="Artifact files that are specific to this variant."),
+    ] = None
+
+
 class BenchmarkInstance(BaseModel):
     """Benchmark instance configuration (instance.yaml)."""
 
@@ -479,6 +515,16 @@ class BenchmarkInstance(BaseModel):
             description=(
                 "Optional generative properties used to produce this instance "
                 "(e.g. random seed, generator parameters). Not declared in benchmark.yaml."
+            )
+        ),
+    ] = None
+    variants: Annotated[
+        list[InstanceVariant] | None,
+        Field(
+            description=(
+                "Different combinations of problem property values that fall under "
+                "this instance. Problem properties not given a value in "
+                "problemPropertyValues must be given one in every variant."
             )
         ),
     ] = None

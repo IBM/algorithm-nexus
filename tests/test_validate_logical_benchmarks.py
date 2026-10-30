@@ -421,6 +421,62 @@ problemPropertyValues:
         assert collector.has_errors
         assert "conflicts with a problem property" in " ".join(collector.errors)
 
+    def _variant_instance(self, tmp_path: Path, body: str) -> ValidationErrorCollector:
+        bench_dir = tmp_path / "foo"
+        inst_dir = bench_dir / "instances" / "v"
+        (inst_dir / "models").mkdir(parents=True)
+        (inst_dir / "models" / "m1.lp").write_text("x")
+        benchmark = LogicalBenchmarkDefinition(
+            benchmarkIdentifier="test_bench",
+            description="Test description",
+            problemProperties=[Property(identifier="n"), Property(identifier="lam")],
+        )
+        (bench_dir / "benchmark.yaml").write_text(
+            benchmark.model_dump_json(exclude_none=True)
+        )
+        (inst_dir / "instance.yaml").write_text(
+            "instanceIdentifier: i1\nbenchmarkIdentifier: test_bench\n"
+            "problemPropertyValues:\n  - property:\n      identifier: n\n    value: 1\n"
+            "instanceArtifacts:\n  - property:\n      identifier: model\n"
+            "    artifactsLocation: models\n" + body
+        )
+        collector = ValidationErrorCollector()
+        validate_logical_benchmark_directory(bench_dir, collector)
+        return collector
+
+    def test_instance_variants_valid(self, tmp_path: Path) -> None:
+        collector = self._variant_instance(
+            tmp_path,
+            "variants:\n  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: 1e-4\n"
+            "    instanceArtifactValues:\n      - property:\n          identifier: model\n"
+            "        values: [m1.lp]\n",
+        )
+        assert not collector.has_errors, collector.errors
+
+    def test_instance_variant_missing_value_fails(self, tmp_path: Path) -> None:
+        collector = self._variant_instance(
+            tmp_path,
+            "variants:\n  - problemPropertyValues:\n      - property:\n"
+            "          identifier: n\n        value: 2\n",
+        )
+        assert collector.has_errors
+        assert "already has a value" in " ".join(collector.errors)
+        assert "missing a value for problem property 'lam'" in " ".join(
+            collector.errors
+        )
+
+    def test_instance_variant_missing_file_fails(self, tmp_path: Path) -> None:
+        collector = self._variant_instance(
+            tmp_path,
+            "variants:\n  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: 1\n"
+            "    instanceArtifactValues:\n      - property:\n          identifier: model\n"
+            "        values: [nope.lp]\n",
+        )
+        assert collector.has_errors
+        assert "nope.lp" in " ".join(collector.errors)
+
     def test_instance_missing_problem_property_value_fails(
         self, tmp_path: Path
     ) -> None:
@@ -919,3 +975,145 @@ class TestRankingValidation:
         assert result is not None
         assert not collector.has_errors
         assert result.ranking is None
+
+
+class TestBindingValidation:
+    """validate_bindings checks experiments/*/bindings against the benchmarks."""
+
+    def _setup(self, tmp_path: Path, binding: str) -> tuple[Path, Path]:
+        benchmarks = tmp_path / "benchmarks"
+        inst_dir = benchmarks / "foo" / "instances" / "i1"
+        (inst_dir / "models").mkdir(parents=True)
+        (inst_dir / "models" / "m1.lp").write_text("x")
+        (benchmarks / "foo" / "benchmark.yaml").write_text(
+            LogicalBenchmarkDefinition(
+                benchmarkIdentifier="foo",
+                description="d",
+                problemProperties=[Property(identifier="n")],
+            ).model_dump_json(exclude_none=True)
+        )
+        (inst_dir / "instance.yaml").write_text(
+            "instanceIdentifier: i1\nbenchmarkIdentifier: foo\n"
+            "problemPropertyValues:\n  - property:\n      identifier: n\n    value: 1\n"
+            "instanceArtifacts:\n  - property:\n      identifier: model\n"
+            "    artifactsLocation: models\n"
+        )
+        exp = tmp_path / "experiments" / "e1"
+        (exp / "bindings").mkdir(parents=True)
+        (exp / "experiment_package.yaml").write_text(
+            "experiment_package:\n  requirement_specifier: pkg\n  experiments: [exp1]\n"
+        )
+        (exp / "bindings" / "b.yaml").write_text(
+            "instanceBindingIdentifier: b1\ninstanceReference: foo/i1\n"
+            "experiment:\n  actuatorIdentifier: a\n  experimentIdentifier: exp1\n"
+            "  experimentVersion: 1.0.0\n" + binding
+        )
+        return tmp_path / "experiments", benchmarks
+
+    def _errors(self, tmp_path: Path, binding: str = "") -> str:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, binding)
+        results = validate_bindings(exps, benches)
+        assert len(results) == 1
+        return " ".join(results[0]["errors"])
+
+    def test_valid_binding_passes(self, tmp_path: Path) -> None:
+        assert (
+            self._errors(
+                tmp_path,
+                "instanceArtifactMapping:\n  - instance: {identifier: model}\n"
+                "    experiment: {identifier: f}\n    validValues: [m1.lp]\n",
+            )
+            == ""
+        )
+
+    def test_unknown_instance_fails(self, tmp_path: Path) -> None:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, "")
+        f = exps / "e1" / "bindings" / "b.yaml"
+        f.write_text(f.read_text().replace("foo/i1", "foo/nope"))
+        assert "unknown instance 'nope'" in " ".join(
+            validate_bindings(exps, benches)[0]["errors"]
+        )
+
+    def test_unknown_benchmark_fails(self, tmp_path: Path) -> None:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, "")
+        f = exps / "e1" / "bindings" / "b.yaml"
+        f.write_text(f.read_text().replace("foo/i1", "bar/i1"))
+        assert "unknown benchmark 'bar'" in " ".join(
+            validate_bindings(exps, benches)[0]["errors"]
+        )
+
+    def test_experiment_not_in_package_fails(self, tmp_path: Path) -> None:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, "")
+        f = exps / "e1" / "bindings" / "b.yaml"
+        f.write_text(
+            f.read_text().replace(
+                "experimentIdentifier: exp1", "experimentIdentifier: zzz"
+            )
+        )
+        assert "not listed in experiment_package.yaml" in " ".join(
+            validate_bindings(exps, benches)[0]["errors"]
+        )
+
+    def test_unknown_artifact_and_missing_file_fail(self, tmp_path: Path) -> None:
+        errs = self._errors(
+            tmp_path,
+            "instanceArtifactMapping:\n  - instance: {identifier: other}\n"
+            "    experiment: {identifier: f}\n    validValues: [m1.lp]\n"
+            "  - instance: {identifier: model}\n"
+            "    experiment: {identifier: g}\n    validValues: [nope.lp]\n",
+        )
+        assert "unknown instance artifact 'other'" in errs
+        assert "'nope.lp'" in errs
+
+    def test_duplicate_binding_identifier_fails(self, tmp_path: Path) -> None:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, "")
+        b = exps / "e1" / "bindings"
+        (b / "c.yaml").write_text((b / "b.yaml").read_text())
+        results = validate_bindings(exps, benches)
+        assert [r["status"] for r in results] == ["success", "failed"]
+        assert "already used" in " ".join(results[1]["errors"])
+
+    def test_validate_experiments_command_reports_binding_errors(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """`nexus validate experiments` validates bindings and fails on errors."""
+        from typer.testing import CliRunner
+
+        from algorithm_nexus.cli import app
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+        from algorithm_nexus.models import ValidationReport
+
+        monkeypatch.setattr(
+            BenchmarkManager,
+            "validate",
+            lambda self, **kw: ValidationReport(
+                instances=[], successful=0, failed=0, total=0
+            ),
+        )
+        exps, benches = self._setup(tmp_path, "")
+        runner = CliRunner()
+        args = [
+            "validate",
+            "experiments",
+            "--experiments-root",
+            str(exps),
+            "--benchmarks-root",
+            str(benches),
+        ]
+        assert runner.invoke(app, args).exit_code == 0
+
+        f = exps / "e1" / "bindings" / "b.yaml"
+        f.write_text(f.read_text().replace("foo/i1", "foo/nope"))
+        result = runner.invoke(app, args)
+        assert result.exit_code == 1
+        assert "nope" in result.output

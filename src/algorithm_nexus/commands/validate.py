@@ -352,6 +352,14 @@ def validate_experiments(
             help="Validate only benchmark submissions from a specific experiment",
         ),
     ] = None,
+    benchmarks_root: Annotated[
+        Path,
+        typer.Option(
+            "--benchmarks-root",
+            help="Path to the logical benchmarks directory that experiment bindings "
+            "are validated against (not used in --pr mode)",
+        ),
+    ] = Path("./benchmarks"),
     verbose: Annotated[
         bool,
         typer.Option(
@@ -386,6 +394,9 @@ def validate_experiments(
     - Checks that each experiment folder has a valid experiment_package.yaml
     - Installs the experiment package in an isolated virtual environment
     - Validates each submission with ADO dry-run
+    - Validates the bindings in experiments/<name>/bindings against the logical
+      benchmarks (schema, instance/experiment references, metric, property and
+      artifact mappings); not done in PR mode
     - Reports validation results
     """
     from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
@@ -437,8 +448,17 @@ def validate_experiments(
             )
 
         # Extract results
-        all_results = results.instances
+        all_results = list(results.instances)
         total_failed = results.failed
+
+        # Bindings are plain YAML checked against the benchmarks; no venv needed
+        if not pr_url and experiments_root.is_dir() and benchmarks_root.is_dir():
+            for binding_result in validate_bindings(
+                experiments_root, benchmarks_root, experiment
+            ):
+                if binding_result["status"] == "failed":
+                    total_failed += 1
+                all_results.append(binding_result)
 
         # Determine output format (default to table for human-readable)
         fmt = output_format or "table"
@@ -481,8 +501,14 @@ def _check_binding_integrity(
     collector: ValidationErrorCollector,
     file_path: Path,
     binding_index: int,
+    instance: BenchmarkInstance | None = None,
+    instance_root: Path | None = None,
 ) -> None:
-    """Check referential integrity between a binding and its parent definition."""
+    """Check referential integrity between a binding and its parent definition.
+
+    When ``instance`` and ``instance_root`` are given, ``instanceArtifactMapping`` is
+    also checked against the instance's declared artifacts and the files on disk.
+    """
     prefix = f"[bold]{file_path}[/bold]\n  Binding[{binding_index}]"
 
     # 1. Metric identifiers in metricMapping must exist in the definition
@@ -512,6 +538,187 @@ def _check_binding_integrity(
                     collector.add(
                         f"{prefix}: problemPropertyMapping references unknown benchmark property '{pid}'"
                     )
+
+    # 3. instanceArtifactMapping must reference declared artifacts and existing files
+    if binding.instanceArtifactMapping and instance is not None:
+        artifact_locations = {
+            a.property.identifier: a.artifactsLocation
+            for a in instance.instanceArtifacts or []
+        }
+        for am_entry in binding.instanceArtifactMapping:
+            aid = am_entry.instance.identifier
+            if aid not in artifact_locations:
+                collector.add(
+                    f"{prefix}: instanceArtifactMapping references unknown instance artifact '{aid}'"
+                )
+                continue
+            if instance_root is None:
+                continue
+            location = artifact_locations[aid]
+            for fname in am_entry.validValues:
+                if not (instance_root / location / fname).is_file():
+                    collector.add(
+                        f"{prefix}: instanceArtifactMapping validValues file '{fname}' for artifact '{aid}' does not exist in '{location}'"
+                    )
+
+
+def _index_benchmarks(
+    benchmarks_root: Path,
+) -> dict[str, tuple[Path, LogicalBenchmarkDefinition]]:
+    """Map benchmarkIdentifier to (benchmark path, parsed definition), skipping invalid ones."""
+    index: dict[str, tuple[Path, LogicalBenchmarkDefinition]] = {}
+    for item in sorted(benchmarks_root.iterdir()):
+        if item.name.startswith("."):
+            continue
+        if item.is_dir():
+            definition_file = item / "benchmark.yaml"
+        elif item.suffix in (".yaml", ".yml"):
+            definition_file = item
+        else:
+            continue
+        if not definition_file.is_file():
+            continue
+        data = load_yaml_file(definition_file, ValidationErrorCollector())
+        if data is None:
+            continue
+        try:
+            definition = LogicalBenchmarkDefinition.model_validate(data)
+        except ValidationError:
+            continue
+        index[definition.benchmarkIdentifier] = (item, definition)
+    return index
+
+
+def _find_instance(
+    benchmark_path: Path, instance_id: str
+) -> tuple[BenchmarkInstance, Path] | None:
+    """Find an instance by instanceIdentifier; returns it with its root folder."""
+    instances_dir = benchmark_path / "instances"
+    if not instances_dir.is_dir():
+        return None
+    for item in sorted(instances_dir.iterdir()):
+        if item.name.startswith("."):
+            continue
+        if not (item.is_dir() or item.suffix in (".yaml", ".yml")):
+            continue
+        # Instance errors are reported by the benchmark validation, not here
+        instance = validate_instance(item, set(), ValidationErrorCollector(), None)
+        if instance is not None and instance.instanceIdentifier == instance_id:
+            return instance, item if item.is_dir() else item.parent
+    return None
+
+
+def validate_bindings(
+    experiments_root: Path,
+    benchmarks_root: Path,
+    experiment_filter: str | None = None,
+) -> list[dict[str, Any]]:
+    """Validate every experiments/<name>/bindings/*.yaml against the benchmarks.
+
+    Checks schema, that the referenced benchmark and instance exist, that the
+    experiment is declared in the experiment package, that metric/property/artifact
+    mappings match the benchmark and instance, and that binding identifiers are unique.
+    """
+    benchmarks = _index_benchmarks(benchmarks_root)
+    seen_ids: dict[str, Path] = {}
+    results: list[dict[str, Any]] = []
+
+    for exp_dir in sorted(experiments_root.iterdir()):
+        bindings_dir = exp_dir / "bindings"
+        if exp_dir.name.startswith(".") or not bindings_dir.is_dir():
+            continue
+        if experiment_filter and exp_dir.name != experiment_filter:
+            continue
+
+        declared_experiments: set[str] | None = None
+        if (exp_dir / "experiment_package.yaml").is_file():
+            exp_config = validate_experiment_yaml(exp_dir, ValidationErrorCollector())
+            if exp_config is not None:
+                declared_experiments = set(exp_config.experiment_package.experiments)
+
+        for binding_file in sorted(bindings_dir.iterdir()):
+            if (
+                not binding_file.is_file()
+                or binding_file.name.startswith(".")
+                or binding_file.suffix not in (".yaml", ".yml")
+            ):
+                continue
+            collector = ValidationErrorCollector()
+            _validate_binding_file(
+                binding_file,
+                benchmarks,
+                declared_experiments,
+                seen_ids,
+                collector,
+            )
+            results.append(
+                {
+                    "submission_path": str(binding_file),
+                    "status": "failed" if collector.has_errors else "success",
+                    "errors": collector.errors,
+                    "warnings": collector.info,
+                }
+            )
+    return results
+
+
+def _validate_binding_file(
+    binding_file: Path,
+    benchmarks: dict[str, tuple[Path, LogicalBenchmarkDefinition]],
+    declared_experiments: set[str] | None,
+    seen_ids: dict[str, Path],
+    collector: ValidationErrorCollector,
+) -> None:
+    data = load_yaml_file(binding_file, collector)
+    if data is None:
+        return
+    try:
+        binding = InstanceBinding.model_validate(data)
+    except ValidationError as exc:
+        for error in exc.errors():
+            collector.add(format_pydantic_error(error, binding_file))
+        return
+
+    bid = binding.instanceBindingIdentifier
+    if bid in seen_ids:
+        collector.add(
+            f"{binding_file}: instanceBindingIdentifier '{bid}' is already used by {seen_ids[bid]}"
+        )
+    else:
+        seen_ids[bid] = binding_file
+
+    exp_id = binding.experiment.experimentIdentifier
+    if declared_experiments is not None and exp_id not in declared_experiments:
+        collector.add(
+            f"{binding_file}: experiment '{exp_id}' is not listed in experiment_package.yaml"
+        )
+
+    benchmark_id, instance_id = binding.instanceReference.split("/")
+    if benchmark_id not in benchmarks:
+        collector.add(
+            f"{binding_file}: instanceReference refers to unknown benchmark '{benchmark_id}'"
+        )
+        return
+    benchmark_path, definition = benchmarks[benchmark_id]
+    found = _find_instance(benchmark_path, instance_id)
+    if found is None:
+        collector.add(
+            f"{binding_file}: instanceReference refers to unknown instance '{instance_id}' of benchmark '{benchmark_id}'"
+        )
+    instance, instance_root = found or (None, None)
+
+    _check_binding_integrity(
+        binding,
+        {p.identifier for p in definition.problemProperties},
+        {m.identifier for m in definition.metrics}
+        if definition.metrics is not None
+        else None,
+        collector,
+        binding_file,
+        0,
+        instance=instance,
+        instance_root=instance_root,
+    )
 
 
 def validate_instance(
@@ -593,10 +800,49 @@ def validate_instance(
             else:
                 covered_ids.add(pid)
 
-    for pid in problem_property_ids - covered_ids:
-        collector.add(
-            f"{instance_file}: instance is missing a value for problem property '{pid}'"
-        )
+    # Properties without a top-level value must be given one in every variant
+    variant_ids = problem_property_ids - covered_ids
+    if instance.variants:
+        seen_combinations: set[tuple[str, ...]] = set()
+        for idx, variant in enumerate(instance.variants):
+            vlabel = f"variants[{idx}]"
+            vcovered: set[str] = set()
+            for pv in variant.problemPropertyValues:
+                pid = pv.property.identifier
+                if pid not in problem_property_ids:
+                    collector.add(
+                        f"{instance_file}: {vlabel} references unknown problem property '{pid}'"
+                    )
+                elif pid in covered_ids:
+                    collector.add(
+                        f"{instance_file}: {vlabel} defines problem property '{pid}' which already has a value in problemPropertyValues"
+                    )
+                elif pid in vcovered:
+                    collector.add(
+                        f"{instance_file}: {vlabel} defines a duplicate value for problem property '{pid}'"
+                    )
+                else:
+                    vcovered.add(pid)
+            for pid in sorted(variant_ids - vcovered):
+                collector.add(
+                    f"{instance_file}: {vlabel} is missing a value for problem property '{pid}'"
+                )
+            combination = tuple(
+                f"{pv.property.identifier}={pv.value!r}"
+                for pv in sorted(
+                    variant.problemPropertyValues, key=lambda v: v.property.identifier
+                )
+            )
+            if combination in seen_combinations:
+                collector.add(
+                    f"{instance_file}: {vlabel} duplicates the problem property values of another variant"
+                )
+            seen_combinations.add(combination)
+    else:
+        for pid in sorted(variant_ids):
+            collector.add(
+                f"{instance_file}: instance is missing a value for problem property '{pid}'"
+            )
 
     # Validate instancePropertyValues (optional, free-form generative properties)
     if instance.instancePropertyValues:
@@ -628,6 +874,29 @@ def validate_instance(
                 collector.add(
                     f"{instance_file}: artifactsLocation folder '{folder_name}' for artifact '{prop_id}' does not exist in {instance_target if instance_target.is_dir() else instance_target.parent}"
                 )
+
+    # Validate variant artifact files against the declared artifact locations
+    if instance.variants:
+        instance_root = (
+            instance_target if instance_target.is_dir() else instance_target.parent
+        )
+        artifact_locations = {
+            a.property.identifier: a.artifactsLocation
+            for a in instance.instanceArtifacts or []
+        }
+        for idx, variant in enumerate(instance.variants):
+            for av in variant.instanceArtifactValues or []:
+                aid = av.property.identifier
+                if aid not in artifact_locations:
+                    collector.add(
+                        f"{instance_file}: variants[{idx}] references undeclared instance artifact '{aid}'"
+                    )
+                    continue
+                for fname in av.values:
+                    if not (instance_root / artifact_locations[aid] / fname).is_file():
+                        collector.add(
+                            f"{instance_file}: variants[{idx}] file '{fname}' for artifact '{aid}' does not exist in '{artifact_locations[aid]}'"
+                        )
 
     return instance
 
