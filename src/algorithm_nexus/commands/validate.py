@@ -726,12 +726,16 @@ def validate_instance(
     problem_property_ids: set[str],
     collector: ValidationErrorCollector,
     parent_benchmark_identifier: str | None,
+    problem_property_domains: dict[str, Any] | None = None,
 ) -> BenchmarkInstance | None:
     """Validate a benchmark instance (either an instance directory containing instance.yaml or a standalone instance YAML).
 
     Args:
         instance_target:
             Path to the instance directory or a standalone instance YAML file.
+        problem_property_domains:
+            Optional map of problem property identifier to its ``PropertyDomain``.
+            When given, variant values must lie in the property's domain.
         problem_property_ids:
             Set of valid problem property identifiers from the parent benchmark.
         collector:
@@ -823,6 +827,11 @@ def validate_instance(
                     )
                 else:
                     vcovered.add(pid)
+                    domain = (problem_property_domains or {}).get(pid)
+                    if domain is not None and not domain.valueInDomain(pv.value):
+                        collector.add(
+                            f"{instance_file}: {vlabel} value {pv.value!r} for problem property '{pid}' is outside the property's domain"
+                        )
             for pid in sorted(variant_ids - vcovered):
                 collector.add(
                     f"{instance_file}: {vlabel} is missing a value for problem property '{pid}'"
@@ -884,7 +893,21 @@ def validate_instance(
             a.property.identifier: a.artifactsLocation
             for a in instance.instanceArtifacts or []
         }
+        # Artifacts that appear in any variant must appear in every variant
+        varying_artifacts = {
+            av.property.identifier
+            for v in instance.variants
+            for av in v.instanceArtifactValues or []
+        }
+        file_owners: dict[tuple[str, str], int] = {}
         for idx, variant in enumerate(instance.variants):
+            variant_artifacts = {
+                av.property.identifier for av in variant.instanceArtifactValues or []
+            }
+            for aid in sorted(varying_artifacts - variant_artifacts):
+                collector.add(
+                    f"{instance_file}: variants[{idx}] has no files for instance artifact '{aid}', which other variants define"
+                )
             for av in variant.instanceArtifactValues or []:
                 aid = av.property.identifier
                 if aid not in artifact_locations:
@@ -893,6 +916,11 @@ def validate_instance(
                     )
                     continue
                 for fname in av.values:
+                    owner = file_owners.setdefault((aid, fname), idx)
+                    if owner != idx:
+                        collector.add(
+                            f"{instance_file}: file '{fname}' of artifact '{aid}' is listed in both variants[{owner}] and variants[{idx}]"
+                        )
                     if not (instance_root / artifact_locations[aid] / fname).is_file():
                         collector.add(
                             f"{instance_file}: variants[{idx}] file '{fname}' for artifact '{aid}' does not exist in '{artifact_locations[aid]}'"
@@ -1014,7 +1042,15 @@ def validate_logical_benchmark_directory(
         for item in visible_items:
             if item.is_dir() or (item.is_file() and item.suffix in (".yaml", ".yml")):
                 inst = validate_instance(
-                    item, problem_property_ids, collector, config.benchmarkIdentifier
+                    item,
+                    problem_property_ids,
+                    collector,
+                    config.benchmarkIdentifier,
+                    problem_property_domains={
+                        p.identifier: p.propertyDomain
+                        for p in config.problemProperties
+                        if p.propertyDomain is not None
+                    },
                 )
                 if inst is not None:
                     discovered_instance_ids.add(inst.instanceIdentifier)

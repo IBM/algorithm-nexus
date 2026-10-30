@@ -6,6 +6,7 @@
 from pathlib import Path
 
 import pytest
+from ado.schema.domain import PropertyDomain
 from ado.schema.property import Property, PropertyDescriptor
 
 from algorithm_nexus.commands.utils import ValidationErrorCollector
@@ -421,7 +422,10 @@ problemPropertyValues:
         assert collector.has_errors
         assert "conflicts with a problem property" in " ".join(collector.errors)
 
-    def _variant_instance(self, tmp_path: Path, body: str) -> ValidationErrorCollector:
+    def _variant_instance(
+        self, tmp_path: Path, body: str, lam_domain: PropertyDomain | None = None
+    ) -> ValidationErrorCollector:
+        domain_kwargs = {"propertyDomain": lam_domain} if lam_domain else {}
         bench_dir = tmp_path / "foo"
         inst_dir = bench_dir / "instances" / "v"
         (inst_dir / "models").mkdir(parents=True)
@@ -429,7 +433,10 @@ problemPropertyValues:
         benchmark = LogicalBenchmarkDefinition(
             benchmarkIdentifier="test_bench",
             description="Test description",
-            problemProperties=[Property(identifier="n"), Property(identifier="lam")],
+            problemProperties=[
+                Property(identifier="n"),
+                Property(identifier="lam", **domain_kwargs),
+            ],
         )
         (bench_dir / "benchmark.yaml").write_text(
             benchmark.model_dump_json(exclude_none=True)
@@ -465,6 +472,49 @@ problemPropertyValues:
         assert "missing a value for problem property 'lam'" in " ".join(
             collector.errors
         )
+
+    def test_instance_variant_shared_file_fails(self, tmp_path: Path) -> None:
+        variant = (
+            "  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: {v}\n"
+            "    instanceArtifactValues:\n      - property:\n          identifier: model\n"
+            "        values: [m1.lp]\n"
+        )
+        collector = self._variant_instance(
+            tmp_path, "variants:\n" + variant.format(v=1) + variant.format(v=2)
+        )
+        assert collector.has_errors
+        assert "listed in both variants[0] and variants[1]" in " ".join(
+            collector.errors
+        )
+
+    def test_instance_variant_missing_artifact_fails(self, tmp_path: Path) -> None:
+        collector = self._variant_instance(
+            tmp_path,
+            "variants:\n  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: 1\n"
+            "    instanceArtifactValues:\n      - property:\n          identifier: model\n"
+            "        values: [m1.lp]\n"
+            "  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: 2\n",
+        )
+        assert collector.has_errors
+        assert "variants[1] has no files for instance artifact 'model'" in " ".join(
+            collector.errors
+        )
+
+    def test_instance_variant_value_outside_domain_fails(self, tmp_path: Path) -> None:
+        body = (
+            "variants:\n  - problemPropertyValues:\n      - property:\n"
+            "          identifier: lam\n        value: {v}\n"
+        )
+        domain = PropertyDomain(values=[1, 2])
+        assert not self._variant_instance(
+            tmp_path / "ok", body.format(v=1), domain
+        ).has_errors
+        collector = self._variant_instance(tmp_path / "bad", body.format(v=3), domain)
+        assert collector.has_errors
+        assert "outside the property's domain" in " ".join(collector.errors)
 
     def test_instance_variant_missing_file_fails(self, tmp_path: Path) -> None:
         collector = self._variant_instance(
