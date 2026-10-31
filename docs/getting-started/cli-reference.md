@@ -70,6 +70,17 @@ nexus validate package packages/my-package
 Validate benchmark submissions in three modes: PR changes, all submissions, or
 specific package.
 
+Unless `--pr` is used, it also validates the bindings in
+`experiments/<name>/bindings/*.yaml` against the logical benchmarks. Each binding
+is checked for:
+
+- schema correctness and a unique `instanceBindingIdentifier`
+- an `experimentIdentifier` listed in the experiment's `experiment_package.yaml`
+- an `instanceReference` that points to an existing benchmark and instance
+- `metricMapping` and `problemPropertyMapping` entries that exist in the benchmark
+- `instanceArtifactMapping` entries that name an artifact declared by the instance,
+  with every `validValues` file present in that artifact's `artifactsLocation`
+
 **Usage:**
 
 ```bash
@@ -89,7 +100,9 @@ nexus validate experiments --experiment <experiment_name> [OPTIONS]
   `https://github.com/IBM/algorithm-nexus/pull/123`). If not provided, validates
   all benchmark submissions.
 - `--experiments-root PATH`: Path to experiments directory (default: `./experiments`)
-- `--experiment NAME`: Validate only benchmark submissions from a specific experiment
+- `--benchmarks-root PATH`: Path to the logical benchmarks that bindings are
+  validated against (default: `./benchmarks`). Not used with `--pr`
+- `--experiment NAME`: Validate only benchmark submissions and bindings from a specific experiment
 - `--verbose`: Show detailed validation output
 - `--fail-fast`: Stop validation on first error
 - `-o, --output-format [table|json|yaml]`: Output format (default: `table`)
@@ -165,6 +178,8 @@ nexus validate experiments -o yaml
 #### nexus validate logical-benchmarks
 
 Validate logical benchmark YAML files for schema correctness and referential integrity.
+
+Experiment bindings are validated by [`nexus validate experiments`](#nexus-validate-experiments).
 
 **Usage:**
 

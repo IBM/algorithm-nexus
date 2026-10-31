@@ -25,6 +25,22 @@ instancePropertyValues:
       identifier: <generator_property_name>
     value: <value>
 
+# Variants — OPTIONAL. Use when one instance covers several values of some problem
+# properties (e.g. a sweep over a parameter). A problem property gets its value either in
+# problemPropertyValues above (omit it there if it varies) or in every variant below.
+# Each variant lists, per artifact, the files in that artifact's artifactsLocation that
+# belong to it. List every combination of interest for each property that has variants.
+variants:
+  - problemPropertyValues:
+      - property:
+          identifier: <varying_property_name>
+        value: <value>
+    instanceArtifactValues:
+      - property:
+          identifier: <artifact_property_name>
+        values:
+          - <file-name>
+
 # Artifact properties — only include when the instance has pre-generated artifact files.
 # The named subfolder must exist inside this instance directory.
 # benchmarks/<benchmark-id>/instances/<instance-name>/<subfolder-name>/
