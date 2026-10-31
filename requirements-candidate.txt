@@ -209,13 +209,13 @@ blake3==1.0.11 \
     # via vllm
 bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@1d403afba44bdee371bf4113c16c893b28da91c7
     # via algorithm-nexus
-boto3==1.43.117 \
-    --hash=sha256:a5b6cd7e67653987fcf0e212187c16f7b58af2ae192e368f7212ddab7c05b25d \
-    --hash=sha256:f3d314908d866b577ee6b74ed432c21e565c4c4dbd640ef3fd5e0da30fa13a98
+boto3==1.43.123 \
+    --hash=sha256:055fabb990c5d2f31fce4ca569255bd640cdd11a3ca68c9ecad35f4f8a5b83b5 \
+    --hash=sha256:d18d66e1e13faa0c25d0b1b8c5ce946e29fb5fc0b6456b655a93a678ff4cc313
     # via litdata
-botocore==1.43.117 \
-    --hash=sha256:5920ef9b3002e1361846549078549d9154a6e0004c22853c01ce7b279d05d495 \
-    --hash=sha256:71993702832cc37c2495048b9945f2929d306fccb3fb767e9964e437e637fa6c
+botocore==1.43.123 \
+    --hash=sha256:80948cb9b1cdf1a1a25809089a42e3a1bc4af0258d198222db6e97dcc660dd0c \
+    --hash=sha256:e30580f9c1282c321529238ff8ff75066096a2adbd0a293c8ae592c21d1733a3
     # via
     #   aiobotocore
     #   boto3
