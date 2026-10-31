@@ -1760,8 +1760,17 @@ experiment identifier when omitted.</p>
 <h2 id="2-validate">2. Validate<a class="headerlink" href="#2-validate" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--experiment<span class="w"> </span>rlx_coloring
 </span></code></pre></div>
-<p>A successful run lists the experiment with status <code>success</code>. The binding is
-ready to commit.</p>
+<p>A successful run lists the binding file with status <code>success</code>. Besides the
+experiment package, the command checks that:</p>
+<ul>
+<li>the binding matches the schema and its <code>instanceBindingIdentifier</code> is unique</li>
+<li><code>experimentIdentifier</code> is listed in the experiment's <code>experiment_package.yaml</code></li>
+<li><code>instanceReference</code> points to an existing benchmark and instance</li>
+<li>every mapped metric and problem property exists in the benchmark</li>
+<li>every <code>instanceArtifactMapping</code> names an artifact declared by the instance,
+  and each file in <code>validValues</code> exists in that artifact's <code>artifactsLocation</code></li>
+</ul>
+<p>The binding is ready to commit.</p>
 <h2 id="3-open-a-pull-request">3. Open a pull request<a class="headerlink" href="#3-open-a-pull-request" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>experiments/rlx_coloring/bindings
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-s<span class="w"> </span>-m<span class="w"> </span><span class="s2">"feat(benchmark): Bind rlx_coloring to graph_coloring"</span>

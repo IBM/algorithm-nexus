@@ -1864,6 +1864,17 @@ Nexus packages.</p>
 <h4 id="nexus-validate-experiments">nexus validate experiments<a class="headerlink" href="#nexus-validate-experiments" title="Permanent link">&para;</a></h4>
 <p>Validate benchmark submissions in three modes: PR changes, all submissions, or
 specific package.</p>
+<p>Unless <code>--pr</code> is used, it also validates the bindings in
+<code>experiments/&lt;name&gt;/bindings/*.yaml</code> against the logical benchmarks. Each binding
+is checked for:</p>
+<ul>
+<li>schema correctness and a unique <code>instanceBindingIdentifier</code></li>
+<li>an <code>experimentIdentifier</code> listed in the experiment's <code>experiment_package.yaml</code></li>
+<li>an <code>instanceReference</code> that points to an existing benchmark and instance</li>
+<li><code>metricMapping</code> and <code>problemPropertyMapping</code> entries that exist in the benchmark</li>
+<li><code>instanceArtifactMapping</code> entries that name an artifact declared by the instance,
+  with every <code>validValues</code> file present in that artifact's <code>artifactsLocation</code></li>
+</ul>
 <p><strong>Usage:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Validate PR changes</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--pr<span class="w"> </span>&lt;pr_url&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -1880,7 +1891,9 @@ specific package.</p>
   <code>https://github.com/IBM/algorithm-nexus/pull/123</code>). If not provided, validates
   all benchmark submissions.</li>
 <li><code>--experiments-root PATH</code>: Path to experiments directory (default: <code>./experiments</code>)</li>
-<li><code>--experiment NAME</code>: Validate only benchmark submissions from a specific experiment</li>
+<li><code>--benchmarks-root PATH</code>: Path to the logical benchmarks that bindings are
+  validated against (default: <code>./benchmarks</code>). Not used with <code>--pr</code></li>
+<li><code>--experiment NAME</code>: Validate only benchmark submissions and bindings from a specific experiment</li>
 <li><code>--verbose</code>: Show detailed validation output</li>
 <li><code>--fail-fast</code>: Stop validation on first error</li>
 <li><code>-o, --output-format [table|json|yaml]</code>: Output format (default: <code>table</code>)</li>
@@ -1935,6 +1948,7 @@ specific package.</p>
 </ul>
 <h4 id="nexus-validate-logical-benchmarks">nexus validate logical-benchmarks<a class="headerlink" href="#nexus-validate-logical-benchmarks" title="Permanent link">&para;</a></h4>
 <p>Validate logical benchmark YAML files for schema correctness and referential integrity.</p>
+<p>Experiment bindings are validated by <a href="#nexus-validate-experiments"><code>nexus validate experiments</code></a>.</p>
 <p><strong>Usage:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Validate all files under ./benchmarks (default)</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>nexus<span class="w"> </span>validate<span class="w"> </span>logical-benchmarks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
