@@ -3673,10 +3673,10 @@ uvloop==0.23.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'c
     --hash=sha256:e2cba180d6451822763eda8364f342435a873bcfb3849cbd82fdeca248ca65eb \
     --hash=sha256:f7548ede3ee908cfabc0d068106e303a9a2d811af959cdf6ab85676344cedcda
     # via uvicorn
-vllm==0.31.0 \
-    --hash=sha256:39132b433967f0962d03d8a5f633b9bee6b32708f566c7d5637b79f8d0ef3433 \
-    --hash=sha256:56edd19c798510b6da5ae4dd38b3bdf55ea7ae261b339a906df006dc3faf751d \
-    --hash=sha256:dde46f1efbe846e5bd0c5c4ec6ec71842c42254c7ff3d9bebb2a57028715d380
+vllm==0.32.0 \
+    --hash=sha256:5e2ecdc5b0baf72921c288486417ca82778456a448e4fe60b62ee43c0dfc8611 \
+    --hash=sha256:d0620dbdf99528bcfebe551a8906347a229921fb1602f887bd1286a920da2d44 \
+    --hash=sha256:d2c957d5eee3d0985012151315ddc62cbe0cd368fc96a5fc3510438d9dddf2ad
     # via
     #   algorithm-nexus
     #   bmfm-targets
