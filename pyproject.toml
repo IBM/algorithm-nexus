@@ -29,7 +29,7 @@ candidate = [
   # This dependency is added by vLLM and TerraTorch
   "opencv-python-headless!=5.0.0.93",
   "terratorch[vllm]==1.2.13",
-  "vllm>=0.31.0,<0.32.0",
+  "vllm>=0.33.0,<0.34.0",
 ]
 cli = [
   "ado-core>=2.0",
@@ -55,8 +55,8 @@ product = [
   # we use this qualifier to prevent installing a potentially malicious library.
   # This dependency is added by vLLM and TerraTorch
   "opencv-python-headless!=5.0.0.93",
-  "terratorch[vllm]==1.2.13",
-  "vllm>=0.31.0,<0.32.0",
+  "terratorch[vllm]==1.2.14",
+  "vllm>=0.33.0,<0.34.0",
 ]
 
 [dependency-groups]

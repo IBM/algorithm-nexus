@@ -1,7 +1,3 @@
-absl-py==2.5.1 \
-    --hash=sha256:286e71c82c1a38e75bbcf185f9b37d0305ad7786535107cb49bf4df9ff2e1f95 \
-    --hash=sha256:721200f2f0e9960f2ca9dc3a2a706b201f5f75d812c158f059cbbe29eeafbdb8
-    # via tensorboard
 accelerate==1.15.0 \
     --hash=sha256:5654f8c5eaa0d4fa68b33e287a97765da6849bf6d51dcac874e73fbbddfb6134 \
     --hash=sha256:97eacca0b73e45cb867dbf8c5d5d4dc32219544300e0c8992c7334dc2ef33cec
@@ -714,29 +710,6 @@ gridfm-graphkit==0.8.1 \
     --hash=sha256:2065037edb4a4e08d03acf4b22ec4ccbdcad3f63a34e93f785010353f09b37a0 \
     --hash=sha256:7311ace3f3ba75728ad25b4287e0f760320f9516876f8a22f0abaa5d45e5d624
     # via algorithm-nexus
-grpcio==1.85.0 \
-    --hash=sha256:087f297442a62e267f37df0cd03681159c225b8e73741b94d55c515e7a4df81e \
-    --hash=sha256:09ab4af4c4c74baa9b17f9a6fcdcef5be98357774417d624191ec41690df4bb3 \
-    --hash=sha256:17641f3a6ff3512c34e5c367805d2632a43a773d7990f1c4c55243df6bee8fbb \
-    --hash=sha256:1a8ee918b5b18c82be2e5f30978258269b858d7e16a36e8729c09d9654bac2f1 \
-    --hash=sha256:1a94f32df519cb7efe3822f7f3c2daee0b0e2f01a281e1db5dbfb0efd1635b6e \
-    --hash=sha256:25007d0e4657dcdafa9a80677895b71de8c1d6335afb7fa6a4b35330e2d3127a \
-    --hash=sha256:372e9cbf91f74127652138b020cf15c6a44541a91aee89c50a5943d1996b44aa \
-    --hash=sha256:3c49f03d8d74196ca6d1351b749aab3fb3362c850286f28aafcb7cd773134b04 \
-    --hash=sha256:4c6c39eee05f6b98266315486a93f36d73a59adc4d34f8b63f1b5725f897d8ea \
-    --hash=sha256:4ddfe8b667889b9be5990ae674b13f0db0a9eb61972306038d0140a1da0f0b87 \
-    --hash=sha256:55cee7cfe71b29f6b377681936f9a5f35e59f5c941a4d84e2712cb309753e7a9 \
-    --hash=sha256:8572f9d7282cded6b018fb0147d09bbe7e59177ba6c452f1903682a80dc0857e \
-    --hash=sha256:874af68625a2ff2585cb112e7583c19a7cb463ab638a7fe5b8a58f76e6d4e7c2 \
-    --hash=sha256:8aa2647afcbe5a87783e9626a2ece6277db33c6604c21690d19b5bd15609e36d \
-    --hash=sha256:8f1c7cb18d7beb81aa65666b739f8a43261df7f9529628e639b578b6d344cdf9 \
-    --hash=sha256:b10f0f0a34ce6b122dbf5dcf8226cbe41509c602af926b1e55113ad9e49cc5f7 \
-    --hash=sha256:b1ea46f63a7a9e19ce5cc09be0a6f9b347e0dcc14c4ab47b48488f6c093b8171 \
-    --hash=sha256:c02d956990c55730efcca487a4eac64f8e0fcb3af7e53c9e89cd02a985669709 \
-    --hash=sha256:d6c43a06a059a95f03013aa5fce9106a6a2b6b78cfff4003a53e0eb410c0e1d7 \
-    --hash=sha256:e2f1c3089ed6ae75e24529a498a6b65941fdb6856c3416d62c88da944947fc88 \
-    --hash=sha256:fc2865f523feeac453f35c762a2e4155df58565229d77069b211f2e21de2e79a
-    # via tensorboard
 gunicorn==26.2.0 ; sys_platform != 'win32' \
     --hash=sha256:62b864895d9ebff0b2f9867ba04fe811c93121596540830c9c916d0769668447 \
     --hash=sha256:bd249d0b3f7972f7432f0a6b6ff3b3ee2d129f70cd1ff6c09a9dd9e29a2b88e3
@@ -903,6 +876,13 @@ jsonargparse==4.53.0 \
     #   terrakit
     #   terratorch
     #   torchgeo
+jsonnet==0.22.0 \
+    --hash=sha256:42d86e5b2740e31a5e970997d470f517d9073c8a743ddb09ae69069e37529aa6 \
+    --hash=sha256:46df8787b30b001b39d9d551b3d85892d99a699cf3311a63f7bcef080d8a18ff \
+    --hash=sha256:a1136eefea98f01d654984e868f10faac2749d062464881491ec79ae5c38dc0e \
+    --hash=sha256:aefd2c07038eb9412ae6c46e49b7cfec74f10c53007755b176f7e075e70646f4 \
+    --hash=sha256:eae5d9bf23c778baad39390f88c13c03b2090dfb5dfa148d6e217df8c1448258
+    # via jsonargparse
 jsonschema==4.26.0 \
     --hash=sha256:0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326 \
     --hash=sha256:d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce
@@ -1059,10 +1039,6 @@ mako==1.4.3 \
     --hash=sha256:723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f \
     --hash=sha256:cd6537fe88d5fec315c55c2f8529bc4ce7a9a352ad7db3eeaa6a66e2dd4ec37a
     # via alembic
-markdown==3.11.2 \
-    --hash=sha256:87bf5d90f2d2882e2c02fcda182c2800456b985bff38913867c49706481514b0 \
-    --hash=sha256:f80390747a2a0ff2ba54da074ce4f862f72a6685f608cd2637b646a6d83993f5
-    # via tensorboard
 markdown-it-py==4.2.0 \
     --hash=sha256:04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49 \
     --hash=sha256:9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a
@@ -1444,7 +1420,6 @@ numpy==2.4.6 \
     #   somacore
     #   stackstac
     #   statsmodels
-    #   tensorboard
     #   tensorboardx
     #   terrakit
     #   terratorch
@@ -1486,10 +1461,10 @@ nvidia-cuda-runtime==13.0.96 ; (platform_machine == 'aarch64' and sys_platform =
     --hash=sha256:ef9bcbe90493a2b9d810e43d249adb3d02e98dd30200d86607d8d02687c43f55 \
     --hash=sha256:f79298c8a098cec150a597c8eba58ecdab96e3bdc4b9bc4f9983635031740492
     # via cuda-toolkit
-nvidia-cudnn-cu13==9.20.0.48 ; sys_platform == 'linux' \
-    --hash=sha256:0c45dd8eeb50b603f07995b1b300c62ffe6a1980482b82b3bcf94a4ca9d49304 \
-    --hash=sha256:af8139732b99c0118be65ea5aac97f0d46018f8c552889e49d2fb0c6261a4a24 \
-    --hash=sha256:e31454ae00094b0c55319d9d15b6fa2fc50a9e1c0f5c8c80fb75258234e731e1
+nvidia-cudnn-cu13==9.24.0.43 ; sys_platform == 'linux' \
+    --hash=sha256:67a7273b5cf062f9446fd76cf464351a1c0f66501e6cd78f6675c0d604d8ac87 \
+    --hash=sha256:71f181cd810e90f9b6023b01186fe82d13d65f0ec098581ee201d39fad769e4b \
+    --hash=sha256:a6812a554a1ff0413e9c52b84c26c050380649ab9615f9c16bded368ce9f421f
     # via torch
 nvidia-cufft==12.0.0.61 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux') \
     --hash=sha256:2708c852ef8cd89d1d2068bdbece0aa188813a0c934db3779b9b1faa8442e5f5 \
@@ -1522,9 +1497,9 @@ nvidia-cusparselt-cu13==0.8.1 ; sys_platform == 'linux' \
     --hash=sha256:786ce87568c303fadb5afcc7102d454cd3040d75f6f8626f5db460d1871f4dd0 \
     --hash=sha256:dccbd362f91a7b9024d1f55ee9f548ac065027ff15d8c8b0db889ab3a8f31215
     # via torch
-nvidia-nccl-cu13==2.29.7 ; sys_platform == 'linux' \
-    --hash=sha256:674a12383e3c38a1bcccae7d4f3633b37852230b6047883cb2f4c2d1b36d9bf5 \
-    --hash=sha256:edd81538446786ec3b73972543e53bb43bcaf0bfc8ef76cb679fcc390ffe136d
+nvidia-nccl-cu13==2.30.7 ; sys_platform == 'linux' \
+    --hash=sha256:ca786ffa5a647c75d4d1f5cc72a6c4f537947e2ba8823d7c8aaf768e7a7b9f77 \
+    --hash=sha256:cefa7fdb9710efd0f39c5f1be1d61ff6fc9a996c451265bd7fbdcf9455ed4b50
     # via torch
 nvidia-nvjitlink==13.4.92 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux') \
     --hash=sha256:25f74fad0d654271c921ac4dca614bd6258bc21791242fc7b2289dad7ae9c099 \
@@ -1666,7 +1641,6 @@ packaging==26.3 \
     #   scikit-image
     #   skops
     #   statsmodels
-    #   tensorboard
     #   tensorboardx
     #   tiledb
     #   tiledb-cloud
@@ -1788,7 +1762,6 @@ pillow==13.0.0 \
     #   scikit-image
     #   segmentation-models-pytorch
     #   sentinelhub
-    #   tensorboard
     #   terrakit
     #   torchgeo
     #   torchvision
@@ -1866,7 +1839,6 @@ protobuf==7.36.1 \
     #   mlflow-skinny
     #   mlflow-tracing
     #   opentelemetry-proto
-    #   tensorboard
     #   tensorboardx
 psutil==7.2.2 \
     --hash=sha256:0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372 \
@@ -1966,7 +1938,9 @@ pycocotools==2.0.11 \
     --hash=sha256:f7eb43b79448476b094240450420b7425d06e297880144b8ea6f01e9b4340e43 \
     --hash=sha256:fd72b9734e6084b217c1fc3945bfd4ec05bdc75a44e4f0c461a91442bb804973 \
     --hash=sha256:ffe806ce535f5996445188f9a35643791dc54beabc61bd81e2b03367356d604f
-    # via terratorch
+    # via
+    #   terratorch
+    #   torchmetrics
 pycparser==3.12 ; implementation_name == 'pypy' or (implementation_name != 'PyPy' and implementation_name != 'pypy' and platform_python_implementation != 'PyPy') \
     --hash=sha256:a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e \
     --hash=sha256:f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6
@@ -2052,7 +2026,9 @@ pyogrio==0.13.0 \
     --hash=sha256:8823f91570c91e66e50cc573bc4722e925b84220ee0c7dc61532438d43c69a95 \
     --hash=sha256:9614f27a1891113f80653e0b76b4233ea1fb3beeb1ac46d118ab22e1670f8f13 \
     --hash=sha256:9e84e7b09b073ee4cc8c35663afcf644b0c17db75ac72c7591dc3864252db461
-    # via geopandas
+    # via
+    #   geopandas
+    #   torchgeo
 pyparsing==3.3.3 \
     --hash=sha256:928ae7e20211f3b6f3915a72f06a0cfd29ab9d24279dd6346b6b1a7146397d36 \
     --hash=sha256:ece8c00a69cf01b45d0b1dedabb469c90d8caf996d4fda40f147627a122849a4
@@ -2447,6 +2423,7 @@ requests==2.34.2 \
     #   terrakit
     #   torch-geometric
     #   torchdata
+    #   torchgeo
 requests-oauthlib==2.0.0 \
     --hash=sha256:7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 \
     --hash=sha256:b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9
@@ -2695,9 +2672,7 @@ session-info2==0.4.2 \
 setuptools==80.10.2 \
     --hash=sha256:8b0e9d10c784bf7d262c4e5ec5d4ec94127ce206e8738f29a437945fbc219b70 \
     --hash=sha256:95b30ddfb717250edb492926c92b5221f7ef3fbcc2b07579bcd4a27da21d0173
-    # via
-    #   tensorboard
-    #   torch
+    # via torch
 shapely==2.2.0 \
     --hash=sha256:17434cb9819c9974c3331333a3b878fa5bf8f85dd69cc3fb7ff5d260f6fbc102 \
     --hash=sha256:1eaa2cb64cdedaf65d6bc86f2819c9cd7d6d68f969aa3ebfdc93743ab581f437 \
@@ -2918,14 +2893,6 @@ tblib==3.2.2 \
     --hash=sha256:26bdccf339bcce6a88b2b5432c988b266ebbe63a4e593f6b578b1d2e723d2b76 \
     --hash=sha256:e9a652692d91bf4f743d4a15bc174c0b76afc750fe8c7b6d195cc1c1d6d2ccec
     # via tiledb-cloud
-tensorboard==2.21.0 \
-    --hash=sha256:7279316dcb6bd5bc391d623dea841531299cde1887310e8133bc34a996d32255
-    # via terratorch
-tensorboard-data-server==0.7.2 \
-    --hash=sha256:7e0610d205889588983836ec05dc098e80f97b7e7bbff7e994ebb78f578d0ddb \
-    --hash=sha256:9fe5d24221b29625dbc7328b0436ca7fc1c23de4acf4d272f1180856e32f9f60 \
-    --hash=sha256:ef687163c24185ae9754ed5650eb5bc4d84ff257aabdc33f0cc6f74d8ba54530
-    # via tensorboard
 tensorboardx==2.6.5 \
     --hash=sha256:c10b891d00af306537cb8b58a039b2ba41571f0da06f433a41c4ca8d6abe1373 \
     --hash=sha256:ca176db3997ee8c07d2eb77381225956a3fd1c10c91beafab1f17069adc47017
@@ -2938,9 +2905,9 @@ terrakit==0.2.2 \
     --hash=sha256:5436f6d0d10b2750d1fd470e6f6ae61f796c7226e4d6d87add773face4228696 \
     --hash=sha256:a80a52b7e7ae078f51c4329c3725a456326df50b1dace95be8819413e308f833
     # via algorithm-nexus
-terratorch==1.2.13 \
-    --hash=sha256:b2e7ed551639fcfe7a7d849cb6acc5d348b66707c500a1bee35953847daff148 \
-    --hash=sha256:e1826ccdf8cdef8ddcd417375473ae6eacea2f56949df4c7f9ae476e4823d437
+terratorch==1.2.14 \
+    --hash=sha256:189a30f87363e8b9ea8a3585f1ba18ff297db3bfd7f1088808f25f02c349ba33 \
+    --hash=sha256:73dec86e92eb0e5cb0f96875edc334a9a21012402d0533ee492cd34f4a844174
     # via algorithm-nexus
 threadpoolctl==3.7.0 \
     --hash=sha256:61348cfb77d53b9242e0017029244b559b810c142ced65b4e21eeca1843959a7 \
@@ -3063,15 +3030,15 @@ toolz==1.2.0 \
     # via
     #   dask
     #   partd
-torch==2.13.0 \
-    --hash=sha256:024c6cc0c1b085f2f91f20a3dc27b0471d021c31ce84b81be3afdc39f791fd9d \
-    --hash=sha256:1e09d6a722504957c694faceca843acde562786df1144ebcc5a74075ec7f6005 \
-    --hash=sha256:2fe228aba290d14b9f31b049be550dbd469c3fd3013d7a19705b30454da97027 \
-    --hash=sha256:33449899ce5496c1b84b4853179d94fd102028ae1407314d9fb956bb79e70d09 \
-    --hash=sha256:49b58f1e2c52440abb6f17c28f0335fe6c6d01ad1a7f55b0183b81e4b34d64e6 \
-    --hash=sha256:572df8be8ffb4599c88cbd6a0726f1f854f4da65d2e3c09f0e2c2283333cd6d4 \
-    --hash=sha256:796633c4cdf0fe2cdced72d8f88f22e73dbcfce83132763162f6d4bff13b820b \
-    --hash=sha256:a3a9a21312872af8a26950b2c15680335a386a1f56ed03e780653d78b9607e9e
+torch==2.14.0 \
+    --hash=sha256:0e7cf18cb0d8bd666b6120932e29c7aef3502b61a08b44da4839580c539a7cdb \
+    --hash=sha256:731b9ebdea402b8b1996d4c2ae613b16660e559b19e47bdc45d970568bc91c53 \
+    --hash=sha256:84bf384779a10c02fc3c6bdbab71a9cb66b0dd93c652d1ed5d6dfc0cb37e5962 \
+    --hash=sha256:9d4b1022a5d9b71282ec67ad0d9e7235870096b8a246dc1c32d6ea1fc83dc998 \
+    --hash=sha256:ada340e62591d06a2bcc2d68170f20f45f0b0665d372dc510a8ed7eb3b1d609a \
+    --hash=sha256:c1f844f1c750e87df4b68bc3afbc0e2b0c7ef19d7b8f666e48bdcf6a0c4f0056 \
+    --hash=sha256:cad84f41bbdf3dcf333ce394aeeaf25237c4d94fd6b659ba5eb813c829978823 \
+    --hash=sha256:fecffb58f51fd643d213acd68da21cc3fc19bea05a3bc64b4ee55128f47a4963
     # via
     #   accelerate
     #   bmfm-targets
@@ -3118,9 +3085,9 @@ torchdata==0.9.0 \
     # via
     #   bmfm-targets
     #   cellxgene-census
-torchgeo==0.9.0 \
-    --hash=sha256:3e05cd85352a2b357c611c6eb44540680f21017d5da4af9d8c9d18bfca791a05 \
-    --hash=sha256:93858ccd1cd9cc25b022572dabcd94a024160529a3bd7fc75dc28e995240ca6c
+torchgeo==0.10.1 \
+    --hash=sha256:9dfb36737e1ddb4156cd51244bf4247c4a2bafd0d177e7b6d59288ca8ae848b7 \
+    --hash=sha256:b002fee686a34dcdec019adf28ce7cf912b39c26f92896ce549209490f9ac753
     # via terratorch
 torchmetrics==1.9.0 \
     --hash=sha256:a488609948600df52d3db4fcdab02e62aab2a85ef34da67037dc3e65b8512faa \
@@ -3131,15 +3098,15 @@ torchmetrics==1.9.0 \
     #   pytorch-lightning
     #   terratorch
     #   torchgeo
-torchvision==0.28.0 \
-    --hash=sha256:028a3d481b37d785605620d7cdad897064c5a55bae2aa1f2658766333e291940 \
-    --hash=sha256:5cf78ebc401ce64ae19b8c55de866bb836797d559a4de9c25ccbe74cfa642d3a \
-    --hash=sha256:7e9dd6f60d6e15f8dc27d4f877fdb6002fc70d70272412135f1c2ff9cfa08d3b \
-    --hash=sha256:87dc16b2df427c1318ad335f1e2be2b3b15b2cf20f7934c83b0505a48425ee5d \
-    --hash=sha256:ad7b3a439265cc3739a4ab5b4c998c0e38ea99c0ee7ca4dea35c5d0b099ec237 \
-    --hash=sha256:bb6dd6918460ed89cc7644adcc2402991474d6933cf1ce92b390641cb233fddf \
-    --hash=sha256:d483b4aa3f5237569053f749cd1a2b5bb548ca456e40461a5dd087f21149d123 \
-    --hash=sha256:e9f54c30cd52e3ef7fd034cc69b7bb7e0964e1c8f8743e018ab92e95b40f9eee
+torchvision==0.29.0 \
+    --hash=sha256:0e3b99c62f7f095153887330c2c60c9ebc2da84dfbe08eea564a41ec361629cf \
+    --hash=sha256:0e631a2f8b24732672d35224d2574ff89a78d56bef5364ef6094a625fa5f1771 \
+    --hash=sha256:28a3964a9e6db34354d4ca440d2c2038deeef24e7219e8d6f49d9d174f44830c \
+    --hash=sha256:83db0299170502b038640444214c99d7b54bad72db447f0554deb8d2c4f02f94 \
+    --hash=sha256:942a3b3fb4e981e1abb7846679ee3882dfc733533a30b68df0dadf6c06f238a9 \
+    --hash=sha256:994687b818cac0e6d34cb407a41458e2c3262cb7db927465841c9522ba7ebb92 \
+    --hash=sha256:b7a736eaa6b2e22476c95ceb62986d195f3e600cdd7d196d7329aa2dfc951994 \
+    --hash=sha256:ebf54f6744556ebd8d7b5f9b6515e2060e5d3156723970dc257bf093f63b2170
     # via
     #   gridfm-graphkit
     #   lightly
@@ -3148,6 +3115,7 @@ torchvision==0.28.0 \
     #   terratorch
     #   timm
     #   torchgeo
+    #   torchmetrics
 tornado==6.6 \
     --hash=sha256:01abf15429d64f04ccfafc238b191cc2c177108b7a331f4461707ad77198c8c2 \
     --hash=sha256:11bb97c00981eb8254e55bd6a5ad960c983ae343fef8ae3ae5584cd1fb70236a \
@@ -3189,6 +3157,7 @@ tqdm==4.70.1 \
     #   terrakit
     #   terratorch
     #   torch-geometric
+    #   torchgeo
     #   transformers
     #   umap-learn
 traitlets==5.16.1 \
@@ -3208,11 +3177,11 @@ transformers==5.17.0 \
     # via
     #   bmfm-targets
     #   peft
-triton==3.7.1 ; sys_platform == 'linux' \
-    --hash=sha256:58c0e131da05134a2a4788ccbcc0c1105cf0f54c8e98f19e34cd465396dc15eb \
-    --hash=sha256:7e40869937a68206ec70d7f25bb7ec6433cb083f9135e1f36dbd318dc449a728 \
-    --hash=sha256:9497f2e696ee368862a181a90b2dcc03ca978cc4f602abd67c7d81022a6988e1 \
-    --hash=sha256:cdbfc09d9ec58bc5e68321525653220de7515c199e7a8097a97c85e62b52cd0a
+triton==3.8.0 ; sys_platform == 'linux' \
+    --hash=sha256:1f0497218e26b7d79773ad9c2a3fa3b539ee69f587a13fac2e552b1d322a8015 \
+    --hash=sha256:a9c404c69ed4a39e8ec632eaf6b9fe058a060bf98979c177f6ef666f06bb8d50 \
+    --hash=sha256:b7004666652f500ed854a86988e4b3d69d247188b5d2092b5df1e44f4a954099 \
+    --hash=sha256:e91ffa46d095b252248297292dd22bcbacd53a125a0c2eefbbbf74925a320bc3
     # via torch
 typeguard==4.6.0 \
     --hash=sha256:79878165bb86f2cf5d41d159a0ff1792a796cf496882d2fe1b1c6c7049b9cdd7 \
@@ -3241,7 +3210,6 @@ typing-extensions==4.16.0 \
     #   fastapi
     #   formulaic
     #   graphene
-    #   grpcio
     #   huggingface-hub
     #   jupyter-client
     #   lightning
@@ -3350,7 +3318,6 @@ werkzeug==3.1.9 \
     # via
     #   flask
     #   flask-cors
-    #   tensorboard
 widgetsnbextension==4.0.16 \
     --hash=sha256:a31a8774885b96fe825462f5d6496166f0c7cae111195b6465c801d230eb5a4e \
     --hash=sha256:adeea0ae78f0856ee4945f413299801b82a0a01416303301f39a704282a37b73
