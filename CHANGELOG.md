@@ -1,3 +1,23 @@
+## [1.1.1](https://github.com/ibm/algorithm-nexus/compare/a4faae38284d5110c88af616378401aed8f733e2..1.1.1) - 2026-11-04
+#### Features
+- (**deps**) Updated vllm to 0.33.0 and terratorch to 1.2.14 in production variant (#345) - ([311df34](https://github.com/ibm/algorithm-nexus/commit/311df340605c08af072c85d39aa47462aeebc3c0)) - Christian Pinto
+- (**schema**) Allow for multiple values for problem properties in a problem instance (#339) - ([70de271](https://github.com/ibm/algorithm-nexus/commit/70de27118995504869d5f8b923333de477238f86)) - Christian Pinto
+- (**schema**) Added instancePropertyValues to benchmark instance definition (#335) - ([3bc0307](https://github.com/ibm/algorithm-nexus/commit/3bc0307c5ee086090f1fd633dbf1acd5f8e37c7e)) - Christian Pinto
+#### Bug Fixes
+- (**docs**) Fixed broken links to ADO docs (#332) - ([eb8b945](https://github.com/ibm/algorithm-nexus/commit/eb8b9457bf5cf13e78345eecb32d0ee89a47b6fb)) - Christian Pinto
+#### Documentation
+- (**changelog**) add release notes for 1.1.0 (#316) - ([fad5d84](https://github.com/ibm/algorithm-nexus/commit/fad5d845236c3b0561d1ab0351577fbf90e1096d)) - DRL-NextGen
+- (**design**) document benchmark source and compute type metadata (#314) - ([a4faae3](https://github.com/ibm/algorithm-nexus/commit/a4faae38284d5110c88af616378401aed8f733e2)) - Vassilis Vassiliadis
+#### Build system
+- (**deps**) update dependencies (#333) - ([0d2df95](https://github.com/ibm/algorithm-nexus/commit/0d2df95b6808216f6572ec20c2b08c490691680f)) - DRL-NextGen
+- (**deps**) update dependencies (#324) - ([a0351aa](https://github.com/ibm/algorithm-nexus/commit/a0351aad6f0c2780afba4a7bba545f0ba8d2c273)) - DRL-NextGen
+- (**deps**) update dependencies (#319) - ([6a6cf6d](https://github.com/ibm/algorithm-nexus/commit/6a6cf6dd3a25ed06fa2fe5bc73cb235334e425bd)) - DRL-NextGen
+- (**hooks**) update pre-commit hooks (#343) - ([7b3e310](https://github.com/ibm/algorithm-nexus/commit/7b3e310f33c79c6e483ba0496bf38c72ff86449a)) - DRL-NextGen
+- (**hooks**) update pre-commit hooks (#334) - ([4af3e14](https://github.com/ibm/algorithm-nexus/commit/4af3e14c0a4f272ad90a4621c97c041d66f2fce4)) - DRL-NextGen
+- (**hooks**) update pre-commit hooks (#327) - ([f75c980](https://github.com/ibm/algorithm-nexus/commit/f75c9803c72b1ea5bd88fb47343cbea4e6266371)) - DRL-NextGen
+
+- - -
+
 ## [1.1.0](https://github.com/ibm/algorithm-nexus/compare/995ebfa4cccd7d6237dbbeda53ec151ab7fa1743..1.1.0) - 2026-10-13
 #### Features
 - (**Schema**) Updated models and cli to the latest schema for logical benchmarks and experiments (#295) - ([cc441c1](https://github.com/ibm/algorithm-nexus/commit/cc441c18922327912a932d343c2e80b66d3a7d0e)) - Christian Pinto
