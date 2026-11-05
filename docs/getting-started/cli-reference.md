@@ -162,11 +162,17 @@ nexus validate experiments -o yaml
     - All mode: Scans packages directory for all submissions
     - Package mode: Finds submissions in specified package
 2. **Dependency Resolution**: Groups submissions by required benchmark packages
-3. **Isolation**: Creates temporary virtual environments for each dependency set
+3. **Isolation**: Creates temporary virtual environments for each dependency set.
+   Each package listed in an `experiment_package.yaml` gets its own environment
 4. **Installation**: Installs required benchmark packages using `uv` (10-100x
-   faster) or `pip`
+   faster) or `pip`. When `experiment_package.yaml` lists several packages, each
+   is installed in its own separate environment and its experiments are
+   verified
 5. **Validation**: Validates each submission's `space.yaml` structure using
-   Pydantic models and ADO dry-run
+   Pydantic models and ADO dry-run. When an experiment is provided by several
+   packages, a submission is validated in the environment of the package that
+   declares the `experimentIdentifier` and `experimentVersion` it references
+   (an exact version match is preferred, then the same major version)
 6. **Reporting**: Displays results in table or JSON format with validation
    status, errors, and warnings
 
@@ -265,8 +271,9 @@ nexus list packages -o json
 #### nexus list experiment-packages
 
 List all experiment packages discovered under the experiments directory. Shows
-a table of experiment packages with their folder, requirement specifier,
-experiment IDs, and logical benchmark bindings.
+a table of experiment packages with their folder, requirement specifier(s),
+experiment IDs, and logical benchmark bindings. When a folder declares several
+packages, their specifiers are listed together.
 
 **Usage:**
 
@@ -295,6 +302,8 @@ nexus list experiment-packages -o json
 #### nexus list experiments
 
 List all benchmark experiments discovered under the experiments directory.
+
+One row is listed per experiment and package, including the experiment `Version` when the package declares one.
 
 **Usage:**
 
@@ -402,7 +411,9 @@ The detection works for submissions located at:
     When not running in remote mode (`--remote` not set), the benchmark submissions will be executed with
     `ado` in the local environment. It is the user responsibility to ensure that the required
     experiment package is installed in the local Python environment. The experiment package requirement
-    specifier is declared in `experiments/<experiment>/experiment_package.yaml`.
+    specifier(s) are declared in `experiments/<experiment>/experiment_package.yaml`.
+    When several packages are listed (for different versions of an experiment), install the one
+    matching the `experimentVersion` you want to run.
 
 **Examples:**
 

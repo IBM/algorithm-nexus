@@ -15,6 +15,7 @@ try:
     from ado.schema.property import Property
     from ado.schema.property_value import PropertyValue
     from ado.schema.reference import ExperimentReference
+    from ado.utilities.pydantic import StrictSemVerStr
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError:
     print(
@@ -90,12 +91,45 @@ def validate_remote_requirement_specifier(v: str) -> str:
     return v
 
 
+class ExperimentEntry(BaseModel):
+    """An experiment exposed by an experiment package, with an optional version."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    experimentIdentifier: Annotated[
+        str,
+        Field(min_length=1, description="Experiment identifier."),
+    ]
+    experimentVersion: Annotated[
+        StrictSemVerStr | None,
+        Field(
+            description=(
+                "Version of the experiment provided by this package "
+                "(strict SemVer MAJOR.MINOR.PATCH)."
+            ),
+        ),
+    ] = None
+
+    @model_validator(mode="after")
+    def _identifier_has_no_version_suffix(self) -> ExperimentEntry:
+        if "@" in self.experimentIdentifier:
+            msg = (
+                "experimentIdentifier must not contain '@'. "
+                "Use experimentVersion to supply version information."
+            )
+            raise ValueError(msg)
+        return self
+
+
 class ExperimentSpecifier(BaseModel):
     """Experiment specifier in an experiment_package.yaml file.
 
     Registers the package that provides experiments and lists the experiment
     identifiers it exposes. The package must be available on PyPI or GitHub;
     local paths are not permitted.
+
+    Each experiment is a mapping with an ``experimentIdentifier`` and an optional
+    ``experimentVersion``.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -113,22 +147,42 @@ class ExperimentSpecifier(BaseModel):
         ),
     ]
     experiments: Annotated[
-        list[str],
+        list[ExperimentEntry],
         Field(
             min_length=1,
-            description="Experiment identifiers exposed by the package.",
+            description=(
+                "Experiments exposed by the package, as "
+                "{experimentIdentifier, experimentVersion} mappings."
+            ),
         ),
     ]
 
+    @property
+    def experiment_entries(self) -> list[ExperimentEntry]:
+        """The experiments of this package."""
+        return self.experiments
+
+    @property
+    def experiment_ids(self) -> list[str]:
+        """Identifiers of the experiments exposed by this package."""
+        return [e.experimentIdentifier for e in self.experiments]
+
 
 class ExperimentConfig(BaseModel):
-    """Top-level schema for experiment_package.yaml files inside experiments/<name>/."""
+    """Top-level schema for experiment_package.yaml files inside experiments/<name>/.
+
+    ``experiment_package`` is a list of packages (e.g. to pin different package
+    revisions providing different experiment versions).
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     experiment_package: Annotated[
-        ExperimentSpecifier,
-        Field(description="Experiment package specifier and experiment list."),
+        list[ExperimentSpecifier],
+        Field(
+            min_length=1,
+            description="Experiment package specifiers, with their experiments.",
+        ),
     ]
     metadata: Annotated[
         MetadataDict | None,
@@ -136,6 +190,34 @@ class ExperimentConfig(BaseModel):
             description="Arbitrary key-value annotations as a flat string-to-string dictionary."
         ),
     ] = None
+
+    @model_validator(mode="after")
+    def _experiment_unique_per_requirement_specifier(self) -> ExperimentConfig:
+        """An experiment may appear only once per requirement_specifier."""
+        seen: set[tuple[str, str]] = set()
+        for pkg in self.packages:
+            for exp_id in pkg.experiment_ids:
+                key = (pkg.requirement_specifier.strip(), exp_id)
+                if key in seen:
+                    msg = (
+                        f"experiment '{exp_id}' is declared more than once for "
+                        f"requirement_specifier '{pkg.requirement_specifier}'. "
+                        "A package exposes a single version of an experiment; use a "
+                        "different requirement_specifier for each version."
+                    )
+                    raise ValueError(msg)
+                seen.add(key)
+        return self
+
+    @property
+    def packages(self) -> list[ExperimentSpecifier]:
+        """All declared experiment packages."""
+        return self.experiment_package
+
+    @property
+    def experiment_ids(self) -> set[str]:
+        """Identifiers of all experiments declared across all packages."""
+        return {eid for pkg in self.packages for eid in pkg.experiment_ids}
 
 
 class NexusPackageInfo(BaseModel):

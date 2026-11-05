@@ -6,8 +6,25 @@
 # Local paths are not allowed.
 
 experiment_package:
-  requirement_specifier: "<benchmark-package-name>"  # e.g. "sorting-benchmarks>=1.0.0"
-  # or "https://github.com/org/repo"
-  experiments:
-    - "<experiment-id>"  # experiment identifier(s) exposed by the package
-    # - "<experiment-id-2>"
+  - requirement_specifier: "<benchmark-package-name>"  # e.g. "sorting-benchmarks>=1.0.0"
+    # or "https://github.com/org/repo"
+    experiments:
+      - experimentIdentifier: "<experiment-id>"  # experiment exposed by the package
+        experimentVersion: "<x.y.z>"  # optional, strict SemVer
+        # - experimentIdentifier: "<experiment-id-2>"
+
+# To declare several versions of an experiment, add one package entry per
+# version. An experiment can appear only once per requirement_specifier. Each
+# requirement_specifier is assumed to be static (always resolving to the same
+# package contents); this is not verified, so prefer an exact version
+# (==<version>) or a commit hash:
+#
+# experiment_package:
+#   - requirement_specifier: "<benchmark-package-name>==1.2.0"
+#     experiments:
+#       - experimentIdentifier: "<experiment-id>"
+#         experimentVersion: "1.2.3"
+#   - requirement_specifier: "<benchmark-package-name>==1.3.0"
+#     experiments:
+#       - experimentIdentifier: "<experiment-id>"
+#         experimentVersion: "1.3.0"

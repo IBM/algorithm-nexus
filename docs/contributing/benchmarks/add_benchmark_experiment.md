@@ -47,14 +47,15 @@ Create `experiments/rlx_coloring/experiment_package.yaml`:
 
 ```yaml
 experiment_package:
-    requirement_specifier: "rlx-coloring"
-    experiments:
-        - rlx_coloring
+    - requirement_specifier: "rlx-coloring"
+      experiments:
+          - experimentIdentifier: rlx_coloring
 ```
 
-`requirement_specifier` is a PyPI package name (optionally with a version
-constraint) or a GitHub URL. The `experiments` list is the set of experiment
-ids submissions will reference.
+`experiment_package` is a list of packages. `requirement_specifier` is a PyPI
+package name (optionally with a version constraint) or a GitHub URL. The
+`experiments` list is the set of experiments, each with an `experimentIdentifier`
+and an optional `experimentVersion`, that submissions will reference.
 
 The full field list is in
 [Benchmark Experiments and Submissions](../../design/benchmarking/benchmark_experiments_and_submissions.md#31-experiment-package-registration-in-experiment_packageyaml).
@@ -101,27 +102,57 @@ repository URL:
 
 ```yaml
 experiment_package:
-    requirement_specifier: "https://github.com/<org>/<experiment-package-repo>"
-    experiments:
-        - rlx_coloring
+    - requirement_specifier: "https://github.com/<org>/<experiment-package-repo>"
+      experiments:
+          - experimentIdentifier: rlx_coloring
 ```
 
 Then validate as in [step 2](#2-validate).
 
 ### Declare several experiment ids from one package
 
-To expose more than one experiment from the same package, list each identifier:
+To expose more than one experiment from the same package, list each one:
 
 ```yaml
 experiment_package:
-    requirement_specifier: "sorting-benchmarks>=1.0.0"
-    experiments:
-        - bubble_sort
-        - merge_sort
-        - quick_sort
+    - requirement_specifier: "sorting-benchmarks>=1.0.0"
+      experiments:
+          - experimentIdentifier: bubble_sort
+          - experimentIdentifier: merge_sort
+          - experimentIdentifier: quick_sort
 ```
 
 Each id in the list is available to submissions under this experiment folder.
+
+### Pin experiment versions or several package revisions
+
+Each experiment can carry an `experimentVersion` (strict SemVer, optional). To
+declare several versions of an experiment, add one package entry per
+`requirement_specifier`, for example to pin two revisions of a repository:
+
+```yaml
+experiment_package:
+    - requirement_specifier: "git+ssh://git@github.com/<org>/<repo>.git@21e38a9[ado]"
+      experiments:
+          - experimentIdentifier: rlx_coloring
+            experimentVersion: 1.2.3
+    - requirement_specifier: "git+ssh://git@github.com/<org>/<repo>.git@5489863[ado]"
+      experiments:
+          - experimentIdentifier: rlx_coloring
+            experimentVersion: 1.3.0
+```
+
+An experiment can be listed only once per `requirement_specifier`. Two versions of
+the same experiment must come from two package entries with different
+specifiers, as above.
+
+Nexus assumes each `requirement_specifier` is static, meaning it always resolves
+to the same package contents, and does not check it. Any specifier is accepted,
+including a branch, tag, commit or version range, but it is up to you to make
+sure it will not change: if a branch or tag moves, the installed package may no
+longer provide the declared `experimentVersion`. For several versions of the
+same experiment, pin each entry to an exact package version
+(`my-package==1.2.3`) or, preferably, a commit hash (`...repo.git@21e38a9`).
 
 ### Label an experiment's compute type
 
@@ -131,9 +162,9 @@ part must be one of the ids in the `experiments` list:
 
 ```yaml
 experiment_package:
-    requirement_specifier: "rlx-coloring"
-    experiments:
-        - rlx_coloring
+    - requirement_specifier: "rlx-coloring"
+      experiments:
+          - experimentIdentifier: rlx_coloring
 
 metadata:
     compute-type-rlx_coloring: Classical

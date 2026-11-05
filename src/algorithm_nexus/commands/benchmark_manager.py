@@ -45,6 +45,7 @@ from algorithm_nexus.commands.utils import strip_ansi_codes
 from algorithm_nexus.models import (
     BenchmarkExecutionResult,
     ExperimentConfig,
+    ExperimentSpecifier,
     ValidationReport,
 )
 
@@ -103,6 +104,53 @@ def create_random_walk_operation_config(
         operation=operation,
         actuatorConfigurationIdentifiers=actuator_configuration_ids or [],
     )
+
+
+def select_package_index(
+    space_experiments: list[Any],
+    packages: list[ExperimentSpecifier],
+) -> tuple[int | None, str | None]:
+    """Choose which experiment package a submission should be validated with.
+
+    Looks at the experiments referenced by a submission's ``space.yaml`` and finds
+    the package entry declaring the referenced ``experimentIdentifier``. When the
+    reference carries an ``experimentVersion`` the entry declaring exactly that
+    version is preferred, then one with the same major version.
+
+    Returns:
+        Tuple of (package index or None, warning or None). The index is None when
+        no package declares any referenced experiment.
+    """
+    from ado.utilities.pydantic import semver_major
+
+    for ref in space_experiments:
+        if not isinstance(ref, dict):
+            continue
+        exp_id = ref.get("experimentIdentifier")
+        version = ref.get("experimentVersion")
+        if not exp_id:
+            continue
+        candidates = [
+            (i, entry.experimentVersion)
+            for i, pkg in enumerate(packages)
+            for entry in pkg.experiment_entries
+            if entry.experimentIdentifier == exp_id
+        ]
+        if not candidates:
+            continue
+        if version is None:
+            return candidates[0][0], None
+        for i, declared in candidates:
+            if declared == version:
+                return i, None
+        for i, declared in candidates:
+            if declared is not None and semver_major(declared) == semver_major(version):
+                return i, None
+        return candidates[0][0], (
+            f"No package declares experiment '{exp_id}' at version {version}; "
+            f"validated with the package at index {candidates[0][0]} instead"
+        )
+    return None, None
 
 
 class BenchmarkManager:
@@ -510,10 +558,12 @@ class BenchmarkManager:
                 experiment_config = ExperimentConfig.model_validate(
                     experiment_config_dict
                 )
-                resolved_req = self._resolve_benchmark_package_requirement(
-                    experiment_config.experiment_package.requirement_specifier
-                )
-                return {resolved_req}
+                return {
+                    self._resolve_benchmark_package_requirement(
+                        pkg.requirement_specifier
+                    )
+                    for pkg in experiment_config.packages
+                }
 
             return set()
 
@@ -1070,6 +1120,22 @@ class BenchmarkManager:
 
         return sorted(benchmark_submissions)
 
+    def _select_package_for(
+        self, instance: Path, packages: list[ExperimentSpecifier]
+    ) -> tuple[int | None, str | None]:
+        """Pick the package whose venv should validate this submission."""
+        try:
+            space = yaml.safe_load(
+                (self.repo_root / instance / "space.yaml").read_text()
+            )
+            experiments = (space or {}).get("experiments") or []
+        except Exception:
+            experiments = []
+        idx, warning = select_package_index(experiments, packages)
+        if idx is None and len(packages) == 1:
+            return 0, None
+        return idx, warning
+
     def _scan_experiments(
         self, experiments_root: Path, experiment_filter: str | None = None
     ) -> list[tuple[str, Path, ExperimentConfig | None, list[Path]]]:
@@ -1132,13 +1198,15 @@ class BenchmarkManager:
         verbose: bool = False,
         fail_fast: bool = False,
     ) -> ValidationReport:
-        """Validate experiments in two phases per experiment, using one shared venv.
+        """Validate experiments in two phases per experiment.
 
         Phase 1 (experiment_package): If experiment_package.yaml is present, install
-        the package and verify the declared experiment IDs are discoverable.
+        each declared package in its own separate venv and verify the declared
+        experiment IDs are discoverable.
 
         Phase 2 (submissions): If submissions/<name>/space.yaml files are present,
-        validate each with ADO dry-run using the same venv.
+        validate each with ADO dry-run in the venv of the package that provides the
+        experiment (and experiment version) the submission references.
 
         Both phases are optional and independent; an experiment may trigger either,
         neither, or both.
@@ -1258,7 +1326,8 @@ class BenchmarkManager:
             console.print(f"\n[bold]Found {len(experiments)} experiment(s):[/bold]")
             for exp_name, _, exp_cfg, submissions in experiments:
                 pkg_label = (
-                    f"package: {exp_cfg.experiment_package.requirement_specifier}"
+                    "package: "
+                    + ", ".join(p.requirement_specifier for p in exp_cfg.packages)
                     if exp_cfg
                     else "no package"
                 )
@@ -1285,37 +1354,43 @@ class BenchmarkManager:
                     )
                     continue
 
-                venv_path = None
-                package_install_ok = True
+                # One virtual environment per experiment package, so that each
+                # requirement_specifier is installed in isolation.
+                created_venvs: list[Path] = []
+                package_venvs: dict[int, Path] = {}
+                failed_packages: set[int] = set()
                 try:
-                    venv_path = create_temp_venv()
-
                     # ── Phase 1: experiment_package ──────────────────────────
                     if exp_cfg is not None:
-                        req = self._resolve_benchmark_package_requirement(
-                            exp_cfg.experiment_package.requirement_specifier
-                        )
-                        console.print(
-                            f"  [cyan]Phase 1:[/cyan] Installing package {req!r}"
-                        )
-                        if not install_packages(venv_path, [req], verbose=verbose):
-                            pkg_result = ValidationResult(
-                                success=False,
-                                submission_path=f"experiments/{exp_name}/experiment_package",
-                                errors=[f"Failed to install package: {req}"],
-                                warnings=[],
+                        for idx, pkg in enumerate(exp_cfg.packages):
+                            req = self._resolve_benchmark_package_requirement(
+                                pkg.requirement_specifier
                             )
-                            all_results.append(pkg_result.model_dump())
-                            total_failed += 1
-                            total_items += 1
-                            package_install_ok = False
-                            if fail_fast:
-                                break
-                        else:
+                            console.print(
+                                f"  [cyan]Phase 1:[/cyan] Installing package {req!r} "
+                                f"in a separate environment"
+                            )
+                            venv_path = create_temp_venv()
+                            created_venvs.append(venv_path)
+                            if not install_packages(venv_path, [req], verbose=verbose):
+                                pkg_result = ValidationResult(
+                                    success=False,
+                                    submission_path=f"experiments/{exp_name}/experiment_package",
+                                    errors=[f"Failed to install package: {req}"],
+                                    warnings=[],
+                                )
+                                all_results.append(pkg_result.model_dump())
+                                total_failed += 1
+                                total_items += 1
+                                failed_packages.add(idx)
+                                if fail_fast:
+                                    break
+                                continue
+
                             # Verify declared experiments are discoverable
                             ok, errors = verify_experiments_installed(
                                 venv_path,
-                                exp_cfg.experiment_package.experiments,
+                                pkg.experiment_entries,
                                 verbose=verbose,
                             )
                             pkg_result = ValidationResult(
@@ -1327,12 +1402,14 @@ class BenchmarkManager:
                             all_results.append(pkg_result.model_dump())
                             total_items += 1
                             if ok:
+                                package_venvs[idx] = venv_path
                                 console.print(
                                     "  [green]✓[/green] Package installed and all "
                                     "experiments verified"
                                 )
                                 total_success += 1
                             else:
+                                failed_packages.add(idx)
                                 console.print(
                                     "  [red]✗[/red] Experiment verification failed"
                                 )
@@ -1341,50 +1418,69 @@ class BenchmarkManager:
                                     console.print(f"    [red]Error:[/red] {err}")
                                 if fail_fast:
                                     break
+                        if fail_fast and total_failed > 0:
+                            break
+                    else:
+                        # No experiment_package.yaml: validate submissions in a
+                        # plain environment.
+                        default_venv = create_temp_venv()
+                        created_venvs.append(default_venv)
+                        package_venvs[0] = default_venv
 
                     # ── Phase 2: submissions ─────────────────────────────────
                     if submissions:
-                        if not package_install_ok:
-                            console.print(
-                                "  [yellow]Skipping submissions:[/yellow] "
-                                "package install failed"
-                            )
-                        else:
-                            console.print(
-                                f"  [cyan]Phase 2:[/cyan] Validating "
-                                f"{len(submissions)} submission(s)"
-                            )
-                            for instance in submissions:
+                        console.print(
+                            f"  [cyan]Phase 2:[/cyan] Validating "
+                            f"{len(submissions)} submission(s)"
+                        )
+                        for instance in submissions:
+                            console.print(f"    [cyan]Validating:[/cyan] {instance}")
+
+                            pkg_idx = 0
+                            select_warning = None
+                            if exp_cfg is not None:
+                                pkg_idx, select_warning = self._select_package_for(
+                                    instance, exp_cfg.packages
+                                )
+                            if (
+                                pkg_idx in failed_packages
+                                or pkg_idx not in package_venvs
+                            ):
+                                reason = (
+                                    "its experiment package failed to install or verify"
+                                    if pkg_idx in failed_packages
+                                    else "no experiment package provides its experiment"
+                                )
                                 console.print(
-                                    f"    [cyan]Validating:[/cyan] {instance}"
+                                    f"    [yellow]Skipping submission:[/yellow] {reason}"
                                 )
-                                result = validate_with_ado(
-                                    base_path=self.repo_root,
-                                    submission_path=str(instance),
-                                    venv_path=venv_path,
-                                )
-                                all_results.append(result.model_dump())
-                                total_items += 1
-                                if result.success:
-                                    console.print(
-                                        "    [green]✓[/green] Validation passed"
-                                    )
-                                    total_success += 1
-                                else:
-                                    console.print("    [red]✗[/red] Validation failed")
-                                    total_failed += 1
-                                    for err in result.errors:
-                                        console.print(f"      [red]Error:[/red] {err}")
-                                    for warn in result.warnings:
-                                        console.print(
-                                            f"      [yellow]Warning:[/yellow] {warn}"
-                                        )
-                                if fail_fast and total_failed > 0:
-                                    break
+                                continue
+
+                            result = validate_with_ado(
+                                base_path=self.repo_root,
+                                submission_path=str(instance),
+                                venv_path=package_venvs[pkg_idx],
+                            )
+                            if select_warning:
+                                result.warnings.append(select_warning)
+                            all_results.append(result.model_dump())
+                            total_items += 1
+                            if result.success:
+                                console.print("    [green]✓[/green] Validation passed")
+                                total_success += 1
+                            else:
+                                console.print("    [red]✗[/red] Validation failed")
+                                total_failed += 1
+                                for err in result.errors:
+                                    console.print(f"      [red]Error:[/red] {err}")
+                            for warn in result.warnings:
+                                console.print(f"      [yellow]Warning:[/yellow] {warn}")
+                            if fail_fast and total_failed > 0:
+                                break
 
                 finally:
-                    if venv_path:
-                        cleanup_venv(venv_path)
+                    for created in created_venvs:
+                        cleanup_venv(created)
 
                 if fail_fast and total_failed > 0:
                     console.print(

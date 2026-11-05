@@ -147,9 +147,9 @@ experiments/
             └── space.yaml       # Required: ADO discoveryspace definition
 ```
 
-Each `experiments/<experiment-name>/experiment_package.yaml` declares the Python package
-(on PyPI or GitHub) that provides the experiment and lists its experiment
-identifiers. Each benchmark submission must have a `space.yaml` file with the
+Each `experiments/<experiment-name>/experiment_package.yaml` declares the Python package(s)
+(on PyPI or GitHub) that provide the experiment and lists their experiment
+identifiers and, optionally, versions. Each benchmark submission must have a `space.yaml` file with the
 full ADO discoveryspace definition for that run. See the
 [Benchmark Experiments and Submissions](benchmarking/benchmark_experiments_and_submissions.md) for the complete
 schema and workflow.

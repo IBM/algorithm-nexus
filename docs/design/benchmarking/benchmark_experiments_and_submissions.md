@@ -18,8 +18,10 @@ top-level `experiments/` directory.
 
 **Key Design Decisions:**
 
-1. `experiments/<name>/experiment_package.yaml` registers a single benchmark
-   experiment package and lists the experiment identifiers it exposes
+1. `experiments/<name>/experiment_package.yaml` registers one or more benchmark
+   experiment packages (for example, different pinned revisions of the same
+   package) and lists the experiment identifiers, and optionally versions, each
+   exposes
 2. `experiments/<name>/submissions/<submission>/space.yaml` is the
    per-submission ADO discoveryspace definition
 3. `model.yaml` remains focused on model metadata — it carries no benchmark
@@ -128,9 +130,11 @@ The canonical benchmark metadata is split across two locations within each
 experiment folder:
 
 - `experiments/<name>/experiment_package.yaml`
-    - registers the package that provides benchmark experiments
-    - records a single `requirement_specifier` (PyPI name or GitHub URL)
-    - records the experiment identifiers exposed by that package
+    - registers the package(s) that provide benchmark experiments
+    - records a `requirement_specifier` (PyPI name or GitHub URL) per package,
+      as a list of one or more packages
+    - records the experiments exposed by each package, optionally with the
+      experiment version
 
 - `experiments/<name>/submissions/`
     - records which benchmark submissions belong to this experiment
@@ -168,13 +172,17 @@ format and the standardized benchmark packaging protocol.
 
 ### 3.1 Experiment Package Registration in `experiment_package.yaml`
 
+`experiment_package` is a list of packages. Each package lists the experiments
+it exposes as mappings with an `experimentIdentifier` and an optional
+`experimentVersion`.
+
 ```yaml
 experiment_package:
-    requirement_specifier: "sorting-benchmarks>=1.0.0" # PyPI package name
-    experiments:
-        - bubble_sort
-        - merge_sort
-        - quick_sort
+    - requirement_specifier: "sorting-benchmarks>=1.0.0" # PyPI package name
+      experiments:
+          - experimentIdentifier: bubble_sort
+          - experimentIdentifier: merge_sort
+          - experimentIdentifier: quick_sort
 
 metadata:
     compute-type-bubble_sort: Classical
@@ -182,21 +190,69 @@ metadata:
     compute-type-quick_sort: Classical
 ```
 
+To pin two revisions of a repository that provide different versions of the same
+experiment, add one package entry per version:
+
+```yaml
+experiment_package:
+    - requirement_specifier: git+ssh://git@github.com/example-org/example-benchmarks.git@21e38a9
+      experiments:
+          - experimentIdentifier: sort_explore
+            experimentVersion: 1.2.3
+    - requirement_specifier: git+ssh://git@github.com/example-org/example-benchmarks.git@5489863
+      experiments:
+          - experimentIdentifier: sort_explore
+            experimentVersion: 1.3.0
+```
+
 GitHub URL example:
 
 ```yaml
 experiment_package:
-    requirement_specifier: "https://github.com/example-org/example-benchmarks"
-    experiments:
-        - leaderboard-baseline
+    - requirement_specifier: "https://github.com/example-org/example-benchmarks"
+      experiments:
+          - experimentIdentifier: leaderboard-baseline
 ```
 
 **Fields:**
 
-- `experiment_package.requirement_specifier` — required; PyPI package name or
+- `experiment_package` — required; non-empty list of package objects. A single
+  package object, as used in earlier versions of this format, is not accepted
+- `experiment_package[].requirement_specifier` — required; PyPI package name or
   GitHub URL (local paths are rejected by schema validation)
-- `experiment_package.experiments` — required; non-empty list of experiment
-  identifiers exposed by the package
+- `experiment_package[].experiments` — required; non-empty list of experiments
+  exposed by the package. Each item is a mapping with (plain identifier strings,
+  as used in earlier versions of this format, are not accepted):
+    - `experimentIdentifier` — required; the experiment identifier
+    - `experimentVersion` — optional; strict SemVer (`MAJOR.MINOR.PATCH`) version
+      of the experiment provided by that package. These names match ado's
+      `ExperimentReference`
+
+    An experiment identifier may appear only once within the same
+    `requirement_specifier`, since a package exposes a single version of each
+    experiment. To declare several versions of the same experiment, add one
+    package entry per version, each with a different `requirement_specifier`,
+    as in the example above.
+
+    A `requirement_specifier` is needed for each version of the experiment for
+    which data will be available, so that the right package can be installed to
+    run or validate it. Bindings match runs by experiment version
+    (from the binding's `experimentVersion` up to the next higher binding, see
+    [Experiment version matching](./logical_benchmarks_and_instances.md#experiment-version-matching)),
+    but a version can only have data if it can be installed and run.
+
+    The `requirement_specifier` of each entry is assumed to be **static**: it is
+    expected to always resolve to the same package contents, so that the right
+    package, and therefore the right experiment version, is installed for the
+    declared `experimentVersion`. Nexus does not verify this and accepts any
+    specifier, whether an exact version (`name==1.2.3`), a commit
+    (`...repo.git@21e38a9`), a tag (`...repo.git@v1.2.3`), a branch
+    (`...repo.git@main`) or a version range (`name>=1.0`). It is the author's
+    responsibility to make sure the specifier does not change; if a branch or
+    tag is later moved, the installed package may no longer provide the declared
+    `experimentVersion`. When declaring several versions of the same
+    experiment, pin each entry to an exact package version or, preferably, a
+    commit hash, since tags and branches can be moved.
 - `metadata` — optional; flat string-to-string dictionary for arbitrary
   key-value annotations (keys and values up to 4,096 characters).
 
@@ -218,10 +274,10 @@ Example `space.yaml`:
 
 ```yaml
 entitySpace:
-    - identifier: dataset
+    - experimentIdentifier: dataset
       propertyDomain:
           values: ["sen1floods11"]
-    - identifier: split
+    - experimentIdentifier: split
       propertyDomain:
           values: ["test"]
 
@@ -252,10 +308,18 @@ For reference on the expected discoveryspace structure, see
 Validation checks that:
 
 1. `experiment_package.yaml` is present in the experiment folder
-2. `requirement_specifier` is a valid PyPI name or GitHub URL (local paths are
-   rejected)
-3. `experiments` list is non-empty
-4. extra fields are forbidden (`extra="forbid"`)
+2. every `requirement_specifier` is a valid PyPI name or GitHub URL (local paths
+   are rejected)
+3. `experiment_package` is a non-empty list when a list is used, and each
+   `experiments` list is non-empty
+4. an experiment identifier is not listed more than once under the same
+   `requirement_specifier`
+5. each package entry is installed in its own separate virtual environment, and
+   the experiments it declares are verified to be discoverable there
+6. each submission is validated in the environment of the package entry that
+   declares the experiment (and `experimentVersion`) its `space.yaml`
+   references; an exact version match is preferred, then the same major version
+7. extra fields are forbidden (`extra="forbid"`)
 
 ### 4.2 Benchmark Submission Validation
 
