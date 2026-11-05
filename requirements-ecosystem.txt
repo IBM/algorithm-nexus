@@ -179,9 +179,9 @@ branca==0.8.2 \
     --hash=sha256:2ebaef3983e3312733c1ae2b793b0a8ba3e1c4edeb7598e10328505280cf2f7c \
     --hash=sha256:e5040f4c286e973658c27de9225c1a5a7356dd0702a7c8d84c0f0dfbde388fe7
     # via folium
-cachetools==7.2.6 \
-    --hash=sha256:1096513bdeed468ba505df3d123e4578a5a22c955f4a9ba3912fd71f3f95363a \
-    --hash=sha256:8722e08fc36ae0838a9a0a2ab9935554720de3343a62dad7aae7c595854c8623
+cachetools==7.2.8 \
+    --hash=sha256:09b04a85741d0019b3fb7d02b7ee9933a422fa6923af92a0fd63b893b695830c \
+    --hash=sha256:3f9b146b2160975da273e7c23ec882f3996b65df608150d52083c07de0682075
     # via
     #   mlflow-skinny
     #   mlflow-tracing
