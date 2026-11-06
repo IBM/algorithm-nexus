@@ -149,7 +149,8 @@ def list_experiment_packages(
     """List all experiment packages discovered under experiments/.
 
     Shows a table of experiment packages with their folder, requirement
-    specifier, experiment IDs, and logical benchmark bindings.
+    specifier(s), experiment IDs, and logical benchmark bindings. When a folder
+    declares several packages, their specifiers are listed together.
     """
     import yaml
 
@@ -182,7 +183,7 @@ def list_experiment_packages(
             if not config_dict or "experiment_package" not in config_dict:
                 raise ValueError("Missing 'experiment_package' key")
             config = ExperimentConfig.model_validate(config_dict)
-            exp_package = config.experiment_package
+            exp_packages = config.packages
         except Exception as e:
             error_console.print(
                 f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
@@ -222,8 +223,10 @@ def list_experiment_packages(
         data.append(
             {
                 "Experiment Folder": exp_dir.name,
-                "Requirement Specifier": exp_package.requirement_specifier,
-                "Experiments": ", ".join(sorted(exp_package.experiments)),
+                "Requirement Specifier": ", ".join(
+                    p.requirement_specifier for p in exp_packages
+                ),
+                "Experiments": ", ".join(sorted(config.experiment_ids)),
                 "Bindings": ", ".join(sorted(all_benchmarks))
                 if all_benchmarks
                 else "None",
@@ -287,7 +290,11 @@ def list_benchmark_experiments(
         ),
     ] = False,
 ) -> None:
-    """List all benchmark experiments discovered under experiments/."""
+    """List all benchmark experiments discovered under experiments/.
+
+    One row is shown per experiment and package, with the experiment version
+    when the package declares one.
+    """
     import yaml
 
     from algorithm_nexus.models import ExperimentConfig
@@ -321,7 +328,7 @@ def list_benchmark_experiments(
                 raise ValueError("Missing 'experiment_package' key")
 
             config = ExperimentConfig.model_validate(config_dict)
-            exp_package = config.experiment_package
+            exp_packages = config.packages
         except Exception as e:
             error_console.print(
                 f"[yellow]Warning:[/yellow] Skipping {exp_dir.name}: "
@@ -331,13 +338,18 @@ def list_benchmark_experiments(
             continue
 
         # For each experiment ID, create an entry
+        # (one row per experiment ID and package, with its version if declared)
         data.extend(
             {
-                "Experiment ID": exp_id,
+                "Experiment ID": entry.experimentIdentifier,
+                "Version": entry.experimentVersion or "",
                 "Experiment Folder": exp_dir.name,
-                "Requirement Specifier": exp_package.requirement_specifier,
+                "Requirement Specifier": pkg.requirement_specifier,
             }
-            for exp_id in sorted(exp_package.experiments)
+            for pkg in exp_packages
+            for entry in sorted(
+                pkg.experiment_entries, key=lambda e: e.experimentIdentifier
+            )
         )
 
     if had_errors and strict:
@@ -351,6 +363,7 @@ def list_benchmark_experiments(
 
     headers = [
         "Experiment ID",
+        "Version",
         "Experiment Folder",
         "Requirement Specifier",
     ]

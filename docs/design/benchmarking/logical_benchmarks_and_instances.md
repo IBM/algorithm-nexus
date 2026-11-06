@@ -718,9 +718,45 @@ Below is an example query:
 
 ```text
 experimentIdentifier=$experimentIdentifier AND
+experimentVersion>=$experimentVersion AND
+experimentVersion<$nextBindingExperimentVersion AND
 mappedProblemPropertyIdentifier=instanceValue AND
 mappedInstanceArtifactPropertyIdentifier in [possible instance values]
 ```
+
+#### Experiment version matching
+
+The `experimentVersion` in a binding's `experiment` reference is the **first
+version** the binding applies to. A binding matches all runs of the experiment
+whose version is greater than or equal to its `experimentVersion`, up to but not
+including the `experimentVersion` of the next higher binding for the same
+experiment and benchmark instance. If there is no higher binding, it matches all
+later versions.
+
+For example, with two bindings for the same experiment and instance, at
+`1.0.0` and `1.3.0`:
+
+| Run version        | Binding used |
+| ------------------ | ------------ |
+| `0.9.0`            | none         |
+| `1.0.0`, `1.2.5`   | `1.0.0`      |
+| `1.3.0`, `2.0.0`   | `1.3.0`      |
+
+So a binding keeps applying to later versions of the experiment without being
+edited, until a newer binding takes over. If something changes in a later version
+that the existing binding does not describe correctly (for example a renamed
+experiment property, or a non-default value that must now be set, see
+[Section 7](#7-instance-binding-versioning)), do not edit the existing binding.
+Add an additional binding with the new `experimentVersion` and the changed
+mappings. It takes over from that version onwards, and the existing binding keeps
+covering the earlier versions.
+
+Binding versions say which runs are _matched_. They do not make data exist: runs
+are only available for the experiment versions that have actually been executed.
+Each version of the experiment that will have data must be installable, so the
+experiment's `experiment_package.yaml` needs a `requirement_specifier` for every
+such version (see
+[Benchmark Experiments and Submissions](./benchmark_experiments_and_submissions.md#31-experiment-package-registration-in-experiment_packageyaml)).
 
 ### 6.3 Dynamic Property Resolution
 
@@ -826,22 +862,34 @@ specific instance.
 
 ## 7. Instance Binding Versioning
 
-An instance binding may only change if:
+A binding matches the runs of its experiment from its `experimentVersion` up to
+the `experimentVersion` of the next higher binding (see
+[Experiment version matching](#experiment-version-matching)). Users are
+encouraged to add an additional binding with a higher `experimentVersion`,
+rather than modify an existing one, when something needs to change for newer
+versions of the experiment. The earlier binding then keeps covering the earlier
+versions.
+
+A new binding is needed when:
 
 - The experiment property names or values used in `problemPropertyMapping`,
   `instanceArtifactMapping`, or `staticFilters` change
     - This should result in a new experiment major version and a new binding
-    - The binding for the previous experiment major version can be kept
+      with that `experimentVersion`
+    - The binding for the previous experiment major version is kept and stops
+      applying where the new binding starts
 - The logical benchmark `problemProperties` or their values change
     - If the original logical benchmark parameters/values and mappings are now
       invalid, the existing logical benchmark and its bindings can be updated in
-      place
+      place (this is a change to the benchmark itself, not a response to a new
+      experiment version)
     - If the original logical benchmark parameters/values and mappings are still
       valid, a new logical benchmark should be created
 - Additional experiment properties are added that must be set to **non-default
   values** AND only the experiment minor version changes
-    - The binding must be changed — different sets of experiment data will be
-      aggregated under `problemPropertyMapping` or `staticFilters`
+    - A new binding with that minor `experimentVersion` must be added with the
+      changed `problemPropertyMapping` or `staticFilters`, since different sets
+      of experiment data will be aggregated under it
     - Note: This applies to **non-default values** only — by ado versioning
       convention a minor version change means that the new parameters with
       default values measure output metrics the same way as the previous

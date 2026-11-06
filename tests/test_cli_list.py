@@ -266,10 +266,10 @@ class TestListExperimentPackages:
 
         (exp_dir / "experiment_package.yaml").write_text(
             "experiment_package:\n"
-            "  requirement_specifier: my-package>=1.0\n"
-            "  experiments:\n"
-            "    - exp_id_1\n"
-            "    - exp_id_2\n",
+            "  - requirement_specifier: my-package>=1.0\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: exp_id_1\n"
+            "      - experimentIdentifier: exp_id_2\n",
             encoding="utf-8",
         )
 
@@ -353,10 +353,10 @@ class TestListBenchmarkExperiments:
         # Write experiment_package.yaml
         (exp_dir / "experiment_package.yaml").write_text(
             "experiment_package:\n"
-            "  requirement_specifier: my-package\n"
-            "  experiments:\n"
-            "    - exp_id_1\n"
-            "    - exp_id_2\n",
+            "  - requirement_specifier: my-package\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: exp_id_1\n"
+            "      - experimentIdentifier: exp_id_2\n",
             encoding="utf-8",
         )
 

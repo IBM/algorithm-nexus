@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 try:
     from rich.console import Console
@@ -20,6 +21,9 @@ except ImportError:
         file=sys.stderr,
     )
     sys.exit(1)
+
+if TYPE_CHECKING:
+    from algorithm_nexus.models import ExperimentEntry
 
 console = Console()
 
@@ -115,7 +119,7 @@ def install_packages(
 
 def verify_experiments_installed(
     venv_path: Path,
-    experiment_ids: list[str],
+    experiments: list[ExperimentEntry],
     verbose: bool = False,
 ) -> tuple[bool, list[str]]:
     """Verify that the declared experiment IDs are discoverable after package install.
@@ -125,7 +129,9 @@ def verify_experiments_installed(
 
     Args:
         venv_path: Path to the virtual environment
-        experiment_ids: List of experiment identifiers to verify
+        experiments: Experiments (ExperimentEntry objects) to verify.
+            Only identifiers are checked; versions are not reported by
+            `ado get experiments`.
         verbose: Whether to show command output
 
     Returns:
@@ -156,6 +162,7 @@ def verify_experiments_installed(
             console.print(f"  [dim]stderr:[/dim]\n{result.stderr}")
 
     output = result.stdout + result.stderr
+    experiment_ids = [e.experimentIdentifier for e in experiments]
     errors = [
         f"Experiment '{exp_id}' not found after installing package "
         f"(not listed by `ado get experiments`)"

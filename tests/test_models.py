@@ -16,7 +16,6 @@ from algorithm_nexus.models import (
     BenchmarkInstance,
     BindingFileConfig,
     ExperimentConfig,
-    ExperimentSpecifier,
     InstanceBinding,
     LogicalBenchmarkDefinition,
     ModelInfo,
@@ -396,163 +395,223 @@ class TestLogicalBenchmarkProperties:
 # Made with Bob
 
 
+def _pkg(spec: str, *experiments: str | dict) -> dict:
+    """Build one experiment_package entry from identifiers or full mappings."""
+    return {
+        "requirement_specifier": spec,
+        "experiments": [
+            e if isinstance(e, dict) else {"experimentIdentifier": e}
+            for e in experiments
+        ],
+    }
+
+
+def _cfg(*packages: dict) -> dict:
+    return {"experiment_package": list(packages)}
+
+
 class TestExperimentConfig:
     """Tests for ExperimentConfig and ExperimentSpecifier models."""
 
     def test_valid_pypi_specifier(self) -> None:
         """Test valid experiment config with a PyPI package name."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "sorting-benchmarks>=1.0.0",
-                "experiments": ["bubble_sort", "merge_sort"],
-            }
-        }
-        config = ExperimentConfig.model_validate(data)
-        assert (
-            config.experiment_package.requirement_specifier
-            == "sorting-benchmarks>=1.0.0"
+        config = ExperimentConfig.model_validate(
+            _cfg(_pkg("sorting-benchmarks>=1.0.0", "bubble_sort", "merge_sort"))
         )
-        assert config.experiment_package.experiments == ["bubble_sort", "merge_sort"]
+        assert config.packages[0].requirement_specifier == "sorting-benchmarks>=1.0.0"
+        assert config.packages[0].experiment_ids == ["bubble_sort", "merge_sort"]
 
     def test_valid_github_https_url(self) -> None:
         """Test valid experiment config with a GitHub HTTPS URL."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "https://github.com/org/repo.git",
-                "experiments": ["exp_one"],
-            }
-        }
-        config = ExperimentConfig.model_validate(data)
+        config = ExperimentConfig.model_validate(
+            _cfg(_pkg("https://github.com/org/repo.git", "exp_one"))
+        )
         assert (
-            config.experiment_package.requirement_specifier
+            config.packages[0].requirement_specifier
             == "https://github.com/org/repo.git"
         )
 
     def test_valid_git_plus_prefix(self) -> None:
         """Test valid experiment config with git+ prefixed URL."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "git+https://github.com/org/repo@main",
-                "experiments": ["exp_one"],
-            }
-        }
-        config = ExperimentConfig.model_validate(data)
+        config = ExperimentConfig.model_validate(
+            _cfg(_pkg("git+https://github.com/org/repo@main", "exp_one"))
+        )
         assert (
-            config.experiment_package.requirement_specifier
+            config.packages[0].requirement_specifier
             == "git+https://github.com/org/repo@main"
         )
 
-    def test_local_path_dot_slash_rejected(self) -> None:
-        """Test that local path starting with ./ is rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "./packages/my-benchmark",
-                "experiments": ["exp_one"],
-            }
-        }
+    @pytest.mark.parametrize(
+        "spec", ["./packages/my-benchmark", "/usr/local/my-pkg", "~/my-pkg"]
+    )
+    def test_local_paths_rejected(self, spec: str) -> None:
+        """Test that local paths are rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            ExperimentConfig.model_validate(data)
-        assert "local paths are not allowed" in str(exc_info.value).lower()
-
-    def test_local_path_absolute_rejected(self) -> None:
-        """Test that absolute local path is rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "/usr/local/my-pkg",
-                "experiments": ["exp_one"],
-            }
-        }
-        with pytest.raises(ValidationError) as exc_info:
-            ExperimentConfig.model_validate(data)
-        assert "local paths are not allowed" in str(exc_info.value).lower()
-
-    def test_local_path_tilde_rejected(self) -> None:
-        """Test that tilde-prefixed path is rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "~/my-pkg",
-                "experiments": ["exp_one"],
-            }
-        }
-        with pytest.raises(ValidationError) as exc_info:
-            ExperimentConfig.model_validate(data)
+            ExperimentConfig.model_validate(_cfg(_pkg(spec, "exp_one")))
         assert "local paths are not allowed" in str(exc_info.value).lower()
 
     def test_empty_experiments_list_rejected(self) -> None:
         """Test that an empty experiments list is rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "my-package",
-                "experiments": [],
-            }
-        }
         with pytest.raises(ValidationError) as exc_info:
-            ExperimentConfig.model_validate(data)
+            ExperimentConfig.model_validate(_cfg(_pkg("my-package")))
         assert "experiments" in str(exc_info.value).lower()
 
     def test_missing_requirement_specifier_rejected(self) -> None:
         """Test that missing requirement_specifier is rejected."""
-        data = {
-            "experiment_package": {
-                "experiments": ["exp_one"],
-            }
-        }
+        data = _cfg({"experiments": [{"experimentIdentifier": "exp_one"}]})
         with pytest.raises(ValidationError) as exc_info:
             ExperimentConfig.model_validate(data)
         assert "requirement_specifier" in str(exc_info.value)
 
     def test_extra_fields_forbidden(self) -> None:
         """Test that extra fields are rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "my-package",
-                "experiments": ["exp_one"],
-                "extra_field": "not allowed",
-            }
-        }
+        pkg = _pkg("my-package", "exp_one")
+        pkg["extra_field"] = "not allowed"
         with pytest.raises(ValidationError) as exc_info:
-            ExperimentConfig.model_validate(data)
+            ExperimentConfig.model_validate(_cfg(pkg))
         assert "extra_field" in str(exc_info.value).lower()
 
     def test_extra_top_level_fields_forbidden(self) -> None:
         """Test that extra top-level fields are rejected."""
-        data = {
-            "experiment_package": {
-                "requirement_specifier": "my-package",
-                "experiments": ["exp_one"],
-            },
-            "unexpected": "value",
-        }
+        data = _cfg(_pkg("my-package", "exp_one"))
+        data["unexpected"] = "value"
         with pytest.raises(ValidationError) as exc_info:
             ExperimentConfig.model_validate(data)
         assert "unexpected" in str(exc_info.value).lower()
 
     def test_valid_metadata(self) -> None:
         """Test valid experiment config with metadata."""
-        config = ExperimentConfig(
-            experiment_package=ExperimentSpecifier(
-                requirement_specifier="my-package",
-                experiments=["exp_one"],
-            ),
-            metadata={
-                "author": "IBM",
-                "tier": "production",
-            },
-        )
+        data = _cfg(_pkg("my-package", "exp_one"))
+        data["metadata"] = {"author": "IBM", "tier": "production"}
+        config = ExperimentConfig.model_validate(data)
         assert config.metadata == {"author": "IBM", "tier": "production"}
 
     def test_metadata_value_too_long_rejected(self) -> None:
         """Test that metadata value exceeding 4096 chars is rejected."""
+        data = _cfg(_pkg("my-package", "exp_one"))
+        data["metadata"] = {"author": "a" * 4097}
         with pytest.raises(ValidationError):
-            ExperimentConfig(
-                experiment_package=ExperimentSpecifier(
-                    requirement_specifier="my-package",
-                    experiments=["exp_one"],
-                ),
-                metadata={
-                    "author": "a" * 4097,
-                },
+            ExperimentConfig.model_validate(data)
+
+
+class TestExperimentPackageList:
+    """Tests for multiple packages and versioned experiment entries."""
+
+    def test_old_single_package_format_rejected(self) -> None:
+        """experiment_package must be a list of packages."""
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate(
+                {
+                    "experiment_package": {
+                        "requirement_specifier": "pkg",
+                        "experiments": [{"experimentIdentifier": "e"}],
+                    }
+                }
             )
+
+    def test_plain_string_experiments_rejected(self) -> None:
+        """Experiments must be mappings with an experimentIdentifier."""
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate(
+                {
+                    "experiment_package": [
+                        {"requirement_specifier": "pkg", "experiments": ["e"]}
+                    ]
+                }
+            )
+
+    def test_versioned_experiment_entries(self) -> None:
+        config = ExperimentConfig.model_validate(
+            _cfg(
+                _pkg(
+                    "pkg",
+                    {"experimentIdentifier": "exp_a", "experimentVersion": "1.2.3"},
+                    "exp_b",
+                )
+            )
+        )
+        entries = config.packages[0].experiment_entries
+        assert [(e.experimentIdentifier, e.experimentVersion) for e in entries] == [
+            ("exp_a", "1.2.3"),
+            ("exp_b", None),
+        ]
+        assert config.experiment_ids == {"exp_a", "exp_b"}
+
+    def test_list_of_packages(self) -> None:
+        config = ExperimentConfig.model_validate(
+            _cfg(
+                _pkg(
+                    "git+ssh://git@host/org/repo.git@21e38a9[ado]",
+                    {"experimentIdentifier": "exp", "experimentVersion": "1.2.3"},
+                ),
+                _pkg(
+                    "git+ssh://git@host/org/repo.git@5489863[ado]",
+                    {"experimentIdentifier": "exp", "experimentVersion": "1.3.0"},
+                ),
+            )
+        )
+        assert len(config.packages) == 2
+        assert config.experiment_ids == {"exp"}
+
+    def test_empty_package_list_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate({"experiment_package": []})
+
+    def test_local_path_rejected_in_list(self) -> None:
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate(_cfg(_pkg("./local", "e")))
+
+    def test_unknown_entry_field_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate(
+                _cfg(_pkg("pkg", {"experimentIdentifier": "e", "bogus": 1}))
+            )
+
+    def test_duplicate_experiment_in_one_package_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="more than once"):
+            ExperimentConfig.model_validate(
+                _cfg(
+                    _pkg(
+                        "pkg",
+                        {"experimentIdentifier": "e", "experimentVersion": "1.0.0"},
+                        {"experimentIdentifier": "e", "experimentVersion": "2.0.0"},
+                    )
+                )
+            )
+
+    def test_duplicate_experiment_across_entries_same_specifier_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="more than once"):
+            ExperimentConfig.model_validate(_cfg(_pkg("pkg", "e"), _pkg("pkg", "e")))
+
+    def test_same_experiment_different_specifiers_allowed(self) -> None:
+        config = ExperimentConfig.model_validate(
+            _cfg(_pkg("pkg==1.0.0", "e"), _pkg("pkg==2.0.0", "e"))
+        )
+        assert len(config.packages) == 2
+
+    def test_same_experiment_in_several_entries_allows_any_specifier(self) -> None:
+        """Specifiers are assumed static; branches, tags and ranges are accepted."""
+        config = ExperimentConfig.model_validate(
+            _cfg(
+                _pkg("git+ssh://git@h/org/repo.git@main", "e"),
+                _pkg("pkg>=2.0", "e"),
+            )
+        )
+        assert len(config.packages) == 2
+
+    def test_non_semver_version_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            ExperimentConfig.model_validate(
+                _cfg(
+                    _pkg(
+                        "pkg", {"experimentIdentifier": "e", "experimentVersion": "1.2"}
+                    )
+                )
+            )
+
+    def test_identifier_with_at_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="@"):
+            ExperimentConfig.model_validate(_cfg(_pkg("pkg", "e@v1")))
 
 
 class TestBenchmarkInstanceMetadata:

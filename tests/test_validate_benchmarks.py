@@ -182,9 +182,9 @@ class TestGetBenchmarkPackagesForSubmission:
         exp_dir.mkdir(parents=True)
         (exp_dir / "experiment_package.yaml").write_text(
             "experiment_package:\n"
-            "  requirement_specifier: sorting-benchmarks\n"
-            "  experiments:\n"
-            "    - bubble_sort\n"
+            "  - requirement_specifier: sorting-benchmarks\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: bubble_sort\n"
         )
 
         self.manager.repo_root = tmp_path
@@ -198,9 +198,9 @@ class TestGetBenchmarkPackagesForSubmission:
         exp_dir.mkdir(parents=True)
         (exp_dir / "experiment_package.yaml").write_text(
             "experiment_package:\n"
-            "  requirement_specifier: https://github.com/org/repo.git\n"
-            "  experiments:\n"
-            "    - my_exp\n"
+            "  - requirement_specifier: https://github.com/org/repo.git\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: my_exp\n"
         )
 
         self.manager.repo_root = tmp_path
@@ -239,7 +239,8 @@ class TestFindAllBenchmarkSubmissions:
         exp_dir = experiments_root / name
         exp_dir.mkdir(parents=True, exist_ok=True)
         (exp_dir / "experiment_package.yaml").write_text(
-            f"experiment_package:\n  requirement_specifier: {requirement}\n"
+            f"experiment_package:\n  - requirement_specifier: {requirement}\n"
+            "    experiments:\n      - experimentIdentifier: my_exp\n"
         )
         return exp_dir
 
@@ -467,3 +468,158 @@ class TestValidateBenchmarksCommand:
 
 
 # Made with Bob
+
+
+class TestValidateSeparateVenvs:
+    """Each experiment package is installed in its own venv when validating."""
+
+    PKG_YAML = (
+        "experiment_package:\n"
+        "  - requirement_specifier: pkg==1.0.0\n"
+        "    experiments:\n"
+        "      - experimentIdentifier: exp\n"
+        "        experimentVersion: 1.0.0\n"
+        "  - requirement_specifier: pkg==2.0.0\n"
+        "    experiments:\n"
+        "      - experimentIdentifier: exp\n"
+        "        experimentVersion: 2.0.0\n"
+    )
+
+    def _setup(self, tmp_path, versions):
+        exp = tmp_path / "experiments" / "my_exp"
+        exp.mkdir(parents=True)
+        (exp / "experiment_package.yaml").write_text(self.PKG_YAML)
+        for name, version in versions.items():
+            sub = exp / "submissions" / name
+            sub.mkdir(parents=True)
+            (sub / "space.yaml").write_text(
+                "experiments:\n"
+                "- actuatorIdentifier: custom_experiments\n"
+                "  experimentIdentifier: exp\n"
+                f"  experimentVersion: {version}\n"
+            )
+        return tmp_path / "experiments"
+
+    def _run(self, tmp_path, monkeypatch, versions, install_ok=lambda req: True):
+        from algorithm_nexus.commands import ado_validator, venv_manager
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+        from algorithm_nexus.models import ValidationResult
+
+        root = self._setup(tmp_path, versions)
+        created, installed, cleaned, used = [], [], [], {}
+
+        def fake_create(*a, **k):
+            p = tmp_path / f"venv{len(created)}"
+            created.append(p)
+            return p
+
+        def fake_install(venv, reqs, verbose=False):
+            installed.append((venv, tuple(reqs)))
+            return install_ok(reqs[0])
+
+        def fake_validate(base_path, submission_path, venv_path):
+            used[submission_path.split("/")[-1]] = venv_path
+            return ValidationResult(
+                success=True,
+                submission_path=submission_path,
+                errors=[],
+                warnings=[],
+            )
+
+        monkeypatch.setattr(venv_manager, "create_temp_venv", fake_create)
+        monkeypatch.setattr(venv_manager, "install_packages", fake_install)
+        monkeypatch.setattr(
+            venv_manager, "verify_experiments_installed", lambda *a, **k: (True, [])
+        )
+        monkeypatch.setattr(venv_manager, "cleanup_venv", cleaned.append)
+        monkeypatch.setattr(ado_validator, "validate_with_ado", fake_validate)
+
+        manager = BenchmarkManager(pr_url=None, execute=False)
+        report = manager.validate(experiments_root=root)
+        return report, created, installed, cleaned, used
+
+    def test_each_package_gets_its_own_venv(self, tmp_path, monkeypatch):
+        _, created, installed, cleaned, _ = self._run(
+            tmp_path, monkeypatch, {"s1": "1.0.0"}
+        )
+        assert len(created) == 2
+        assert len({venv for venv, _ in installed}) == 2
+        assert [reqs for _, reqs in installed] == [("pkg==1.0.0",), ("pkg==2.0.0",)]
+        assert set(cleaned) == set(created)
+
+    def test_submission_validated_in_venv_of_matching_version(
+        self, tmp_path, monkeypatch
+    ):
+        _, created, _, _, used = self._run(
+            tmp_path, monkeypatch, {"old": "1.0.0", "new": "2.0.0"}
+        )
+        assert used["old"] == created[0]
+        assert used["new"] == created[1]
+
+    def test_failed_install_only_skips_its_own_submissions(self, tmp_path, monkeypatch):
+        report, _, _, _, used = self._run(
+            tmp_path,
+            monkeypatch,
+            {"old": "1.0.0", "new": "2.0.0"},
+            install_ok=lambda req: req != "pkg==1.0.0",
+        )
+        assert "old" not in used
+        assert "new" in used
+        assert report.failed == 1
+
+
+class TestSelectPackageIndex:
+    def _packages(self):
+        from algorithm_nexus.models import ExperimentConfig
+
+        return ExperimentConfig.model_validate(
+            {
+                "experiment_package": [
+                    {
+                        "requirement_specifier": "pkg==1.0.0",
+                        "experiments": [
+                            {"experimentIdentifier": "e", "experimentVersion": "1.0.0"}
+                        ],
+                    },
+                    {
+                        "requirement_specifier": "pkg==2.1.0",
+                        "experiments": [
+                            {"experimentIdentifier": "e", "experimentVersion": "2.1.0"}
+                        ],
+                    },
+                ]
+            }
+        ).packages
+
+    def test_exact_version(self):
+        from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+        refs = [{"experimentIdentifier": "e", "experimentVersion": "2.1.0"}]
+        assert select_package_index(refs, self._packages()) == (1, None)
+
+    def test_same_major_version(self):
+        from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+        refs = [{"experimentIdentifier": "e", "experimentVersion": "2.0.0"}]
+        assert select_package_index(refs, self._packages()) == (1, None)
+
+    def test_unknown_version_warns_and_falls_back(self):
+        from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+        refs = [{"experimentIdentifier": "e", "experimentVersion": "9.0.0"}]
+        idx, warning = select_package_index(refs, self._packages())
+        assert idx == 0
+        assert warning is not None
+        assert "9.0.0" in warning
+
+    def test_no_version_uses_first_declaring_package(self):
+        from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+        refs = [{"experimentIdentifier": "e"}]
+        assert select_package_index(refs, self._packages()) == (0, None)
+
+    def test_unknown_experiment(self):
+        from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+        refs = [{"experimentIdentifier": "other"}]
+        assert select_package_index(refs, self._packages()) == (None, None)

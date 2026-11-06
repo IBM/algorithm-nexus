@@ -19,6 +19,7 @@ from algorithm_nexus.commands.validate import (
 from algorithm_nexus.models import (
     BenchmarkInstance,
     ExperimentConfig,
+    ExperimentEntry,
     ExperimentSpecifier,
     LogicalBenchmarkDefinition,
     PropertyValue,
@@ -934,10 +935,12 @@ class TestManifestMetadataValidation:
         exp_dir.mkdir(parents=True)
 
         exp_config = ExperimentConfig(
-            experiment_package=ExperimentSpecifier(
-                requirement_specifier="https://github.com/IBM/my-experiment.git",
-                experiments=["my_experiment"],
-            ),
+            experiment_package=[
+                ExperimentSpecifier(
+                    requirement_specifier="https://github.com/IBM/my-experiment.git",
+                    experiments=[ExperimentEntry(experimentIdentifier="my_experiment")],
+                )
+            ],
             metadata={"author": "IBM"},
         )
         (exp_dir / "experiment_package.yaml").write_text(
@@ -1051,7 +1054,10 @@ class TestBindingValidation:
         exp = tmp_path / "experiments" / "e1"
         (exp / "bindings").mkdir(parents=True)
         (exp / "experiment_package.yaml").write_text(
-            "experiment_package:\n  requirement_specifier: pkg\n  experiments: [exp1]\n"
+            "experiment_package:\n"
+            "  - requirement_specifier: pkg\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: exp1\n"
         )
         (exp / "bindings" / "b.yaml").write_text(
             "instanceBindingIdentifier: b1\ninstanceReference: foo/i1\n"

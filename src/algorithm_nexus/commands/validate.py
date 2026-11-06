@@ -392,7 +392,8 @@ def validate_experiments(
 
     The command:
     - Checks that each experiment folder has a valid experiment_package.yaml
-    - Installs the experiment package in an isolated virtual environment
+    - Installs the experiment package(s) in an isolated virtual environment and
+      checks that the declared experiments are available
     - Validates each submission with ADO dry-run
     - Validates the bindings in experiments/<name>/bindings against the logical
       benchmarks (schema, instance/experiment references, metric, property and
@@ -634,7 +635,7 @@ def validate_bindings(
         if (exp_dir / "experiment_package.yaml").is_file():
             exp_config = validate_experiment_yaml(exp_dir, ValidationErrorCollector())
             if exp_config is not None:
-                declared_experiments = set(exp_config.experiment_package.experiments)
+                declared_experiments = exp_config.experiment_ids
 
         for binding_file in sorted(bindings_dir.iterdir()):
             if (

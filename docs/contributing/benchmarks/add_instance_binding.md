@@ -99,6 +99,26 @@ experiments/rlx_coloring/
     └── graph_coloring_binding.yaml
 ```
 
+### How the experiment version is used
+
+`experimentVersion` is the first version the binding applies to. The binding
+matches all runs of the experiment from that version up to, but not including,
+the `experimentVersion` of the next higher binding for the same experiment and
+instance. With no higher binding, `1.0.0` above covers runs of `1.0.1`, `1.1.0`
+and all later versions.
+
+If something needs to change for newer versions of the experiment, for example
+an experiment property was renamed, add an additional binding with the new
+`experimentVersion` and updated mappings rather than editing this one. For
+example, adding a binding at `1.3.0` makes it cover `1.3.0` and later, while this
+one keeps covering `1.0.0` up to (but not including) `1.3.0`. See
+[Experiment version matching](../../design/benchmarking/logical_benchmarks_and_instances.md#experiment-version-matching).
+
+Binding versions only select which runs are matched. Data exists for a version
+only if that version has been run, and each version of the experiment that will
+have data needs its own `requirement_specifier` in `experiment_package.yaml`
+(see [Add a benchmark experiment](add_benchmark_experiment.md)).
+
 ## 2. Validate
 
 ```bash
