@@ -1836,8 +1836,10 @@ To add a submission, see
 top-level <code>experiments/</code> directory.</p>
 <p><strong>Key Design Decisions:</strong></p>
 <ol>
-<li><code>experiments/&lt;name&gt;/experiment_package.yaml</code> registers a single benchmark
-   experiment package and lists the experiment identifiers it exposes</li>
+<li><code>experiments/&lt;name&gt;/experiment_package.yaml</code> registers one or more benchmark
+   experiment packages (for example, different pinned revisions of the same
+   package) and lists the experiment identifiers, and optionally versions, each
+   exposes</li>
 <li><code>experiments/&lt;name&gt;/submissions/&lt;submission&gt;/space.yaml</code> is the
    per-submission ADO discoveryspace definition</li>
 <li><code>model.yaml</code> remains focused on model metadata — it carries no benchmark
@@ -2006,9 +2008,11 @@ experiment folder:</p>
 <li>
 <p><code>experiments/&lt;name&gt;/experiment_package.yaml</code></p>
 <ul>
-<li>registers the package that provides benchmark experiments</li>
-<li>records a single <code>requirement_specifier</code> (PyPI name or GitHub URL)</li>
-<li>records the experiment identifiers exposed by that package</li>
+<li>registers the package(s) that provide benchmark experiments</li>
+<li>records a <code>requirement_specifier</code> (PyPI name or GitHub URL) per package,
+  as a list of one or more packages</li>
+<li>records the experiments exposed by each package, optionally with the
+  experiment version</li>
 </ul>
 </li>
 <li>
@@ -2048,54 +2052,103 @@ format and the standardized benchmark packaging protocol.</p>
 <hr />
 <h2 id="3-schema-design">3. Schema Design<a class="headerlink" href="#3-schema-design" title="Permanent link">&para;</a></h2>
 <h3 id="31-experiment-package-registration-in-experiment_packageyaml">3.1 Experiment Package Registration in <code>experiment_package.yaml</code><a class="headerlink" href="#31-experiment-package-registration-in-experiment_packageyaml" title="Permanent link">&para;</a></h3>
+<p><code>experiment_package</code> is a list of packages. Each package lists the experiments
+it exposes as mappings with an <code>experimentIdentifier</code> and an optional
+<code>experimentVersion</code>.</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"sorting-benchmarks&gt;=1.0.0"</span><span class="w"> </span><span class="c1"># PyPI package name</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bubble_sort</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_sort</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"sorting-benchmarks&gt;=1.0.0"</span><span class="w"> </span><span class="c1"># PyPI package name</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bubble_sort</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_sort</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">metadata</span><span class="p">:</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">compute-type-merge_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">compute-type-quick_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span></code></pre></div>
-<p>GitHub URL example:</p>
+<p>To pin two revisions of a repository that provide different versions of the same
+experiment, add one package entry per version:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"https://github.com/example-org/example-benchmarks"</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">leaderboard-baseline</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">git+ssh://git@github.com/example-org/example-benchmarks.git@21e38a9</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sort_explore</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.2.3</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">git+ssh://git@github.com/example-org/example-benchmarks.git@5489863</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sort_explore</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">            </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.3.0</span>
+</span></code></pre></div>
+<p>GitHub URL example:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"https://github.com/example-org/example-benchmarks"</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">leaderboard-baseline</span>
 </span></code></pre></div>
 <p><strong>Fields:</strong></p>
 <ul>
-<li><code>experiment_package.requirement_specifier</code> — required; PyPI package name or
+<li><code>experiment_package</code> — required; non-empty list of package objects. A single
+  package object, as used in earlier versions of this format, is not accepted</li>
+<li><code>experiment_package[].requirement_specifier</code> — required; PyPI package name or
   GitHub URL (local paths are rejected by schema validation)</li>
-<li><code>experiment_package.experiments</code> — required; non-empty list of experiment
-  identifiers exposed by the package</li>
-<li><code>metadata</code> — optional; flat string-to-string dictionary for arbitrary
-  key-value annotations (keys and values up to 4,096 characters).</li>
+<li>
+<p><code>experiment_package[].experiments</code> — required; non-empty list of experiments
+  exposed by the package. Each item is a mapping with (plain identifier strings,
+  as used in earlier versions of this format, are not accepted):</p>
+<ul>
+<li><code>experimentIdentifier</code> — required; the experiment identifier</li>
+<li><code>experimentVersion</code> — optional; strict SemVer (<code>MAJOR.MINOR.PATCH</code>) version
+  of the experiment provided by that package. These names match ado's
+  <code>ExperimentReference</code></li>
+</ul>
+<p>An experiment identifier may appear only once within the same
+<code>requirement_specifier</code>, since a package exposes a single version of each
+experiment. To declare several versions of the same experiment, add one
+package entry per version, each with a different <code>requirement_specifier</code>,
+as in the example above.</p>
+<p>A <code>requirement_specifier</code> is needed for each version of the experiment for
+which data will be available, so that the right package can be installed to
+run or validate it. Bindings match runs by experiment version
+(from the binding's <code>experimentVersion</code> up to the next higher binding, see
+<a href=".././logical_benchmarks_and_instances/#experiment-version-matching">Experiment version matching</a>),
+but a version can only have data if it can be installed and run.</p>
+<p>The <code>requirement_specifier</code> of each entry is assumed to be <strong>static</strong>: it is
+expected to always resolve to the same package contents, so that the right
+package, and therefore the right experiment version, is installed for the
+declared <code>experimentVersion</code>. Nexus does not verify this and accepts any
+specifier, whether an exact version (<code>name==1.2.3</code>), a commit
+(<code>...repo.git@21e38a9</code>), a tag (<code>...repo.git@v1.2.3</code>), a branch
+(<code>...repo.git@main</code>) or a version range (<code>name&gt;=1.0</code>). It is the author's
+responsibility to make sure the specifier does not change; if a branch or
+tag is later moved, the installed package may no longer provide the declared
+<code>experimentVersion</code>. When declaring several versions of the same
+experiment, pin each entry to an exact package version or, preferably, a
+commit hash, since tags and branches can be moved.
+- <code>metadata</code> — optional; flat string-to-string dictionary for arbitrary
+  key-value annotations (keys and values up to 4,096 characters).</p>
+</li>
 </ul>
 <h3 id="32-benchmark-submissions-in-submissions">3.2 Benchmark Submissions in <code>submissions/</code><a class="headerlink" href="#32-benchmark-submissions-in-submissions" title="Permanent link">&para;</a></h3>
 <p>An experiment folder may define a <code>submissions/</code> directory. That folder contains
 one subfolder per benchmark submission. Each benchmark submission folder must
 contain a file named <code>space.yaml</code>.</p>
 <p>Example structure:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>submissions/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── flood-baseline-test/
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    └── space.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>submissions/
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>└── flood-baseline-test/
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    └── space.yaml
 </span></code></pre></div>
 <p>Example <code>space.yaml</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">entitySpace</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">      </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"sen1floods11"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">split</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">propertyDomain</span><span class="p">:</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"test"</span><span class="p p-Indicator">]</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_experiments</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local-segmentation-eval</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">entitySpace</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataset</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">      </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"sen1floods11"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">split</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="nt">propertyDomain</span><span class="p">:</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"test"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">actuatorIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_experiments</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local-segmentation-eval</span>
 </span></code></pre></div>
 <p><strong>Fields and expectations:</strong></p>
 <ul>
@@ -2115,9 +2168,17 @@ contain a file named <code>space.yaml</code>.</p>
 <p>Validation checks that:</p>
 <ol>
 <li><code>experiment_package.yaml</code> is present in the experiment folder</li>
-<li><code>requirement_specifier</code> is a valid PyPI name or GitHub URL (local paths are
-   rejected)</li>
-<li><code>experiments</code> list is non-empty</li>
+<li>every <code>requirement_specifier</code> is a valid PyPI name or GitHub URL (local paths
+   are rejected)</li>
+<li><code>experiment_package</code> is a non-empty list when a list is used, and each
+   <code>experiments</code> list is non-empty</li>
+<li>an experiment identifier is not listed more than once under the same
+   <code>requirement_specifier</code></li>
+<li>each package entry is installed in its own separate virtual environment, and
+   the experiments it declares are verified to be discoverable there</li>
+<li>each submission is validated in the environment of the package entry that
+   declares the experiment (and <code>experimentVersion</code>) its <code>space.yaml</code>
+   references; an exact version match is preferred, then the same major version</li>
 <li>extra fields are forbidden (<code>extra="forbid"</code>)</li>
 </ol>
 <h3 id="42-benchmark-submission-validation">4.2 Benchmark Submission Validation<a class="headerlink" href="#42-benchmark-submission-validation" title="Permanent link">&para;</a></h3>
@@ -2153,10 +2214,10 @@ filter and categorize experiments. For example, a user might want to search for,
 experiments of a specific compute type (e.g. classical algorithms, AI-based approaches, or hybrid quantum workflows).</p>
 <p>Using the metadata conventions, a discovery interface or leaderboard can parse labels like the following to
 automatically tag and filter results:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">compute-type-neural_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">compute-type-merge_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI-Classical</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nt">compute-type-bubble_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">compute-type-neural_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">compute-type-merge_sort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AI-Classical</span>
 </span></code></pre></div>
 <hr />
 <h2 id="6-compute-type-metadata">6. Compute Type Metadata<a class="headerlink" href="#6-compute-type-metadata" title="Permanent link">&para;</a></h2>

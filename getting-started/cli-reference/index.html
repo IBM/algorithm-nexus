@@ -1933,11 +1933,17 @@ is checked for:</p>
 </ul>
 </li>
 <li><strong>Dependency Resolution</strong>: Groups submissions by required benchmark packages</li>
-<li><strong>Isolation</strong>: Creates temporary virtual environments for each dependency set</li>
+<li><strong>Isolation</strong>: Creates temporary virtual environments for each dependency set.
+   Each package listed in an <code>experiment_package.yaml</code> gets its own environment</li>
 <li><strong>Installation</strong>: Installs required benchmark packages using <code>uv</code> (10-100x
-   faster) or <code>pip</code></li>
+   faster) or <code>pip</code>. When <code>experiment_package.yaml</code> lists several packages, each
+   is installed in its own separate environment and its experiments are
+   verified</li>
 <li><strong>Validation</strong>: Validates each submission's <code>space.yaml</code> structure using
-   Pydantic models and ADO dry-run</li>
+   Pydantic models and ADO dry-run. When an experiment is provided by several
+   packages, a submission is validated in the environment of the package that
+   declares the <code>experimentIdentifier</code> and <code>experimentVersion</code> it references
+   (an exact version match is preferred, then the same major version)</li>
 <li><strong>Reporting</strong>: Displays results in table or JSON format with validation
    status, errors, and warnings</li>
 </ol>
@@ -2005,8 +2011,9 @@ is checked for:</p>
 </span></code></pre></div>
 <h4 id="nexus-list-experiment-packages">nexus list experiment-packages<a class="headerlink" href="#nexus-list-experiment-packages" title="Permanent link">&para;</a></h4>
 <p>List all experiment packages discovered under the experiments directory. Shows
-a table of experiment packages with their folder, requirement specifier,
-experiment IDs, and logical benchmark bindings.</p>
+a table of experiment packages with their folder, requirement specifier(s),
+experiment IDs, and logical benchmark bindings. When a folder declares several
+packages, their specifiers are listed together.</p>
 <p><strong>Usage:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiment-packages<span class="w"> </span><span class="o">[</span>experiments_root<span class="o">]</span>
 </span></code></pre></div>
@@ -2027,6 +2034,7 @@ experiment IDs, and logical benchmark bindings.</p>
 </span></code></pre></div>
 <h4 id="nexus-list-experiments">nexus list experiments<a class="headerlink" href="#nexus-list-experiments" title="Permanent link">&para;</a></h4>
 <p>List all benchmark experiments discovered under the experiments directory.</p>
+<p>One row is listed per experiment and package, including the experiment <code>Version</code> when the package declares one.</p>
 <p><strong>Usage:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>nexus<span class="w"> </span>list<span class="w"> </span>experiments<span class="w"> </span><span class="o">[</span>experiments_root<span class="o">]</span>
 </span></code></pre></div>
@@ -2117,7 +2125,9 @@ is modified in the PR. This includes:</p>
 <p>When not running in remote mode (<code>--remote</code> not set), the benchmark submissions will be executed with
 <code>ado</code> in the local environment. It is the user responsibility to ensure that the required
 experiment package is installed in the local Python environment. The experiment package requirement
-specifier is declared in <code>experiments/&lt;experiment&gt;/experiment_package.yaml</code>.</p>
+specifier(s) are declared in <code>experiments/&lt;experiment&gt;/experiment_package.yaml</code>.
+When several packages are listed (for different versions of an experiment), install the one
+matching the <code>experimentVersion</code> you want to run.</p>
 </div>
 <p><strong>Examples:</strong></p>
 <p>List benchmarks in a PR without executing (dry run):</p>

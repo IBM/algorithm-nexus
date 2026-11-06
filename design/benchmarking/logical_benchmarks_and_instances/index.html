@@ -1228,6 +1228,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="6.2 Routing Query">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#experiment-version-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Experiment version matching
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3011,9 +3028,56 @@ property name. For instance artifact properties, the query is executed for the
 mapped experiment property to match any of the values specified in the instance.</p>
 <p>Below is an example query:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>experimentIdentifier=$experimentIdentifier AND
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>mappedProblemPropertyIdentifier=instanceValue AND
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>mappedInstanceArtifactPropertyIdentifier in [possible instance values]
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>experimentVersion&gt;=$experimentVersion AND
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>experimentVersion&lt;$nextBindingExperimentVersion AND
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>mappedProblemPropertyIdentifier=instanceValue AND
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>mappedInstanceArtifactPropertyIdentifier in [possible instance values]
 </span></code></pre></div>
+<h4 id="experiment-version-matching">Experiment version matching<a class="headerlink" href="#experiment-version-matching" title="Permanent link">&para;</a></h4>
+<p>The <code>experimentVersion</code> in a binding's <code>experiment</code> reference is the <strong>first
+version</strong> the binding applies to. A binding matches all runs of the experiment
+whose version is greater than or equal to its <code>experimentVersion</code>, up to but not
+including the <code>experimentVersion</code> of the next higher binding for the same
+experiment and benchmark instance. If there is no higher binding, it matches all
+later versions.</p>
+<p>For example, with two bindings for the same experiment and instance, at
+<code>1.0.0</code> and <code>1.3.0</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Run version</th>
+<th>Binding used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0.9.0</code></td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>1.0.0</code>, <code>1.2.5</code></td>
+<td><code>1.0.0</code></td>
+</tr>
+<tr>
+<td><code>1.3.0</code>, <code>2.0.0</code></td>
+<td><code>1.3.0</code></td>
+</tr>
+</tbody>
+</table>
+<p>So a binding keeps applying to later versions of the experiment without being
+edited, until a newer binding takes over. If something changes in a later version
+that the existing binding does not describe correctly (for example a renamed
+experiment property, or a non-default value that must now be set, see
+<a href="#7-instance-binding-versioning">Section 7</a>), do not edit the existing binding.
+Add an additional binding with the new <code>experimentVersion</code> and the changed
+mappings. It takes over from that version onwards, and the existing binding keeps
+covering the earlier versions.</p>
+<p>Binding versions say which runs are <em>matched</em>. They do not make data exist: runs
+are only available for the experiment versions that have actually been executed.
+Each version of the experiment that will have data must be installable, so the
+experiment's <code>experiment_package.yaml</code> needs a <code>requirement_specifier</code> for every
+such version (see
+<a href=".././benchmark_experiments_and_submissions/#31-experiment-package-registration-in-experiment_packageyaml">Benchmark Experiments and Submissions</a>).</p>
 <h3 id="63-dynamic-property-resolution">6.3 Dynamic Property Resolution<a class="headerlink" href="#63-dynamic-property-resolution" title="Permanent link">&para;</a></h3>
 <p>Property resolution — mapping from raw experiment properties to canonical
 benchmark properties — is performed <strong>at query time</strong>. This means only one
@@ -3101,26 +3165,37 @@ QOBLIB).</p>
 specific instance.</p>
 <hr />
 <h2 id="7-instance-binding-versioning">7. Instance Binding Versioning<a class="headerlink" href="#7-instance-binding-versioning" title="Permanent link">&para;</a></h2>
-<p>An instance binding may only change if:</p>
+<p>A binding matches the runs of its experiment from its <code>experimentVersion</code> up to
+the <code>experimentVersion</code> of the next higher binding (see
+<a href="#experiment-version-matching">Experiment version matching</a>). Users are
+encouraged to add an additional binding with a higher <code>experimentVersion</code>,
+rather than modify an existing one, when something needs to change for newer
+versions of the experiment. The earlier binding then keeps covering the earlier
+versions.</p>
+<p>A new binding is needed when:</p>
 <ul>
 <li>The experiment property names or values used in <code>problemPropertyMapping</code>,
   <code>instanceArtifactMapping</code>, or <code>staticFilters</code> change<ul>
-<li>This should result in a new experiment major version and a new binding</li>
-<li>The binding for the previous experiment major version can be kept</li>
+<li>This should result in a new experiment major version and a new binding
+  with that <code>experimentVersion</code></li>
+<li>The binding for the previous experiment major version is kept and stops
+  applying where the new binding starts</li>
 </ul>
 </li>
 <li>The logical benchmark <code>problemProperties</code> or their values change<ul>
 <li>If the original logical benchmark parameters/values and mappings are now
   invalid, the existing logical benchmark and its bindings can be updated in
-  place</li>
+  place (this is a change to the benchmark itself, not a response to a new
+  experiment version)</li>
 <li>If the original logical benchmark parameters/values and mappings are still
   valid, a new logical benchmark should be created</li>
 </ul>
 </li>
 <li>Additional experiment properties are added that must be set to <strong>non-default
   values</strong> AND only the experiment minor version changes<ul>
-<li>The binding must be changed — different sets of experiment data will be
-  aggregated under <code>problemPropertyMapping</code> or <code>staticFilters</code></li>
+<li>A new binding with that minor <code>experimentVersion</code> must be added with the
+  changed <code>problemPropertyMapping</code> or <code>staticFilters</code>, since different sets
+  of experiment data will be aggregated under it</li>
 <li>Note: This applies to <strong>non-default values</strong> only — by ado versioning
   convention a minor version change means that the new parameters with
   default values measure output metrics the same way as the previous

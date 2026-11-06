@@ -1165,6 +1165,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="1. Create the binding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-the-experiment-version-is-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        How the experiment version is used
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1757,6 +1774,22 @@ experiment identifier when omitted.</p>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>└── bindings/
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    └── graph_coloring_binding.yaml
 </span></code></pre></div>
+<h3 id="how-the-experiment-version-is-used">How the experiment version is used<a class="headerlink" href="#how-the-experiment-version-is-used" title="Permanent link">&para;</a></h3>
+<p><code>experimentVersion</code> is the first version the binding applies to. The binding
+matches all runs of the experiment from that version up to, but not including,
+the <code>experimentVersion</code> of the next higher binding for the same experiment and
+instance. With no higher binding, <code>1.0.0</code> above covers runs of <code>1.0.1</code>, <code>1.1.0</code>
+and all later versions.</p>
+<p>If something needs to change for newer versions of the experiment, for example
+an experiment property was renamed, add an additional binding with the new
+<code>experimentVersion</code> and updated mappings rather than editing this one. For
+example, adding a binding at <code>1.3.0</code> makes it cover <code>1.3.0</code> and later, while this
+one keeps covering <code>1.0.0</code> up to (but not including) <code>1.3.0</code>. See
+<a href="../../../design/benchmarking/logical_benchmarks_and_instances/#experiment-version-matching">Experiment version matching</a>.</p>
+<p>Binding versions only select which runs are matched. Data exists for a version
+only if that version has been run, and each version of the experiment that will
+have data needs its own <code>requirement_specifier</code> in <code>experiment_package.yaml</code>
+(see <a href="../add_benchmark_experiment/">Add a benchmark experiment</a>).</p>
 <h2 id="2-validate">2. Validate<a class="headerlink" href="#2-validate" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>validate<span class="w"> </span>experiments<span class="w"> </span>--experiment<span class="w"> </span>rlx_coloring
 </span></code></pre></div>

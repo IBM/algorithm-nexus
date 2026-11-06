@@ -1197,6 +1197,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pin-experiment-versions-or-several-package-revisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Pin experiment versions or several package revisions
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#label-an-experiments-compute-type" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1722,13 +1733,14 @@ names the Python package and the experiment identifiers it exposes.</p>
 </span></code></pre></div>
 <p>Create <code>experiments/rlx_coloring/experiment_package.yaml</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"rlx-coloring"</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"rlx-coloring"</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
 </span></code></pre></div>
-<p><code>requirement_specifier</code> is a PyPI package name (optionally with a version
-constraint) or a GitHub URL. The <code>experiments</code> list is the set of experiment
-ids submissions will reference.</p>
+<p><code>experiment_package</code> is a list of packages. <code>requirement_specifier</code> is a PyPI
+package name (optionally with a version constraint) or a GitHub URL. The
+<code>experiments</code> list is the set of experiments, each with an <code>experimentIdentifier</code>
+and an optional <code>experimentVersion</code>, that submissions will reference.</p>
 <p>The full field list is in
 <a href="../../../design/benchmarking/benchmark_experiments_and_submissions/#31-experiment-package-registration-in-experiment_packageyaml">Benchmark Experiments and Submissions</a>.</p>
 <p>You now have:</p>
@@ -1756,32 +1768,56 @@ To apply this experiment to a target and instance, continue with
 <p>To register a package hosted on GitHub, set <code>requirement_specifier</code> to the
 repository URL:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"https://github.com/&lt;org&gt;/&lt;experiment-package-repo&gt;"</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"https://github.com/&lt;org&gt;/&lt;experiment-package-repo&gt;"</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
 </span></code></pre></div>
 <p>Then validate as in <a href="#2-validate">step 2</a>.</p>
 <h3 id="declare-several-experiment-ids-from-one-package">Declare several experiment ids from one package<a class="headerlink" href="#declare-several-experiment-ids-from-one-package" title="Permanent link">&para;</a></h3>
-<p>To expose more than one experiment from the same package, list each identifier:</p>
+<p>To expose more than one experiment from the same package, list each one:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"sorting-benchmarks&gt;=1.0.0"</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bubble_sort</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_sort</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"sorting-benchmarks&gt;=1.0.0"</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bubble_sort</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_sort</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quick_sort</span>
 </span></code></pre></div>
 <p>Each id in the list is available to submissions under this experiment folder.</p>
+<h3 id="pin-experiment-versions-or-several-package-revisions">Pin experiment versions or several package revisions<a class="headerlink" href="#pin-experiment-versions-or-several-package-revisions" title="Permanent link">&para;</a></h3>
+<p>Each experiment can carry an <code>experimentVersion</code> (strict SemVer, optional). To
+declare several versions of an experiment, add one package entry per
+<code>requirement_specifier</code>, for example to pin two revisions of a repository:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"git+ssh://git@github.com/&lt;org&gt;/&lt;repo&gt;.git@21e38a9[ado]"</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">            </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.2.3</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"git+ssh://git@github.com/&lt;org&gt;/&lt;repo&gt;.git@5489863[ado]"</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">            </span><span class="nt">experimentVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.3.0</span>
+</span></code></pre></div>
+<p>An experiment can be listed only once per <code>requirement_specifier</code>. Two versions of
+the same experiment must come from two package entries with different
+specifiers, as above.</p>
+<p>Nexus assumes each <code>requirement_specifier</code> is static, meaning it always resolves
+to the same package contents, and does not check it. Any specifier is accepted,
+including a branch, tag, commit or version range, but it is up to you to make
+sure it will not change: if a branch or tag moves, the installed package may no
+longer provide the declared <code>experimentVersion</code>. For several versions of the
+same experiment, pin each entry to an exact package version
+(<code>my-package==1.2.3</code>) or, preferably, a commit hash (<code>...repo.git@21e38a9</code>).</p>
 <h3 id="label-an-experiments-compute-type">Label an experiment's compute type<a class="headerlink" href="#label-an-experiments-compute-type" title="Permanent link">&para;</a></h3>
 <p>To label the compute type of an experiment, add a <code>compute-type-&lt;experiment&gt;</code>
 key to the <code>metadata</code> block of <code>experiment_package.yaml</code>. The <code>&lt;experiment&gt;</code>
 part must be one of the ids in the <code>experiments</code> list:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"rlx-coloring"</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">experiments</span><span class="p">:</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nt">metadata</span><span class="p">:</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">compute-type-rlx_coloring</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">experiment_package</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">requirement_specifier</span><span class="p">:</span><span class="w"> </span><span class="s">"rlx-coloring"</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">      </span><span class="nt">experiments</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">experimentIdentifier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rlx_coloring</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="nt">compute-type-rlx_coloring</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classical</span>
 </span></code></pre></div>
 <p>See <a href="../../../design/benchmarking/benchmark_experiments_and_submissions/#6-compute-type-metadata">Compute type metadata</a>
 for suggested values.</p>
@@ -1792,7 +1828,7 @@ publish the package on PyPI or GitHub, then continue from
 <a href="#1-create-the-experiment-folder">step 1</a>.</p>
 <h3 id="list-registered-experiments">List registered experiments<a class="headerlink" href="#list-registered-experiments" title="Permanent link">&para;</a></h3>
 <p>To see which experiments Algorithm Nexus already registers:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>list<span class="w"> </span>experiments
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>uv<span class="w"> </span>run<span class="w"> </span>nexus<span class="w"> </span>list<span class="w"> </span>experiments
 </span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
