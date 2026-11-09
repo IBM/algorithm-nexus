@@ -2,8 +2,9 @@
 # Copy this directory to experiments/<experiment-name>/ and replace every
 # <...> placeholder with real values.
 #
-# requirement_specifier must be a PyPI package name or GitHub URL.
-# Local paths are not allowed.
+# requirement_specifier must be a PyPI package name or a GitHub URL (HTTPS or
+# SSH) on github.com, github.ibm.com or research.github.ibm.com.
+# Local paths and other hosts are not allowed.
 
 experiment_package:
   - requirement_specifier: "<benchmark-package-name>"  # e.g. "sorting-benchmarks>=1.0.0"

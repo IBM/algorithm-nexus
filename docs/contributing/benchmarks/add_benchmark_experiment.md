@@ -53,7 +53,8 @@ experiment_package:
 ```
 
 `experiment_package` is a list of packages. `requirement_specifier` is a PyPI
-package name (optionally with a version constraint) or a GitHub URL. The
+package name (optionally with a version constraint) or a GitHub URL over HTTPS
+or SSH on `github.com`, `github.ibm.com` or `research.github.ibm.com`. The
 `experiments` list is the set of experiments, each with an `experimentIdentifier`
 and an optional `experimentVersion`, that submissions will reference.
 

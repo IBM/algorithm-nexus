@@ -156,12 +156,25 @@ An experiment package specifier uses:
 
 The `requirement_specifier` must be one of:
 
-1. a Python package name published on PyPI (optionally with a version
-   constraint)
-2. a GitHub repository URL (HTTPS or `git+` prefixed)
+1. a Python package name published on PyPI (optionally with extras and a
+   version constraint, e.g. `pkg[ado]>=1.0,<2`)
+2. a git repository URL on one of the allowed hosts — `github.com`,
+   `github.ibm.com` or `research.github.ibm.com` — over HTTPS
+   (`https://<host>/...`, `git+https://<host>/...`) or SSH
+   (`ssh://git@<host>/...`, `git+ssh://git@<host>/...`, `git@<host>:org/repo`)
 
-Local paths are explicitly **not** allowed. The package must be publicly
-accessible from either PyPI or a GitHub repository.
+Hosts are matched exactly: subdomains, look-alike domains, ports, credentials
+in the URL and SSH users other than `git` are rejected.
+
+Local paths are explicitly **not** allowed, in any form (`./pkg`, `/abs/pkg`,
+`~/pkg`, `sub/dir`, `../pkg`). Schema validation enforces a strict allowlist and
+also rejects other git hosts, `file://` URLs, `pkg @ url` direct references,
+plain `http://` URLs, environment markers, and values starting with `-`. This
+matters because the specifier is passed to `uv pip install`, which runs the
+build backend of the referenced project.
+
+Packages on `github.ibm.com` or `research.github.ibm.com` are only installable
+where the validator has access to those hosts.
 
 In all cases, the referenced package must follow the ADO custom experiment
 format and the standardized benchmark packaging protocol.

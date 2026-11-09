@@ -442,13 +442,121 @@ class TestExperimentConfig:
         )
 
     @pytest.mark.parametrize(
-        "spec", ["./packages/my-benchmark", "/usr/local/my-pkg", "~/my-pkg"]
+        "spec",
+        [
+            "sorting-benchmarks",
+            "sorting_benchmarks",
+            "pkg.name",
+            "pkg==1.2.3",
+            "pkg>=1.0,<2",
+            "pkg >= 1.0, < 2",
+            "pkg~=1.4",
+            "pkg[ado]",
+            "pkg[ado,extra]>=1.0",
+            "https://github.com/org/repo",
+            "https://github.com/org/repo.git",
+            "https://github.ibm.com/org/repo.git",
+            "git+https://github.com/org/repo.git@main",
+            "git+https://github.com/org/repo.git@21e38a9#egg=pkg",
+            "git+ssh://git@github.com/org/repo.git@21e38a9[ado]",
+            "ssh://git@github.com/org/repo.git",
+            "git@github.com:org/repo.git",
+            "git@github.ibm.com/org/repo.git@branch",
+            # Every allowed host over every HTTPS and SSH form
+            *(
+                form.format(host=host)
+                for host in (
+                    "github.com",
+                    "github.ibm.com",
+                    "research.github.ibm.com",
+                    "GitHub.com",
+                )
+                for form in (
+                    "https://{host}/org/repo",
+                    "git+https://{host}/org/repo.git@v1.0",
+                    "ssh://git@{host}/org/repo.git",
+                    "git+ssh://git@{host}/org/repo.git@main[ado]",
+                    "git@{host}:org/repo.git",
+                    "git@{host}/org/repo.git@branch",
+                )
+            ),
+        ],
     )
-    def test_local_paths_rejected(self, spec: str) -> None:
-        """Test that local paths are rejected."""
+    def test_allowed_specifiers_accepted(self, spec: str) -> None:
+        """Test that PyPI names and remote git URLs are accepted."""
+        config = ExperimentConfig.model_validate(_cfg(_pkg(spec, "exp_one")))
+        assert config.packages[0].requirement_specifier == spec
+
+    @pytest.mark.parametrize(
+        "spec",
+        [
+            # Local paths in every form
+            "./packages/my-benchmark",
+            "/usr/local/my-pkg",
+            "~/my-pkg",
+            "experiments/evil",
+            "sub/dir",
+            "../evil",
+            "evil/",
+            "C:\\evil",
+            "..",
+            # file URLs and direct references
+            "file:///tmp/evil",
+            "git+file:///tmp/evil",
+            "pkg @ file:///tmp/evil",
+            "pkg @ https://github.com/org/repo",
+            # installer option injection
+            "--no-deps",
+            "--index-url=https://evil.example/simple",
+            "-e",
+            "-r requirements.txt",
+            # plain http, unsupported schemes, missing path
+            "http://github.com/org/repo",
+            "git+http://github.com/org/repo",
+            "ftp://example.com/pkg.tar.gz",
+            "https://github.com",
+            "https://github.com/",
+            # whitespace-separated extra tokens and markers
+            "pkg evil",
+            "https://github.com/org/repo --no-deps",
+            'pkg; python_version < "3.13"',
+            # hosts not on the allowlist
+            "https://gitlab.com/org/repo",
+            "git+https://bitbucket.org/org/repo.git",
+            "git@bitbucket.org:org/repo.git",
+            "ssh://git@gitlab.com/org/repo.git",
+            "https://evil.example/org/repo",
+            # look-alike and sub/sibling domains of allowed hosts
+            "https://github.com.evil.com/org/repo",
+            "https://evilgithub.com/org/repo",
+            "https://api.github.com/org/repo",
+            "https://raw.github.com/org/repo",
+            "https://other.github.ibm.com/org/repo",
+            "https://ibm.com/org/repo",
+            "git@github.com.evil.com:org/repo.git",
+            # allowed host appearing only in the path
+            "https://evil.com/github.com/org/repo",
+            # user info / credentials in the URL
+            "https://github.com@evil.com/org/repo",
+            "https://token@github.com/org/repo",
+            "https://user:pass@github.ibm.com/org/repo",
+            # ports
+            "https://github.com:443/org/repo",
+            "ssh://git@github.com:22/org/repo.git",
+            # SSH user other than git
+            "ssh://bob@github.com/org/repo.git",
+            "git+ssh://root@github.ibm.com/org/repo.git",
+            "bob@github.com:org/repo.git",
+            # path that does not start with a normal segment
+            "https://github.com//evil",
+            "git@github.com:-oProxyCommand=evil",
+        ],
+    )
+    def test_disallowed_specifiers_rejected(self, spec: str) -> None:
+        """Test that local paths, file URLs and installer options are rejected."""
         with pytest.raises(ValidationError) as exc_info:
             ExperimentConfig.model_validate(_cfg(_pkg(spec, "exp_one")))
-        assert "local paths are not allowed" in str(exc_info.value).lower()
+        assert "invalid requirement_specifier" in str(exc_info.value).lower()
 
     def test_empty_experiments_list_rejected(self) -> None:
         """Test that an empty experiments list is rejected."""
@@ -541,11 +649,11 @@ class TestExperimentPackageList:
         config = ExperimentConfig.model_validate(
             _cfg(
                 _pkg(
-                    "git+ssh://git@host/org/repo.git@21e38a9[ado]",
+                    "git+ssh://git@github.com/org/repo.git@21e38a9[ado]",
                     {"experimentIdentifier": "exp", "experimentVersion": "1.2.3"},
                 ),
                 _pkg(
-                    "git+ssh://git@host/org/repo.git@5489863[ado]",
+                    "git+ssh://git@github.com/org/repo.git@5489863[ado]",
                     {"experimentIdentifier": "exp", "experimentVersion": "1.3.0"},
                 ),
             )
@@ -593,7 +701,7 @@ class TestExperimentPackageList:
         """Specifiers are assumed static; branches, tags and ranges are accepted."""
         config = ExperimentConfig.model_validate(
             _cfg(
-                _pkg("git+ssh://git@h/org/repo.git@main", "e"),
+                _pkg("git+ssh://git@github.com/org/repo.git@main", "e"),
                 _pkg("pkg>=2.0", "e"),
             )
         )

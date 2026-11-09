@@ -102,6 +102,9 @@ def install_packages(
                 "install",
                 "--python",
                 str(python_path),
+                # "--" ends option parsing so a requirement can never be
+                # interpreted as a uv flag (e.g. --index-url=...).
+                "--",
                 "ado-core",
                 *requirements,
             ],
