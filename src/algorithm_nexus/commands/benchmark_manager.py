@@ -47,6 +47,7 @@ from algorithm_nexus.models import (
     ExperimentConfig,
     ExperimentSpecifier,
     ValidationReport,
+    validate_remote_requirement_specifier,
 )
 
 console = Console()
@@ -494,12 +495,17 @@ class BenchmarkManager:
             requirement: The requirement specifier from nexus.yaml
 
         Returns:
-            Resolved requirement string (local path or package specifier)
+            Resolved requirement string (PyPI specifier or git+ URL). Local
+            paths are never produced: the value is passed to ``uv pip install``,
+            which would execute the build backend of a local directory.
+
+        Raises:
+            ValueError: If the requirement is not an allowed remote specifier.
         """
-        # Check if it's a local path
-        resolved_path = self.repo_root / requirement.lstrip("./")
-        if resolved_path.exists():
-            return str(resolved_path)
+        # Defense in depth: never turn a manifest value into anything that is
+        # not an allowlisted PyPI name or remote URL, even if the caller skipped
+        # schema validation.
+        requirement = validate_remote_requirement_specifier(requirement)
 
         # Already has git+ scheme (e.g. git+https://, git+ssh://, git+http://)
         if requirement.startswith("git+"):
@@ -518,8 +524,8 @@ class BenchmarkManager:
             # If formatted like git@host/path -> git+ssh://git@host/path
             return f"git+ssh://{requirement}"
 
-        # HTTP/HTTPS URLs (e.g. https://github.com/..., https://github.ibm.com/...) -> git+https://...
-        if requirement.startswith(("https://", "http://")):
+        # HTTPS URLs (e.g. https://github.com/..., https://github.ibm.com/...) -> git+https://...
+        if requirement.startswith("https://"):
             return f"git+{requirement}"
 
         return requirement

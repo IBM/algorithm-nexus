@@ -52,7 +52,6 @@ class TestVenvManager:
         requirements = [
             "git+https://github.com/user/repo.git",
             "package-name==1.0.0",
-            "./local/path",
         ]
 
         install_packages(venv_path, requirements, verbose=False)
@@ -62,9 +61,19 @@ class TestVenvManager:
 
         assert "git+https://github.com/user/repo.git" in call_args
         assert "package-name==1.0.0" in call_args
-        assert "./local/path" in call_args
 
         shutil.rmtree(venv_path.parent, ignore_errors=True)
+
+    @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
+    def test_install_packages_ends_option_parsing_before_requirements(self, mock_run):
+        """Test that requirements follow '--' so they can't be read as uv options."""
+        mock_run.return_value = MagicMock(stdout="", returncode=0)
+
+        install_packages(Path("/nonexistent/venv"), ["pkg"], verbose=False)
+
+        call_args = mock_run.call_args[0][0]
+        separator = call_args.index("--")
+        assert call_args[separator + 1 :] == ["ado-core", "pkg"]
 
 
 class TestResolveBenchmarkPackageRequirement:
@@ -74,7 +83,7 @@ class TestResolveBenchmarkPackageRequirement:
         from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
 
         self.manager = BenchmarkManager(pr_url=None, execute=False)
-        self.manager.repo_root = Path("/nonexistent")  # no local paths will resolve
+        self.manager.repo_root = Path("/nonexistent")
 
     def test_https_github_url_gets_git_prefix(self):
         result = self.manager._resolve_benchmark_package_requirement(
@@ -112,6 +121,23 @@ class TestResolveBenchmarkPackageRequirement:
     def test_pypi_package_unchanged(self):
         result = self.manager._resolve_benchmark_package_requirement("mypackage==1.2.3")
         assert result == "mypackage==1.2.3"
+
+    @pytest.mark.parametrize(
+        "requirement",
+        ["experiments/evil", "sub/dir", "../evil", "--no-deps", "file:///tmp/x"],
+    )
+    def test_existing_local_path_is_never_resolved(self, tmp_path, requirement):
+        """Test that a manifest value is never turned into a filesystem path.
+
+        Regression test: previously any value that existed under repo_root was
+        returned as an absolute path, and uv would execute its build backend.
+        """
+        (tmp_path / "experiments" / "evil").mkdir(parents=True)
+        (tmp_path / "sub" / "dir").mkdir(parents=True)
+        self.manager.repo_root = tmp_path / "experiments"
+
+        with pytest.raises(ValueError, match="Invalid requirement_specifier"):
+            self.manager._resolve_benchmark_package_requirement(requirement)
 
 
 class TestFindBenchmarkSubmissions:
@@ -566,6 +592,113 @@ class TestValidateSeparateVenvs:
         assert "old" not in used
         assert "new" in used
         assert report.failed == 1
+
+
+MALICIOUS_SPECIFIERS = [
+    "experiments/evil",
+    "sub/dir",
+    "../evil",
+    "--no-deps",
+    "--index-url=https://evil.example/simple",
+    "file:///tmp/evil",
+    "pkg @ file:///tmp/evil",
+]
+
+
+class TestMaliciousRequirementSpecifierNeverInstalled:
+    """Regression tests: manifest values outside the allowlist never reach uv.
+
+    A benchmark repository controls experiment_package.yaml. If a value such as
+    "experiments/evil" reached ``uv pip install``, uv would execute the build
+    backend of that attacker-controlled directory.
+    """
+
+    def _make_repo(self, tmp_path: Path, requirement: str) -> Path:
+        """Create a repository with an attacker-style package and a submission."""
+        exp_dir = tmp_path / "experiments" / "evil"
+        sub_dir = exp_dir / "submissions" / "s1"
+        sub_dir.mkdir(parents=True)
+        # Make the path-like specifiers resolve to real directories, as in the PoC.
+        (tmp_path / "sub" / "dir").mkdir(parents=True)
+        (exp_dir / "pyproject.toml").write_text(
+            '[build-system]\nrequires = []\nbuild-backend = "evil_backend"\n'
+            'backend-path = ["."]\n'
+        )
+        (exp_dir / "experiment_package.yaml").write_text(
+            "experiment_package:\n"
+            f"  - requirement_specifier: {requirement!r}\n"
+            "    experiments:\n"
+            "      - experimentIdentifier: pwn\n"
+        )
+        (sub_dir / "space.yaml").write_text(
+            "experiments:\n"
+            "- actuatorIdentifier: custom_experiments\n"
+            "  experimentIdentifier: pwn\n"
+        )
+        return tmp_path / "experiments"
+
+    @staticmethod
+    def _assert_allowlisted(reqs: list[str], forbidden: str) -> None:
+        from algorithm_nexus.models import validate_remote_requirement_specifier
+
+        for req in reqs:
+            assert forbidden not in req
+            # Every token handed to uv must itself pass the allowlist.
+            validate_remote_requirement_specifier(req)
+
+    @pytest.mark.parametrize("requirement", MALICIOUS_SPECIFIERS)
+    def test_validate_experiments_never_installs_manifest_value(
+        self, tmp_path, monkeypatch, requirement
+    ):
+        """End-to-end over ``validate`` with the experiments_root (non-PR) flow."""
+        from algorithm_nexus.commands import ado_validator, venv_manager
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+        from algorithm_nexus.models import ValidationResult
+
+        root = self._make_repo(tmp_path, requirement)
+        installed: list[list[str]] = []
+
+        def fake_install(venv, reqs, verbose=False):
+            installed.append(list(reqs))
+            return True
+
+        monkeypatch.setattr(
+            venv_manager, "create_temp_venv", lambda *a, **k: tmp_path / "venv"
+        )
+        monkeypatch.setattr(venv_manager, "install_packages", fake_install)
+        monkeypatch.setattr(
+            venv_manager, "verify_experiments_installed", lambda *a, **k: (True, [])
+        )
+        monkeypatch.setattr(venv_manager, "cleanup_venv", lambda *a, **k: None)
+        monkeypatch.setattr(
+            ado_validator,
+            "validate_with_ado",
+            lambda base_path, submission_path, venv_path: ValidationResult(
+                success=True, submission_path=submission_path, errors=[], warnings=[]
+            ),
+        )
+
+        BenchmarkManager(pr_url=None, execute=False).validate(experiments_root=root)
+
+        for reqs in installed:
+            self._assert_allowlisted(reqs, requirement)
+
+    @pytest.mark.parametrize("requirement", MALICIOUS_SPECIFIERS)
+    def test_pr_mode_dependency_resolution_drops_manifest_value(
+        self, tmp_path, requirement
+    ):
+        """PR mode installs what get_benchmark_packages_for_submission returns."""
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        self._make_repo(tmp_path, requirement)
+        manager = BenchmarkManager(pr_url=None, execute=False)
+        manager.repo_root = tmp_path
+
+        packages = manager.get_benchmark_packages_for_submission(
+            Path("experiments/evil/submissions/s1")
+        )
+
+        assert packages == set()
 
 
 class TestSelectPackageIndex:

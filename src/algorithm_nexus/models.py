@@ -71,24 +71,74 @@ def validate_hf_model_id(v: str) -> str:
     return v
 
 
-def validate_remote_requirement_specifier(v: str) -> str:
-    """Validate that a requirement specifier points to GitHub or PyPI, not a local path.
+# PEP 508 package name, optional extras and optional version specifiers, e.g.
+# "pkg", "pkg[ado]", "pkg>=1.0,<2", "pkg[a,b] == 1.2.3". Direct references
+# ("pkg @ url"), environment markers and anything path-like are rejected.
+_PYPI_REQUIREMENT_PATTERN = re.compile(
+    r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?"  # name
+    r"(?:\[\s*[A-Za-z0-9][A-Za-z0-9._-]*(?:\s*,\s*[A-Za-z0-9][A-Za-z0-9._-]*)*\s*\])?"  # extras
+    r"(?:\s*(?:~=|===|==|!=|<=|>=|<|>)\s*[A-Za-z0-9.*+!_-]+"  # first specifier
+    r"(?:\s*,\s*(?:~=|===|==|!=|<=|>=|<|>)\s*[A-Za-z0-9.*+!_-]+)*)?$"  # further specifiers
+)
 
-    Local paths (starting with '.', '/', or '~') are not allowed. The specifier
-    must be either a PyPI package name (optionally with a version constraint) or
-    a GitHub repository URL.
+# Git hosts that experiment packages may be installed from. Hosts are matched
+# exactly (case-insensitive): subdomains, ports and user info are not allowed.
+ALLOWED_GIT_HOSTS: tuple[str, ...] = (
+    "github.com",
+    "github.ibm.com",
+    "research.github.ibm.com",
+)
+
+# Remote git URLs on an allowed host, over HTTPS or SSH:
+#   https://<host>/<path>          git+https://<host>/<path>
+#   ssh://git@<host>/<path>        git+ssh://git@<host>/<path>
+#   git@<host>:<path>              git@<host>/<path>
+# The host must be immediately followed by "/" (or ":" in the scp-like form), so
+# look-alikes such as "github.com.evil.com" or "github.com@evil.com" are rejected.
+# HTTPS URLs must not carry credentials, and the SSH user must be "git". Plain
+# http://, file:// and whitespace anywhere in the URL are not accepted.
+_HOST = "(?i:" + "|".join(re.escape(h) for h in ALLOWED_GIT_HOSTS) + ")"
+_PATH = r"[A-Za-z0-9][A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]*"
+_REMOTE_URL_PATTERN = re.compile(
+    rf"^(?:(?:git\+)?https://{_HOST}/{_PATH}"
+    rf"|(?:git\+)?ssh://git@{_HOST}/{_PATH}"
+    rf"|git@{_HOST}[:/]{_PATH})$"
+)
+
+
+def validate_remote_requirement_specifier(v: str) -> str:
+    """Validate that a requirement specifier points to PyPI or an allowed git host.
+
+    The specifier must match a strict allowlist:
+
+    - a PyPI package name, optionally with extras and version specifiers
+      (e.g. ``pkg``, ``pkg[ado]>=1.0,<2``)
+    - a git URL on one of ``ALLOWED_GIT_HOSTS`` over HTTPS (``https://``,
+      ``git+https://``) or SSH (``ssh://git@``, ``git+ssh://git@``, or the
+      scp-like ``git@host:org/repo``)
+
+    Anything else is rejected, including other git hosts, local paths in any
+    form (``./pkg``, ``/abs/pkg``, ``~/pkg``, ``sub/dir``, ``../pkg``),
+    ``file://`` URLs, ``pkg @ url`` direct references, plain ``http://`` URLs,
+    credentials or ports in URLs, and values starting with ``-`` that would be
+    interpreted as installer options. These values end up as arguments to
+    ``uv pip install``, which executes the build backend of the referenced
+    project, so local paths must never be accepted.
     """
     stripped = v.strip()
     if not stripped:
         msg = "requirement_specifier must not be empty"
         raise ValueError(msg)
-    if stripped.startswith((".", "/", "~")):
-        msg = (
-            "requirement_specifier must be a PyPI package name or a GitHub URL. "
-            "Local paths are not allowed."
-        )
-        raise ValueError(msg)
-    return v
+    if _PYPI_REQUIREMENT_PATTERN.match(stripped) or _REMOTE_URL_PATTERN.match(stripped):
+        return stripped
+    msg = (
+        f"Invalid requirement_specifier {stripped!r}: must be a PyPI package name "
+        "(optionally with extras and version specifiers) or a git URL over HTTPS "
+        "or SSH on one of: " + ", ".join(ALLOWED_GIT_HOSTS) + ". "
+        "Local paths, other hosts, file:// URLs, direct references, credentials "
+        "in URLs and installer options are not allowed."
+    )
+    raise ValueError(msg)
 
 
 class ExperimentEntry(BaseModel):
