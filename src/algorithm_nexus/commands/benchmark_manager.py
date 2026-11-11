@@ -33,6 +33,7 @@ try:
     )
     from ado.utilities.output import pydantic_model_as_yaml
     from rich.console import Console
+    from rich.markup import escape
 except ImportError:
     print(
         "Error: CLI dependencies are not installed.\n"
@@ -40,6 +41,8 @@ except ImportError:
         file=sys.stderr,
     )
     sys.exit(1)
+
+from pydantic import ValidationError
 
 from algorithm_nexus.commands.utils import strip_ansi_codes
 from algorithm_nexus.models import (
@@ -54,6 +57,22 @@ console_err = Console(stderr=True)
 
 
 # Random walk operation template using DiscoveryOperationResourceConfiguration
+def _format_config_error(error: Exception) -> str:
+    """Render an experiment_package.yaml load error as readable text.
+
+    Pydantic validation errors are rendered one per line as ``<field path>: <message>``
+    so they stay readable; any other error (e.g. a YAML syntax error) is
+    rendered as its string form.
+    """
+    if isinstance(error, ValidationError):
+        lines = []
+        for err in error.errors():
+            loc = ".".join(str(part) for part in err["loc"]) or "<root>"
+            lines.append(f"{loc}: {err['msg']}")
+        return "\n".join(lines)
+    return str(error)
+
+
 def create_random_walk_operation_config(
     space_id: str,
     metadata_name: str = "randomwalk-all",
@@ -1138,13 +1157,16 @@ class BenchmarkManager:
 
     def _scan_experiments(
         self, experiments_root: Path, experiment_filter: str | None = None
-    ) -> list[tuple[str, Path, ExperimentConfig | None, list[Path]]]:
+    ) -> list[tuple[str, Path, ExperimentConfig | None, str | None, list[Path]]]:
         """Scan experiments directory and return structured per-experiment data.
 
         For each experiment directory returns a tuple of:
-          (experiment_name, experiment_dir, experiment_config_or_None, submission_paths)
+          (experiment_name, experiment_dir, experiment_config_or_None,
+           config_error_or_None, submission_paths)
 
         experiment_config is None when experiment_package.yaml is absent or invalid.
+        config_error holds a human-readable description of why
+        experiment_package.yaml could not be loaded, or None if it is absent or valid.
         submission_paths are relative to self.repo_root.
 
         Args:
@@ -1152,7 +1174,8 @@ class BenchmarkManager:
             experiment_filter: Optional experiment name to filter by
 
         Returns:
-            List of (name, dir, config, submissions) tuples, sorted by name
+            List of (name, dir, config, config_error, submissions) tuples,
+            sorted by name
         """
         results = []
 
@@ -1165,6 +1188,7 @@ class BenchmarkManager:
 
             # Phase 1 — optional experiment_package.yaml
             experiment_config: ExperimentConfig | None = None
+            config_error: str | None = None
             experiment_yaml = exp_dir / "experiment_package.yaml"
             if experiment_yaml.is_file():
                 try:
@@ -1172,10 +1196,7 @@ class BenchmarkManager:
                         yaml.safe_load(experiment_yaml.read_text())
                     )
                 except Exception as e:
-                    console.print(
-                        f"[yellow]Warning:[/yellow] Could not parse "
-                        f"{experiment_yaml}: {e}"
-                    )
+                    config_error = _format_config_error(e)
 
             # Phase 2 — optional submissions directory
             submissions: list[Path] = []
@@ -1187,7 +1208,9 @@ class BenchmarkManager:
                     if instance_dir.is_dir() and (instance_dir / "space.yaml").exists()
                 )
 
-            results.append((exp_dir.name, exp_dir, experiment_config, submissions))
+            results.append(
+                (exp_dir.name, exp_dir, experiment_config, config_error, submissions)
+            )
 
         return results
 
@@ -1324,15 +1347,19 @@ class BenchmarkManager:
                 return ValidationReport(instances=[], successful=0, failed=0, total=0)
 
             console.print(f"\n[bold]Found {len(experiments)} experiment(s):[/bold]")
-            for exp_name, _, exp_cfg, submissions in experiments:
-                pkg_label = (
-                    "package: "
-                    + ", ".join(p.requirement_specifier for p in exp_cfg.packages)
-                    if exp_cfg
-                    else "no package"
-                )
+            for exp_name, _, exp_cfg, cfg_error, submissions in experiments:
+                if exp_cfg:
+                    pkg_label = "package: " + ", ".join(
+                        p.requirement_specifier for p in exp_cfg.packages
+                    )
+                elif cfg_error:
+                    pkg_label = "invalid experiment_package.yaml"
+                else:
+                    pkg_label = "no package"
                 console.print(
-                    f"  • {exp_name}  [{pkg_label}, {len(submissions)} submission(s)]"
+                    escape(
+                        f"  • {exp_name}  [{pkg_label}, {len(submissions)} submission(s)]"
+                    )
                 )
 
             all_results = []
@@ -1343,8 +1370,39 @@ class BenchmarkManager:
             console.print("\n[bold]Validating experiments...[/bold]")
             console.print("=" * 60)
 
-            for exp_name, _exp_dir, exp_cfg, submissions in experiments:
+            for exp_name, _exp_dir, exp_cfg, cfg_error, submissions in experiments:
                 console.print(f"\n[bold cyan]Experiment:[/bold cyan] {exp_name}")
+
+                # An invalid experiment_package.yaml is a validation failure in
+                # its own right. Without it, the packages (and ado-core) cannot be
+                # installed, so validating the submissions would only produce
+                # misleading errors: report the parse error and skip them.
+                if cfg_error is not None:
+                    errors = [f"Invalid experiment_package.yaml: {cfg_error}"]
+                    all_results.append(
+                        ValidationResult(
+                            success=False,
+                            submission_path=f"experiments/{exp_name}/experiment_package",
+                            errors=errors,
+                            warnings=[],
+                        ).model_dump()
+                    )
+                    total_failed += 1
+                    total_items += 1
+                    console.print("  [red]✗[/red] Invalid experiment_package.yaml")
+                    for line in cfg_error.splitlines():
+                        console.print(f"    [red]{escape(line)}[/red]")
+                    if submissions:
+                        console.print(
+                            f"  [yellow]Skipping {len(submissions)} submission(s):"
+                            "[/yellow] experiment_package.yaml must be fixed first"
+                        )
+                    if fail_fast:
+                        console.print(
+                            "\n[yellow]Stopping validation (--fail-fast)[/yellow]"
+                        )
+                        break
+                    continue
 
                 # Skip entirely if there is nothing to validate
                 if exp_cfg is None and not submissions:

@@ -568,6 +568,53 @@ class TestValidateSeparateVenvs:
         assert report.failed == 1
 
 
+class TestValidateInvalidExperimentPackage:
+    """An invalid experiment_package.yaml is reported, not hidden by ado errors."""
+
+    # Pre-#350 schema: experiment_package is a mapping, not a list.
+    LEGACY_YAML = (
+        "experiment_package:\n"
+        "  requirement_specifier: pkg==1.0.0\n"
+        "  experiments:\n"
+        "    - exp\n"
+    )
+
+    def test_reports_parse_error_and_skips_submissions(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        from algorithm_nexus.commands import ado_validator, venv_manager
+        from algorithm_nexus.commands.benchmark_manager import BenchmarkManager
+
+        exp = tmp_path / "experiments" / "my_exp"
+        sub = exp / "submissions" / "s1"
+        sub.mkdir(parents=True)
+        (exp / "experiment_package.yaml").write_text(self.LEGACY_YAML)
+        (sub / "space.yaml").write_text("experiments: []\n")
+
+        def fail(*a, **k):
+            raise AssertionError("must not be called for an invalid config")
+
+        monkeypatch.setattr(venv_manager, "create_temp_venv", fail)
+        monkeypatch.setattr(venv_manager, "install_packages", fail)
+        monkeypatch.setattr(ado_validator, "validate_with_ado", fail)
+
+        manager = BenchmarkManager(pr_url=None, execute=False)
+        report = manager.validate(experiments_root=tmp_path / "experiments")
+
+        assert report.failed == 1
+        assert report.successful == 0
+        assert report.total == 1
+        (result,) = report.instances
+        assert result["submission_path"] == "experiments/my_exp/experiment_package"
+        assert "Invalid experiment_package.yaml" in result["errors"][0]
+        assert "experiment_package: Input should be a valid list" in result["errors"][0]
+
+        out = capsys.readouterr().out
+        assert "Input should be a valid list" in out
+        assert "Skipping 1 submission(s)" in out
+        assert "ADO binary not found" not in out
+
+
 class TestSelectPackageIndex:
     def _packages(self):
         from algorithm_nexus.models import ExperimentConfig
