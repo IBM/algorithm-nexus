@@ -615,6 +615,27 @@ class TestValidateInvalidExperimentPackage:
         assert "ADO binary not found" not in out
 
 
+class TestFormatConfigError:
+    def test_never_empty(self):
+        from algorithm_nexus.commands.benchmark_manager import _format_config_error
+
+        assert _format_config_error(ValueError()) == "ValueError"
+        assert _format_config_error(ValueError("  ")) == "ValueError"
+        assert _format_config_error(ValueError("boom")) == "boom"
+
+    def test_pydantic_errors_one_per_line(self):
+        import pydantic
+
+        from algorithm_nexus.commands.benchmark_manager import _format_config_error
+        from algorithm_nexus.models import ExperimentConfig
+
+        with pytest.raises(pydantic.ValidationError) as exc:
+            ExperimentConfig.model_validate({"experiment_package": {}, "extra": 1})
+        lines = _format_config_error(exc.value).splitlines()
+        assert "experiment_package: Input should be a valid list" in lines
+        assert any(line.startswith("extra: ") for line in lines)
+
+
 class TestSelectPackageIndex:
     def _packages(self):
         from algorithm_nexus.models import ExperimentConfig

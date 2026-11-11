@@ -62,15 +62,18 @@ def _format_config_error(error: Exception) -> str:
 
     Pydantic validation errors are rendered one per line as ``<field path>: <message>``
     so they stay readable; any other error (e.g. a YAML syntax error) is
-    rendered as its string form.
+    rendered as its string form. The result is never empty, falling back to the
+    exception type name when the error carries no message.
     """
     if isinstance(error, ValidationError):
         lines = []
         for err in error.errors():
             loc = ".".join(str(part) for part in err["loc"]) or "<root>"
             lines.append(f"{loc}: {err['msg']}")
-        return "\n".join(lines)
-    return str(error)
+        message = "\n".join(lines)
+    else:
+        message = str(error).strip()
+    return message or type(error).__name__
 
 
 def create_random_walk_operation_config(
@@ -1348,11 +1351,11 @@ class BenchmarkManager:
 
             console.print(f"\n[bold]Found {len(experiments)} experiment(s):[/bold]")
             for exp_name, _, exp_cfg, cfg_error, submissions in experiments:
-                if exp_cfg:
+                if exp_cfg is not None:
                     pkg_label = "package: " + ", ".join(
                         p.requirement_specifier for p in exp_cfg.packages
                     )
-                elif cfg_error:
+                elif cfg_error is not None:
                     pkg_label = "invalid experiment_package.yaml"
                 else:
                     pkg_label = "no package"
