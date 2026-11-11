@@ -213,13 +213,13 @@ def output_data(
         # Add columns with appropriate styling
         for header in headers:
             if "package" in header.lower() and "nexus" in header.lower():
-                table.add_column(header, style="cyan")
+                table.add_column(header, style="cyan", overflow="fold")
             elif "package" in header.lower():
-                table.add_column(header, style="yellow")
+                table.add_column(header, style="yellow", overflow="fold")
             elif "experiment" in header.lower():
-                table.add_column(header, style="white")
+                table.add_column(header, style="white", overflow="fold")
             else:
-                table.add_column(header)
+                table.add_column(header, overflow="fold")
 
         # Add rows
         for row in data:
@@ -372,9 +372,9 @@ def print_results_table(
         details_column: Header label for the third column.
     """
     table = Table(title=f"\n{title}", show_header=True)
-    table.add_column("Instance", style="cyan")
+    table.add_column("Instance", style="cyan", overflow="fold")
     table.add_column("Status", style="bold")
-    table.add_column(details_column)
+    table.add_column(details_column, overflow="fold")
 
     for row in rows:
         status = row.get("status", "unknown")
