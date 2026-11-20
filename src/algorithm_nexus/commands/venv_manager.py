@@ -5,10 +5,12 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -26,6 +28,9 @@ if TYPE_CHECKING:
     from algorithm_nexus.models import ExperimentEntry
 
 console = Console()
+
+# Number of trailing stderr lines to include when `ado` fails.
+_ADO_STDERR_TAIL_LINES = 20
 
 
 def create_temp_venv(system_site_packages: bool = True) -> Path:
@@ -117,60 +122,137 @@ def install_packages(
         return False
 
 
+# Run with the venv's Python to dump every experiment in ado's actuator registry as
+# JSON on the last line of stdout. Registry initialisation may print to stdout, so
+# only the last line is parsed.
+_LIST_EXPERIMENTS_SCRIPT = """
+import json
+from ado.modules.actuators.registry import ActuatorRegistry
+
+registry = ActuatorRegistry.globalRegistry()
+experiments = [
+    {
+        "actuatorIdentifier": actuator_id,
+        "experimentIdentifier": experiment.identifier,
+        "version": experiment.version,
+        "targetProperties": [t.identifier for t in experiment.targetProperties],
+    }
+    for actuator_id in sorted(registry.actuatorIdentifierMap)
+    for experiment in registry.catalogForActuatorIdentifier(actuator_id).experiments
+]
+print()
+print(json.dumps(experiments))
+"""
+
+
+@dataclass(frozen=True)
+class InstalledExperiment:
+    """An experiment found in ado's actuator registry of a validation venv."""
+
+    actuatorIdentifier: str
+    experimentIdentifier: str
+    version: str | None
+    targetProperties: tuple[str, ...]
+
+
+def list_installed_experiments(
+    venv_path: Path,
+    verbose: bool = False,
+) -> tuple[list[InstalledExperiment] | None, list[str]]:
+    """List the experiments, with their target properties, installed in a venv.
+
+    Queries ado's actuator registry with the venv's Python interpreter.
+
+    Returns:
+        Tuple of (experiments or None on failure, list_of_error_strings)
+    """
+    python = venv_path / "bin" / "python"
+    if not python.is_file():
+        return None, ["Python interpreter not found in the virtual environment."]
+
+    try:
+        result = subprocess.run(  # noqa: S603
+            [str(python), "-c", _LIST_EXPERIMENTS_SCRIPT],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=120,
+        )
+    except subprocess.TimeoutExpired:
+        return None, ["Timed out waiting for ado's actuator registry"]
+    except Exception as e:
+        return None, [f"Failed to query ado's actuator registry: {e}"]
+
+    if verbose:
+        console.print(f"  [dim]ado registry stdout:[/dim]\n{result.stdout}")
+        if result.stderr:
+            console.print(f"  [dim]stderr:[/dim]\n{result.stderr}")
+
+    if result.returncode != 0:
+        # ado itself failed: report that rather than claiming every experiment is
+        # missing, which would point at the wrong culprit (the benchmark package).
+        details = (result.stderr.strip() or result.stdout.strip()).splitlines()
+        tail = "\n".join(details[-_ADO_STDERR_TAIL_LINES:])
+        message = (
+            f"Querying ado's actuator registry failed with exit code "
+            f"{result.returncode}; could not verify experiments. This usually "
+            "indicates a problem with ado-core or its dependencies in the "
+            "validation environment, not with the experiment package."
+        )
+        if tail:
+            message += f"\n{tail}"
+        return None, [message]
+
+    lines = result.stdout.strip().splitlines()
+    try:
+        raw = json.loads(lines[-1]) if lines else None
+        if not isinstance(raw, list):
+            raise ValueError("expected a JSON list")
+        experiments = [
+            InstalledExperiment(
+                actuatorIdentifier=e["actuatorIdentifier"],
+                experimentIdentifier=e["experimentIdentifier"],
+                version=e.get("version"),
+                targetProperties=tuple(e.get("targetProperties") or ()),
+            )
+            for e in raw
+        ]
+    except (ValueError, KeyError, TypeError) as e:
+        return None, [f"Could not parse ado's actuator registry output: {e}"]
+    return experiments, []
+
+
 def verify_experiments_installed(
     venv_path: Path,
     experiments: list[ExperimentEntry],
     verbose: bool = False,
-) -> tuple[bool, list[str]]:
+) -> tuple[bool, list[str], list[InstalledExperiment] | None]:
     """Verify that the declared experiment IDs are discoverable after package install.
 
-    Runs `ado describe experiments` in the venv and checks that each declared
-    experiment ID appears in the output.
+    Queries ado's actuator registry in the venv and checks that each declared
+    experiment ID is registered. Only identifiers are checked, not versions.
 
     Args:
         venv_path: Path to the virtual environment
         experiments: Experiments (ExperimentEntry objects) to verify.
-            Only identifiers are checked; versions are not reported by
-            `ado get experiments`.
         verbose: Whether to show command output
 
     Returns:
-        Tuple of (success, list_of_error_strings)
+        Tuple of (success, list_of_error_strings, installed experiments or None
+        when the registry could not be queried)
     """
-    ado_binary = venv_path / "bin" / "ado"
-    if not ado_binary.is_file():
-        return False, [
-            "ADO binary not found in the virtual environment. Make sure ado-core is installed."
-        ]
+    installed, errors = list_installed_experiments(venv_path, verbose=verbose)
+    if installed is None:
+        return False, errors, None
 
-    try:
-        result = subprocess.run(  # noqa: S603
-            [str(ado_binary), "get", "experiments"],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=30,
-        )
-    except subprocess.TimeoutExpired:
-        return False, ["Timed out waiting for `ado get experiments`"]
-    except Exception as e:
-        return False, [f"Failed to run `ado get experiments`: {e}"]
-
-    if verbose:
-        console.print(f"  [dim]ado get experiments stdout:[/dim]\n{result.stdout}")
-        if result.stderr:
-            console.print(f"  [dim]stderr:[/dim]\n{result.stderr}")
-
-    output = result.stdout + result.stderr
-    experiment_ids = [e.experimentIdentifier for e in experiments]
+    installed_ids = {e.experimentIdentifier for e in installed}
     errors = [
-        f"Experiment '{exp_id}' not found after installing package "
-        f"(not listed by `ado get experiments`)"
-        for exp_id in experiment_ids
-        if exp_id not in output
+        f"Experiment '{e.experimentIdentifier}' not found after installing package "
+        "(not registered with ado)"
+        for e in experiments
+        if e.experimentIdentifier not in installed_ids
     ]
-
-    return len(errors) == 0, errors
+    return not errors, errors, installed
 
 
 def cleanup_venv(venv_path: Path) -> None:
