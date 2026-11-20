@@ -1033,7 +1033,9 @@ class TestRankingValidation:
 class TestBindingValidation:
     """validate_bindings checks experiments/*/bindings against the benchmarks."""
 
-    def _setup(self, tmp_path: Path, binding: str) -> tuple[Path, Path]:
+    def _setup(
+        self, tmp_path: Path, binding: str, metrics: list[str] | None = None
+    ) -> tuple[Path, Path]:
         benchmarks = tmp_path / "benchmarks"
         inst_dir = benchmarks / "foo" / "instances" / "i1"
         (inst_dir / "models").mkdir(parents=True)
@@ -1043,6 +1045,9 @@ class TestBindingValidation:
                 benchmarkIdentifier="foo",
                 description="d",
                 problemProperties=[Property(identifier="n")],
+                metrics=[Property(identifier=m) for m in metrics]
+                if metrics is not None
+                else None,
             ).model_dump_json(exclude_none=True)
         )
         (inst_dir / "instance.yaml").write_text(
@@ -1173,3 +1178,104 @@ class TestBindingValidation:
         result = runner.invoke(app, args)
         assert result.exit_code == 1
         assert "nope" in result.output
+
+
+class TestBindingMetricValidation:
+    """Binding metrics are checked against the bound experiment's target properties."""
+
+    _setup = TestBindingValidation._setup
+
+    @staticmethod
+    def _catalog(*targets: str, actuator: str = "a"):
+        from algorithm_nexus.commands.venv_manager import InstalledExperiment
+
+        return {
+            "e1": {
+                0: [
+                    InstalledExperiment(
+                        actuatorIdentifier=actuator,
+                        experimentIdentifier="exp1",
+                        version="1.0.0",
+                        targetProperties=targets,
+                    )
+                ]
+            }
+        }
+
+    def _result(
+        self,
+        tmp_path: Path,
+        binding: str = "",
+        metrics: list[str] | None = None,
+        catalogs=None,
+    ) -> dict:
+        from algorithm_nexus.commands.validate import validate_bindings
+
+        exps, benches = self._setup(tmp_path, binding, metrics)
+        results = validate_bindings(exps, benches, experiment_catalogs=catalogs)
+        assert len(results) == 1
+        return results[0]
+
+    MAPPING = (
+        "metricMapping:\n"
+        "  - benchmark: {identifier: objective}\n"
+        "    experiment: {identifier: obj_value}\n"
+    )
+
+    def test_mapped_and_same_named_metrics_pass(self, tmp_path: Path) -> None:
+        result = self._result(
+            tmp_path,
+            self.MAPPING,
+            metrics=["objective", "runtime"],
+            catalogs=self._catalog("obj_value", "runtime"),
+        )
+        assert result["status"] == "success"
+        assert result["warnings"] == []
+
+    def test_mapping_to_unknown_target_property_fails(self, tmp_path: Path) -> None:
+        result = self._result(
+            tmp_path,
+            self.MAPPING,
+            metrics=["objective"],
+            catalogs=self._catalog("runtime"),
+        )
+        assert result["status"] == "failed"
+        errs = " ".join(result["errors"])
+        assert "'obj_value', which is not a target property" in errs
+        assert "runtime" in errs
+
+    def test_unmapped_metric_without_target_property_warns(
+        self, tmp_path: Path
+    ) -> None:
+        result = self._result(
+            tmp_path,
+            self.MAPPING,
+            metrics=["objective", "runtime"],
+            catalogs=self._catalog("obj_value"),
+        )
+        assert result["status"] == "success"
+        assert len(result["warnings"]) == 1
+        assert (
+            "Benchmark metric 'runtime' has no metricMapping" in (result["warnings"][0])
+        )
+
+    def test_experiment_from_other_actuator_fails(self, tmp_path: Path) -> None:
+        result = self._result(
+            tmp_path, catalogs=self._catalog("objective", actuator="other")
+        )
+        assert result["status"] == "failed"
+        assert "is not provided by its experiment package" in " ".join(result["errors"])
+
+    def test_failed_package_skips_metric_checks_with_warning(
+        self, tmp_path: Path
+    ) -> None:
+        result = self._result(
+            tmp_path, self.MAPPING, metrics=["objective"], catalogs={"e1": {0: None}}
+        )
+        assert result["status"] == "success"
+        assert "Metrics not checked" in " ".join(result["warnings"])
+
+    def test_without_catalogs_metric_checks_are_skipped(self, tmp_path: Path) -> None:
+        result = self._result(tmp_path, self.MAPPING, metrics=["objective"])
+        assert result["status"] == "success"
+        assert result["warnings"] == []

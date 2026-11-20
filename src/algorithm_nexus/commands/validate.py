@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Annotated, Any, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 try:
     import typer
@@ -41,6 +41,9 @@ from algorithm_nexus.models import (
     InstanceBinding,
     LogicalBenchmarkDefinition,
 )
+
+if TYPE_CHECKING:
+    from algorithm_nexus.commands.venv_manager import InstalledExperiment
 
 console = Console()
 
@@ -452,10 +455,15 @@ def validate_experiments(
         all_results = list(results.instances)
         total_failed = results.failed
 
-        # Bindings are plain YAML checked against the benchmarks; no venv needed
+        # Bindings are checked against the benchmarks without a venv; the
+        # ado-dependent metric checks reuse the catalogs Phase 1 collected
+        # from each experiment package's venv
         if not pr_url and experiments_root.is_dir() and benchmarks_root.is_dir():
             for binding_result in validate_bindings(
-                experiments_root, benchmarks_root, experiment
+                experiments_root,
+                benchmarks_root,
+                experiment,
+                experiment_catalogs=manager.experiment_catalogs,
             ):
                 if binding_result["status"] == "failed":
                     total_failed += 1
@@ -613,12 +621,19 @@ def validate_bindings(
     experiments_root: Path,
     benchmarks_root: Path,
     experiment_filter: str | None = None,
+    experiment_catalogs: dict[str, dict[int, list[InstalledExperiment] | None]]
+    | None = None,
 ) -> list[dict[str, Any]]:
     """Validate every experiments/<name>/bindings/*.yaml against the benchmarks.
 
     Checks schema, that the referenced benchmark and instance exist, that the
     experiment is declared in the experiment package, that metric/property/artifact
     mappings match the benchmark and instance, and that binding identifiers are unique.
+
+    When ``experiment_catalogs`` is given (experiment directory name -> package
+    index -> experiments installed by that package, see
+    ``BenchmarkManager.experiment_catalogs``), the binding's metrics are also
+    checked against the target properties of the bound experiment.
     """
     benchmarks = _index_benchmarks(benchmarks_root)
     seen_ids: dict[str, Path] = {}
@@ -631,11 +646,9 @@ def validate_bindings(
         if experiment_filter and exp_dir.name != experiment_filter:
             continue
 
-        declared_experiments: set[str] | None = None
+        exp_config: ExperimentConfig | None = None
         if (exp_dir / "experiment_package.yaml").is_file():
             exp_config = validate_experiment_yaml(exp_dir, ValidationErrorCollector())
-            if exp_config is not None:
-                declared_experiments = exp_config.experiment_ids
 
         for binding_file in sorted(bindings_dir.iterdir()):
             if (
@@ -648,9 +661,12 @@ def validate_bindings(
             _validate_binding_file(
                 binding_file,
                 benchmarks,
-                declared_experiments,
+                exp_config,
                 seen_ids,
                 collector,
+                None
+                if experiment_catalogs is None
+                else experiment_catalogs.get(exp_dir.name, {}),
             )
             results.append(
                 {
@@ -666,9 +682,10 @@ def validate_bindings(
 def _validate_binding_file(
     binding_file: Path,
     benchmarks: dict[str, tuple[Path, LogicalBenchmarkDefinition]],
-    declared_experiments: set[str] | None,
+    exp_config: ExperimentConfig | None,
     seen_ids: dict[str, Path],
     collector: ValidationErrorCollector,
+    catalogs: dict[int, list[InstalledExperiment] | None] | None = None,
 ) -> None:
     data = load_yaml_file(binding_file, collector)
     if data is None:
@@ -689,7 +706,7 @@ def _validate_binding_file(
         seen_ids[bid] = binding_file
 
     exp_id = binding.experiment.experimentIdentifier
-    if declared_experiments is not None and exp_id not in declared_experiments:
+    if exp_config is not None and exp_id not in exp_config.experiment_ids:
         collector.add(
             f"{binding_file}: experiment '{exp_id}' is not listed in experiment_package.yaml"
         )
@@ -720,6 +737,82 @@ def _validate_binding_file(
         instance=instance,
         instance_root=instance_root,
     )
+
+    if catalogs is not None:
+        _check_binding_metrics(
+            binding, definition, exp_config, catalogs, collector, binding_file
+        )
+
+
+def _check_binding_metrics(
+    binding: InstanceBinding,
+    definition: LogicalBenchmarkDefinition,
+    exp_config: ExperimentConfig | None,
+    catalogs: dict[int, list[InstalledExperiment] | None],
+    collector: ValidationErrorCollector,
+    binding_file: Path,
+) -> None:
+    """Check a binding's metrics against the bound experiment's target properties.
+
+    Every ``metricMapping[].experiment`` must be a target property of the
+    experiment (error). Every benchmark metric without a ``metricMapping`` entry
+    is expected to be a target property with the same name (warning).
+    """
+    from algorithm_nexus.commands.benchmark_manager import select_package_index
+
+    ref = binding.experiment
+    label = f"{ref.actuatorIdentifier}.{ref.experimentIdentifier}"
+    if exp_config is None:
+        return
+    pkg_idx, _ = select_package_index(
+        [ref.model_dump(exclude_none=True)], exp_config.packages
+    )
+    if pkg_idx is None:
+        # Not declared by any package: already reported as an error.
+        return
+    installed = catalogs.get(pkg_idx)
+    if installed is None:
+        collector.add_info(
+            f"{binding_file}: Metrics not checked against experiment '{label}': its experiment "
+            "package was not installed or failed verification"
+        )
+        return
+
+    candidates = [
+        e
+        for e in installed
+        if e.experimentIdentifier == ref.experimentIdentifier
+        and e.actuatorIdentifier == ref.actuatorIdentifier
+    ]
+    if not candidates:
+        collector.add(
+            f"{binding_file}: Experiment '{label}' is not provided by its experiment package "
+            f"(package {exp_config.packages[pkg_idx].requirement_specifier!r})"
+        )
+        return
+    experiment = next(
+        (e for e in candidates if e.version == ref.experimentVersion), candidates[0]
+    )
+    targets = set(experiment.targetProperties)
+
+    mapped_benchmark_metrics: set[str] = set()
+    for entry in binding.metricMapping or []:
+        mapped_benchmark_metrics.add(entry.benchmark.identifier)
+        if entry.experiment.identifier not in targets:
+            collector.add(
+                f"{binding_file}: metricMapping maps benchmark metric '{entry.benchmark.identifier}' "
+                f"to '{entry.experiment.identifier}', which is not a target property "
+                f"of experiment '{label}' (target properties: "
+                f"{', '.join(sorted(targets)) or 'none'})"
+            )
+
+    for metric in definition.metrics or []:
+        mid = metric.identifier
+        if mid not in mapped_benchmark_metrics and mid not in targets:
+            collector.add_info(
+                f"{binding_file}: Benchmark metric '{mid}' has no metricMapping entry and experiment "
+                f"'{label}' has no target property with that name"
+            )
 
 
 def validate_instance(

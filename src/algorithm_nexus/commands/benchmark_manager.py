@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 try:
     import typer
@@ -51,6 +51,9 @@ from algorithm_nexus.models import (
     ExperimentSpecifier,
     ValidationReport,
 )
+
+if TYPE_CHECKING:
+    from algorithm_nexus.commands.venv_manager import InstalledExperiment
 
 console = Console()
 console_err = Console(stderr=True)
@@ -200,6 +203,12 @@ class BenchmarkManager:
         """
         self.pr_url = pr_url
         self.execute = execute
+        # Filled by validate(): experiment directory name -> package index ->
+        # experiments installed by that package (None when it failed to install
+        # or verify). Used to check bindings against the experiments' properties.
+        self.experiment_catalogs: dict[
+            str, dict[int, list[InstalledExperiment] | None]
+        ] = {}
         self.remote_context_file = remote_context_file
         self.context_file = context_file
         self.actuator_configuration_id_map: dict[str, str] = (
@@ -1420,6 +1429,7 @@ class BenchmarkManager:
                 created_venvs: list[Path] = []
                 package_venvs: dict[int, Path] = {}
                 failed_packages: set[int] = set()
+                catalogs = self.experiment_catalogs.setdefault(exp_name, {})
                 try:
                     # ── Phase 1: experiment_package ──────────────────────────
                     if exp_cfg is not None:
@@ -1444,16 +1454,18 @@ class BenchmarkManager:
                                 total_failed += 1
                                 total_items += 1
                                 failed_packages.add(idx)
+                                catalogs[idx] = None
                                 if fail_fast:
                                     break
                                 continue
 
                             # Verify declared experiments are discoverable
-                            ok, errors = verify_experiments_installed(
+                            ok, errors, installed = verify_experiments_installed(
                                 venv_path,
                                 pkg.experiment_entries,
                                 verbose=verbose,
                             )
+                            catalogs[idx] = installed if ok else None
                             pkg_result = ValidationResult(
                                 success=ok,
                                 submission_path=f"experiments/{exp_name}/experiment_package",

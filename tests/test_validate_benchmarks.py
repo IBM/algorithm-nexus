@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import tempfile
 from pathlib import Path
@@ -14,11 +15,13 @@ import pytest
 
 from algorithm_nexus.commands.ado_validator import validate_space_yaml_syntax
 from algorithm_nexus.commands.venv_manager import (
+    InstalledExperiment,
     cleanup_venv,
     create_temp_venv,
     install_packages,
+    verify_experiments_installed,
 )
-from algorithm_nexus.models import ValidationResult
+from algorithm_nexus.models import ExperimentEntry, ValidationResult
 
 
 class TestVenvManager:
@@ -65,6 +68,109 @@ class TestVenvManager:
         assert "./local/path" in call_args
 
         shutil.rmtree(venv_path.parent, ignore_errors=True)
+
+
+class TestVerifyExperimentsInstalled:
+    """Tests for verify_experiments_installed."""
+
+    @pytest.fixture
+    def venv_path(self, tmp_path):
+        python = tmp_path / "venv" / "bin" / "python"
+        python.parent.mkdir(parents=True)
+        python.touch()
+        return tmp_path / "venv"
+
+    @staticmethod
+    def _registry_output(*experiments):
+        return "registry init noise\n" + json.dumps(
+            [
+                {
+                    "actuatorIdentifier": "custom_experiments",
+                    "experimentIdentifier": exp_id,
+                    "version": "1.0.0",
+                    "targetProperties": targets,
+                }
+                for exp_id, targets in experiments
+            ]
+        )
+
+    @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
+    def test_ado_failure_is_reported_instead_of_missing_experiments(
+        self, mock_run, venv_path
+    ):
+        """A crashing `ado` is reported with its exit code and stderr."""
+        mock_run.return_value = MagicMock(
+            returncode=1, stdout="", stderr="Traceback ...\nKeyError: 'experiment'"
+        )
+
+        ok, errors, installed = verify_experiments_installed(
+            venv_path, [ExperimentEntry(experimentIdentifier="solve_mip")]
+        )
+
+        assert not ok
+        assert installed is None
+        assert len(errors) == 1
+        assert "exit code 1" in errors[0]
+        assert "KeyError: 'experiment'" in errors[0]
+        assert "not registered" not in errors[0]
+
+    @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
+    def test_missing_experiment_reported_when_ado_succeeds(self, mock_run, venv_path):
+        """Experiments absent from ado's registry are reported as missing."""
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout=self._registry_output(("solve_mip", ["objective"])),
+            stderr="",
+        )
+
+        ok, errors, installed = verify_experiments_installed(
+            venv_path,
+            [
+                ExperimentEntry(experimentIdentifier="solve_mip"),
+                ExperimentEntry(experimentIdentifier="other_exp"),
+            ],
+        )
+
+        assert not ok
+        assert len(errors) == 1
+        assert "'other_exp' not found" in errors[0]
+        assert installed is not None
+
+    @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
+    def test_returns_target_properties(self, mock_run, venv_path):
+        """The installed experiments are returned with their target properties."""
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout=self._registry_output(("solve_mip", ["objective", "runtime"])),
+            stderr="",
+        )
+
+        ok, errors, installed = verify_experiments_installed(
+            venv_path, [ExperimentEntry(experimentIdentifier="solve_mip")]
+        )
+
+        assert ok
+        assert errors == []
+        assert installed == [
+            InstalledExperiment(
+                actuatorIdentifier="custom_experiments",
+                experimentIdentifier="solve_mip",
+                version="1.0.0",
+                targetProperties=("objective", "runtime"),
+            )
+        ]
+
+    @patch("algorithm_nexus.commands.venv_manager.subprocess.run")
+    def test_unparseable_output_is_reported(self, mock_run, venv_path):
+        mock_run.return_value = MagicMock(returncode=0, stdout="not json", stderr="")
+
+        ok, errors, installed = verify_experiments_installed(
+            venv_path, [ExperimentEntry(experimentIdentifier="solve_mip")]
+        )
+
+        assert not ok
+        assert installed is None
+        assert "Could not parse" in errors[0]
 
 
 class TestResolveBenchmarkPackageRequirement:
@@ -529,13 +635,16 @@ class TestValidateSeparateVenvs:
         monkeypatch.setattr(venv_manager, "create_temp_venv", fake_create)
         monkeypatch.setattr(venv_manager, "install_packages", fake_install)
         monkeypatch.setattr(
-            venv_manager, "verify_experiments_installed", lambda *a, **k: (True, [])
+            venv_manager,
+            "verify_experiments_installed",
+            lambda venv, *a, **k: (True, [], [venv]),
         )
         monkeypatch.setattr(venv_manager, "cleanup_venv", cleaned.append)
         monkeypatch.setattr(ado_validator, "validate_with_ado", fake_validate)
 
         manager = BenchmarkManager(pr_url=None, execute=False)
         report = manager.validate(experiments_root=root)
+        self.manager = manager
         return report, created, installed, cleaned, used
 
     def test_each_package_gets_its_own_venv(self, tmp_path, monkeypatch):
@@ -566,6 +675,18 @@ class TestValidateSeparateVenvs:
         assert "old" not in used
         assert "new" in used
         assert report.failed == 1
+
+    def test_catalogs_recorded_per_package(self, tmp_path, monkeypatch):
+        _, created, _, _, _ = self._run(
+            tmp_path,
+            monkeypatch,
+            {"s1": "1.0.0"},
+            install_ok=lambda req: req != "pkg==1.0.0",
+        )
+        # The fake verify returns the venv path as the "catalog"
+        assert self.manager.experiment_catalogs == {
+            "my_exp": {0: None, 1: [created[1]]}
+        }
 
 
 class TestValidateInvalidExperimentPackage:
