@@ -642,9 +642,9 @@ filelock==4.2.9 \
     #   litdata
     #   torch
     #   vllm
-flashinfer-python==0.7.2.post1 \
-    --hash=sha256:af60319898dcfd552ba12a34165b9dd46c0bbd83d48ce665b1df6bd6ae77e9f1 \
-    --hash=sha256:bfdc18b9e1e4d8d0730fe4343dc0e284cd0c160086de80f99888bc4867922d49
+flashinfer-python==0.7.5.post1 \
+    --hash=sha256:27d2b6b32eef26fbabd2c933ebe951951187c81ea5380e689c2ddb41cf279505 \
+    --hash=sha256:aadc64681cca35e1ef4e0471a46ec49190a5e32f15d74b48b06bd2972ed5dd61
     # via vllm
 focal-loss-torch @ git+https://github.com/mathiaszinnen/focal_loss_torch.git@69fd65795f2688c2c302029f383f1b58978c1123
     # via bmfm-targets
