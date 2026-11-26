@@ -572,9 +572,9 @@ filelock==4.2.9 \
     #   huggingface-hub
     #   torch
     #   vllm
-flashinfer-python==0.7.2.post1 \
-    --hash=sha256:af60319898dcfd552ba12a34165b9dd46c0bbd83d48ce665b1df6bd6ae77e9f1 \
-    --hash=sha256:bfdc18b9e1e4d8d0730fe4343dc0e284cd0c160086de80f99888bc4867922d49
+flashinfer-python==0.7.6 \
+    --hash=sha256:09384212478e110c8fa8c3bdf858d964f6182b7ea5d5ad5cd5f93dfba5e2dd6c \
+    --hash=sha256:287a31d0c8314c4370483208a03a2e608c9771ba15f4fe7e7367b53c16627008
     # via vllm
 fonttools==4.68.0 \
     --hash=sha256:04a4868dcfcc23f00bb033147d5afc1a118a992842644c3eb9da55467ab4fd74 \
