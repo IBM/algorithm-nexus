@@ -164,15 +164,15 @@ blinker==1.9.0 \
     # via flask
 bmfm-targets @ git+https://github.com/BiomedSciAI/biomed-multi-omic.git@67bc0b1f6c84c45d21258338ea33071768b9a8a5
     # via algorithm-nexus
-boto3==1.43.117 \
-    --hash=sha256:a5b6cd7e67653987fcf0e212187c16f7b58af2ae192e368f7212ddab7c05b25d \
-    --hash=sha256:f3d314908d866b577ee6b74ed432c21e565c4c4dbd640ef3fd5e0da30fa13a98
+boto3==1.44.12 \
+    --hash=sha256:7459cd7a476eef9a5a8044f5cd6b2dfa47cef0fcb74aefa951e154c5102b1199 \
+    --hash=sha256:9f1cf241303edb523af912ebdc001e0563301d9ba8eef076d25fe9a8bfb6efaf
     # via
     #   litdata
     #   terrakit
-botocore==1.43.117 \
-    --hash=sha256:5920ef9b3002e1361846549078549d9154a6e0004c22853c01ce7b279d05d495 \
-    --hash=sha256:71993702832cc37c2495048b9945f2929d306fccb3fb767e9964e437e637fa6c
+botocore==1.44.12 \
+    --hash=sha256:5806bb66bf167fa3172f4ddf78b088db9b22653702537b19969d02d2c3301ee5 \
+    --hash=sha256:d5df4cf868f2c4050999a0e6bc94e0a039017e719f4e27b2a8e87053856787b9
     # via
     #   aiobotocore
     #   boto3
