@@ -3374,12 +3374,13 @@ tiledbsoma==2.3.0 \
     # via
     #   bmfm-targets
     #   cellxgene-census
-tilelang==0.1.12 \
-    --hash=sha256:595b39581d099a53f875bd8d553863e7e4f58998052b58764f5472cbfbb87043 \
-    --hash=sha256:8741d6cd519782645d55c17abd8986402c62948bc2122d3417c445d11de5dd16 \
-    --hash=sha256:a1701eba4ad603d73f1b128b88f6a2350f1b1161729e5b2d1e540a1ec7a82d52 \
-    --hash=sha256:bbeb5573cbe2544a51a5c9a6cc737c5e3b5c2d95411caa3687fd9b08eb9d5f97 \
-    --hash=sha256:daeb3d529ab9e7665adb94c4bf0d47732294709aa9b8b9bd673fa48001385422
+tilelang==0.1.16 \
+    --hash=sha256:26c190bbe2a65fd5702644e9ee18864ae1cef155f3333209f893b43e032895a5 \
+    --hash=sha256:5d848dedfae41e3c72701c671fa14156c7125162a9ba3b665dd90cddbf5ec2b0 \
+    --hash=sha256:7be7d9f5679a2a8e037d5fa41e66c6921ce242cc6e2f42bb2a01206fdd41f3e6 \
+    --hash=sha256:8810c42670b3dfc8a5aa93548a07b530f796762ee3cebc5cc294e11ada6c92ef \
+    --hash=sha256:d742f040d2bc310b94882cf08981225501acadd166fdccd0c86f308fdfcfbb71 \
+    --hash=sha256:e3ce061d6b1640e569fdcbd2dd4d1df622072a53652bdd7a8101699ce3eadb5b
     # via vllm
 timm==1.0.31 \
     --hash=sha256:5bd50f7d0fe6d09bf9285ac2523234a1b7e6bf075c0be3e7aed09139fcb617c7 \
